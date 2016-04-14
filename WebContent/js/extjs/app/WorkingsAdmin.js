@@ -37,7 +37,6 @@ Ext.onReady(function(){
     	    {name: 'wrk_dtl',	type: 'string'},
     	    {name: 'wrk_in',	type: 'date', dateFormat: 'Y-m-d H:i:s'},
     	    {name: 'wrk_out',	type: 'date', dateFormat: 'Y-m-d H:i:s'}
-    	    //test
         ]
     });
     
