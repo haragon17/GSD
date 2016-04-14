@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security" 
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:util="http://www.springframework.org/schema/util"
+             xmlns:context="http://www.springframework.org/schema/context"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                 http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                 http://www.springframework.org/schema/security 
+                 http://www.springframework.org/schema/security/spring-security-3.1.xsd
+                 http://www.springframework.org/schema/util 
+                 http://www.springframework.org/schema/util/spring-util-3.0.xsd
+                 http://www.springframework.org/schema/context 
+                 http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <global-method-security pre-post-annotations="enabled">
+    </global-method-security>
+
+    <http  use-expressions="true" auto-config="true">
+<!--         <intercept-url pattern="/*" 
+                       access="isAuthenticated()" />
+        <intercept-url pattern="/CreateUser*" 
+                               access="hasRole('EDITOR')" />
+        <intercept-url pattern="/LogListing*" 
+                                       access="hasRole('ADMIN')" /> --> 
+        <intercept-url pattern="/forgotPass.htm" access="isAnonymous()" />   
+        <intercept-url pattern="/chkUserName.htm" access="permitAll" />
+        <intercept-url pattern="/register.htm" access="permitAll" />                            
+        <intercept-url pattern="/*" access="isAuthenticated()" />
+        <logout logout-success-url="/login/"/>
+        <form-login login-page="/login/"
+                    default-target-url="/projects.htm"
+                    authentication-failure-url="/login?access=fail"
+                    always-use-default-target="false" />
+        
+        <remember-me key="rememberMeKey" 
+                     user-service-ref="userDetailsService"/>
+    </http>
+    <beans:bean id="userDetailsService" 
+                class="com.gsd.security.UserDetailServices">
+    </beans:bean>
+    
+    <beans:bean id="encoder" 
+    			class="org.springframework.security.crypto.password.StandardPasswordEncoder" >
+    </beans:bean>
+    
+    <authentication-manager alias="authenManager">
+        <authentication-provider user-service-ref="userDetailsService">
+        <!-- <password-encoder hash="sha" base64="true" /> -->
+        <password-encoder ref="encoder" />
+        </authentication-provider>
+    </authentication-manager>
+    <beans:bean id="messageSource"
+                class="org.springframework.context.support.ResourceBundleMessageSource">
+        <beans:property name="basename" 
+                        value="springsecurity"/>
+    </beans:bean>
+</beans:beans>

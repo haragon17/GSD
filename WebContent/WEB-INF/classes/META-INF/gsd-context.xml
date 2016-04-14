@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+							http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<!-- Basic Bean Create -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:/META-INF/database.properties</value>
+				<value>classpath:/META-INF/javamail.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Initialization for DataSource -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${database.driverClassName}" />
+		<property name="url" value="${database.url}" />
+		<property name="username" value="${database.username}" />
+		<property name="password" value="${database.password}" />
+	</bean>
+
+	<!-- Initialization for TransactionManager -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- Initialization for JavaMail -->
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${javamail.host}" />
+		<property name="port" value="${javamail.port}" />
+		<property name="protocol" value="smtps" />
+		<property name="username" value="${javamail.username}" />
+		<property name="password" value="${javamail.password}" />
+
+		<property name="javaMailProperties">
+			<props>
+				<!-- <prop key="mail.smtp.auth">true</prop> 
+				<prop key="mail.smtp.starttls.enable">true</prop> -->
+				<prop key="mail.smtps.auth">true</prop>
+			    <prop key="mail.smtps.starttls.enable">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="SentMail" class="com.gsd.mail.SentMail">
+		<property name="mailSender" ref="mailSender" />
+	</bean>
+
+<!-- 	<bean id="WorkingsDao" class="com.gsd.dao.impl.WorkingsDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean> -->
+
+	<bean id="UserDao" class="com.gsd.dao.impl.UserDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="CategoryManagementDao" class="com.gsd.dao.impl.CategoryManagementDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="ReportDao" class="com.gsd.dao.impl.ReportDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="CustomerDao" class="com.gsd.dao.impl.CustomerDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="KeyAccountManagerDao" class="com.gsd.dao.impl.KeyAccountManagerDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="ProjectsDao" class="com.gsd.dao.impl.ProjectsDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="ItemDao" class="com.gsd.dao.impl.ItemDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+</beans>

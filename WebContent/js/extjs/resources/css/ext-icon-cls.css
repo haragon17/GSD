@@ -1,0 +1,58 @@
+.icon-add {
+	background-image: url(../../images/icons/fam/add.png) !important;
+}
+
+.icon-arrow_left {
+	background-image: url(../../images/icons/fam/arrow_left.png) !important;
+}
+
+.icon-delete {
+	background-image: url(../../images/icons/fam/delete.png) !important;
+}
+
+.icon-edit {
+	background-image: url(../../images/icons/fam/page_edit.png) !important;
+}
+
+.icon-save {
+	background-image: url(../../images/icons/fam/disk.png) !important;
+}
+
+.icon-accept {
+	background-image: url(../../images/icons/fam/accept.png) !important;
+}
+
+.icon-connect {
+	background-image: url(../../images/icons/fam/connect.png) !important;
+}
+
+.icon-disconnect {
+	background-image: url(../../images/icons/fam/disconnect.png) !important;
+}
+
+.icon-application {
+	background-image: url(../../images/icons/fam/application.png) !important;
+}
+
+.icon-bug {
+	background-image: url(../../images/icons/fam/bug.png) !important;
+}
+.icon-copy {
+	background-image: url(../../images/icons/fam/page_copy.png) !important;
+}
+.icon-printer {
+	background-image: url(../../images/icons/fam/printer.png) !important;
+}
+.icon-date{
+	background-image: url(../../images/icons/fam/date.png) !important;
+}
+
+.book-view{
+	background-image: url(../../images/icons/fam/book_open.png) !important;
+}
+.book-edit{
+	background-image: url(../../images/icons/fam/book_edit.png) !important;
+}
+.book-delete{
+	background-image: url(../../images/icons/fam/book_delete.png) !important;
+}

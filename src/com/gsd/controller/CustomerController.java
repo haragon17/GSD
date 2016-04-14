@@ -1,0 +1,229 @@
+package com.gsd.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.gsd.dao.CustomerDao;
+import com.gsd.model.Customer;
+import com.gsd.security.UserDetailsApp;
+import com.gsd.security.UserLoginDetail;
+
+import net.sf.json.JSONObject;
+
+@Controller
+public class CustomerController {
+
+	private ApplicationContext context;
+	private CustomerDao customerDao;
+	private String scus_name, scus_code, skey_acc_id, scus_email;
+	
+	public CustomerController() {
+		this.context = new ClassPathXmlApplicationContext("META-INF/gsd-context.xml");
+		this.customerDao = (CustomerDao) this.context.getBean("CustomerDao");
+	}
+	
+	@RequestMapping(value = "/customer")
+	public ModelAndView viewCustomer(HttpServletRequest request,
+			HttpServletResponse response){
+		
+		scus_name = "";
+		scus_code = "";
+		skey_acc_id = "";
+		scus_email = "";
+		UserDetailsApp user = UserLoginDetail.getUser();
+		int type = user.getUserModel().getUsr_type();
+
+		if (type == 0) {
+			return new ModelAndView("CustomerManagement");
+		} else {
+			return new ModelAndView("AccessDenied");
+		}
+	}
+	
+	@RequestMapping(value = "/searchCustomerParam")
+	public void searchReportParam(HttpServletRequest request, HttpServletResponse response) {
+
+		scus_name = request.getParameter("scus_name");
+		scus_code = request.getParameter("scus_code");
+		skey_acc_id = request.getParameter("skey_acc_mng");
+		scus_email = request.getParameter("scus_email");
+
+	}
+	
+	@RequestMapping(value = "/showCustomer")
+	public ModelAndView showCustomer(HttpServletRequest request, HttpServletResponse response) {
+		
+		List<Customer> cus = null;
+		
+		cus = customerDao.showCustomer();
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", cus);
+		jobj.put("total", cus.size());
+
+		return new ModelAndView("jsonView", jobj);
+	}
+	
+	@RequestMapping(value = "/searchCustomer")
+	public ModelAndView searchMember(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		List<Customer> cus = null;
+		List<Customer> cusLs = new ArrayList<Customer>();
+		Map<String, String> map = new HashMap<String, String>();
+
+		map.put("cus_name", scus_name);
+		map.put("cus_code", scus_code);
+		map.put("key_acc_id", skey_acc_id);
+		map.put("cus_email", scus_email);
+		
+		int start = Integer.parseInt(request.getParameter("start"));
+		int limit = Integer.parseInt(request.getParameter("limit"));
+		
+		try {
+			cus = customerDao.searchCustomer(map);
+
+			if (limit + start > cus.size()) {
+				limit = cus.size();
+			} else {
+				limit += start;
+			}
+			for (int i = start; i < (limit); i++) {
+				cusLs.add(cus.get(i));
+			}
+
+		} catch (Exception e) {
+			System.out.println("Error: "+e.getMessage());
+		}
+
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", cusLs);
+		jobj.put("total", cus.size());
+
+		return new ModelAndView("jsonView", jobj);
+
+	}
+	
+	@RequestMapping(value="/chkCusCode")
+	public ModelAndView chkCusCode(@RequestParam("records") String cus_code, HttpServletRequest request,
+			HttpServletResponse response){
+		
+		List<Customer> cusLs = new ArrayList<Customer>();
+		Customer cusNull = new Customer();
+		
+		try{
+			cusLs.add(customerDao.findByCusCode(cus_code));
+		} catch (Exception e){
+			cusLs.add(cusNull);
+		}
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", cusLs);
+
+		return new ModelAndView("jsonView", jobj);
+	}
+	
+	@RequestMapping(value="/updateCustomer")
+	public ModelAndView updateCustomer(HttpServletRequest request, HttpServletResponse response){
+		
+		int cus_id = Integer.parseInt(request.getParameter("ecus_id"));
+		String cus_name = request.getParameter("ecus_name");
+		String cus_code = request.getParameter("ecus_code");
+		String address = request.getParameter("eaddress");
+		String contact_person = request.getParameter("econtact_person");
+		int key_acc_id = Integer.parseInt(request.getParameter("ekey_acc_mng"));
+		String cus_email = request.getParameter("ecus_email");
+		
+		Customer cus = new Customer();
+		cus.setCus_id(cus_id);
+		cus.setCus_name(cus_name);
+		cus.setCus_code(cus_code);
+		cus.setKey_acc_id(key_acc_id);
+		
+		if(!address.equals("Address")){
+			cus.setAddress(address);
+		}else{
+			cus.setAddress("");
+			}
+		if(!contact_person.equals("Contact Person")){
+			cus.setContact_person(contact_person);
+		}else{
+			cus.setContact_person("");
+		}
+		if(!cus_email.equals("E-mail")){
+			cus.setCus_email(cus_email);
+		}else{
+			cus.setCus_email("");
+		}
+		
+		customerDao.updateCustomer(cus);
+		
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("success", true);
+//		return new ModelAndView("redirect:customer.htm");
+		return new ModelAndView("jsonView", model);
+	}
+	
+	@RequestMapping(value="/addCustomer")
+	public ModelAndView addCustomer(HttpServletRequest request, HttpServletResponse response){
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		String cus_name = request.getParameter("acus_name");
+		String cus_code = request.getParameter("acus_code");
+		String address = request.getParameter("aaddress");
+		String contact_person = request.getParameter("acontact_person");
+		int key_acc_id = Integer.parseInt(request.getParameter("akey_acc_mng"));
+		String cus_email = request.getParameter("acus_email");
+		
+		Customer cus = new Customer();
+		cus.setCus_id(customerDao.getLastCustomerId());
+		cus.setCus_name(cus_name);
+		cus.setCus_code(cus_code);
+		cus.setKey_acc_id(key_acc_id);
+		cus.setCretd_usr(user.getUserModel().getUsr_id());
+		
+		if(!address.equals("Address")){
+			cus.setAddress(address);
+		}else{
+			cus.setAddress("");
+			}
+		if(!contact_person.equals("Contact Person")){
+		cus.setContact_person(contact_person);
+		}else{
+			cus.setContact_person("");
+		}
+		if(!cus_email.equals("E-mail")){
+			cus.setCus_email(cus_email);
+		}else{
+			cus.setCus_email("");
+		}
+		
+		customerDao.createCustomer(cus);
+		
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("success", true);
+
+		return new ModelAndView("jsonView", model);
+	}
+	
+	@RequestMapping(value = "/deleteCustomer")
+	public void deleteMember(HttpServletRequest request, HttpServletResponse response) {
+
+		int id = Integer.parseInt(request.getParameter("id"));
+		customerDao.deleteCustomer(id);
+		
+	}
+	
+}
