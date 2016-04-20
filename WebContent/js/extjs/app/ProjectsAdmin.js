@@ -580,8 +580,18 @@ Ext.onReady(function() {
 					align : 'center',
 					id : 'open',
 					items : [{
-						iconCls : 'my-icon',
-						tooltip : 'Download',
+						getClass: function(v, meta, rec) {
+							
+							if(rec.get('file_id') != 0){
+								this.items[0].tooltip = 'd1';
+								return 'icon-d1';
+							} else {
+								this.items[0].tooltip = 'd2';
+								
+								return 'icon-d2';
+							}
+							
+						},
 						handler : function(grid, rowIndex, colIndex){
 							file_id = grid.getStore().getAt(rowIndex).get('file_id');
 							if(file_id != 0){
@@ -596,6 +606,23 @@ Ext.onReady(function() {
 								});
 							}
 						}
+						
+//						iconCls : 'my-icon',
+//						tooltip : 'Download',
+//						handler : function(grid, rowIndex, colIndex){
+//							file_id = grid.getStore().getAt(rowIndex).get('file_id');
+//							if(file_id != 0){
+//								window.open('download.htm?file='+file_id,'_blank');
+//							}else{
+//								Ext.MessageBox.show({
+//									title : 'Infomation',
+//									msg : 'No Briefing Uploaded !',
+//									buttons : Ext.MessageBox.OK,
+//									animateTarget : 'open',
+//									icon : Ext.MessageBox.INFO
+//								});
+//							}
+//						}
 					}]
 				},
 				{

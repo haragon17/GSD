@@ -353,26 +353,26 @@ public class WorkingsController_old {
 		  return new ModelAndView("redirect:workings.htm");
 	}
 	
-	@RequestMapping(value="download")
-	public void doDownload(HttpServletRequest   request,HttpServletResponse response) throws Exception{
-
-		try{
-			int id=Integer.valueOf(request.getParameter("file"));
-			FileModel fm=new FileModel();
-			fm = workingsDao.getFile(id);
-			
-			File file = new File(fm.getFile_path() + "/" +fm.getFile_name());
-			InputStream in =new BufferedInputStream(new FileInputStream(file));
-			response.setContentType(fm.getFile_type());
-	        response.setHeader("Content-Disposition","attachment; filename=\"" + fm.getFile_name() +"\"");
-			ServletOutputStream out = response.getOutputStream();
-			IOUtils.copy(in, out);
-			response.flushBuffer();
-			in.close();
-		}catch(Exception e){
-			System.out.println(e.getMessage());
-		}
-	}
+//	@RequestMapping(value="download")
+//	public void doDownload(HttpServletRequest   request,HttpServletResponse response) throws Exception{
+//
+//		try{
+//			int id=Integer.valueOf(request.getParameter("file"));
+//			FileModel fm=new FileModel();
+//			fm = workingsDao.getFile(id);
+//			
+//			File file = new File(fm.getFile_path() + "/" +fm.getFile_name());
+//			InputStream in =new BufferedInputStream(new FileInputStream(file));
+//			response.setContentType(fm.getFile_type());
+//	        response.setHeader("Content-Disposition","attachment; filename=\"" + fm.getFile_name() +"\"");
+//			ServletOutputStream out = response.getOutputStream();
+//			IOUtils.copy(in, out);
+//			response.flushBuffer();
+//			in.close();
+//		}catch(Exception e){
+//			System.out.println(e.getMessage());
+//		}
+//	}
 	
 	@RequestMapping(value = "/deleteWorkings")
 	public void deleteWorkings(HttpServletRequest request,

@@ -192,7 +192,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		
 		sql += "ORDER BY jobs.job_name";
 		
-		System.out.println(sql);
+//		System.out.println(sql);
 		
 		List<Jobs> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
 		return result;
@@ -278,9 +278,9 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 			sql += "AND projects.update_date BETWEEN '"+data.get("updateStart")+"' AND '"+data.get("updateLimit")+" 23:59:59'\n";
 		}
 		
-		sql += "ORDER BY jobs.job_name";
+		sql += "ORDER BY jobs.job_name, item.itm_name";
 		
-		System.out.println(sql);
+//		System.out.println(sql);
 		
 		List<Projects> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Projects>(Projects.class));
 		return result;

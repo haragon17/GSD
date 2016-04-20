@@ -10,6 +10,17 @@ img {
 	background-image: url(images/icon-d.png) !important;
 }
 
+.my-icon2 {
+	background-image: url(images/icon-nd.png) !important;
+}
+
+.x-action-col-cell img.icon-d1 {
+background-image: url(images/icon-d.png);
+}
+.x-action-col-cell img.icon-d2 {
+    background-image: url(images/icon-nd.png);
+}
+
 .icon-add {
 	background-image: url(../../images/icons/fam/add.png) !important;
 }
