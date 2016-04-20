@@ -3,9 +3,9 @@ panels = {};
 
 Ext.onReady(function() {
 
-	jobid = new Ext.form.Hidden({
-		name : 'jobid',
-		id : 'jobid'
+	projid = new Ext.form.Hidden({
+		name : 'projid',
+		id : 'projid'
 	});
 	cusid = new Ext.form.Hidden({
 		name : 'cusid',
@@ -424,13 +424,13 @@ Ext.onReady(function() {
 				if (form.isValid()) {
 
 					Ext.Ajax.request({
-						url : 'searchProjectParam.htm?AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
+						url : 'searchProjectsParam.htm?AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
 						'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
 						'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&cus_id='+Ext.getCmp('cusid').getValue() + getParamValues(),
 						success : function(response, opts) {
-							store.projects.reload();
-							store.jobs.loadPage(1);
-//							for(var xyz=0;xyz<store.jobs.count();xyz++){
+							store.projectsRef.reload();
+							store.projects.loadPage(1);
+//							for(var xyz=0;xyz<store.projects.count();xyz++){
 //								if(Ext.fly(panels.grid.plugins[0].view.getNodes()[xyz]).hasCls(panels.grid.plugins[0].rowCollapsedCls) == true){
 //									panels.grid.plugins[0].toggleRow(xyz, panels.grid.getStore().getAt(xyz));
 //								}
@@ -469,7 +469,7 @@ Ext.onReady(function() {
 		loadMask : true,
 		autoWidth : true,
 		frame : true,
-		store : store.jobs,
+		store : store.projects,
 //		tbar: [{
 //            text: 'Expand All',
 //            scope: this,
@@ -501,7 +501,7 @@ Ext.onReady(function() {
 					text : "Project Name",
 					width : 150,
 					sortable : true,
-					dataIndex : 'job_name'
+					dataIndex : 'proj_name'
 				},
 				{
 					text : "Customer Name",
@@ -513,7 +513,7 @@ Ext.onReady(function() {
 					text : "Project Description",
 					width : 200,
 					sortable : true,
-					dataIndex : 'job_desc'
+					dataIndex : 'proj_desc'
 				},
 //				{
 //					text : "Item Name",
@@ -534,14 +534,14 @@ Ext.onReady(function() {
 //					width : 80,
 //					sortable : true,
 //					renderer : combinecols,
-//					dataIndex : 'proj_id'
+//					dataIndex : 'proj_ref_id'
 //				},
 //				{
 //					text : "Price(Euro)",
 //					width : 80,
 //					sortable : true,
 //					renderer : currencyToEuro,
-//					dataIndex : 'proj_id'
+//					dataIndex : 'proj_ref_id'
 //				},
 				{
 					text : 'Briefing',
@@ -578,8 +578,8 @@ Ext.onReady(function() {
 //						iconCls : 'icon-add',
 //						tooltip : 'Add',
 //						handler : function(grid, rowIndex, colIndex){
-//							job_id = grid.getStore().getAt(rowIndex).get('job_id');
-//							Ext.getCmp('ajob_id').setValue(job_id);
+//							proj_id = grid.getStore().getAt(rowIndex).get('proj_id');
+//							Ext.getCmp('aproj_id').setValue(proj_id);
 //							addItem.show();
 //						}
 //					}]
@@ -593,7 +593,7 @@ Ext.onReady(function() {
 //					items : [ {
 //						iconCls : 'table-edit',
 //						handler : function(grid, rowIndex, colIndex) {
-//							proj_id = grid.getStore().getAt(rowIndex).get('proj_id');
+//							proj_ref_id = grid.getStore().getAt(rowIndex).get('proj_ref_id');
 //							proj_name = grid.getStore().getAt(rowIndex).get('proj_name');
 //							itm_id = grid.getStore().getAt(rowIndex).get('itm_id');
 //							cus_id = grid.getStore().getAt(rowIndex).get('cus_id');
@@ -601,7 +601,7 @@ Ext.onReady(function() {
 //							time = grid.getStore().getAt(rowIndex).get('time');
 //							price = grid.getStore().getAt(rowIndex).get('price');
 //							currency = grid.getStore().getAt(rowIndex).get('currency');
-//							proj_desc = grid.getStore().getAt(rowIndex).get('proj_desc');
+//							proj_ref_desc = grid.getStore().getAt(rowIndex).get('proj_ref_desc');
 //							cus_name = grid.getStore().getAt(rowIndex).get('cus_name');
 //							cus_code = grid.getStore().getAt(rowIndex).get('cus_code');
 //
@@ -613,8 +613,8 @@ Ext.onReady(function() {
 //							Ext.getCmp('etime').setValue(time);
 //							Ext.getCmp('eprice').setValue(price);
 //							Ext.getCmp('ecurrency').setValue(currency);
-//							Ext.getCmp('eproj_desc').setValue(proj_desc);
-//							Ext.getCmp('eproj_id').setValue(proj_id);
+//							Ext.getCmp('eproj_ref_desc').setValue(proj_ref_desc);
+//							Ext.getCmp('eproj_ref_id').setValue(proj_ref_id);
 //							Ext.getCmp('efile_id').setValue(file_id);
 //							editProject.show();
 //						}
@@ -629,9 +629,9 @@ Ext.onReady(function() {
 //					items : [ {
 //						iconCls : 'icon-delete',
 //						handler : function(grid, rowIndex, colIndex) {
-//							job_id = grid.getStore().getAt(rowIndex).get('job_id');
+//							proj_id = grid.getStore().getAt(rowIndex).get('proj_id');
 //							file_id = grid.getStore().getAt(rowIndex).get('file_id');
-//							Ext.getCmp('jobid').setValue(job_id);
+//							Ext.getCmp('projid').setValue(proj_id);
 //							Ext.getCmp('fid').setValue(file_id);
 //							Ext.MessageBox.show({
 //								title : 'Confirm',
@@ -649,16 +649,16 @@ Ext.onReady(function() {
 		plugins: [{
 	        ptype: 'rowexpander',
 	        rowBodyTpl : new Ext.XTemplate(
-	        		'{job_id:this.myTest}',
+	        		'{proj_id:this.myTest}',
 	        		{
 	        			myTest: function(v){
 		            		var myText = "";
-		            		 store.projects.each(function(rec){
+		            		 store.projectsRef.each(function(rec){
 //		            			 alert(rec.data.cus_id);
 		            			 var myEuro = "";
 		            			 var myDesc = "";
-		            			 if(rec.data.proj_desc != ""){
-		            				 myDesc = rec.data.proj_desc;
+		            			 if(rec.data.proj_ref_desc != ""){
+		            				 myDesc = rec.data.proj_ref_desc;
 		            			 }else{
 		            				 myDesc = "-";
 		            			 }
@@ -677,7 +677,7 @@ Ext.onReady(function() {
 //		            					}else{
 //		            						myEuro = '-';
 //		            					}
-		            			if(rec.data.job_id == v){
+		            			if(rec.data.proj_id == v){
 		            				 myText += '<tr><td>Item: <b>'+rec.data.itm_name+'</b></td>'+
 		            				 '<td>Time: <b>'+rec.data.time+'</b></td>'+
 //		            				 '<td>Price: <b>'+(Math.round(rec.data.price*100)/100)+' '+rec.data.currency+'</b></td>'+
@@ -696,7 +696,7 @@ Ext.onReady(function() {
 	        )
 	    }],
 		bbar : Ext.create('Ext.PagingToolbar', {
-			store : store.jobs,
+			store : store.projects,
 			displayInfo : true,
 			displayMsg : 'Displaying Project {0} - {1} of {2}',
 			emptyMsg : "No Project to display",
@@ -706,13 +706,13 @@ Ext.onReady(function() {
 
 });
 
-Ext.define('projModel', {
+Ext.define('projRefModel', {
 	extend : 'Ext.data.Model',
 	fields : [ {
-		name : 'proj_id',
+		name : 'proj_ref_id',
 		type : 'int'
 	}, {
-		name : 'job_id',
+		name : 'proj_id',
 		type : 'int'
 	}, {
 		name : 'itm_id',
@@ -742,7 +742,7 @@ Ext.define('projModel', {
 		name : 'cus_code',
 		type : 'string'
 	}, {
-		name : 'proj_desc',
+		name : 'proj_ref_desc',
 		type : 'string'
 	}, {
 		name : 'file_name',
@@ -752,33 +752,33 @@ Ext.define('projModel', {
 	]
 });
 
-store.projects = Ext.create('Ext.data.JsonStore', {
-	model : 'projModel',
-	id : 'projStore',
+store.projectsRef = Ext.create('Ext.data.JsonStore', {
+	model : 'projRefModel',
+	id : 'projRefStore',
 //	pageSize : 9,
 	autoLoad : true,
 	proxy : {
 		type : 'ajax',
-		url : 'searchProject.htm',
+		url : 'searchProjectsReference.htm',
 		reader : {
 			type : 'json',
 			root : 'records',
-			idProperty : 'proj_id',
+			idProperty : 'proj_ref_id',
 			totalProperty : 'total'
 		}
 	},
 });
 
-Ext.define('jobModel', {
+Ext.define('projModel', {
 	extend : 'Ext.data.Model',
 	fields : [ {
-		name : 'job_id',
+		name : 'proj_id',
 		type : 'int'
 	}, {
-		name : 'job_name',
+		name : 'proj_name',
 		type : 'string'
 	}, {
-		name : 'job_desc',
+		name : 'proj_desc',
 		type : 'string'
 	}, {
 		name : 'cus_id',
@@ -800,24 +800,24 @@ Ext.define('jobModel', {
 	]
 });
 
-store.jobs = Ext.create('Ext.data.JsonStore', {
-	model : 'jobModel',
-	id : 'jobStore',
+store.projects = Ext.create('Ext.data.JsonStore', {
+	model : 'projModel',
+	id : 'projStore',
 	pageSize : 9,
 //	autoLoad : true,
 	proxy : {
 		type : 'ajax',
-		url : 'searchJobs.htm',
+		url : 'searchProjects.htm',
 		reader : {
 			type : 'json',
 			root : 'records',
-			idProperty : 'job_id',
+			idProperty : 'proj_id',
 			totalProperty : 'total'
 		}
 	},
 	listeners: {
 		'load' : function(){
-			for(var xyz=0;xyz<store.jobs.count();xyz++){
+			for(var xyz=0;xyz<store.projects.count();xyz++){
 				if(Ext.fly(panels.grid.plugins[0].view.getNodes()[xyz]).hasCls(panels.grid.plugins[0].rowCollapsedCls) == true){
 					panels.grid.plugins[0].toggleRow(xyz, panels.grid.getStore().getAt(xyz));
 				}
@@ -1089,8 +1089,8 @@ editProject = new Ext.create('Ext.window.Window', {
 	    	labelWidth: 120,
             width: 300,
 	    	fieldLabel: 'Project Detail',
-	    	name: 'eproj_desc',
-	    	id: 'eproj_desc',
+	    	name: 'eproj_ref_desc',
+	    	id: 'eproj_ref_desc',
 	    	emptyText: 'Project Details'
 	    },{
 			xtype : 'hidden',
@@ -1098,8 +1098,8 @@ editProject = new Ext.create('Ext.window.Window', {
 			name : 'ecus_id'
 		},{
 			xtype : 'hidden',
-			id : 'eproj_id',
-			name : 'eproj_id'
+			id : 'eproj_ref_id',
+			name : 'eproj_ref_id'
 		},{
 			xtype : 'hidden',
 			id : 'efile_id',
@@ -1122,7 +1122,7 @@ editProject = new Ext.create('Ext.window.Window', {
 					var form = Ext.getCmp('editform').getForm();
 					if (form.isValid()) {
 						form.submit({
-							url : 'updateProjects.htm',
+							url : 'updateProjectsReference.htm',
 							waitTitle : 'Update Project',
 							waitMsg : 'Please wait...',
 							standardSubmit : false,
@@ -1135,7 +1135,7 @@ editProject = new Ext.create('Ext.window.Window', {
 									animateTarget : 'ebtn',
 									fn : function() {
 										editProject.hide();
-										store.projects.reload();
+										store.projectsRef.reload();
 									}
 								});
 							}
@@ -1256,15 +1256,15 @@ addItem = new Ext.create('Ext.window.Window', {
     	    	xtype: 'textarea',
     	    	labelWidth: 120,
     	    	fieldLabel: 'Item Detail',
-    	    	name: 'aproj_desc',
-    	    	id: 'aproj_desc',
+    	    	name: 'aproj_ref_desc',
+    	    	id: 'aproj_ref_desc',
     	    	emptyText: 'Item Details'
     	    }]
             }]},
             {
     				xtype : 'hidden',
-    				id : 'ajob_id',
-    				name : 'ajob_id'
+    				id : 'aproj_id',
+    				name : 'aproj_id'
             }],
             buttons:[{
             	text: 'Reset',
@@ -1280,7 +1280,7 @@ addItem = new Ext.create('Ext.window.Window', {
                 	 var form = Ext.getCmp('addItemForm').getForm();
                 	 if(form.isValid()){
         				 form.submit({
-        				 url: 'createJobs.htm',
+        				 url: 'createProjects.htm',
         				 waitTitle: 'Creating Project',
         				 waitMsg: 'Please wait...',
         				 standardSubmit: true,
@@ -1452,8 +1452,8 @@ addProject = new Ext.create('Ext.window.Window', {
     	    	xtype: 'textarea',
     	    	labelWidth: 120,
     	    	fieldLabel: 'Project Detail',
-    	    	name: 'cjob_desc',
-    	    	id: 'cjob_desc',
+    	    	name: 'cproj_desc',
+    	    	id: 'cproj_desc',
     	    	emptyText: 'Project Details'
     	    }]
             },{
@@ -1547,8 +1547,8 @@ addProject = new Ext.create('Ext.window.Window', {
     	    	xtype: 'textarea',
     	    	labelWidth: 120,
     	    	fieldLabel: 'Item Detail',
-    	    	name: 'cproj_desc',
-    	    	id: 'cproj_desc',
+    	    	name: 'cproj_ref_desc',
+    	    	id: 'cproj_ref_desc',
     	    	emptyText: 'Item Details'
     	    }]
             },{
@@ -1580,11 +1580,11 @@ addProject = new Ext.create('Ext.window.Window', {
         		 Ext.getCmp('ctime').setValue('');
         		 Ext.getCmp('cprice').setValue('');
         		 Ext.getCmp('ccurrency').setValue('');
-        		 Ext.getCmp('cproj_desc').setValue('');
+        		 Ext.getCmp('cproj_ref_desc').setValue('');
         	 }
         	 if(form.isValid()){
 				 form.submit({
-				 url: 'createJobs.htm',
+				 url: 'createProjects.htm',
 				 waitTitle: 'Creating Project',
 				 waitMsg: 'Please wait...',
 				 standardSubmit: true,
@@ -1754,8 +1754,8 @@ addProject = new Ext.create('Ext.window.Window', {
 //    	    	labelWidth: 120,
 //                width: 300,
 //    	    	fieldLabel: 'Project Detail',
-//    	    	name: 'cjob_desc',
-//    	    	id: 'cjob_desc',
+//    	    	name: 'cproj_desc',
+//    	    	id: 'cproj_desc',
 //    	    	emptyText: 'Project Details'
 //    	    },{
 //				xtype: 'combobox',
@@ -1839,8 +1839,8 @@ addProject = new Ext.create('Ext.window.Window', {
 //    	    	labelWidth: 120,
 //                width: 300,
 //    	    	fieldLabel: 'Item Detail',
-//    	    	name: 'cproj_desc',
-//    	    	id: 'cproj_desc',
+//    	    	name: 'cproj_ref_desc',
+//    	    	id: 'cproj_ref_desc',
 //    	    	emptyText: 'Item Details'
 //    	    },{
 //				xtype : 'hidden',
@@ -1864,7 +1864,7 @@ addProject = new Ext.create('Ext.window.Window', {
 //        	 var form = Ext.getCmp('projectsform').getForm();
 //        	 if(form.isValid()){
 //				 form.submit({
-//				 url: 'createJobs.htm',
+//				 url: 'createProjects.htm',
 //				 waitTitle: 'Creating Project',
 //				 waitMsg: 'Please wait...',
 //				 standardSubmit: true,
@@ -1901,15 +1901,15 @@ function confirmChk(btn) {
 	if (btn == "yes") {
 		Ext.Ajax
 				.request({
-					url : 'deleteJobs.htm',
+					url : 'deleteProjects.htm',
 					params : {
-						id : Ext.getCmp('jobid').getValue(),
+						id : Ext.getCmp('projid').getValue(),
 						fid : Ext.getCmp('fid').getValue()
 					},
 					success : function(response, opts) {
 						// window.location = "memberManagement.htm";
+						store.projectsRef.reload();
 						store.projects.reload();
-						store.jobs.reload();
 					},
 					failure : function(response, opts) {
 						var responseOject = Ext.util.JSON

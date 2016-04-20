@@ -1,9 +1,9 @@
 package com.gsd.model;
 
-public class Projects_old {
+public class ProjectsReference {
 
+	private int proj_ref_id;
 	private int proj_id;
-	private int job_id;
 	private int itm_id;
 	private int time;
 	private float price;
@@ -11,22 +11,22 @@ public class Projects_old {
 	private String cretd_date;
 	private String update_date;
 	private String currency;
-	private String proj_desc;
+	private String proj_ref_desc;
 	private String itm_name;
 	private String cus_name;
 	private String cus_code;
 	
+	public int getProj_ref_id() {
+		return proj_ref_id;
+	}
+	public void setProj_ref_id(int proj_ref_id) {
+		this.proj_ref_id = proj_ref_id;
+	}
 	public int getProj_id() {
 		return proj_id;
 	}
 	public void setProj_id(int proj_id) {
 		this.proj_id = proj_id;
-	}
-	public int getJob_id() {
-		return job_id;
-	}
-	public void setJob_id(int job_id) {
-		this.job_id = job_id;
 	}
 	public int getItm_id() {
 		return itm_id;
@@ -70,11 +70,11 @@ public class Projects_old {
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
-	public String getProj_desc() {
-		return proj_desc;
+	public String getProj_ref_desc() {
+		return proj_ref_desc;
 	}
-	public void setProj_desc(String proj_desc) {
-		this.proj_desc = proj_desc;
+	public void setProj_ref_desc(String proj_ref_desc) {
+		this.proj_ref_desc = proj_ref_desc;
 	}
 	public String getItm_name() {
 		return itm_name;

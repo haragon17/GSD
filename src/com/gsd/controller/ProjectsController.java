@@ -28,8 +28,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.gsd.dao.ProjectsDao;
 import com.gsd.model.FileModel;
 import com.gsd.model.FileUploadBean;
-import com.gsd.model.Jobs;
 import com.gsd.model.Projects;
+import com.gsd.model.ProjectsReference;
 import com.gsd.security.UserDetailsApp;
 import com.gsd.security.UserLoginDetail;
 
@@ -66,27 +66,27 @@ public class ProjectsController {
 		}
 	}
 
-	@RequestMapping(value = "/chkJobName")
-	public ModelAndView chkJobName(@RequestParam("records") String name, HttpServletRequest request,
+	@RequestMapping(value = "/chkProjName")
+	public ModelAndView chkProjName(@RequestParam("records") String name, HttpServletRequest request,
 			HttpServletResponse response){
 		
-		List<Jobs> jobLs = new ArrayList<Jobs>();
-		Jobs jobNull = new Jobs();
+		List<Projects> projLs = new ArrayList<Projects>();
+		Projects projNull = new Projects();
 		
 		try{
-			jobLs.add(projectsDao.findByJobName(name));
+			projLs.add(projectsDao.findByProjectName(name));
 		} catch (Exception e){
-			jobLs.add(jobNull);
+			projLs.add(projNull);
 		}
 		
 		JSONObject jobj = new JSONObject();
-		jobj.put("records", jobLs);
+		jobj.put("records", projLs);
 
 		return new ModelAndView("jsonView", jobj);
 	}
 	
-	@RequestMapping(value = "/searchProjectParam")
-	public void searchProjectParam(HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/searchProjectsParam")
+	public void searchProjectsParam(HttpServletRequest request, HttpServletResponse response) {
 		proj_name = request.getParameter("sproj_name");
 		itm_id = request.getParameter("sitm_id");
 		cus_id = request.getParameter("cus_id");
@@ -104,10 +104,10 @@ public class ProjectsController {
 		EUR = request.getParameter("EUR");
 	}
 
-	@RequestMapping(value = "/searchProject")
-	public ModelAndView searchProject(HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/searchProjectsReference")
+	public ModelAndView searchProjectsReference(HttpServletRequest request, HttpServletResponse response) {
 
-		List<Projects> proj = null;
+		List<ProjectsReference> projRef = null;
 //		List<Projects> projLs = new ArrayList<Projects>();
 		Map<String, String> map = new HashMap<String, String>();
 
@@ -131,7 +131,7 @@ public class ProjectsController {
 //		int limit = Integer.parseInt(request.getParameter("limit"));
 
 		try {
-			proj = projectsDao.searchProjects(map);
+			projRef = projectsDao.searchProjectsReferences(map);
 
 //			if (limit + start > proj.size()) {
 //				limit = proj.size();
@@ -148,17 +148,17 @@ public class ProjectsController {
 
 		JSONObject jobj = new JSONObject();
 //		jobj.put("records", projLs);
-		jobj.put("records", proj);
-		jobj.put("total", proj.size());
+		jobj.put("records", projRef);
+		jobj.put("total", projRef.size());
 
 		return new ModelAndView("jsonView", jobj);
 	}
 	
-	@RequestMapping(value = "/searchJobs")
-	public ModelAndView searchJobs(HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/searchProjects")
+	public ModelAndView searchProjects(HttpServletRequest request, HttpServletResponse response) {
 
-		List<Jobs> job = null;
-		List<Jobs> jobLs = new ArrayList<Jobs>();
+		List<Projects> proj = null;
+		List<Projects> projLs = new ArrayList<Projects>();
 		Map<String, String> map = new HashMap<String, String>();
 
 		map.put("proj_name", proj_name);
@@ -181,15 +181,15 @@ public class ProjectsController {
 		int limit = Integer.parseInt(request.getParameter("limit"));
 
 		try {
-			job = projectsDao.searchJobs(map);
+			proj = projectsDao.searchProjects(map);
 
-			if (limit + start > job.size()) {
-				limit = job.size();
+			if (limit + start > proj.size()) {
+				limit = proj.size();
 			} else {
 				limit += start;
 			}
 			for (int i = start; i < (limit); i++) {
-				jobLs.add(job.get(i));
+				projLs.add(proj.get(i));
 			}
 
 		} catch (Exception e) {
@@ -197,32 +197,14 @@ public class ProjectsController {
 		}
 
 		JSONObject jobj = new JSONObject();
-		jobj.put("records", jobLs);
-		jobj.put("total", job.size());
+		jobj.put("records", projLs);
+		jobj.put("total", proj.size());
 
 		return new ModelAndView("jsonView", jobj);
 	}
 
-	@RequestMapping(value = "/showJobs")
-	public ModelAndView showJobs(HttpServletRequest request, HttpServletResponse response) {
-
-		List<Jobs> jobs = null;
-
-		try {
-			jobs = projectsDao.showJobs();
-		} catch (Exception e) {
-			System.out.println("Error: " + e.getMessage());
-		}
-
-		JSONObject jobj = new JSONObject();
-		jobj.put("records", jobs);
-		jobj.put("total", jobs.size());
-
-		return new ModelAndView("jsonView", jobj);
-	}
-	
 	@RequestMapping(value = "/showProjects")
-	public ModelAndView showProject(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView showProjects(HttpServletRequest request, HttpServletResponse response) {
 
 		List<Projects> proj = null;
 
@@ -238,9 +220,27 @@ public class ProjectsController {
 
 		return new ModelAndView("jsonView", jobj);
 	}
+	
+	@RequestMapping(value = "/showProjectsReference")
+	public ModelAndView showProject(HttpServletRequest request, HttpServletResponse response) {
 
-//	@RequestMapping(value = "/createProjects")
-//	public ModelAndView createProjects(HttpServletRequest request, HttpServletResponse response,
+		List<ProjectsReference> projRef = null;
+
+		try {
+			projRef = projectsDao.showProjectsReference();
+		} catch (Exception e) {
+			System.out.println("Error: " + e.getMessage());
+		}
+
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", projRef);
+		jobj.put("total", projRef.size());
+
+		return new ModelAndView("jsonView", jobj);
+	}
+
+//	@RequestMapping(value = "/createProjectsReference")
+//	public ModelAndView createProjectsReference(HttpServletRequest request, HttpServletResponse response,
 //			FileUploadBean uploadItem, BindingResult result) {
 //
 //		UserDetailsApp user = UserLoginDetail.getUser();
@@ -252,12 +252,12 @@ public class ProjectsController {
 //		String time = request.getParameter("ctime");
 //		String price = request.getParameter("cprice");
 //		String currency = request.getParameter("ccurrency");
-//		String proj_desc = request.getParameter("cproj_desc");
+//		String proj_ref_desc = request.getParameter("cproj_ref_desc");
 //
 //		Projects proj = new Projects();
 //		FileModel fileModel = new FileModel();
 //
-//		proj.setProj_id(projectsDao.getLastProjectId());
+//		proj.setProj_ref_id(projectsDao.getLastProjectId());
 //		proj.setProj_name(proj_name);
 //		proj.setItm_id(itm_id);
 //		proj.setCus_id(cus_id);
@@ -277,10 +277,10 @@ public class ProjectsController {
 //		} else {
 //			proj.setCurrency("");
 //		}
-//		if (!proj_desc.equals("Project Details")) {
-//			proj.setProj_desc(proj_desc);
+//		if (!proj_ref_desc.equals("Project Details")) {
+//			proj.setProj_ref_desc(proj_ref_desc);
 //		} else {
-//			proj.setProj_desc("");
+//			proj.setProj_ref_desc("");
 //		}
 //
 //		proj.setCretd_usr(user.getUserModel().getUsr_id());
@@ -291,7 +291,7 @@ public class ProjectsController {
 //		System.out.println("time = " + proj.getTime());
 //		System.out.println("price = " + proj.getPrice());
 //		System.out.println("currency = " + proj.getCurrency());
-//		System.out.println("detail = " + proj.getProj_desc());
+//		System.out.println("detail = " + proj.getProj_ref_desc());
 //
 //		OutputStream outputStream = null;
 //
@@ -313,7 +313,7 @@ public class ProjectsController {
 //						createMain.mkdir();
 //					}
 //					   String fileName = uploadItem.getFile().getOriginalFilename();  
-//					   String filePath = "/Users/gsd/files/" + proj.getProj_id();
+//					   String filePath = "/Users/gsd/files/" + proj.getProj_ref_id();
 //					   File newFile = new File(filePath);
 //					   if(!newFile.exists()){
 //						   newFile.mkdir();
@@ -339,18 +339,18 @@ public class ProjectsController {
 //
 //				projectsDao.createFile(fileModel);
 //				proj.setFile_id(fileModel.getFile_id());
-//				projectsDao.createProjects(proj);
+//				projectsDao.createProjectsReference(proj);
 //			} else {
 //				proj.setFile_id(0);
-//				projectsDao.createProjects(proj);
+//				projectsDao.createProjectsReference(proj);
 //
 //			}
 //			return new ModelAndView("redirect:projects.htm");
 //		}
 //	}
 	
-	@RequestMapping(value = "/createJobs")
-	public ModelAndView createJobs(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping(value = "/createProjects")
+	public ModelAndView createProjects(HttpServletRequest request, HttpServletResponse response,
 			FileUploadBean uploadItem, BindingResult result) {
 
 		UserDetailsApp user = UserLoginDetail.getUser();
@@ -362,29 +362,29 @@ public class ProjectsController {
 		String time = request.getParameter("ctime");
 		String price = request.getParameter("cprice");
 		String currency = request.getParameter("ccurrency");
+		String proj_ref_desc = request.getParameter("cproj_ref_desc");
 		String proj_desc = request.getParameter("cproj_desc");
-		String job_desc = request.getParameter("cjob_desc");
 
+		ProjectsReference projRef = new ProjectsReference();
 		Projects proj = new Projects();
-		Jobs job = new Jobs();
 		FileModel fileModel = new FileModel();
 		
-		job.setJob_id(projectsDao.getLastJobId());
-		job.setJob_name(proj_name);
-		job.setCus_id(cus_id);
-		job.setCretd_usr(user.getUserModel().getUsr_id());
+		proj.setProj_id(projectsDao.getLastProjectId());
+		proj.setProj_name(proj_name);
+		proj.setCus_id(cus_id);
+		proj.setCretd_usr(user.getUserModel().getUsr_id());
 
-		if (!job_desc.equals("Project Details")) {
-			job.setJob_desc(job_desc);
+		if (!proj_desc.equals("Project Details")) {
+			proj.setProj_desc(proj_desc);
 		} else {
-			job.setJob_desc("");
+			proj.setProj_desc("");
 		}
 		
-		System.out.println("job_id = " + job.getJob_id());
-		System.out.println("name = " + job.getJob_name());
-		System.out.println("cus_id = " + job.getCus_id());
-		System.out.println("cretd_usr = " + job.getCretd_usr());
-		System.out.println("detail = " + job.getJob_desc());
+		System.out.println("proj_id = " + proj.getProj_id());
+		System.out.println("name = " + proj.getProj_name());
+		System.out.println("cus_id = " + proj.getCus_id());
+		System.out.println("cretd_usr = " + proj.getCretd_usr());
+		System.out.println("detail = " + proj.getProj_desc());
 		
 		OutputStream outputStream = null;
 
@@ -406,7 +406,7 @@ public class ProjectsController {
 						createMain.mkdir();
 					}
 					   String fileName = uploadItem.getFile().getOriginalFilename();  
-					   String filePath = "/Users/gsd/files/" + job.getJob_id();
+					   String filePath = "/Users/gsd/files/" + proj.getProj_id();
 					   File newFile = new File(filePath);
 					   if(!newFile.exists()){
 						   newFile.mkdir();
@@ -431,50 +431,50 @@ public class ProjectsController {
 				}
 
 				projectsDao.createFile(fileModel);
-				job.setFile_id(fileModel.getFile_id());
-				projectsDao.createJobs(job);
+				proj.setFile_id(fileModel.getFile_id());
+				projectsDao.createProjects(proj);
 			} else {
-				job.setFile_id(0);
-				projectsDao.createJobs(job);
+				proj.setFile_id(0);
+				projectsDao.createProjects(proj);
 
 			}
 			
 			if(!itm_id.equals("Item Name")){
-			proj.setProj_id(projectsDao.getLastProjectId());
-			proj.setItm_id(Integer.parseInt(itm_id));
-			proj.setJob_id(job.getJob_id());
+			projRef.setProj_ref_id(projectsDao.getLastProjectRefId());
+			projRef.setItm_id(Integer.parseInt(itm_id));
+			projRef.setProj_id(proj.getProj_id());
 
 			if (!time.equals("Time in minutes")) {
-				proj.setTime(Integer.parseInt(time));
+				projRef.setTime(Integer.parseInt(time));
 			} else {
-				proj.setTime(0);
+				projRef.setTime(0);
 			}
 			if (!price.equals("Project Price")) {
-				proj.setPrice(Float.parseFloat(price));
+				projRef.setPrice(Float.parseFloat(price));
 			} else {
-				proj.setPrice(0);
+				projRef.setPrice(0);
 			}
 			if (!currency.equals("Price Currency")) {
-				proj.setCurrency(currency);
+				projRef.setCurrency(currency);
 			} else {
-				proj.setCurrency("");
+				projRef.setCurrency("");
 			}
-			if (!proj_desc.equals("Item Details")) {
-				proj.setProj_desc(proj_desc);
+			if (!proj_ref_desc.equals("Item Details")) {
+				projRef.setProj_ref_desc(proj_ref_desc);
 			} else {
-				proj.setProj_desc("");
+				projRef.setProj_ref_desc("");
 			}
 
-			proj.setCretd_usr(user.getUserModel().getUsr_id());
+			projRef.setCretd_usr(user.getUserModel().getUsr_id());
 			
-			projectsDao.createProjects(proj);
+			projectsDao.createProjectsReference(projRef);
 			
-			System.out.println("itm_id = " + proj.getItm_id());
-			System.out.println("job_id = " + proj.getJob_id());
-			System.out.println("time = " + proj.getTime());
-			System.out.println("price = " + proj.getPrice());
-			System.out.println("currency = " + proj.getCurrency());
-			System.out.println("item detail = " + proj.getProj_desc());
+			System.out.println("itm_id = " + projRef.getItm_id());
+			System.out.println("proj_id = " + projRef.getProj_id());
+			System.out.println("time = " + projRef.getTime());
+			System.out.println("price = " + projRef.getPrice());
+			System.out.println("currency = " + projRef.getCurrency());
+			System.out.println("item detail = " + projRef.getProj_ref_desc());
 			}
 			
 //			Map<String, Object> model = new HashMap<String, Object>();
@@ -485,34 +485,34 @@ public class ProjectsController {
 		}
 	}
 	
-	@RequestMapping(value = "/updateJobs")
-	public ModelAndView updateJobs(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping(value = "/updateProjects")
+	public ModelAndView updateProjects(HttpServletRequest request, HttpServletResponse response,
 			FileUploadBean uploadItem, BindingResult result) {
 
 		UserDetailsApp user = UserLoginDetail.getUser();
 
-		int job_id = Integer.parseInt(request.getParameter("ejob_id"));
-		String job_name = request.getParameter("ejob_name");
+		int proj_id = Integer.parseInt(request.getParameter("eproj_id"));
+		String proj_name = request.getParameter("eproj_name");
 		int cus_id = Integer.parseInt(request.getParameter("ecus_id"));
-		String job_desc = request.getParameter("ejob_desc");
+		String proj_desc = request.getParameter("eproj_desc");
 		int file_id = Integer.parseInt(request.getParameter("efile_id"));
 
-		Jobs job = new Jobs();
+		Projects proj = new Projects();
 		FileModel fileModel = new FileModel();
 
-		job.setJob_id(job_id);
-		job.setJob_name(job_name);
-		job.setCus_id(cus_id);
+		proj.setProj_id(proj_id);
+		proj.setProj_name(proj_name);
+		proj.setCus_id(cus_id);
 
-		if (!job_desc.equals("Project Details")) {
-			job.setJob_desc(job_desc);
+		if (!proj_desc.equals("Project Details")) {
+			proj.setProj_desc(proj_desc);
 		} else {
-			job.setJob_desc("");
+			proj.setProj_desc("");
 		}
 
-		System.out.println("name = " + job.getJob_name());
-		System.out.println("cus_id = " + job.getCus_id());
-		System.out.println("detail = " + job.getJob_desc());
+		System.out.println("name = " + proj.getProj_name());
+		System.out.println("cus_id = " + proj.getCus_id());
+		System.out.println("detail = " + proj.getProj_desc());
 
 		OutputStream outputStream = null;
 
@@ -541,7 +541,7 @@ public class ProjectsController {
 							   createMain.mkdir();
 						   }
 						   String fileName = uploadItem.getFile().getOriginalFilename();  
-						   String filePath = "/Users/gsd/files/" + job.getJob_id();
+						   String filePath = "/Users/gsd/files/" + proj.getProj_id();
 						   File newFile = new File(filePath);
 						   if(!newFile.exists()){
 							   newFile.mkdir();
@@ -565,11 +565,11 @@ public class ProjectsController {
 						  }
 
 					projectsDao.updateFile(fileModel);
-					job.setFile_id(fileModel.getFile_id());
-					projectsDao.updateJobs(job);
+					proj.setFile_id(fileModel.getFile_id());
+					projectsDao.updateProjects(proj);
 				} else {
-					job.setFile_id(file_id);
-					projectsDao.updateJobs(job);
+					proj.setFile_id(file_id);
+					projectsDao.updateProjects(proj);
 				}
 			}else{
 				System.out.println("file_id == 0");
@@ -584,7 +584,7 @@ public class ProjectsController {
 							createMain.mkdir();
 						}
 						   String fileName = uploadItem.getFile().getOriginalFilename();  
-						   String filePath = "/Users/gsd/files/" + job.getJob_id();
+						   String filePath = "/Users/gsd/files/" + proj.getProj_id();
 						   File newFile = new File(filePath);
 						   if(!newFile.exists()){
 							   newFile.mkdir();
@@ -609,11 +609,11 @@ public class ProjectsController {
 					}
 
 					projectsDao.createFile(fileModel);
-					job.setFile_id(fileModel.getFile_id());
-					projectsDao.updateJobs(job);
+					proj.setFile_id(fileModel.getFile_id());
+					projectsDao.updateProjects(proj);
 				} else {
-					job.setFile_id(0);
-					projectsDao.updateJobs(job);
+					proj.setFile_id(0);
+					projectsDao.updateProjects(proj);
 				}
 			}
 		}
@@ -621,85 +621,85 @@ public class ProjectsController {
 		return new ModelAndView("redirect:projects.htm");
 	}
 	
-	@RequestMapping(value="/createProjects")
-	public ModelAndView createProjects(HttpServletRequest request, HttpServletResponse response){
+	@RequestMapping(value="/createProjectsReference")
+	public ModelAndView createProjectsReference(HttpServletRequest request, HttpServletResponse response){
 		
-		int job_id = Integer.parseInt(request.getParameter("ajob_id"));
+		int proj_id = Integer.parseInt(request.getParameter("aproj_id"));
 		int itm_id = Integer.parseInt(request.getParameter("aitm_id"));
 		String time = request.getParameter("atime");
 		String price = request.getParameter("aprice");
 		String currency = request.getParameter("acurrency");
-		String proj_desc = request.getParameter("aproj_desc");
+		String proj_ref_desc = request.getParameter("aproj_ref_desc");
 		
-		Projects proj = new Projects();
-		proj.setProj_id(projectsDao.getLastProjectId());
-		proj.setJob_id(job_id);
-		proj.setItm_id(itm_id);
+		ProjectsReference projRef = new ProjectsReference();
+		projRef.setProj_ref_id(projectsDao.getLastProjectRefId());
+		projRef.setProj_id(proj_id);
+		projRef.setItm_id(itm_id);
 		
 		if (!time.equals("Time in minutes")) {
-			proj.setTime(Integer.parseInt(time));
+			projRef.setTime(Integer.parseInt(time));
 		} else {
-			proj.setTime(0);
+			projRef.setTime(0);
 		}
 		if (!price.equals("Project Price")) {
-			proj.setPrice(Float.parseFloat(price));
+			projRef.setPrice(Float.parseFloat(price));
 		} else {
-			proj.setPrice(0);
+			projRef.setPrice(0);
 		}
 		if (!currency.equals("Price Currency")) {
-			proj.setCurrency(currency);
+			projRef.setCurrency(currency);
 		} else {
-			proj.setCurrency("");
+			projRef.setCurrency("");
 		}
-		if (!proj_desc.equals("Item Details")) {
-			proj.setProj_desc(proj_desc);
+		if (!proj_ref_desc.equals("Item Details")) {
+			projRef.setProj_ref_desc(proj_ref_desc);
 		} else {
-			proj.setProj_desc("");
+			projRef.setProj_ref_desc("");
 		}
 		
-		projectsDao.createProjects(proj);
+		projectsDao.createProjectsReference(projRef);
 		
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("success", true);
 		return new ModelAndView("jsonView", model);
 	}
 	
-	@RequestMapping(value="/updateProjects")
-	public ModelAndView updateProjects(HttpServletRequest request, HttpServletResponse response){
+	@RequestMapping(value="/updateProjectsReference")
+	public ModelAndView updateProjectsReference(HttpServletRequest request, HttpServletResponse response){
 		
-		int proj_id = Integer.parseInt(request.getParameter("eproj_id"));
+		int proj_ref_id = Integer.parseInt(request.getParameter("eproj_ref_id"));
 		int itm_id = Integer.parseInt(request.getParameter("eitm_id"));
 		String time = request.getParameter("etime");
 		String price = request.getParameter("eprice");
 		String currency = request.getParameter("ecurrency");
-		String proj_desc = request.getParameter("eproj_desc");
+		String proj_ref_desc = request.getParameter("eproj_ref_desc");
 		
-		Projects proj = new Projects();
-		proj.setProj_id(proj_id);
-		proj.setItm_id(itm_id);
+		ProjectsReference projRef = new ProjectsReference();
+		projRef.setProj_ref_id(proj_ref_id);
+		projRef.setItm_id(itm_id);
 		
 		if (!time.equals("Time in minutes")) {
-			proj.setTime(Integer.parseInt(time));
+			projRef.setTime(Integer.parseInt(time));
 		} else {
-			proj.setTime(0);
+			projRef.setTime(0);
 		}
 		if (!price.equals("Project Price")) {
-			proj.setPrice(Float.parseFloat(price));
+			projRef.setPrice(Float.parseFloat(price));
 		} else {
-			proj.setPrice(0);
+			projRef.setPrice(0);
 		}
 		if (!currency.equals("Price Currency")) {
-			proj.setCurrency(currency);
+			projRef.setCurrency(currency);
 		} else {
-			proj.setCurrency("");
+			projRef.setCurrency("");
 		}
-		if (!proj_desc.equals("Item Details")) {
-			proj.setProj_desc(proj_desc);
+		if (!proj_ref_desc.equals("Item Details")) {
+			projRef.setProj_ref_desc(proj_ref_desc);
 		} else {
-			proj.setProj_desc("");
+			projRef.setProj_ref_desc("");
 		}
 		
-		projectsDao.updateProjects(proj);
+		projectsDao.updateProjectsReference(projRef);
 		
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("success", true);
@@ -727,18 +727,18 @@ public class ProjectsController {
 		}
 	}
 	
-	@RequestMapping(value = "/deleteProjects")
-	public void deleteProjects(HttpServletRequest request,
+	@RequestMapping(value = "/deleteProjectsReference")
+	public void deleteProjectsReference(HttpServletRequest request,
 			HttpServletResponse response){
 
 		int id = Integer.parseInt(request.getParameter("id"));
 		
-			projectsDao.deleteProject(id);
+			projectsDao.deleteProjectsReference(id);
 		
 	}
 	
-	@RequestMapping(value = "/deleteJobs")
-	public void deleteJobs(HttpServletRequest request,
+	@RequestMapping(value = "/deleteProjects")
+	public void deleteProjects(HttpServletRequest request,
 			HttpServletResponse response){
 //		LOG.debug("Inside LogListing page on method view");
 
@@ -752,16 +752,16 @@ public class ProjectsController {
 		File dFile3 = new File(dfile.getFile_path());
 		
 		if(dFile2.delete()){
-			projectsDao.deleteJob(id);
+			projectsDao.deleteProjects(id);
 			projectsDao.deleteFile(fid);
 			dFile3.delete();
-			System.out.println("delete Jobs "+id);
+			System.out.println("delete Projects "+id);
 		}else{
-			System.out.println("can't delete Jobs or file "+id);
+			System.out.println("can't delete Projects or file on proj_id = "+id);
 		}
 		}else{
-			projectsDao.deleteJob(id);
-			System.out.println("delete Jobs "+id);
+			projectsDao.deleteProjects(id);
+			System.out.println("delete Projects "+id);
 		}
 	}
 	

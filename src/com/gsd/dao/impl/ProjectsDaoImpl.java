@@ -8,48 +8,48 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 import com.gsd.dao.ProjectsDao;
 import com.gsd.model.FileModel;
-import com.gsd.model.Jobs;
 import com.gsd.model.Projects;
+import com.gsd.model.ProjectsReference;
 
 public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 
 	@Override
-	public List<Jobs> showJobs() {
-		String sql = "SELECT jobs.job_id, \n" +
-				"	jobs.job_name, \n" +
-				"	jobs.job_desc, \n" +
-				"	jobs.file_id, \n" +
-				"	jobs.cus_id, \n" +
-				"	jobs.cretd_usr, \n" +
-				"	jobs.cretd_date, \n" +
-				"	jobs.update_date,\n" +
-				"	count(*) as proj_count\n" +
-				"FROM jobs\n" +
-				"LEFT JOIN projects on projects.job_id = jobs.job_id\n" +
-				"GROUP BY jobs.job_id";
-		
-		List<Jobs> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
-		return result;
-	}
-	
-	@Override
 	public List<Projects> showProjects() {
-		
-		String sql = "SELECT * FROM projects, item, customer\n" +
-				"WHERE projects.itm_id = item.itm_id " +
-				"AND projects.cus_id = customer.cus_id\n" +
-				"ORDER BY proj_name";
+		String sql = "SELECT projects.proj_id, \n" +
+				"	projects.proj_name, \n" +
+				"	projects.proj_desc, \n" +
+				"	projects.file_id, \n" +
+				"	projects.cus_id, \n" +
+				"	projects.cretd_usr, \n" +
+				"	projects.cretd_date, \n" +
+				"	projects.update_date,\n" +
+				"	count(*) as proj_count\n" +
+				"FROM projects\n" +
+				"LEFT JOIN projects_reference on projects_reference.proj_id = projects.proj_id\n" +
+				"GROUP BY projects.proj_id";
 		
 		List<Projects> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Projects>(Projects.class));
 		return result;
 	}
+	
+	@Override
+	public List<ProjectsReference> showProjectsReference() {
+		
+		String sql = "SELECT * FROM projects_reference, item, customer\n" +
+				"WHERE projects_reference.itm_id = item.itm_id " +
+				"AND projects_reference.cus_id = customer.cus_id\n" +
+				"ORDER BY proj_name";
+		
+		List<ProjectsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<ProjectsReference>(ProjectsReference.class));
+		return result;
+	}
 
 //	@Override
-//	public List<Projects> searchProjects(Map<String, String> data) {
+//	public List<Projects> searchProjectsReferences(Map<String, String> data) {
 //		
-//		String sql = "SELECT * FROM projects, item, customer\n" +
-//				"WHERE projects.itm_id = item.itm_id " +
-//				"AND projects.cus_id = customer.cus_id\n";
+//		String sql = "SELECT * FROM projects_reference, item, customer\n" +
+//				"WHERE projects_reference.itm_id = item.itm_id " +
+//				"AND projects_reference.cus_id = customer.cus_id\n";
 //		
 //		if(data.get("proj_name")==null || data.get("proj_name").isEmpty()){
 //		}else{
@@ -57,16 +57,16 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 //		}
 //		if(data.get("itm_id")==null || data.get("itm_id").isEmpty()){
 //		}else{
-//			sql += "AND projects.itm_id = "+data.get("itm_id")+"\n";
+//			sql += "AND projects_reference.itm_id = "+data.get("itm_id")+"\n";
 //		}
 //		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
 //		}else{
-//			sql += "AND projects.cus_id = "+data.get("cus_id")+"\n";
+//			sql += "AND projects_reference.cus_id = "+data.get("cus_id")+"\n";
 //		}
 //		if(data.get("priceStart")==null || data.get("priceStart").isEmpty()){
 //			if(data.get("priceLimit")==null || data.get("priceLimit").isEmpty()){
 //			}else{
-//				sql += "AND (round(price*(CASE projects.currency \n" +
+//				sql += "AND (round(price*(CASE projects_reference.currency \n" +
 //						"WHEN 'AUD' THEN "+data.get("EUR")+"/"+data.get("AUD")+"\n" +
 //						"WHEN 'CHF' THEN "+data.get("EUR")+"/"+data.get("CHF")+"\n" +
 //						"WHEN 'GBP' THEN "+data.get("EUR")+"/"+data.get("GBP")+"\n" +
@@ -76,7 +76,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 //						"END)*10000)/10000) <= "+data.get("priceLimit")+"\n";
 //			}
 //		}else if(data.get("priceLimit")==null || data.get("priceLimit").isEmpty()){
-//			sql += "AND (round(price*(CASE projects.currency \n" +
+//			sql += "AND (round(price*(CASE projects_reference.currency \n" +
 //					"WHEN 'AUD' THEN "+data.get("EUR")+"/"+data.get("AUD")+"\n" +
 //					"WHEN 'CHF' THEN "+data.get("EUR")+"/"+data.get("CHF")+"\n" +
 //					"WHEN 'GBP' THEN "+data.get("EUR")+"/"+data.get("GBP")+"\n" +
@@ -85,7 +85,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 //					"ELSE 1\n" +
 //					"END)*10000)/10000) >= "+data.get("priceStart")+"\n";
 //		}else{
-//			sql += "AND (round(price*(CASE projects.currency \n" +
+//			sql += "AND (round(price*(CASE projects_reference.currency \n" +
 //					"WHEN 'AUD' THEN "+data.get("EUR")+"/"+data.get("AUD")+"\n" +
 //					"WHEN 'CHF' THEN "+data.get("EUR")+"/"+data.get("CHF")+"\n" +
 //					"WHEN 'GBP' THEN "+data.get("EUR")+"/"+data.get("GBP")+"\n" +
@@ -97,12 +97,12 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 //		if(data.get("timeStart")==null || data.get("timeStart").isEmpty()){
 //			if(data.get("timeLimit")==null || data.get("timeLimit").isEmpty()){
 //			}else{
-//				sql += "AND projects.time <= "+data.get("timeLimit")+"\n";
+//				sql += "AND projects_reference.time <= "+data.get("timeLimit")+"\n";
 //			}
 //		}else if(data.get("timeLimit")==null || data.get("timeLimit").isEmpty()){
-//			sql += "AND projects.time >= "+data.get("timeStart")+"\n";
+//			sql += "AND projects_reference.time >= "+data.get("timeStart")+"\n";
 //		}else{
-//			sql += "AND projects.time BETWEEN "+data.get("timeStart")+" AND "+data.get("timeLimit")+"\n";
+//			sql += "AND projects_reference.time BETWEEN "+data.get("timeStart")+" AND "+data.get("timeLimit")+"\n";
 //		}
 //		
 //		sql += "ORDER BY proj_name";
@@ -114,113 +114,25 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 //	}
 	
 	@Override
-	public List<Jobs> searchJobs(Map<String, String> data){
-		String sql = "SELECT DISTINCT jobs.job_id, customer.cus_name, jobs.job_name, jobs.job_desc, jobs.cus_id, \n" +
-				"customer.cus_code, jobs.file_id\n" +
-				"FROM jobs\n" +
-				"LEFT JOIN projects ON projects.job_id = jobs.job_id\n" +
-				"LEFT JOIN customer ON customer.cus_id = jobs.cus_id\n" +
-				"WHERE jobs.job_id != 0\n";
-		
-		if(data.get("proj_name")==null || data.get("proj_name").isEmpty()){
-		}else{
-			sql += "AND LOWER(jobs.job_name) LIKE LOWER('%"+data.get("proj_name")+"%')\n";
-		}
-		if(data.get("itm_id")==null || data.get("itm_id").isEmpty()){
-		}else{
-			sql += "AND projects.itm_id = "+data.get("itm_id")+"\n";
-		}
-		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
-		}else{
-			sql += "AND jobs.cus_id = "+data.get("cus_id")+"\n";
-		}
-		if(data.get("key_acc_id")==null || data.get("key_acc_id").isEmpty()){
-		}else{
-			sql += "AND customer.key_acc_id = "+data.get("key_acc_id")+"\n";
-		}
-		if(data.get("priceStart")==null || data.get("priceStart").isEmpty()){
-			if(data.get("priceLimit")==null || data.get("priceLimit").isEmpty()){
-			}else{
-				sql += "AND (round(price*(CASE projects.currency \n" +
-						"WHEN 'AUD' THEN "+data.get("EUR")+"/"+data.get("AUD")+"\n" +
-						"WHEN 'CHF' THEN "+data.get("EUR")+"/"+data.get("CHF")+"\n" +
-						"WHEN 'GBP' THEN "+data.get("EUR")+"/"+data.get("GBP")+"\n" +
-						"WHEN 'THB' THEN "+data.get("EUR")+"/"+data.get("THB")+"\n" +
-						"WHEN 'USD' THEN "+data.get("EUR")+"\n" +
-						"ELSE 1\n" +
-						"END)*10000)/10000) <= "+data.get("priceLimit")+"\n";
-			}
-		}else if(data.get("priceLimit")==null || data.get("priceLimit").isEmpty()){
-			sql += "AND (round(price*(CASE projects.currency \n" +
-					"WHEN 'AUD' THEN "+data.get("EUR")+"/"+data.get("AUD")+"\n" +
-					"WHEN 'CHF' THEN "+data.get("EUR")+"/"+data.get("CHF")+"\n" +
-					"WHEN 'GBP' THEN "+data.get("EUR")+"/"+data.get("GBP")+"\n" +
-					"WHEN 'THB' THEN "+data.get("EUR")+"/"+data.get("THB")+"\n" +
-					"WHEN 'USD' THEN "+data.get("EUR")+"\n" +
-					"ELSE 1\n" +
-					"END)*10000)/10000) >= "+data.get("priceStart")+"\n";
-		}else{
-			sql += "AND (round(price*(CASE projects.currency \n" +
-					"WHEN 'AUD' THEN "+data.get("EUR")+"/"+data.get("AUD")+"\n" +
-					"WHEN 'CHF' THEN "+data.get("EUR")+"/"+data.get("CHF")+"\n" +
-					"WHEN 'GBP' THEN "+data.get("EUR")+"/"+data.get("GBP")+"\n" +
-					"WHEN 'THB' THEN "+data.get("EUR")+"/"+data.get("THB")+"\n" +
-					"WHEN 'USD' THEN "+data.get("EUR")+"\n" +
-					"ELSE 1\n" +
-					"END)*10000)/10000) BETWEEN "+data.get("priceStart")+" and "+data.get("priceLimit")+"\n";
-		}
-		if(data.get("timeStart")==null || data.get("timeStart").isEmpty()){
-			if(data.get("timeLimit")==null || data.get("timeLimit").isEmpty()){
-			}else{
-				sql += "AND projects.time <= "+data.get("timeLimit")+"\n";
-			}
-		}else if(data.get("timeLimit")==null || data.get("timeLimit").isEmpty()){
-			sql += "AND projects.time >= "+data.get("timeStart")+"\n";
-		}else{
-			sql += "AND projects.time BETWEEN "+data.get("timeStart")+" AND "+data.get("timeLimit")+"\n";
-		}
-		if(data.get("updateStart")==null || data.get("updateStart").isEmpty()){
-			if(data.get("updateLimit")==null || data.get("updateLimit").isEmpty()){
-			}else{
-				sql += "AND projects.update_date <= '"+data.get("updateLimit")+" 23:59:59'\n";
-			}
-		}else if(data.get("updateLimit")==null || data.get("updateLimit").isEmpty()){
-			sql += "AND projects.update_date >= '"+data.get("updateStart")+"'\n";
-		}else{
-			sql += "AND projects.update_date BETWEEN '"+data.get("updateStart")+"' AND '"+data.get("updateLimit")+" 23:59:59'\n";
-		}
-		
-		sql += "ORDER BY jobs.job_name";
-		
-//		System.out.println(sql);
-		
-		List<Jobs> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
-		return result;
-	}
-	
-	@Override
-	public List<Projects> searchProjects(Map<String, String> data) {
-		
-		String sql = "SELECT projects.proj_id, projects.job_id, jobs.job_name, \n" +
-				"projects.itm_id, item.itm_name, projects.\"time\", \n" +
-				"projects.price, projects.currency, projects.proj_desc\n" +
+	public List<Projects> searchProjects(Map<String, String> data){
+		String sql = "SELECT DISTINCT projects.proj_id, customer.cus_name, projects.proj_name, projects.proj_desc, projects.cus_id, \n" +
+				"customer.cus_code, projects.file_id\n" +
 				"FROM projects\n" +
-				"LEFT JOIN jobs ON jobs.job_id = projects.job_id\n" +
-				"LEFT JOIN item ON item.itm_id = projects.itm_id\n" +
-				"LEFT JOIN customer ON customer.cus_id = jobs.cus_id\n" +
+				"LEFT JOIN projects_reference ON projects_reference.proj_id = projects.proj_id\n" +
+				"LEFT JOIN customer ON customer.cus_id = projects.cus_id\n" +
 				"WHERE projects.proj_id != 0\n";
 		
 		if(data.get("proj_name")==null || data.get("proj_name").isEmpty()){
 		}else{
-			sql += "AND LOWER(jobs.job_name) LIKE LOWER('%"+data.get("proj_name")+"%')\n";
+			sql += "AND LOWER(projects.proj_name) LIKE LOWER('%"+data.get("proj_name")+"%')\n";
 		}
 		if(data.get("itm_id")==null || data.get("itm_id").isEmpty()){
 		}else{
-			sql += "AND projects.itm_id = "+data.get("itm_id")+"\n";
+			sql += "AND projects_reference.itm_id = "+data.get("itm_id")+"\n";
 		}
 		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
 		}else{
-			sql += "AND jobs.cus_id = "+data.get("cus_id")+"\n";
+			sql += "AND projects.cus_id = "+data.get("cus_id")+"\n";
 		}
 		if(data.get("key_acc_id")==null || data.get("key_acc_id").isEmpty()){
 		}else{
@@ -229,7 +141,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		if(data.get("priceStart")==null || data.get("priceStart").isEmpty()){
 			if(data.get("priceLimit")==null || data.get("priceLimit").isEmpty()){
 			}else{
-				sql += "AND (round(price*(CASE projects.currency \n" +
+				sql += "AND (round(price*(CASE projects_reference.currency \n" +
 						"WHEN 'AUD' THEN "+data.get("EUR")+"/"+data.get("AUD")+"\n" +
 						"WHEN 'CHF' THEN "+data.get("EUR")+"/"+data.get("CHF")+"\n" +
 						"WHEN 'GBP' THEN "+data.get("EUR")+"/"+data.get("GBP")+"\n" +
@@ -239,7 +151,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 						"END)*10000)/10000) <= "+data.get("priceLimit")+"\n";
 			}
 		}else if(data.get("priceLimit")==null || data.get("priceLimit").isEmpty()){
-			sql += "AND (round(price*(CASE projects.currency \n" +
+			sql += "AND (round(price*(CASE projects_reference.currency \n" +
 					"WHEN 'AUD' THEN "+data.get("EUR")+"/"+data.get("AUD")+"\n" +
 					"WHEN 'CHF' THEN "+data.get("EUR")+"/"+data.get("CHF")+"\n" +
 					"WHEN 'GBP' THEN "+data.get("EUR")+"/"+data.get("GBP")+"\n" +
@@ -248,7 +160,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 					"ELSE 1\n" +
 					"END)*10000)/10000) >= "+data.get("priceStart")+"\n";
 		}else{
-			sql += "AND (round(price*(CASE projects.currency \n" +
+			sql += "AND (round(price*(CASE projects_reference.currency \n" +
 					"WHEN 'AUD' THEN "+data.get("EUR")+"/"+data.get("AUD")+"\n" +
 					"WHEN 'CHF' THEN "+data.get("EUR")+"/"+data.get("CHF")+"\n" +
 					"WHEN 'GBP' THEN "+data.get("EUR")+"/"+data.get("GBP")+"\n" +
@@ -260,36 +172,124 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		if(data.get("timeStart")==null || data.get("timeStart").isEmpty()){
 			if(data.get("timeLimit")==null || data.get("timeLimit").isEmpty()){
 			}else{
-				sql += "AND projects.time <= "+data.get("timeLimit")+"\n";
+				sql += "AND projects_reference.time <= "+data.get("timeLimit")+"\n";
 			}
 		}else if(data.get("timeLimit")==null || data.get("timeLimit").isEmpty()){
-			sql += "AND projects.time >= "+data.get("timeStart")+"\n";
+			sql += "AND projects_reference.time >= "+data.get("timeStart")+"\n";
 		}else{
-			sql += "AND projects.time BETWEEN "+data.get("timeStart")+" AND "+data.get("timeLimit")+"\n";
+			sql += "AND projects_reference.time BETWEEN "+data.get("timeStart")+" AND "+data.get("timeLimit")+"\n";
 		}
 		if(data.get("updateStart")==null || data.get("updateStart").isEmpty()){
 			if(data.get("updateLimit")==null || data.get("updateLimit").isEmpty()){
 			}else{
-				sql += "AND projects.update_date <= '"+data.get("updateLimit")+" 23:59:59'\n";
+				sql += "AND projects_reference.update_date <= '"+data.get("updateLimit")+" 23:59:59'\n";
 			}
 		}else if(data.get("updateLimit")==null || data.get("updateLimit").isEmpty()){
-			sql += "AND projects.update_date >= '"+data.get("updateStart")+"'\n";
+			sql += "AND projects_reference.update_date >= '"+data.get("updateStart")+"'\n";
 		}else{
-			sql += "AND projects.update_date BETWEEN '"+data.get("updateStart")+"' AND '"+data.get("updateLimit")+" 23:59:59'\n";
+			sql += "AND projects_reference.update_date BETWEEN '"+data.get("updateStart")+"' AND '"+data.get("updateLimit")+" 23:59:59'\n";
 		}
 		
-		sql += "ORDER BY jobs.job_name, item.itm_name";
+		sql += "ORDER BY projects.proj_name";
 		
 //		System.out.println(sql);
 		
 		List<Projects> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Projects>(Projects.class));
 		return result;
 	}
+	
+	@Override
+	public List<ProjectsReference> searchProjectsReferences(Map<String, String> data) {
+		
+		String sql = "SELECT projects_reference.proj_ref_id, projects_reference.proj_id, projects.proj_name, \n" +
+				"projects_reference.itm_id, item.itm_name, projects_reference.\"time\", \n" +
+				"projects_reference.price, projects_reference.currency, projects_reference.proj_ref_desc\n" +
+				"FROM projects_reference\n" +
+				"LEFT JOIN projects ON projects.proj_id = projects_reference.proj_id\n" +
+				"LEFT JOIN item ON item.itm_id = projects_reference.itm_id\n" +
+				"LEFT JOIN customer ON customer.cus_id = projects.cus_id\n" +
+				"WHERE projects_reference.proj_ref_id != 0\n";
+		
+		if(data.get("proj_name")==null || data.get("proj_name").isEmpty()){
+		}else{
+			sql += "AND LOWER(projects.proj_name) LIKE LOWER('%"+data.get("proj_name")+"%')\n";
+		}
+		if(data.get("itm_id")==null || data.get("itm_id").isEmpty()){
+		}else{
+			sql += "AND projects_reference.itm_id = "+data.get("itm_id")+"\n";
+		}
+		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
+		}else{
+			sql += "AND projects.cus_id = "+data.get("cus_id")+"\n";
+		}
+		if(data.get("key_acc_id")==null || data.get("key_acc_id").isEmpty()){
+		}else{
+			sql += "AND customer.key_acc_id = "+data.get("key_acc_id")+"\n";
+		}
+		if(data.get("priceStart")==null || data.get("priceStart").isEmpty()){
+			if(data.get("priceLimit")==null || data.get("priceLimit").isEmpty()){
+			}else{
+				sql += "AND (round(price*(CASE projects_reference.currency \n" +
+						"WHEN 'AUD' THEN "+data.get("EUR")+"/"+data.get("AUD")+"\n" +
+						"WHEN 'CHF' THEN "+data.get("EUR")+"/"+data.get("CHF")+"\n" +
+						"WHEN 'GBP' THEN "+data.get("EUR")+"/"+data.get("GBP")+"\n" +
+						"WHEN 'THB' THEN "+data.get("EUR")+"/"+data.get("THB")+"\n" +
+						"WHEN 'USD' THEN "+data.get("EUR")+"\n" +
+						"ELSE 1\n" +
+						"END)*10000)/10000) <= "+data.get("priceLimit")+"\n";
+			}
+		}else if(data.get("priceLimit")==null || data.get("priceLimit").isEmpty()){
+			sql += "AND (round(price*(CASE projects_reference.currency \n" +
+					"WHEN 'AUD' THEN "+data.get("EUR")+"/"+data.get("AUD")+"\n" +
+					"WHEN 'CHF' THEN "+data.get("EUR")+"/"+data.get("CHF")+"\n" +
+					"WHEN 'GBP' THEN "+data.get("EUR")+"/"+data.get("GBP")+"\n" +
+					"WHEN 'THB' THEN "+data.get("EUR")+"/"+data.get("THB")+"\n" +
+					"WHEN 'USD' THEN "+data.get("EUR")+"\n" +
+					"ELSE 1\n" +
+					"END)*10000)/10000) >= "+data.get("priceStart")+"\n";
+		}else{
+			sql += "AND (round(price*(CASE projects_reference.currency \n" +
+					"WHEN 'AUD' THEN "+data.get("EUR")+"/"+data.get("AUD")+"\n" +
+					"WHEN 'CHF' THEN "+data.get("EUR")+"/"+data.get("CHF")+"\n" +
+					"WHEN 'GBP' THEN "+data.get("EUR")+"/"+data.get("GBP")+"\n" +
+					"WHEN 'THB' THEN "+data.get("EUR")+"/"+data.get("THB")+"\n" +
+					"WHEN 'USD' THEN "+data.get("EUR")+"\n" +
+					"ELSE 1\n" +
+					"END)*10000)/10000) BETWEEN "+data.get("priceStart")+" and "+data.get("priceLimit")+"\n";
+		}
+		if(data.get("timeStart")==null || data.get("timeStart").isEmpty()){
+			if(data.get("timeLimit")==null || data.get("timeLimit").isEmpty()){
+			}else{
+				sql += "AND projects_reference.time <= "+data.get("timeLimit")+"\n";
+			}
+		}else if(data.get("timeLimit")==null || data.get("timeLimit").isEmpty()){
+			sql += "AND projects_reference.time >= "+data.get("timeStart")+"\n";
+		}else{
+			sql += "AND projects_reference.time BETWEEN "+data.get("timeStart")+" AND "+data.get("timeLimit")+"\n";
+		}
+		if(data.get("updateStart")==null || data.get("updateStart").isEmpty()){
+			if(data.get("updateLimit")==null || data.get("updateLimit").isEmpty()){
+			}else{
+				sql += "AND projects_reference.update_date <= '"+data.get("updateLimit")+" 23:59:59'\n";
+			}
+		}else if(data.get("updateLimit")==null || data.get("updateLimit").isEmpty()){
+			sql += "AND projects_reference.update_date >= '"+data.get("updateStart")+"'\n";
+		}else{
+			sql += "AND projects_reference.update_date BETWEEN '"+data.get("updateStart")+"' AND '"+data.get("updateLimit")+" 23:59:59'\n";
+		}
+		
+		sql += "ORDER BY projects.proj_name, item.itm_name";
+		
+//		System.out.println(sql);
+		
+		List<ProjectsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<ProjectsReference>(ProjectsReference.class));
+		return result;
+	}
 
 	@Override
-	public int getLastProjectId() {
+	public int getLastProjectRefId() {
 		
-		String sql = "SELECT max(proj_id) from projects";
+		String sql = "SELECT max(proj_ref_id) from projects_reference";
 		 
 		int id = getJdbcTemplate().queryForInt(sql);
 		return id+1;
@@ -305,43 +305,43 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	}
 	
 	@Override
-	public int getLastJobId() {
+	public int getLastProjectId() {
 		
-		String sql = "SELECT max(job_id) from jobs";
+		String sql = "SELECT max(proj_id) from projects";
 		 
 		int id = getJdbcTemplate().queryForInt(sql);
 		return id+1;
 	}
 
 	@Override
-	public void createProjects(Projects proj) {
+	public void createProjectsReference(ProjectsReference proj) {
 		// TODO Auto-generated method stub
-		String sql = "INSERT INTO projects VALUES (?,?,?,?,?,?,now(),now(),?,?)";
+		String sql = "INSERT INTO projects_reference VALUES (?,?,?,?,?,?,now(),now(),?,?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[] { 
+				proj.getProj_ref_id(),
 				proj.getProj_id(),
-				proj.getJob_id(),
 				proj.getItm_id(),
 				proj.getTime(),
 				proj.getPrice(),
 				proj.getCretd_usr(),
 				proj.getCurrency(),
-				proj.getProj_desc()
+				proj.getProj_ref_desc()
 		});
 	}
 	
 	@Override
-	public void createJobs(Jobs job) {
+	public void createProjects(Projects proj) {
 		// TODO Auto-generated method stub
-		String sql = "INSERT INTO jobs VALUES (?,?,?,?,?,?,now(),now())";
+		String sql = "INSERT INTO projects VALUES (?,?,?,?,?,?,now(),now())";
 		
 		this.getJdbcTemplate().update(sql, new Object[] { 
-				job.getJob_id(),
-				job.getJob_name(),
-				job.getJob_desc(),
-				job.getFile_id(),
-				job.getCus_id(),
-				job.getCretd_usr()
+				proj.getProj_id(),
+				proj.getProj_name(),
+				proj.getProj_desc(),
+				proj.getFile_id(),
+				proj.getCus_id(),
+				proj.getCretd_usr()
 		});
 	}
 
@@ -384,52 +384,52 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	}
 
 	@Override
-	public void updateProjects(Projects proj) {
+	public void updateProjectsReference(ProjectsReference proj) {
 		// TODO Auto-generated method stub
-		String sql = "update projects set "
+		String sql = "update projects_reference set "
 				+ "itm_id=?, "
 				+ "time=?, "
 				+ "price=?, "
 				+ "update_date=now(), "
 				+ "currency=?, "
-				+ "proj_desc=? "
-				+ "where proj_id=?";
+				+ "proj_ref_desc=? "
+				+ "where proj_ref_id=?";
 		
 		this.getJdbcTemplate().update(sql, new Object[] { 
 				proj.getItm_id(),
 				proj.getTime(),
 				proj.getPrice(),
 				proj.getCurrency(),
-				proj.getProj_desc(),
-				proj.getProj_id()
+				proj.getProj_ref_desc(),
+				proj.getProj_ref_id()
 		});
 		
 	}
 	
 	@Override
-	public void updateJobs(Jobs job){
+	public void updateProjects(Projects proj){
 		
-		String sql = "update jobs set "
-				+ "job_name=?, "
-				+ "job_desc=?, "
+		String sql = "update projects set "
+				+ "proj_name=?, "
+				+ "proj_desc=?, "
 				+ "file_id=?, "
 				+ "cus_id=?,"
 				+ "update_date=now() "
-				+ "where job_id=?";
+				+ "where proj_id=?";
 		
 		this.getJdbcTemplate().update(sql, new Object[] { 
-				job.getJob_name(),
-				job.getJob_desc(),
-				job.getFile_id(),
-				job.getCus_id(),
-				job.getJob_id()
+				proj.getProj_name(),
+				proj.getProj_desc(),
+				proj.getFile_id(),
+				proj.getCus_id(),
+				proj.getProj_id()
 		});
 	}
 
 	@Override
-	public void deleteProject(int id) {
+	public void deleteProjectsReference(int id) {
 		// TODO Auto-generated method stub
-		String sql = "delete from projects where proj_id="+id;
+		String sql = "delete from projects_reference where proj_ref_id="+id;
 		this.getJdbcTemplate().update(sql);
 	}
 	
@@ -440,17 +440,17 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	}
 
 	@Override
-	public void deleteJob(int id) {
+	public void deleteProjects(int id) {
 		// TODO Auto-generated method stub
-		String sql = "delete from jobs where job_id="+id;
+		String sql = "delete from projects where proj_id="+id;
 		this.getJdbcTemplate().update(sql);
 	}
 
 	@Override
-	public Jobs findByJobName(String name) {
+	public Projects findByProjectName(String name) {
 		// TODO Auto-generated method stub
-		String sql = "select * from jobs where lower(job_name)=lower('"+name+"')";
-		return getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class)) ;
+		String sql = "select * from projects where lower(proj_name)=lower('"+name+"')";
+		return getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<Projects>(Projects.class)) ;
 	}
 
 }

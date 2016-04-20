@@ -1,6 +1,6 @@
 package com.gsd.model;
 
-public class Jobs {
+public class Jobs_old {
 
 	private int job_id;
 	private String job_name;

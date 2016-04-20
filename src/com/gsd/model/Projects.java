@@ -3,16 +3,14 @@ package com.gsd.model;
 public class Projects {
 
 	private int proj_id;
-	private int job_id;
-	private int itm_id;
-	private int time;
-	private float price;
+	private String proj_name;
+	private String proj_desc;
+	private int file_id;
+	private int cus_id;
 	private int cretd_usr;
 	private String cretd_date;
 	private String update_date;
-	private String currency;
-	private String proj_desc;
-	private String itm_name;
+	private int proj_count;
 	private String cus_name;
 	private String cus_code;
 	
@@ -22,29 +20,29 @@ public class Projects {
 	public void setProj_id(int proj_id) {
 		this.proj_id = proj_id;
 	}
-	public int getJob_id() {
-		return job_id;
+	public String getProj_name() {
+		return proj_name;
 	}
-	public void setJob_id(int job_id) {
-		this.job_id = job_id;
+	public void setProj_name(String proj_name) {
+		this.proj_name = proj_name;
 	}
-	public int getItm_id() {
-		return itm_id;
+	public String getProj_desc() {
+		return proj_desc;
 	}
-	public void setItm_id(int itm_id) {
-		this.itm_id = itm_id;
+	public void setProj_desc(String proj_desc) {
+		this.proj_desc = proj_desc;
 	}
-	public int getTime() {
-		return time;
+	public int getFile_id() {
+		return file_id;
 	}
-	public void setTime(int time) {
-		this.time = time;
+	public void setFile_id(int file_id) {
+		this.file_id = file_id;
 	}
-	public float getPrice() {
-		return price;
+	public int getCus_id() {
+		return cus_id;
 	}
-	public void setPrice(float price) {
-		this.price = price;
+	public void setCus_id(int cus_id) {
+		this.cus_id = cus_id;
 	}
 	public int getCretd_usr() {
 		return cretd_usr;
@@ -64,23 +62,11 @@ public class Projects {
 	public void setUpdate_date(String update_date) {
 		this.update_date = update_date;
 	}
-	public String getCurrency() {
-		return currency;
+	public int getProj_count() {
+		return proj_count;
 	}
-	public void setCurrency(String currency) {
-		this.currency = currency;
-	}
-	public String getProj_desc() {
-		return proj_desc;
-	}
-	public void setProj_desc(String proj_desc) {
-		this.proj_desc = proj_desc;
-	}
-	public String getItm_name() {
-		return itm_name;
-	}
-	public void setItm_name(String itm_name) {
-		this.itm_name = itm_name;
+	public void setProj_count(int proj_count) {
+		this.proj_count = proj_count;
 	}
 	public String getCus_name() {
 		return cus_name;
