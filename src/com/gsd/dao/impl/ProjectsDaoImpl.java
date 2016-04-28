@@ -14,31 +14,34 @@ import com.gsd.model.ProjectsReference;
 public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 
 	@Override
-	public List<Projects> showProjects() {
+	public List<Projects> showProjects(int cus_id) {
 		String sql = "SELECT projects.proj_id, \n" +
-				"	projects.proj_name, \n" +
-				"	projects.proj_desc, \n" +
-				"	projects.file_id, \n" +
-				"	projects.cus_id, \n" +
-				"	projects.cretd_usr, \n" +
-				"	projects.cretd_date, \n" +
-				"	projects.update_date,\n" +
-				"	count(*) as proj_count\n" +
+				"	projects.proj_name \n" +
+//				"	projects.proj_desc, \n" +
+//				"	projects.file_id, \n" +
+//				"	projects.cus_id, \n" +
+//				"	projects.cretd_usr, \n" +
+//				"	projects.cretd_date, \n" +
+//				"	projects.update_date,\n" +
+//				"	count(*) as proj_count\n" +
 				"FROM projects\n" +
 				"LEFT JOIN projects_reference on projects_reference.proj_id = projects.proj_id\n" +
-				"GROUP BY projects.proj_id";
+				"Where projects.cus_id = "+cus_id+"\n"+
+				"ORDER BY projects.proj_name";
 		
 		List<Projects> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Projects>(Projects.class));
 		return result;
 	}
 	
 	@Override
-	public List<ProjectsReference> showProjectsReference() {
+	public List<ProjectsReference> showProjectsReference(int proj_id) {
 		
-		String sql = "SELECT * FROM projects_reference, item, customer\n" +
+		String sql = "SELECT projects_reference.proj_ref_id, \n" + 
+				"item.itm_name \n" +
+				"FROM projects_reference, item\n" +
 				"WHERE projects_reference.itm_id = item.itm_id " +
-				"AND projects_reference.cus_id = customer.cus_id\n" +
-				"ORDER BY proj_name";
+				"AND projects_reference.proj_id = "+ proj_id +"\n" +
+				"ORDER BY item.itm_name";
 		
 		List<ProjectsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<ProjectsReference>(ProjectsReference.class));
 		return result;

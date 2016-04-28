@@ -204,12 +204,14 @@ public class ProjectsController {
 	}
 
 	@RequestMapping(value = "/showProjects")
-	public ModelAndView showProjects(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView showProjects(@RequestParam("id") int id, HttpServletRequest request, HttpServletResponse response) {
 
 		List<Projects> proj = null;
 
+		int cus_id = id;
+		
 		try {
-			proj = projectsDao.showProjects();
+			proj = projectsDao.showProjects(cus_id);
 		} catch (Exception e) {
 			System.out.println("Error: " + e.getMessage());
 		}
@@ -222,12 +224,14 @@ public class ProjectsController {
 	}
 	
 	@RequestMapping(value = "/showProjectsReference")
-	public ModelAndView showProject(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView showProject(@RequestParam("id") int id, HttpServletRequest request, HttpServletResponse response) {
 
 		List<ProjectsReference> projRef = null;
 
+		int proj_id = id;
+		
 		try {
-			projRef = projectsDao.showProjectsReference();
+			projRef = projectsDao.showProjectsReference(proj_id);
 		} catch (Exception e) {
 			System.out.println("Error: " + e.getMessage());
 		}

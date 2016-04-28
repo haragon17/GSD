@@ -101,10 +101,15 @@ Ext.onReady(function(){
 //    		window.location = 'categoryManagement.htm';
 //          		}
 //          },
-			{text: 'Projects',
+		  {text: 'Projects',
         	handler : function(){
     		window.location = 'projects.htm';
           		}
+          },
+          {text: 'Job Report',
+          	handler : function(){
+      		window.location = 'jobReport.htm';
+            		}
           },
           {text: 'Customer Management',
           	handler : function(){

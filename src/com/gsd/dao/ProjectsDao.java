@@ -9,7 +9,7 @@ import com.gsd.model.ProjectsReference;
 
 public interface ProjectsDao {
 
-	public List<ProjectsReference> showProjectsReference();
+	public List<ProjectsReference> showProjectsReference(int proj_id);
 	
 	public List<ProjectsReference> searchProjectsReferences(Map<String, String> data);
 
@@ -37,7 +37,7 @@ public interface ProjectsDao {
 	
 	public void deleteProjects(int id);
 	
-	public List<Projects> showProjects();
+	public List<Projects> showProjects(int cus_id);
 
 	public List<Projects> searchProjects(Map<String, String> data);
 

@@ -45,6 +45,26 @@ background-image: url(images/icon-d.png);
 	background-image: url(../../images/icons/fam/printer.png) !important;
 }
 
+.icon-camera {
+	background-image: url(../../images/icons/fam/camera.png) !important;
+}
+
+.chart-bar {
+	background-image: url(../../images/icons/fam/chart_bar.png) !important;
+}
+
+.chart-curve {
+	background-image: url(../../images/icons/fam/chart_curve.png) !important;
+}
+
+.chart-line {
+	background-image: url(../../images/icons/fam/chart_line.png) !important;
+}
+
+.chart-pie {
+	background-image: url(../../images/icons/fam/chart_pie.png) !important;
+}
+
 .x-border-box, .x-border-box * {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
