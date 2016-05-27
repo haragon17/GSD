@@ -1,5 +1,30 @@
 store = {};
 panels = {};
+myStackItem = [];
+myRadarItem = [];
+
+Ext.override(Ext.chart.axis.Radial, {
+    processView: function() {
+        var me = this,
+            seriesItems = me.chart.series.items,
+            i, ln, series, ends, fields = [];
+        
+        for (i = 0, ln = seriesItems.length; i < ln; i++) {
+            series = seriesItems[i];
+            fields.push(series.yField);
+        }
+        me.fields = fields;
+        
+        // Recalculate maximum and minimum properties
+        delete me.minimum;
+        delete me.maximum;
+        //
+        
+        ends = me.calcEnds();
+        me.maximum = ends.to;
+        me.steps = ends.steps;
+    }
+});
 
 Ext.onReady(function() {
 
@@ -10,10 +35,6 @@ Ext.onReady(function() {
 	cusid = new Ext.form.Hidden({
 		name : 'cusid',
 		id : 'cusid'
-	});
-	fid = new Ext.form.Hidden({
-		name : 'fid',
-		id : 'fid'
 	});
 	
 	panels.search = Ext.create('Ext.form.Panel', {
@@ -95,26 +116,19 @@ Ext.onReady(function() {
 							var myIndex = this.store.indexOf(record);
 							var myValue = this.store.getAt(myIndex).data.cus_code;
 							var myId = this.store.getAt(myIndex).data.cus_id;
-							Ext.getCmp('cusid').setValue(myId);
+							Ext.getCmp('scus_id').setValue(myId);
 							Ext.getCmp('scus_code').setValue(myValue);
 							
-							console.log("cus_code: "+myValue);
-						},
-//						blur : function() {
-//							var v = this.getValue();
-//							var record = this.findRecord(this.valueField || this.displayField, v);
-//							if(record !== false){
-//								var myIndex = this.store.indexOf(record);
-//								var myValue = this.store.getAt(myIndex).data.cus_name;
-//								var myId = this.store.getAt(myIndex).data.cus_id;
-//								Ext.getCmp('cusid').setValue(myId);
-//								Ext.getCmp('scus_code').setValue(myValue);
-//							}else{
-//								Ext.getCmp('cusid').setValue("");
-//								Ext.getCmp('scus_name').setValue("");
-//								Ext.getCmp('scus_code').setValue("");
-//							}
-//						}
+							var proj = Ext.getCmp('sproj_id');
+							var item = Ext.getCmp('sitm_id');
+							item.clearValue();
+							item.getStore().removeAll();
+							proj.clearValue();
+							proj.getStore().removeAll();
+							proj.getStore().load({
+								url: 'showProjects.htm?id='+myId
+							});
+						}
 
 					}
 				}, {
@@ -155,25 +169,18 @@ Ext.onReady(function() {
 							var myIndex = this.store.indexOf(record);
 							var myValue = this.store.getAt(myIndex).data.cus_name;
 							var myId = this.store.getAt(myIndex).data.cus_id;
-							Ext.getCmp('cusid').setValue(myId);
+							Ext.getCmp('scus_id').setValue(myId);
 							Ext.getCmp('scus_name').setValue(myValue);
 							
-							console.log("cus_name: "+myValue);
-						},
-						blur : function() {
-							var v = this.getValue();
-							var record = this.findRecord(this.valueField || this.displayField, v);
-							if(record !== false){
-								var myIndex = this.store.indexOf(record);
-								var myValue = this.store.getAt(myIndex).data.cus_name;
-								var myId = this.store.getAt(myIndex).data.cus_id;
-								Ext.getCmp('cusid').setValue(myId);
-								Ext.getCmp('scus_name').setValue(myValue);
-							}else{
-								Ext.getCmp('cusid').setValue("");
-								Ext.getCmp('scus_code').setValue("");
-								Ext.getCmp('scus_name').setValue("");
-							}
+							var proj = Ext.getCmp('sproj_id');
+							var item = Ext.getCmp('sitm_id');
+							item.clearValue();
+							item.getStore().removeAll();
+							proj.clearValue();
+							proj.getStore().removeAll();
+							proj.getStore().load({
+								url: 'showProjects.htm?id='+myId
+							});
 						}
 
 					}
@@ -186,23 +193,40 @@ Ext.onReady(function() {
 					labelWidth : 110,
 					margin : '0 0 10 0',
 					width : 280,
-					editable : false,
+//					editable : false,
 					emptyText : 'Project Name',
 					store : {
-						fields : [ 'key_acc_id', 'key_acc_name' ],
+						fields : [ 'proj_id', 'proj_name' ],
 						proxy : {
 							type : 'ajax',
-							url : 'showKeyAccMng.htm',
+							url : 'showProjects.htm?id=0',
 							reader : {
 								type : 'json',
 								root : 'records',
-								idProperty : 'key_acc_id'
+								idProperty : 'proj_id'
 							}
 						},
-						autoLoad : true
+						autoLoad : true,
+						sorters: [{
+					         property: 'proj_name',
+					         direction: 'ASC'
+					     }]
 					},
-					valueField : 'key_acc_id',
-					displayField : 'key_acc_name'
+					valueField : 'proj_id',
+					displayField : 'proj_name',
+					listeners : {
+
+						select : function() {
+							var item = Ext.getCmp('sitm_id');
+							var proj_id = Ext.getCmp('sproj_id').getValue();
+
+							item.clearValue();
+							item.getStore().removeAll();
+							item.getStore().load({
+								url: 'showItem.htm?id='+proj_id
+							});
+						}
+					}
 				},{
 					xtype: 'combobox',
 					fieldLabel : 'Item Name ',
@@ -217,14 +241,18 @@ Ext.onReady(function() {
 						fields : [ 'itm_id', 'itm_name' ],
 						proxy : {
 							type : 'ajax',
-							url : 'showItem.htm',
+							url : 'showItem.htm?id=0',
 							reader : {
 								type : 'json',
 								root : 'records',
 								idProperty : 'itm_id'
 							}
 						},
-						autoLoad : true
+						autoLoad : true,
+						sorters: [{
+					         property: 'itm_name',
+					         direction: 'ASC'
+					     }]
 					},
 					valueField : 'itm_id',
 					displayField : 'itm_name'
@@ -243,8 +271,8 @@ Ext.onReady(function() {
 				items : [ 
 				    {
 				    fieldLabel : 'Job Name ',
-				    name : 'sproj_name',
-				    id : 'sproj_name',
+				    name : 'sjob_name',
+				    id : 'sjob_name',
 				    labelWidth : 100,
 					margin : '0 0 10 0',
 					width : 280,
@@ -325,7 +353,11 @@ Ext.onReady(function() {
 		                        }
 		                    }
 		                ]
-					} ]
+					}, {
+						xtype : 'hidden',
+						id : 'scus_id',
+						name : 'scus_id'
+		            } ]
 			}  ]
 		} ],
 
@@ -337,10 +369,9 @@ Ext.onReady(function() {
 				if (form.isValid()) {
 					Ext.getCmp('ireport').setDisabled(false);
 					Ext.Ajax.request({
-						url : 'searchProjectsParam.htm?cus_id='+Ext.getCmp('cusid').getValue() + getParamValues(),
+						url : 'searchJobsParam.htm' + getParamValues(),
 						success : function(response, opts) {
-							store.projectsRef.reload();
-							store.projects.loadPage(1);
+							store.jobs.loadPage(1);
 						}
 					});
 
@@ -359,9 +390,10 @@ Ext.onReady(function() {
 			text : 'Reset',
 			handler : function() {
 				this.up('form').getForm().reset();
-				Ext.getCmp('cusid').setValue("");
-				Ext.getCmp('update_start').setMaxValue(new Date());
-				Ext.getCmp('update_limit').setMinValue('');
+				Ext.getCmp('sproj_id').getStore().load({url: 'showProjects.htm?id=0'});
+//				Ext.getCmp('scus_id').setValue("");
+//				Ext.getCmp('update_start').setMaxValue(new Date());
+//				Ext.getCmp('update_limit').setMinValue('');
 			}
 		} ]
 
@@ -385,6 +417,18 @@ Ext.onReady(function() {
 //			disabled : true,
 			iconCls : 'chart-line',
 			handler : function() {
+				myRadarItem = [];
+				itmCount = 0;
+				for(var i=0; i<store.radarItem.count(); i++){
+					myRadarItem[i]=store.radarItem.getAt(i).getData().dept;
+					itmCount = i+1;
+				};
+				myRadarItem[itmCount]="itm_name";
+//				dailyRadarModel.setFields(myRadarItem);
+				myRadarItem.pop();
+				store.dailyRadar.load({
+					url: 'dailyRadar.htm?dept_list='+myRadarItem.toString()
+				});
 				chartRadar.show();
 			}
 		},{
@@ -395,6 +439,30 @@ Ext.onReady(function() {
 //			disabled : true,
 			iconCls : 'chart-bar',
 			handler : function() {
+//				myStackItem = [];
+//				itmCount = 0;
+//				for(var i=0; i<store.stackItem.count(); i++){
+//					myStackItem[i]=store.stackItem.getAt(i).getData().itm_name;
+//					itmCount = i+1;
+//				};
+//				myStackItem[itmCount]="dept";
+//				dailyStackModel.setFields(myStackItem);
+//				myStackItem.pop();
+//				store.dailyStack.load({
+//					url: 'dailyStack.htm?itm_list='+myStackItem.toString()
+//				});
+				myRadarItem = [];
+				itmCount = 0;
+				for(var i=0; i<store.radarItem.count(); i++){
+					myRadarItem[i]=store.radarItem.getAt(i).getData().dept;
+					itmCount = i+1;
+				};
+				myRadarItem[itmCount]="itm_name";
+//				dailyRadarModel.setFields(myRadarItem);
+				myRadarItem.pop();
+				store.dailyRadar.load({
+					url: 'dailyRadar.htm?dept_list='+myRadarItem.toString()
+				});
 				chartStack.show();
 			}
 		},{
@@ -564,7 +632,34 @@ Ext.onReady(function() {
 						}
 					} ]
 				}, ],
-		columnLines : true,		
+		columnLines : true,
+		listeners: {
+			viewready: function (grid) {
+		        var view = grid.view;
+		        this.toolTip = Ext.create('Ext.tip.ToolTip', {
+		            target: view.el,
+		            delegate: view.cellSelector,
+//		            width: 'auto',
+		            trackMouse: true,
+		            renderTo: Ext.getBody(),
+		            listeners: {
+		                beforeshow: function(tip) {
+		                    var trigger = tip.triggerElement,
+		                        parent = tip.triggerElement.parentElement,
+		                        columnTitle = view.getHeaderByCell(trigger).text,
+		                        columnDataIndex = view.getHeaderByCell(trigger).dataIndex,
+		                        columnText = view.getRecord(parent).get(columnDataIndex).toString();
+		                    if (columnText){
+//		                        tip.update("<b>" + columnTitle + ":</b> " + columnText);
+		                        tip.update("<b>"+columnText+"</b>");
+		                    } else {
+		                        return false;
+		                    }
+		                }
+		            }
+		        });
+	        }
+	    },
 		bbar : Ext.create('Ext.PagingToolbar', {
 			store : store.jobs,
 			displayInfo : true,
@@ -574,74 +669,6 @@ Ext.onReady(function() {
 		})
 	});
 	
-	var store1 = Ext.create('Ext.data.JsonStore', {
-        fields: ['dept', 'clipping', 'alpha', 'retouch', 'indesign'],
-        data: [
-                {dept: 'PP', clipping: 1000, alpha: 600, retouch: 600, indesign: 200},
-                {dept: 'PK', clipping: 300, alpha: 200, retouch: 800, indesign: 600},
-                {dept: 'CM', clipping: 200, alpha: 100, retouch: 300, indesign: 100},
-                {dept: 'BKK', clipping: 100, alpha: 20, retouch: 200, indesign: 50}
-              ]
-    });
-	
-	stack = Ext.create('Ext.chart.Chart',{
-        animate: true,
-        shadow: true,
-        store: store1,
-        legend: {
-            position: 'right'
-        },
-        axes: [{
-            type: 'Numeric',
-            position: 'bottom',
-            fields: ['clipping', 'alpha', 'retouch', 'indesign'],
-            title: false,
-            grid: true,
-            label: {
-            	renderer: Ext.util.Format.numberRenderer('0,0')
-//                renderer: function(v) {
-//                	return String(v).replace(/(.)00000$/, '.$1M');
-//                }
-            }
-        }, {
-            type: 'Category',
-            position: 'left',
-            fields: ['dept'],
-            title: false
-        }],
-        series: [{
-            type: 'bar',
-            axis: 'bottom',
-            gutter: 80,
-            xField: 'dept',
-            yField: ['clipping', 'alpha', 'retouch', 'indesign'],
-            highlight: true,
-            stacked: true,
-            tips: {
-                trackMouse: true,
-                width: 110,
-                height: 28,
-                renderer: function(storeItem, item) {
-                	for( var i = 0; i < item.series.items.length; i++ ){
-                        if( item == item.series.items[i] ){
-                        	itemsPerRec = item.series.items.length / item.storeItem.store.getCount();
-                        	Y=item.series.yField[ i % itemsPerRec ]; 
-                        }
-                    }
-                	this.update( '<b>' + Y + '</b> = ' + String(item.value[1]));
-                }
-            },
-//            label: {
-//                display: 'insideEnd',
-//                  field: ['clipping', 'alpha', 'retouch', 'indesign'],
-//                  renderer: Ext.util.Format.numberRenderer('0'),
-//                  orientation: 'horizontal',
-//                  color: '#333',
-//                  'text-anchor': 'middle'
-//              }
-        }]
-    });
-
 
 	chartStack = new Ext.create('Ext.window.Window',{
 		width : 800,
@@ -649,6 +676,7 @@ Ext.onReady(function() {
 		minHeight : 450,
 		animateTarget : 'ichart2',
 		minWidth : 600,
+//		modal : true,
 		hidden : false,
 		shadow : false,
 		maximizable : true,
@@ -810,293 +838,120 @@ Ext.onReady(function() {
 		} ]
 
 	});	
-	
-//var panel1 = Ext.create('widget.panel', {
-//    width: 800,
-//    height: 400,
-//    title: 'Stacked Bar Chart - GSD',
-//    renderTo: Ext.getBody(),
-//    layout: 'fit',
-//    tbar: [{
-//        text: 'Save Chart',
-//        handler: function() {
-//            Ext.MessageBox.confirm('Confirm Download', 'Would you like to download the chart as an image?', function(choice){
-//                if(choice == 'yes'){
-//                    chart.save({
-//                        type: 'image/png'
-//                    });
-//                }
-//            });
-//        }
-//    }],
-//    items: chartStack
-//});
 
-	Ext.require('Ext.chart.*');
-	Ext.require(['Ext.Window', 'Ext.fx.target.Sprite', 'Ext.layout.container.Fit', 'Ext.window.MessageBox']);
-	
-	var store3 = Ext.create('Ext.data.JsonStore', {
-        fields: ['type','PP','CM','PK','BKK','KK','time'],
-        data: [
-                {'type':'Clipping', 'PP':1000, 'CM':200, 'PK':300, 'BKK':50, 'KK':400, 'time':10},
-                {'type':'Alpha', 'PP':500, 'CM':50, 'PK':100, 'BKK':50, 'KK':200, 'time':45},
-                {'type':'Retouch', 'PP':400, 'CM':350, 'PK':1000, 'BKK':200, 'KK':500, 'time':30},
-                {'type':'In-Design', 'PP':100, 'CM':50, 'PK':800, 'BKK':30, 'KK':50, 'time':60}
-              ]
-    });
-	
-	    var seriesConfig = function(field) {
-	        return {
-	            type: 'radar',
-	            xField: 'type',
-	            yField: field,
-	            showInLegend: true,
-	            showMarkers: true,
-	            markerConfig: {
-	                radius: 5,
-	                size: 5
-	            },
-	            tips: {
-	                trackMouse: true,
-	                width: 100,
-	                height: 28,
-	                renderer: function(storeItem, item) {
-//	                    this.setTitle(storeItem.get('name') + ': ' + storeItem.get(field));
-//	                	this.setTitle(storeItem.get('type') + ': ' + ((storeItem.get(field))*(storeItem.get('time'))/60/8));
-	                	this.setTitle(storeItem.get('type') + ': ' + storeItem.get(field));
-	                }
-	            },
-	            style: {
-	                'stroke-width': 2,
-//	                opacity: 0.4
-	                fill: 'none'
-	            }
-	        }
-	    },
+}); //end onReady
 
-	    radar = Ext.create('Ext.chart.Chart', {
-	            style: 'background:#fff',
-	            theme: 'Category2',
-	            animate: true,
-	            store: store3,
-	            insetPadding: 20,
-	            legend: {
-	                position: 'right'
-	            },
-	            axes: [{
-	                type: 'Radial',
-	                position: 'radial',
-	                label: {
-	                    display: true
-	                }
-	            }],
-//	            series: [{
-//	                type: 'radar',
-//	                xField: 'clipping',
-//	                yField: 'dept',
-//	                style: {
-//	                    opacity: 0.4
-//	                }
-//	            },{
-//	                type: 'radar',
-//	                xField: 'alpha',
-//	                yField: 'dept',
-//	                style: {
-//	                    opacity: 0.4
-//	                }
-//	            },{
-//	                type: 'radar',
-//	                xField: 'retouch',
-//	                yField: 'dept',
-//	                style: {
-//	                    opacity: 0.4
-//	                }
-//	            },{
-//	                type: 'radar',
-//	                xField: 'in-design',
-//	                yField: 'dept',
-//	                style: {
-//	                    opacity: 0.4
-//	                }
-//	            }]
-	            series: [
-	                     seriesConfig('PP'),
-	                     seriesConfig('PK'),
-	                     seriesConfig('CM'),
-	                     seriesConfig('BKK'),
-	                     seriesConfig('KK')
-	                 ]
-	        });
-
-			chartRadar = new Ext.create('Ext.window.Window',{
-						width : 800,
-						height : 600,
-						minHeight : 450,
-						animateTarget : 'ichart',
-						minWidth : 600,
-						hidden : false,
-						shadow : false,
-						maximizable : true,
-						closeAction : 'hide',
-						style : 'overflow: hidden;',
-						title : 'Radar Chart - GSD',
-						layout : 'fit',
-						items : [ {
-							region : 'center',
-							defaults : {
-								hideMode : 'offsets',
-								layout : 'fit'
-							},
-							xtype : 'tabpanel',
-							items : [ {
-										title : 'Daily',
-										items : [ {
-											region : 'center',
-											defaults : {
-												hideMode : 'offsets',
-												layout : 'fit'
-											},
-											tabPosition : 'left',
-											tbar : [ {
-												text : 'Save Chart',
-												iconCls : 'icon-camera',
-												handler : function() {
-														Ext.MessageBox.confirm('Confirm Download','Would you like to download the chart as an image?',
-														function(choice) {
-															if (choice == 'yes') {
-																radar.save({
-																	type : 'image/png'
-																});
-															}
-														});
-													}
-												},{
-												text : 'Generate Excel',
-												iconCls : 'icon-print',
-												handler : function() {
-														Ext.MessageBox.confirm('Confirm Download','Would you like to download the chart as an excel?',
-														function(choice) {
-															if (choice == 'yes') {
-																radar.save({
-																	type : 'image/png'
-																	});
-															}
-														});
-													}
-												} 
-											],
-											xtype : 'tabpanel',
-											items : [ {
-												title : 'Amount',
-												items : radar
-											}, {
-												title : 'Hours'
-											}, {
-												title : 'Manpower'
-											} ]
-										} ]
-									},
-									{
-										title : 'Weekly',
-										items : [ {
-											region : 'center',
-											defaults : {
-												hideMode : 'offsets',
-												layout : 'fit'
-											},
-											tabPosition : 'left',
-											tbar : [ {
-												text : 'Save Chart',
-												iconCls : 'icon-camera',
-												handler : function() {
-														Ext.MessageBox.confirm('Confirm Download','Would you like to download the chart as an image?',
-														function(choice) {
-															if (choice == 'yes') {
-																radar.save({
-																	type : 'image/png'
-																});
-															}
-														});
-													}
-												},{
-												text : 'Generate Excel',
-												iconCls : 'icon-print',
-												handler : function() {
-														Ext.MessageBox.confirm('Confirm Download','Would you like to download the chart as an excel?',
-														function(choice) {
-															if (choice == 'yes') {
-																radar.save({
-																	type : 'image/png'
-																	});
-															}
-														});
-													}
-												} 
-											],
-											xtype : 'tabpanel',
-											items : [ {
-												title : 'Amount',
-											// items: chart
-											}, {
-												title : 'Hours'
-											}, {
-												title : 'Manpower'
-											} ]
-										} ]
-									},
-									{
-										title : 'Monthly',
-										items : [ {
-											region : 'center',
-											defaults : {
-												hideMode : 'offsets',
-												layout : 'fit'
-											},
-											tabPosition : 'left',
-											tbar : [ {
-												text : 'Save Chart',
-												iconCls : 'icon-camera',
-												handler : function() {
-														Ext.MessageBox.confirm('Confirm Download','Would you like to download the chart as an image?',
-														function(choice) {
-															if (choice == 'yes') {
-																radar.save({
-																	type : 'image/png'
-																});
-															}
-														});
-													}
-												},{
-												text : 'Generate Excel',
-												iconCls : 'icon-print',
-												handler : function() {
-														Ext.MessageBox.confirm('Confirm Download','Would you like to download the chart as an excel?',
-														function(choice) {
-															if (choice == 'yes') {
-																radar.save({
-																	type : 'image/png'
-																	});
-															}
-														});
-													}
-												} 
-											],
-											xtype : 'tabpanel',
-											items : [ {
-												title : 'Amount',
-											//	items : chart
-											}, {
-												title : 'Hours'
-											}, {
-												title : 'Manpower'
-											} ]
-										} ]
-									} ]
-						} ]
-
-					});	
+var store1 = Ext.create('Ext.data.JsonStore', {
+    fields: ['dept', 'clipping', 'alpha', 'retouch', 'indesign'],
+    data: [
+            {dept: 'PP', clipping: 1000, alpha: 600, retouch: 600, indesign: 200},
+            {dept: 'PK', clipping: 300, alpha: 200, retouch: 800, indesign: 600},
+            {dept: 'CM', clipping: 200, alpha: 100, retouch: 300, indesign: 100},
+            {dept: 'BKK', clipping: 100, alpha: 20, retouch: 200, indesign: 50}
+          ]
 });
 
+var store3 = Ext.create('Ext.data.JsonStore', {
+    fields: ['type','PP','CM','PK','BKK','KK','time'],
+    data: [
+            {'type':'Clipping', 'PP':1000, 'CM':200, 'PK':300, 'BKK':50, 'KK':400, 'time':10},
+            {'type':'Alpha', 'PP':500, 'CM':50, 'PK':100, 'BKK':50, 'KK':200, 'time':45},
+            {'type':'Retouch', 'PP':400, 'CM':350, 'PK':1000, 'BKK':200, 'KK':500, 'time':30},
+          ]
+});
+
+var store2 = Ext.create('Ext.data.JsonStore', {
+    fields: ['itm_name','PP','PK'],
+    data: [
+            {'itm_name':'Basic Clipping', 'PP':80.5, 'PK':0},
+            {'itm_name':'Basic Retouch', 'PP':10, 'PK':50},
+          ]
+});
+
+Ext.define('dailyStackModel', {
+	extend : 'Ext.data.Model',
+	fields : []
+});
+	
+store.stackItem = Ext.create('Ext.data.JsonStore', {
+	autoLoad : true,
+	fields : ['itm_name'],
+	proxy : {
+		type : 'ajax',
+		url : 'stackItem.htm',
+		reader : {
+			type : 'json',
+			root : 'records',
+		}
+	}
+});
+
+store.dailyStack = Ext.create('Ext.data.JsonStore', {
+	model : 'dailyStackModel',
+	id : 'dailyStackStore',
+	autoLoad : false,
+	proxy : {
+		type : 'ajax',
+//		url : 'searchJobs.htm',
+		reader : {
+			type : 'json',
+			root : 'records',
+			totalProperty : 'total'
+		}
+	}
+});
+
+Ext.define('dailyRadarModel', {
+	extend : 'Ext.data.Model',
+	fields : [{
+		name : 'itm_name',
+		type : 'string'
+	},{
+		name : 'PP',
+		type : 'float'
+	},{
+		name : 'PK',
+		type : 'float'
+	},{
+		name : 'CM',
+		type : 'float'
+	},{
+		name : 'KK',
+		type : 'float'
+	},{
+		name : 'BKK',
+		type : 'float'
+	}]
+});
+	
+store.radarItem = Ext.create('Ext.data.JsonStore', {
+	autoLoad : true,
+	fields : ['dept'],
+	proxy : {
+		type : 'ajax',
+		url : 'radarItem.htm',
+		reader : {
+			type : 'json',
+			root : 'records',
+		}
+	}
+});
+
+store.dailyRadar = Ext.create('Ext.data.JsonStore', {
+	autoDestroy: true,
+	model : 'dailyRadarModel',
+	id : 'dailyRadarStore',
+	autoLoad : false,
+	proxy : {
+		type : 'ajax',
+//		url : 'searchJobs.htm',
+		reader : {
+			type : 'json',
+			root : 'records',
+			totalProperty : 'total'
+		}
+	}
+});
 
 Ext.define('jobModel', {
 	extend : 'Ext.data.Model',
@@ -1199,6 +1054,285 @@ var department = Ext.create('Ext.data.Store', {
 	]
 })
 
+stack = Ext.create('Ext.chart.Chart',{
+    animate: true,
+    shadow: true,
+    store: store.dailyRadar,
+    legend: {
+        position: 'right'
+    },
+    axes: [{
+        type: 'Numeric',
+        position: 'bottom',
+//        fields: myStackItem,
+        fields: ["PP","PK","CM","KK","BKK"],
+        title: false,
+        grid: true,
+        label: {
+        	renderer: Ext.util.Format.numberRenderer('0,0')
+//            renderer: function(v) {
+//            	return String(v).replace(/(.)00000$/, '.$1M');
+//            }
+        }
+    }, {
+        type: 'Category',
+        position: 'left',
+        fields: ['itm_name'],
+        title: false
+    }],
+    series: [{
+        type: 'bar',
+        axis: 'bottom',
+        gutter: 80,
+        xField: 'itm_name',
+        yField: ["PP","PK","CM","KK","BKK"],
+        highlight: true,
+        stacked: true,
+        tips: {
+            trackMouse: true,
+            width: 110,
+            height: 28,
+            renderer: function(storeItem, item) {
+            	for( var i = 0; i < item.series.items.length; i++ ){
+                    if( item == item.series.items[i] ){
+                    	itemsPerRec = item.series.items.length / item.storeItem.store.getCount();
+                    	Y=item.series.yField[ i % itemsPerRec ]; 
+                    }
+                }
+            	this.update( '<b>' + Y + '</b> = ' + String(item.value[1]));
+            }
+        },
+//        label: {
+//            display: 'insideEnd',
+//              field: ['clipping', 'alpha', 'retouch', 'indesign'],
+//              renderer: Ext.util.Format.numberRenderer('0'),
+//              orientation: 'horizontal',
+//              color: '#333',
+//              'text-anchor': 'middle'
+//          }
+    }]
+});
+
+var seriesConfig = function(field) {
+    return {
+        type: 'radar',
+        xField: 'itm_name',
+        yField: field,
+        showInLegend: true,
+        showMarkers: true,
+        markerConfig: {
+            radius: 5,
+            size: 5
+        },
+        tips: {
+            trackMouse: true,
+            width: 150,
+            height: 28,
+            renderer: function(storeItem, item) {
+//                this.setTitle(storeItem.get('name') + ': ' + storeItem.get(field));
+//            	this.setTitle(storeItem.get('type') + ': ' + ((storeItem.get(field))*(storeItem.get('time'))/60/8));
+            	if(storeItem.get(field) == ""){
+            		this.setTitle(storeItem.get('itm_name') + ": 0");
+            	}else{
+            		this.setTitle(storeItem.get('itm_name') + ': ' + storeItem.get(field));
+            	}
+            }
+        },
+        style: {
+            'stroke-width': 2,
+//            opacity: 0.4
+            fill: 'none'
+        }
+    }
+}
+
+radar = Ext.create('Ext.chart.Chart', {
+		id: 'dailyRadar',
+        style: 'background:#fff',
+        theme: 'Category2',
+        animate: true,
+        store: store.dailyRadar,
+        insetPadding: 20,
+        legend: {
+            position: 'right'
+        },
+        axes: [{
+            type: 'Radial',
+            position: 'radial',
+            label: {
+                display: true
+            }
+        }],
+        series: [seriesConfig('PK'),seriesConfig('PP'),seriesConfig('CM'),seriesConfig('KK'),seriesConfig('BKK')]
+});
+
+chartRadar = new Ext.create('Ext.window.Window',{
+	width : 800,
+	height : 600,
+	minHeight : 450,
+	animateTarget : 'ichart',
+	minWidth : 600,
+	hidden : false,
+	shadow : false,
+	maximizable : true,
+	closeAction : 'hide',
+	style : 'overflow: hidden;',
+	title : 'Radar Chart - GSD',
+	layout : 'fit',
+	items : [ {
+		region : 'center',
+		defaults : {
+			hideMode : 'offsets',
+			layout : 'fit'
+		},
+		xtype : 'tabpanel',
+		items : [ {
+					title : 'Daily',
+					items : [ {
+						region : 'center',
+						defaults : {
+							hideMode : 'offsets',
+							layout : 'fit'
+						},
+						tabPosition : 'left',
+						tbar : [ {
+							text : 'Save Chart',
+							iconCls : 'icon-camera',
+							handler : function() {
+									Ext.MessageBox.confirm('Confirm Download','Would you like to download the chart as an image?',
+									function(choice) {
+										if (choice == 'yes') {
+											radar.save({
+												type : 'image/png'
+											});
+										}
+									});
+								}
+							},{
+							text : 'Generate Excel',
+							iconCls : 'icon-print',
+							handler : function() {
+									Ext.MessageBox.confirm('Confirm Download','Would you like to download the chart as an excel?',
+									function(choice) {
+										if (choice == 'yes') {
+											radar.save({
+												type : 'image/png'
+												});
+										}
+									});
+								}
+							} 
+						],
+						xtype : 'tabpanel',
+						items : [ {
+							title : 'Amount',
+							items : radar
+						}, {
+							title : 'Hours'
+						}, {
+							title : 'Manpower'
+						} ]
+					} ]
+				},
+				{
+					title : 'Weekly',
+					items : [ {
+						region : 'center',
+						defaults : {
+							hideMode : 'offsets',
+							layout : 'fit'
+						},
+						tabPosition : 'left',
+						tbar : [ {
+							text : 'Save Chart',
+							iconCls : 'icon-camera',
+							handler : function() {
+									Ext.MessageBox.confirm('Confirm Download','Would you like to download the chart as an image?',
+									function(choice) {
+										if (choice == 'yes') {
+											radar.save({
+												type : 'image/png'
+											});
+										}
+									});
+								}
+							},{
+							text : 'Generate Excel',
+							iconCls : 'icon-print',
+							handler : function() {
+									Ext.MessageBox.confirm('Confirm Download','Would you like to download the chart as an excel?',
+									function(choice) {
+										if (choice == 'yes') {
+											radar.save({
+												type : 'image/png'
+												});
+										}
+									});
+								}
+							} 
+						],
+						xtype : 'tabpanel',
+						items : [ {
+							title : 'Amount',
+						// items: chart
+						}, {
+							title : 'Hours'
+						}, {
+							title : 'Manpower'
+						} ]
+					} ]
+				},
+				{
+					title : 'Monthly',
+					items : [ {
+						region : 'center',
+						defaults : {
+							hideMode : 'offsets',
+							layout : 'fit'
+						},
+						tabPosition : 'left',
+						tbar : [ {
+							text : 'Save Chart',
+							iconCls : 'icon-camera',
+							handler : function() {
+									Ext.MessageBox.confirm('Confirm Download','Would you like to download the chart as an image?',
+									function(choice) {
+										if (choice == 'yes') {
+											radar.save({
+												type : 'image/png'
+											});
+										}
+									});
+								}
+							},{
+							text : 'Generate Excel',
+							iconCls : 'icon-print',
+							handler : function() {
+									Ext.MessageBox.confirm('Confirm Download','Would you like to download the chart as an excel?',
+									function(choice) {
+										if (choice == 'yes') {
+											radar.save({
+												type : 'image/png'
+												});
+										}
+									});
+								}
+							} 
+						],
+						xtype : 'tabpanel',
+						items : [ {
+							title : 'Amount',
+						//	items : chart
+						}, {
+							title : 'Hours'
+						}, {
+							title : 'Manpower'
+						} ]
+					} ]
+				} ]
+	} ]
+
+});
 
 addJob = new Ext.create('Ext.window.Window', {
 	title: 'Add Job',
@@ -1352,7 +1486,11 @@ addJob = new Ext.create('Ext.window.Window', {
 							idProperty : 'proj_id'
 						}
 					},
-					autoLoad : true
+					autoLoad : true,
+					sorters: [{
+				         property: 'proj_name',
+				         direction: 'ASC'
+				     }]
 				},
 				valueField : 'proj_id',
 				displayField : 'proj_name',
@@ -1390,7 +1528,11 @@ addJob = new Ext.create('Ext.window.Window', {
 							idProperty : 'proj_ref_id'
 						}
 					},
-					autoLoad : true
+					autoLoad : true,
+					sorters: [{
+				         property: 'itm_name',
+				         direction: 'ASC'
+				     }]
 				},
 				valueField : 'proj_ref_id',
 				displayField : 'itm_name'
@@ -1402,6 +1544,7 @@ addJob = new Ext.create('Ext.window.Window', {
     	    	emptyText : 'Job Name',
 //    	    	minValue : 0,
     	    	msgTarget : 'under',
+    	    	maxLength : 50,
     	    	name: 'ajob_name',
     	    	id: 'ajob_name',
     	    },{
@@ -1499,7 +1642,7 @@ addJob = new Ext.create('Ext.window.Window', {
     	    	name: 'ajob_dtl',
     	    	id: 'ajob_dtl',
     	    	emptyText: 'Job Details',
-    	    	maxLength : 50,
+    	    	maxLength : 100,
 				maxLengthText : 'Maximum input 100 Character',
     	    }]
             },
@@ -1960,7 +2103,7 @@ function confirmChk(btn) {
 function getParamValues() {
 	var url = "";
 	var param = "";
-	var prefix = "&";
+	var prefix = "?";
 	var queryStr = "";
 	var i = 1;
 	var count = 0;

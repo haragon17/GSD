@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.gsd.dao.JobsDao;
@@ -28,6 +29,7 @@ import net.sf.json.JSONObject;
 public class JobsController {
 
 	private ApplicationContext context;
+	private String cus_id,proj_id,itm_id,job_name,dept,start,end;
 	private JobsDao jobsDao;
 	
 	public JobsController() {
@@ -38,8 +40,27 @@ public class JobsController {
 	@RequestMapping(value = "/jobReport")
 	public ModelAndView viewJobsReport(HttpServletRequest request, HttpServletResponse response){
 		
+		cus_id = "";
+		proj_id = "";
+		itm_id = "";
+		job_name = "";
+		dept = "";
+		start = "";
+		end = "";
+		
 		return new ModelAndView("JobReport");
 		
+	}
+	
+	@RequestMapping(value="/searchJobsParam")
+	public void searchJobParam(HttpServletRequest request, HttpServletResponse response){
+		cus_id = request.getParameter("scus_id");
+		proj_id = request.getParameter("sproj_id");
+		itm_id = request.getParameter("sitm_id");
+		job_name = request.getParameter("sjob_name");
+		dept = request.getParameter("sdept");
+		start = request.getParameter("sbtw_start");
+		end = request.getParameter("sbtw_end");
 	}
 	
 	@RequestMapping(value="/searchJobs")
@@ -48,6 +69,14 @@ public class JobsController {
 		List<Jobs> job = null;
 		List<Jobs> jobLs = new ArrayList<Jobs>();
 		Map<String, String> map = new HashMap<String, String>();
+		
+		map.put("cus_id", cus_id);
+		map.put("proj_id", proj_id);
+		map.put("itm_id", itm_id);
+		map.put("job_name", job_name);
+		map.put("dept", dept);
+		map.put("start", start);
+		map.put("end", end);
 		
 		int start = Integer.parseInt(request.getParameter("start"));
 		int limit = Integer.parseInt(request.getParameter("limit"));
@@ -180,6 +209,102 @@ public class JobsController {
 		}catch(Exception e){
 			System.out.println("Cannot delete job_id = "+id+"\n"+e.getMessage());
 		}
+	}
+	
+	@RequestMapping(value="radarItem")
+	public ModelAndView radarItem(HttpServletRequest request, HttpServletResponse response){
+		
+		List<Jobs> job = new ArrayList<Jobs>();
+		Map<String, String> map = new HashMap<String, String>();
+		
+		map.put("cus_id", cus_id);
+		map.put("proj_id", proj_id);
+		map.put("itm_id", itm_id);
+		map.put("job_name", job_name);
+		map.put("dept", dept);
+		map.put("start", start);
+		map.put("end", end);
+		
+		job = jobsDao.radarItem(map);
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", job);
+		jobj.put("total", job.size());
+
+		return new ModelAndView("jsonView", jobj);
+	}
+	
+	@RequestMapping(value="dailyRadar")
+	public ModelAndView dailyRadar(HttpServletRequest request, HttpServletResponse response){
+		
+		List<Jobs> job = new ArrayList<Jobs>();
+		String itm = request.getParameter("dept_list");
+		String[] dept_list = itm.split(",");
+		Map<String, String> map = new HashMap<String, String>();
+		
+		map.put("cus_id", cus_id);
+		map.put("proj_id", proj_id);
+		map.put("itm_id", itm_id);
+		map.put("job_name", job_name);
+		map.put("dept", dept);
+		map.put("start", start);
+		map.put("end", end);
+		
+		job = jobsDao.dailyRadar(map, dept_list);
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", job);
+		jobj.put("total", job.size());
+
+		return new ModelAndView("jsonView", jobj);
+	}
+	
+	@RequestMapping(value="stackItem")
+	public ModelAndView stackItem(HttpServletRequest request, HttpServletResponse response){
+		
+		List<Jobs> job = new ArrayList<Jobs>();
+		Map<String, String> map = new HashMap<String, String>();
+		
+		map.put("cus_id", cus_id);
+		map.put("proj_id", proj_id);
+		map.put("itm_id", itm_id);
+		map.put("job_name", job_name);
+		map.put("dept", dept);
+		map.put("start", start);
+		map.put("end", end);
+		
+		job = jobsDao.stackItem(map);
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", job);
+		jobj.put("total", job.size());
+
+		return new ModelAndView("jsonView", jobj);
+	}
+	
+	@RequestMapping(value="dailyStack")
+	public ModelAndView dailyStack(HttpServletRequest request, HttpServletResponse response){
+		
+		List<Jobs> job = new ArrayList<Jobs>();
+		String itm = request.getParameter("itm_list");
+		String[] itm_list = itm.split(",");
+		Map<String, String> map = new HashMap<String, String>();
+		
+		map.put("cus_id", cus_id);
+		map.put("proj_id", proj_id);
+		map.put("itm_id", itm_id);
+		map.put("job_name", job_name);
+		map.put("dept", dept);
+		map.put("start", start);
+		map.put("end", end);
+		
+		job = jobsDao.dailyStack(map, itm_list);
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", job);
+		jobj.put("total", job.size());
+
+		return new ModelAndView("jsonView", jobj);
 	}
 	
 }

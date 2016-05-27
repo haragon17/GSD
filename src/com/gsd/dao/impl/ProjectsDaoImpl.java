@@ -25,9 +25,11 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 //				"	projects.update_date,\n" +
 //				"	count(*) as proj_count\n" +
 				"FROM projects\n" +
-				"LEFT JOIN projects_reference on projects_reference.proj_id = projects.proj_id\n" +
-				"Where projects.cus_id = "+cus_id+"\n"+
-				"ORDER BY projects.proj_name";
+				"LEFT JOIN projects_reference on projects_reference.proj_id = projects.proj_id\n";
+				if(cus_id != 0){
+					sql += "Where projects.cus_id = "+cus_id+"\n";
+				}
+				sql += "ORDER BY projects.proj_name";
 		
 		List<Projects> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Projects>(Projects.class));
 		return result;

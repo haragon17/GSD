@@ -16,4 +16,12 @@ public interface JobsDao {
 	public void updateJob(Jobs job);
 	
 	public void deleteJob(int id);
+	
+	public List<Jobs> radarItem(Map<String, String> data);
+	
+	public List<Jobs> dailyRadar(Map<String, String> data, String[] dept_list);
+	
+	public List<Jobs> stackItem(Map<String, String> data);
+	
+	public List<Jobs> dailyStack(Map<String, String> data, String[] itm_list);
 }

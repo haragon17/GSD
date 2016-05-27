@@ -59,6 +59,22 @@ public class ProjectsController {
 			uc.setChk(1);
 		}
 		
+		proj_name = "";
+		itm_id = "";
+		cus_id = "";
+		timeStart = "";
+		timeLimit = "";
+		priceStart = "";
+		priceLimit = "";
+		key_acc_id = "";
+		updateStart = "";
+		updateLimit = "";
+		AUD = "";
+		CHF = "";
+		GBP = "";
+		THB = "";
+		EUR = "";
+		
 		if(type == 0){
 			return new ModelAndView("ProjectsAdmin");
 		}else{

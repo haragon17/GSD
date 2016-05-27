@@ -24,6 +24,20 @@ public class ItemDaoImpl extends JdbcDaoSupport implements ItemDao {
 		List<Item> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Item>(Item.class));
 		return result;
 	}
+	
+	@Override
+	public List<Item> showItem(int proj_id){
+		
+		String sql = "SELECT item.itm_id, itm_name FROM item\n"
+				+ "LEFT JOIN projects_reference proj_ref ON proj_ref.itm_id = item.itm_id\n";
+		
+		if(proj_id != 0){
+			sql += "WHERE proj_id = "+proj_id;
+		}
+		
+		List<Item> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Item>(Item.class));
+		return result;
+	}
 
 	@Override
 	public int getLastItemId() {

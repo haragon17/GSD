@@ -50,9 +50,10 @@ public class ItemController {
 	public ModelAndView showItem(HttpServletRequest request, HttpServletResponse response) {
 
 		List<Item> itm = null;
+		int proj_id = Integer.parseInt(request.getParameter("id"));
 
 		try {
-			itm = itemDao.searchItem("");
+			itm = itemDao.showItem(proj_id);
 		} catch (Exception e) {
 			System.out.println("Error: " + e.getMessage());
 		}

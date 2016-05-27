@@ -20,7 +20,44 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					 "LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = jobs.proj_ref_id\n" +
 					 "LEFT JOIN projects proj ON proj.proj_id = proj_ref.proj_id\n" +
 					 "LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n" +
-					 "LEFT JOIN item ON item.itm_id = proj_ref.itm_id";
+					 "LEFT JOIN item ON item.itm_id = proj_ref.itm_id\n" +
+					 "WHERE job_id != 0\n";
+		
+		if(data.get("job_name")==null || data.get("job_name").isEmpty()){
+		}else{
+			sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
+		}
+		if(data.get("itm_id")==null || data.get("itm_id").isEmpty()){
+		}else{
+			sql += "AND item.itm_id = "+data.get("itm_id")+"\n";
+		}
+		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
+		}else{
+			sql += "AND cus.cus_id = "+data.get("cus_id")+"\n";
+		}
+		if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
+		}else{
+			sql += "AND proj.proj_id = "+data.get("proj_id")+"\n";
+		}
+		if(data.get("dept")==null || data.get("dept").isEmpty()){
+		}else{
+			sql += "AND dept = '"+data.get("dept")+"'\n";
+		}
+		if(data.get("start")==null || data.get("start").isEmpty()){
+			if(data.get("end")==null || data.get("end").isEmpty()){
+			}else{
+				sql += "AND (job_in <= '"+data.get("end")+" 23:59:59' OR job_out <= '"+data.get("end")+" 23:59:59')\n";
+			}
+		}else if(data.get("end")==null || data.get("end").isEmpty()){
+			sql += "AND (job_in >= '"+data.get("start")+"' OR job_out >= '"+data.get("start")+"')\n";
+		}else{
+//			sql += "AND (job_in BETWEEN '"+data.get("start")+"' AND '"+data.get("end")+" 23:59:59' "
+//					+ "OR job_out BETWEEN '"+data.get("start")+"' AND '"+data.get("end")+" 23:59:59')\n";
+			sql += "AND ('"+data.get("start")+"' BETWEEN job_in AND job_out "
+					+ "OR '"+data.get("end")+" 23:59:59' BETWEEN job_in AND job_out)\n";
+		}
+		
+		System.out.println(sql);
 		
 		List<Jobs> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
 		return result;
@@ -84,6 +121,343 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	public void deleteJob(int id) {
 		String sql = "DELETE from jobs where job_id="+id;
 		this.getJdbcTemplate().update(sql);
+	}
+
+	@Override
+	public List<Jobs> radarItem(Map<String, String> data) {
+		
+		String sql = "SELECT DISTINCT dept "+
+					 "FROM jobs\n" +
+					 "LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = jobs.proj_ref_id\n" +
+					 "LEFT JOIN projects proj ON proj.proj_id = proj_ref.proj_id\n" +
+					 "LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n" +
+					 "LEFT JOIN item ON item.itm_id = proj_ref.itm_id\n" +
+					 "WHERE job_id != 0\n";
+		
+		if(data.get("job_name")==null || data.get("job_name").isEmpty()){
+		}else{
+			sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
+		}
+		if(data.get("itm_id")==null || data.get("itm_id").isEmpty()){
+		}else{
+			sql += "AND item.itm_id = "+data.get("itm_id")+"\n";
+		}
+		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
+		}else{
+			sql += "AND cus.cus_id = "+data.get("cus_id")+"\n";
+		}
+		if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
+		}else{
+			sql += "AND proj.proj_id = "+data.get("proj_id")+"\n";
+		}
+		if(data.get("dept")==null || data.get("dept").isEmpty()){
+		}else{
+			sql += "AND dept = '"+data.get("dept")+"'\n";
+		}
+		if(data.get("start")==null || data.get("start").isEmpty()){
+			if(data.get("end")==null || data.get("end").isEmpty()){
+			}else{
+				sql += "AND (job_in <= '"+data.get("end")+" 23:59:59' OR job_out <= '"+data.get("end")+" 23:59:59')\n";
+			}
+		}else if(data.get("end")==null || data.get("end").isEmpty()){
+			sql += "AND (job_in >= '"+data.get("start")+"' OR job_out >= '"+data.get("start")+"')\n";
+		}else{
+			sql += "AND ('"+data.get("start")+"' BETWEEN job_in AND job_out "
+					+ "OR '"+data.get("end")+" 23:59:59' BETWEEN job_in AND job_out)\n";
+		}
+		
+		sql += "ORDER BY 1";
+		
+		List<Jobs> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
+		return result;
+	}
+
+	@Override
+	public List<Jobs> dailyRadar(Map<String, String> data, String[] dept_list) {
+		
+		
+		String sql = "SELECT * FROM crosstab(\n"+
+				"$$select B.itm_name, B.dept, sum(B.result) as amount from\n"+
+				"(select A.dept, A.itm_name, A.amount, A.hours, A.mans, A.deadline, A.diff_date,\n"+
+				"CASE WHEN diff_date = 0			THEN amount\n"+
+				"	 WHEN deadline >  diff_date THEN diff_date*amount\n"+
+				"	 WHEN deadline <= diff_date THEN deadline*amount\n"+
+				"	 END AS result,\n"+
+				"CASE WHEN diff_date = 0			THEN hours\n"+
+				"	 WHEN deadline >  diff_date THEN diff_date*hours\n"+
+				"	 WHEN deadline <= diff_date THEN deadline*hours\n"+
+				"	 END AS result2,\n"+
+				"CASE WHEN diff_date = 0			THEN mans\n"+
+				"	 WHEN deadline >  diff_date THEN diff_date*mans\n"+
+				"	 WHEN deadline <= diff_date THEN deadline*mans\n"+
+				"	 END AS result3\n"+
+				"FROM\n"+
+				"(select item.itm_name, dept, amount/date_part('day', job_out::timestamp - job_in::timestamp) as amount,\n"+
+				"time*(amount/date_part('day', job_out::timestamp - job_in::timestamp))/60 as hours,\n"+
+				"time*(amount/date_part('day', job_out::timestamp - job_in::timestamp))/60/8 as mans,\n"+
+				"DATE(job_out)-DATE(job_in) as deadline,\n"+
+				"DATE(job_out)-'2016-04-28' as diff_date\n"+
+				"from jobs\n"+
+				"LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = jobs.proj_ref_id\n"+
+				"LEFT JOIN projects proj ON proj.proj_id = proj_ref.proj_id\n"+
+				"LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"+
+				"LEFT JOIN item ON item.itm_id = proj_ref.itm_id\n";
+				
+				if(data.get("job_name")==null || data.get("job_name").isEmpty()){
+				}else{
+					sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
+				}
+				if(data.get("itm_id")==null || data.get("itm_id").isEmpty()){
+				}else{
+					sql += "AND item.itm_id = "+data.get("itm_id")+"\n";
+				}
+				if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
+				}else{
+					sql += "AND cus.cus_id = "+data.get("cus_id")+"\n";
+				}
+				if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
+				}else{
+					sql += "AND proj.proj_id = "+data.get("proj_id")+"\n";
+				}
+				if(data.get("dept")==null || data.get("dept").isEmpty()){
+				}else{
+					sql += "AND dept = '"+data.get("dept")+"'\n";
+				}
+				if(data.get("start")==null || data.get("start").isEmpty()){
+					if(data.get("end")==null || data.get("end").isEmpty()){
+					}else{
+						sql += "AND (job_in <= '"+data.get("end")+" 23:59:59' OR job_out <= '"+data.get("end")+" 23:59:59')\n";
+					}
+				}else if(data.get("end")==null || data.get("end").isEmpty()){
+					sql += "AND (job_in >= '"+data.get("start")+"' OR job_out >= '"+data.get("start")+"')\n";
+				}else{
+					sql += "AND ('"+data.get("start")+"' BETWEEN job_in AND job_out "
+							+ "OR '"+data.get("end")+" 23:59:59' BETWEEN job_in AND job_out)\n";
+				}
+				
+				sql +=  ")A)B\n"+
+						"GROUP BY B.dept, B.itm_name\n"+
+						"ORDER BY 1\n"+
+						"$$,\n"+
+						"$$SELECT DISTINCT dept FROM jobs \n"+
+						"LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = jobs.proj_ref_id\n"+
+						"LEFT JOIN projects proj ON proj.proj_id = proj_ref.proj_id\n"+
+						"LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"+
+						"LEFT JOIN item ON item.itm_id = proj_ref.itm_id\n";
+						
+						if(data.get("job_name")==null || data.get("job_name").isEmpty()){
+						}else{
+							sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
+						}
+						if(data.get("itm_id")==null || data.get("itm_id").isEmpty()){
+						}else{
+							sql += "AND item.itm_id = "+data.get("itm_id")+"\n";
+						}
+						if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
+						}else{
+							sql += "AND cus.cus_id = "+data.get("cus_id")+"\n";
+						}
+						if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
+						}else{
+							sql += "AND proj.proj_id = "+data.get("proj_id")+"\n";
+						}
+						if(data.get("dept")==null || data.get("dept").isEmpty()){
+						}else{
+							sql += "AND dept = '"+data.get("dept")+"'\n";
+						}
+						if(data.get("start")==null || data.get("start").isEmpty()){
+							if(data.get("end")==null || data.get("end").isEmpty()){
+							}else{
+								sql += "AND (job_in <= '"+data.get("end")+" 23:59:59' OR job_out <= '"+data.get("end")+" 23:59:59')\n";
+							}
+						}else if(data.get("end")==null || data.get("end").isEmpty()){
+							sql += "AND (job_in >= '"+data.get("start")+"' OR job_out >= '"+data.get("start")+"')\n";
+						}else{
+							sql += "AND ('"+data.get("start")+"' BETWEEN job_in AND job_out "
+									+ "OR '"+data.get("end")+" 23:59:59' BETWEEN job_in AND job_out)\n";
+						}
+						
+				sql +=	"ORDER BY 1$$\n";
+				String myItem = ") AS ct(\"itm_name\" text";
+				for(int i=0;i<dept_list.length;i++){
+					myItem += ", \"" + dept_list[i] + "\" float";
+				}
+				sql += myItem+")";
+//						") AS ct(\"dept\" text, "Basic Clipping" float, "Basic Retouch" float, "Image Processing" float)\n";
+
+				System.out.println("dailyRadar sql : \n"+sql);
+				
+		List<Jobs> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
+		return result;
+	}
+	
+	@Override
+	public List<Jobs> stackItem(Map<String, String> data) {
+		
+		String sql = "SELECT DISTINCT item.itm_name "+
+					 "FROM jobs\n" +
+					 "LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = jobs.proj_ref_id\n" +
+					 "LEFT JOIN projects proj ON proj.proj_id = proj_ref.proj_id\n" +
+					 "LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n" +
+					 "LEFT JOIN item ON item.itm_id = proj_ref.itm_id\n" +
+					 "WHERE job_id != 0\n";
+		
+		if(data.get("job_name")==null || data.get("job_name").isEmpty()){
+		}else{
+			sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
+		}
+		if(data.get("itm_id")==null || data.get("itm_id").isEmpty()){
+		}else{
+			sql += "AND item.itm_id = "+data.get("itm_id")+"\n";
+		}
+		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
+		}else{
+			sql += "AND cus.cus_id = "+data.get("cus_id")+"\n";
+		}
+		if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
+		}else{
+			sql += "AND proj.proj_id = "+data.get("proj_id")+"\n";
+		}
+		if(data.get("dept")==null || data.get("dept").isEmpty()){
+		}else{
+			sql += "AND dept = '"+data.get("dept")+"'\n";
+		}
+		if(data.get("start")==null || data.get("start").isEmpty()){
+			if(data.get("end")==null || data.get("end").isEmpty()){
+			}else{
+				sql += "AND (job_in <= '"+data.get("end")+" 23:59:59' OR job_out <= '"+data.get("end")+" 23:59:59')\n";
+			}
+		}else if(data.get("end")==null || data.get("end").isEmpty()){
+			sql += "AND (job_in >= '"+data.get("start")+"' OR job_out >= '"+data.get("start")+"')\n";
+		}else{
+//			sql += "AND (job_in BETWEEN '"+data.get("start")+"' AND '"+data.get("end")+" 23:59:59' "
+//					+ "OR job_out BETWEEN '"+data.get("start")+"' AND '"+data.get("end")+" 23:59:59')\n";
+			sql += "AND ('"+data.get("start")+"' BETWEEN job_in AND job_out "
+					+ "OR '"+data.get("end")+" 23:59:59' BETWEEN job_in AND job_out)\n";
+		}
+		
+		sql += "ORDER BY 1";
+		
+		List<Jobs> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
+		return result;
+	}
+	
+	@Override
+	public List<Jobs> dailyStack(Map<String, String> data, String[] itm_list) {
+		
+		String sql = "SELECT * FROM crosstab(\n"+
+				"$$select B.dept, B.itm_name, sum(B.result) as amount from\n"+
+				"(select A.dept, A.itm_name, A.amount, A.hours, A.mans, A.deadline, A.diff_date,\n"+
+				"CASE WHEN diff_date = 0			THEN amount\n"+
+				"	 WHEN deadline >  diff_date THEN diff_date*amount\n"+
+				"	 WHEN deadline <= diff_date THEN deadline*amount\n"+
+				"	 END AS result,\n"+
+				"CASE WHEN diff_date = 0			THEN hours\n"+
+				"	 WHEN deadline >  diff_date THEN diff_date*hours\n"+
+				"	 WHEN deadline <= diff_date THEN deadline*hours\n"+
+				"	 END AS result2,\n"+
+				"CASE WHEN diff_date = 0			THEN mans\n"+
+				"	 WHEN deadline >  diff_date THEN diff_date*mans\n"+
+				"	 WHEN deadline <= diff_date THEN deadline*mans\n"+
+				"	 END AS result3\n"+
+				"FROM\n"+
+				"(select item.itm_name, dept, amount/date_part('day', job_out::timestamp - job_in::timestamp) as amount,\n"+
+				"time*(amount/date_part('day', job_out::timestamp - job_in::timestamp))/60 as hours,\n"+
+				"time*(amount/date_part('day', job_out::timestamp - job_in::timestamp))/60/8 as mans,\n"+
+				"DATE(job_out)-DATE(job_in) as deadline,\n"+
+				"DATE(job_out)-'2016-04-28' as diff_date\n"+
+				"from jobs\n"+
+				"LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = jobs.proj_ref_id\n"+
+				"LEFT JOIN projects proj ON proj.proj_id = proj_ref.proj_id\n"+
+				"LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"+
+				"LEFT JOIN item ON item.itm_id = proj_ref.itm_id\n";
+				
+				if(data.get("job_name")==null || data.get("job_name").isEmpty()){
+				}else{
+					sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
+				}
+				if(data.get("itm_id")==null || data.get("itm_id").isEmpty()){
+				}else{
+					sql += "AND item.itm_id = "+data.get("itm_id")+"\n";
+				}
+				if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
+				}else{
+					sql += "AND cus.cus_id = "+data.get("cus_id")+"\n";
+				}
+				if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
+				}else{
+					sql += "AND proj.proj_id = "+data.get("proj_id")+"\n";
+				}
+				if(data.get("dept")==null || data.get("dept").isEmpty()){
+				}else{
+					sql += "AND dept = '"+data.get("dept")+"'\n";
+				}
+				if(data.get("start")==null || data.get("start").isEmpty()){
+					if(data.get("end")==null || data.get("end").isEmpty()){
+					}else{
+						sql += "AND (job_in <= '"+data.get("end")+" 23:59:59' OR job_out <= '"+data.get("end")+" 23:59:59')\n";
+					}
+				}else if(data.get("end")==null || data.get("end").isEmpty()){
+					sql += "AND (job_in >= '"+data.get("start")+"' OR job_out >= '"+data.get("start")+"')\n";
+				}else{
+					sql += "AND ('"+data.get("start")+"' BETWEEN job_in AND job_out "
+							+ "OR '"+data.get("end")+" 23:59:59' BETWEEN job_in AND job_out)\n";
+				}
+				
+				sql +=  ")A)B\n"+
+						"GROUP BY B.dept, B.itm_name\n"+
+						"ORDER BY 1\n"+
+						"$$,\n"+
+						"$$SELECT DISTINCT item.itm_name FROM jobs \n"+
+						"LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = jobs.proj_ref_id\n"+
+						"LEFT JOIN projects proj ON proj.proj_id = proj_ref.proj_id\n"+
+						"LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"+
+						"LEFT JOIN item ON item.itm_id = proj_ref.itm_id\n";
+						
+						if(data.get("job_name")==null || data.get("job_name").isEmpty()){
+						}else{
+							sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
+						}
+						if(data.get("itm_id")==null || data.get("itm_id").isEmpty()){
+						}else{
+							sql += "AND item.itm_id = "+data.get("itm_id")+"\n";
+						}
+						if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
+						}else{
+							sql += "AND cus.cus_id = "+data.get("cus_id")+"\n";
+						}
+						if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
+						}else{
+							sql += "AND proj.proj_id = "+data.get("proj_id")+"\n";
+						}
+						if(data.get("dept")==null || data.get("dept").isEmpty()){
+						}else{
+							sql += "AND dept = '"+data.get("dept")+"'\n";
+						}
+						if(data.get("start")==null || data.get("start").isEmpty()){
+							if(data.get("end")==null || data.get("end").isEmpty()){
+							}else{
+								sql += "AND (job_in <= '"+data.get("end")+" 23:59:59' OR job_out <= '"+data.get("end")+" 23:59:59')\n";
+							}
+						}else if(data.get("end")==null || data.get("end").isEmpty()){
+							sql += "AND (job_in >= '"+data.get("start")+"' OR job_out >= '"+data.get("start")+"')\n";
+						}else{
+							sql += "AND ('"+data.get("start")+"' BETWEEN job_in AND job_out "
+									+ "OR '"+data.get("end")+" 23:59:59' BETWEEN job_in AND job_out)\n";
+						}
+						
+				sql +=	"ORDER BY 1$$\n";
+				String myItem = ") AS ct(\"dept\" text";
+				for(int i=0;i<itm_list.length;i++){
+					myItem += ", \"" + itm_list[i] + "\" float";
+				}
+				sql += myItem+")";
+//						") AS ct(\"dept\" text, "Basic Clipping" float, "Basic Retouch" float, "Image Processing" float)\n";
+
+				System.out.println("dailyStack sql : \n"+sql);
+				
+		List<Jobs> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
+		return result;
 	}
 	
 }

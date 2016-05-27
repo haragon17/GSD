@@ -17,4 +17,6 @@ public interface ItemDao {
 	public void deleteItem(int id);
 	
 	public Item findByItmName(String itm_name);
+
+	public List<Item> showItem(int proj_id);
 }

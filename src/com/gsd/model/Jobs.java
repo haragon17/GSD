@@ -24,6 +24,11 @@ public class Jobs {
 	private int cus_id;
 	private int proj_id;
 	private int itm_id;
+	private String PP;
+	private String PK;
+	private String BKK;
+	private String CM;
+	private String KK;
 	
 	public int getJob_id() {
 		return job_id;
@@ -144,6 +149,36 @@ public class Jobs {
 	}
 	public void setItm_id(int itm_id) {
 		this.itm_id = itm_id;
+	}
+	public String getPP() {
+		return PP;
+	}
+	public void setPP(String pP) {
+		PP = pP;
+	}
+	public String getPK() {
+		return PK;
+	}
+	public void setPK(String pK) {
+		PK = pK;
+	}
+	public String getBKK() {
+		return BKK;
+	}
+	public void setBKK(String bKK) {
+		BKK = bKK;
+	}
+	public String getCM() {
+		return CM;
+	}
+	public void setCM(String cM) {
+		CM = cM;
+	}
+	public String getKK() {
+		return KK;
+	}
+	public void setKK(String kK) {
+		KK = kK;
 	}
 	
 }
