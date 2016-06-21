@@ -15,6 +15,7 @@ public class ProjectsReference {
 	private String itm_name;
 	private String cus_name;
 	private String cus_code;
+	private int actual_time;
 	
 	public int getProj_ref_id() {
 		return proj_ref_id;
@@ -93,6 +94,12 @@ public class ProjectsReference {
 	}
 	public void setCus_code(String cus_code) {
 		this.cus_code = cus_code;
+	}
+	public int getActual_time() {
+		return actual_time;
+	}
+	public void setActual_time(int actual_time) {
+		this.actual_time = actual_time;
 	}
 	
 }

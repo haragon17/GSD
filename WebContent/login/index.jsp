@@ -6,7 +6,7 @@
 <html>
 <sec:authorize access="isAuthenticated()">
    <script type="text/javascript">
-   window.location = "/PSMS";
+   window.location = "/GSD";
    </script>
 </sec:authorize>
 <head>

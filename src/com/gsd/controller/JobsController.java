@@ -48,7 +48,15 @@ public class JobsController {
 		start = "";
 		end = "";
 		
-		return new ModelAndView("JobReport");
+		UserDetailsApp user = UserLoginDetail.getUser();
+		int type = user.getUserModel().getUsr_type();
+		
+		if (type == 0 || type == 1) {
+			return new ModelAndView("JobReport");
+		} else {
+			return new ModelAndView("AccessDenied");
+		}
+		
 		
 	}
 	

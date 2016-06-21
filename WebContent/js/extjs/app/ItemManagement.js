@@ -112,6 +112,7 @@ Ext.onReady(function() {
 		layout : 'column',
 		renderTo : document.body,
 		width : 560,
+		height : 400,
 		style: {
             "margin-left": "auto",
             "margin-right": "auto",
@@ -127,22 +128,21 @@ Ext.onReady(function() {
 			}
 		} ],
 			store : store.item,
-			height : 400,
 			columns : [ {
 				text : 'Item Name',
-				width : 180,
+				flex : 4,
 				sortable : true,
 				dataIndex : 'itm_name'
 			}, {
 				text : 'Item Description',
-				width : 245,
+				flex : 4,
 				sortable : true,
 				dataIndex : 'itm_desc'
 			}
 			, {
 				text : 'Edit',
 				xtype : 'actioncolumn',
-				width : 60,
+				flex : 1,
 				align : 'center',
 				id : 'edit',
 				items : [ {
@@ -162,7 +162,7 @@ Ext.onReady(function() {
 			{
 				text : 'Delete',
 				xtype : 'actioncolumn',
-				width : 60,
+				flex : 1,
 				align : 'center',
 				id : 'del',
 				items : [ {
@@ -208,7 +208,7 @@ Ext.onReady(function() {
 	editItem = new Ext.create('Ext.window.Window', {
 		title : 'Edit Item',
 		width : 450,
-		height : 260,
+//		height : 260,
 		animateTarget : 'edit',
 		modal : true,
 		resizable : false,
@@ -286,13 +286,6 @@ Ext.onReady(function() {
 		} ],
 		buttons : [
 				{
-					text : 'Reset',
-					width : 100,
-					handler : function() {
-						Ext.getCmp('editform').getForm().reset();
-					}
-				},
-				{
 					text : 'Update',
 					width : 100,
 					id : 'ebtn',
@@ -333,6 +326,12 @@ Ext.onReady(function() {
 							});
 						}
 					}
+				},{
+					text : 'Reset',
+					width : 100,
+					handler : function() {
+						Ext.getCmp('editform').getForm().reset();
+					}
 				} ],
 		listeners : {
 			'beforehide' : function() {
@@ -350,7 +349,7 @@ Ext.onReady(function() {
 		closeAction : 'hide',
 		// autoScroll:true,
 		width : 450,
-		height : 260,
+//		height : 260,
 
 		items : [ {
 			xtype : 'form',
@@ -418,12 +417,6 @@ Ext.onReady(function() {
 		} ],
 		buttons : [
 				{
-					text : 'Reset',
-					handler : function() {
-						Ext.getCmp('addform').getForm().reset();
-					}
-				},
-				{
 					text : 'Add',
 					id : 'btnRegist',
 					handler : function() {
@@ -462,6 +455,11 @@ Ext.onReady(function() {
 								animateTarget : 'btnRegist',
 							});
 						}
+					}
+				},{
+					text : 'Reset',
+					handler : function() {
+						Ext.getCmp('addform').getForm().reset();
 					}
 				} ],
 		listeners : {

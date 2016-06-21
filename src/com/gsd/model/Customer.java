@@ -13,6 +13,7 @@ public class Customer {
 	private String update_date;
 	private String key_acc_name;
 	private String cus_email;
+	private String cus_phone;
 	
 	public int getCus_id() {
 		return cus_id;
@@ -79,6 +80,12 @@ public class Customer {
 	}
 	public void setCus_email(String cus_email) {
 		this.cus_email = cus_email;
+	}
+	public String getCus_phone() {
+		return cus_phone;
+	}
+	public void setCus_phone(String cus_phone) {
+		this.cus_phone = cus_phone;
 	}
 	
 }

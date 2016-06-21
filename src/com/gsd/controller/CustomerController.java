@@ -45,7 +45,7 @@ public class CustomerController {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		int type = user.getUserModel().getUsr_type();
 
-		if (type == 0) {
+		if (type == 0 || type == 1) {
 			return new ModelAndView("CustomerManagement");
 		} else {
 			return new ModelAndView("AccessDenied");
@@ -141,6 +141,7 @@ public class CustomerController {
 		String cus_name = request.getParameter("ecus_name");
 		String cus_code = request.getParameter("ecus_code");
 		String address = request.getParameter("eaddress");
+		String cus_phone = request.getParameter("ecus_phone");
 		String contact_person = request.getParameter("econtact_person");
 		int key_acc_id = Integer.parseInt(request.getParameter("ekey_acc_mng"));
 		String cus_email = request.getParameter("ecus_email");
@@ -166,6 +167,11 @@ public class CustomerController {
 		}else{
 			cus.setCus_email("");
 		}
+		if(!cus_phone.equals("Phone Number")){
+			cus.setCus_phone(cus_phone);
+		}else{
+			cus.setCus_phone("");
+		}
 		
 		customerDao.updateCustomer(cus);
 		
@@ -184,6 +190,7 @@ public class CustomerController {
 		String cus_code = request.getParameter("acus_code");
 		String address = request.getParameter("aaddress");
 		String contact_person = request.getParameter("acontact_person");
+		String cus_phone = request.getParameter("acus_phone");
 		int key_acc_id = Integer.parseInt(request.getParameter("akey_acc_mng"));
 		String cus_email = request.getParameter("acus_email");
 		
@@ -208,6 +215,11 @@ public class CustomerController {
 			cus.setCus_email(cus_email);
 		}else{
 			cus.setCus_email("");
+		}
+		if(!cus_phone.equals("Phone Number")){
+			cus.setCus_phone(cus_phone);
+		}else{
+			cus.setCus_phone("");
 		}
 		
 		customerDao.createCustomer(cus);

@@ -167,19 +167,20 @@ Ext.onReady(function(){
 	    width: 900,
 	    height: 350,   
 	    columns: [
-	        {text: "User Name",		   width: 100, sortable: true, dataIndex:'usr_name' },
-	        {text: "First Name",      width: 100, sortable: true, dataIndex:'fname'},
-	        {text: "Last Name",      width: 100, sortable: true, dataIndex:'lname'},
-	        {text: "Email",      width: 150, sortable: true, dataIndex:'email'},
-	        {text: 'Edit',   xtype: 'actioncolumn', width: 60,  align: 'center', id: 'edit',
-		            items: [{ iconCls: 'icon-edit', 
+	        {text: "User Name",		   flex:1.5, sortable: true, dataIndex:'usr_name' },
+	        {text: "First Name",      flex:1.8, sortable: true, dataIndex:'fname'},
+	        {text: "Last Name",      flex:1.8, sortable: true, dataIndex:'lname'},
+	        {text: "Email",      flex:2, sortable: true, dataIndex:'email'},
+	        {text: "Phone",      flex:1.5, sortable: true, dataIndex:'phone'},
+	        {text: 'Edit',   xtype: 'actioncolumn', flex:1,  align: 'center', id: 'edit',
+		            items: [{ iconCls : 'table-edit', 
 		            	handler: function(grid, rowIndex, colIndex) {
 		            		 usr_id = grid.getStore().getAt(rowIndex).get('usr_id');
 		            		 usr_name = grid.getStore().getAt(rowIndex).get('usr_name');
 		            		 fname = grid.getStore().getAt(rowIndex).get('fname');
 		            		 lname = grid.getStore().getAt(rowIndex).get('lname');
 		            		 email = grid.getStore().getAt(rowIndex).get('email');
-		            		 dob = grid.getStore().getAt(rowIndex).get('birthday');
+//		            		 dob = grid.getStore().getAt(rowIndex).get('birthday');
 		            		 phone = grid.getStore().getAt(rowIndex).get('phone');
 		            		 type = grid.getStore().getAt(rowIndex).get('usr_type');
 		            		 
@@ -187,7 +188,7 @@ Ext.onReady(function(){
 		            		 Ext.getCmp('efname').setValue(fname);
 		            		 Ext.getCmp('elname').setValue(lname);
 		            		 Ext.getCmp('eemail').setValue(email);
-		            		 Ext.getCmp('edob').setValue(dob);
+//		            		 Ext.getCmp('edob').setValue(dob);
 		            		 Ext.getCmp('ephone').setValue(phone);
 		            		 Ext.getCmp('eusr_type').setValue({usr_type:type});
 		            		 Ext.getCmp('eid').setValue(usr_id);
@@ -195,7 +196,7 @@ Ext.onReady(function(){
 		            		 }
 		            }]
 		        },
-		        {text: 'Delete',   xtype: 'actioncolumn', width: 60,  align: 'center', id: 'del',
+		        {text: 'Delete',   xtype: 'actioncolumn', flex:1,  align: 'center', id: 'del',
 			            items: [{ iconCls: 'icon-delete', 
 			            	handler: function(grid, rowIndex, colIndex) {
 			            		 usr_id = grid.getStore().getAt(rowIndex).get('usr_id');
@@ -231,7 +232,7 @@ Ext.define('mems', {
 		{name: 'usr_name',	 type: 'string'},
 		{name: 'fname',     type: 'string'},
 		{name: 'lname',     type: 'string'},
-		{name: 'birthday',     type: 'string'},
+//		{name: 'birthday',     type: 'string'},
 		{name: 'email',     type: 'string'},
 		{name: 'phone',    type: 'string'},
 		{name: 'usr_type', type: 'int'},
@@ -264,7 +265,7 @@ store.searchMember = Ext.create('Ext.data.JsonStore', {
 editMember = new Ext.create('Ext.window.Window', {
 	title: 'Edit Member',
 	    width: 500,
-	    height: 310,
+//	    height: 310,
 	    animateTarget: 'edit',
 	    modal : true,
 	    resizable:false,
@@ -309,18 +310,18 @@ editMember = new Ext.create('Ext.window.Window', {
 	                	maxLength: 25,
 	           		maxLengthText: 'Maximum input 25 Character',
 	                },
-	                 { xtype: 'datefield',
-	                    fieldLabel: 'Date of Birth <font color="red">*</font>',
-	                    name: 'edob',
-	                    id: 'edob',
-	                    allowBlank: false,
-	                    maxValue: new Date(),
-	                    emptyText: 'Date of Birth',
-	                    format: 'Y-m-d',
-	                    editable: false,
-	                	labelWidth : 145, 
-	                	msgTarget: 'side',
-	                },
+//	                 { xtype: 'datefield',
+//	                    fieldLabel: 'Date of Birth <font color="red">*</font>',
+//	                    name: 'edob',
+//	                    id: 'edob',
+//	                    allowBlank: false,
+//	                    maxValue: new Date(),
+//	                    emptyText: 'Date of Birth',
+//	                    format: 'Y-m-d',
+//	                    editable: false,
+//	                	labelWidth : 145, 
+//	                	msgTarget: 'side',
+//	                },
 	                {
 	               	 allowBlank:false,
 	               	 fieldLabel: 'Email <font color="red">*</font>  ', 
@@ -354,7 +355,9 @@ editMember = new Ext.create('Ext.window.Window', {
 	                    columns: 2,
 	                    vertical: true,
 	                    items: [
-	                        { boxLabel: 'User', name: 'usr_type', inputValue: '1', checked: true },
+	                        { boxLabel: 'JMD', name: 'usr_type', inputValue: '3', checked: true },
+	                        { boxLabel: 'PM', name: 'usr_type', inputValue: '2'},
+	                        { boxLabel: 'BUM/Sale', name: 'usr_type', inputValue: '1'},
 	                        { boxLabel: 'Admin', name: 'usr_type', inputValue: '0'},
 	                    ]
 	                },
@@ -422,7 +425,6 @@ addMember = new Ext.create('Ext.window.Window', {
     closeAction: 'hide',
     autoScroll:true,
     width: 500,
-    height: 500,
 
     items:[{
         xtype:'fieldset',
@@ -446,9 +448,9 @@ addMember = new Ext.create('Ext.window.Window', {
 			emptyText: 'userName',
 			labelWidth : 145,
 			msgTarget: 'under',
-			minLength: 6,
 			vtype: 'alphanum',
-			minLengthText: 'Minimum input 6 Character',
+//			minLength: 6,
+//			minLengthText: 'Minimum input 6 Character',
 			maxLength: 12,
 			maxLengthText: 'Maximum input 12 Character',
 			listeners: {
@@ -537,18 +539,18 @@ addMember = new Ext.create('Ext.window.Window', {
      	maxLength: 25,
 		maxLengthText: 'Maximum input 25 Character',
      },
-      { xtype: 'datefield',
-         fieldLabel: 'Date of Birth <font color="red">*</font>',
-         name: 'dob',
-         id: 'adob',
-         allowBlank: false,
-         maxValue: new Date(),
-         emptyText: 'Date of Birth',
-         format: 'Y-m-d',
-         editable: false,
-     	labelWidth : 145, 
-     	msgTarget: 'side',
-     },
+//      { xtype: 'datefield',
+//         fieldLabel: 'Date of Birth <font color="red">*</font>',
+//         name: 'dob',
+//         id: 'adob',
+//         allowBlank: false,
+//         maxValue: new Date(),
+//         emptyText: 'Date of Birth',
+//         format: 'Y-m-d',
+//         editable: false,
+//     	labelWidth : 145, 
+//     	msgTarget: 'side',
+//     },
      {
     	 allowBlank:false,
     	 fieldLabel: 'Email <font color="red">*</font>  ', 
@@ -582,26 +584,16 @@ addMember = new Ext.create('Ext.window.Window', {
          columns: 2,
          vertical: true,
          items: [
-             { boxLabel: 'User', name: 'usr_type', inputValue: '1', checked: true },
-             { boxLabel: 'Admin', name: 'usr_type', inputValue: '0'},
+			{ boxLabel: 'JMD', name: 'usr_type', inputValue: '3', checked: true },
+			{ boxLabel: 'PM', name: 'usr_type', inputValue: '2'},
+			{ boxLabel: 'BUM/Sale', name: 'usr_type', inputValue: '1'},
+			{ boxLabel: 'Admin', name: 'usr_type', inputValue: '0'},
          ]
      }
         ]
 }],
 buttons: [{
-  text: 'Reset',
-  handler: function(){
-	  	Ext.getCmp('username').reset();
-		Ext.getCmp('pass').reset();
-		Ext.getCmp('pass-cfrm').reset();
-		Ext.getCmp('afname').reset();
-		Ext.getCmp('alname').reset();
-		Ext.getCmp('adob').reset();
-		Ext.getCmp('aemail').reset();
-		Ext.getCmp('aphone').reset();
-  }
-},{
-  text: 'Register',
+  text: 'Add',
   id: 'btnRegist',
   handler: function(){
 	  var username = Ext.getCmp('username');
@@ -609,12 +601,12 @@ buttons: [{
 	  var passc = Ext.getCmp('pass-cfrm');
 	  var fname = Ext.getCmp('afname');
 	  var lname = Ext.getCmp('alname');
-	  var dob = Ext.getCmp('adob');
+//	  var dob = Ext.getCmp('adob');
 	  var email = Ext.getCmp('aemail');
 	  var phone = Ext.getCmp('aphone');
 	  
 	  if(username.validate() && pass.validate() && passc.validate() && fname.validate() && 
-			  lname.validate() && dob.validate() && email.validate() && phone.validate()){
+			  lname.validate() && email.validate() && phone.validate()){
 		  var box1 = Ext.MessageBox.show({
               title: 'Adding Member',
               msg: 'Please wait...',
@@ -627,7 +619,7 @@ buttons: [{
 				pass: pass.getValue(),
 				fname: fname.getValue(),
 				lname: lname.getValue(),
-				dob: dob.getValue(),
+//				dob: dob.getValue(),
 				email: email.getValue(),
 				phone: phone.getValue(),
 				usr_type: Ext.getCmp('type').getValue().usr_type
@@ -659,7 +651,19 @@ buttons: [{
 			});
 	  }
   }
-}],
+},{
+	  text: 'Reset',
+	  handler: function(){
+		  	Ext.getCmp('username').reset();
+			Ext.getCmp('pass').reset();
+			Ext.getCmp('pass-cfrm').reset();
+			Ext.getCmp('afname').reset();
+			Ext.getCmp('alname').reset();
+//			Ext.getCmp('adob').reset();
+			Ext.getCmp('aemail').reset();
+			Ext.getCmp('aphone').reset();
+	  }
+	}],
 listeners:{
 		'beforehide':function(){
 			Ext.getCmp('aphone').focus(false,0);
@@ -668,7 +672,7 @@ listeners:{
 			Ext.getCmp('pass-cfrm').reset();
 			Ext.getCmp('afname').reset();
 			Ext.getCmp('alname').reset();
-			Ext.getCmp('adob').reset();
+//			Ext.getCmp('adob').reset();
 			Ext.getCmp('aemail').reset();
 			Ext.getCmp('aphone').reset();
 		}

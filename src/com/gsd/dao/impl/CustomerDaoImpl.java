@@ -49,7 +49,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 				+ "address=?, "
 				+ "contact_person=?, "
 				+ "cus_email=?, "
-				+ "update_date=now() "
+				+ "update_date=now(), "
+				+ "cus_phone=? "
 				+ "where cus_id=?";
 		
 		this.getJdbcTemplate().update(sql, new Object[]{
@@ -59,6 +60,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			cus.getAddress(),
 			cus.getContact_person(),
 			cus.getCus_email(),
+			cus.getCus_phone(),
 			cus.getCus_id()
 		});
 		
@@ -76,7 +78,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 	@Override
 	public void createCustomer(Customer cus) {
 		
-		String sql = "INSERT INTO customer VALUES (?,?,?,?,?,?,?,now(),now(),?)";
+		String sql = "INSERT INTO customer VALUES (?,?,?,?,?,?,?,now(),now(),?,?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[]{
 			cus.getCus_id(),
@@ -86,7 +88,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			cus.getAddress(),
 			cus.getContact_person(),
 			cus.getCretd_usr(),
-			cus.getCus_email()
+			cus.getCus_email(),
+			cus.getCus_phone()
 		});
 		
 	}

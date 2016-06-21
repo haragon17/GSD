@@ -97,21 +97,21 @@ var	loginForm = Ext.create('Ext.form.Panel', {
             name: '_spring_security_remember_me',
             id: '_spring_security_remember_me'
         },
-        {
-        	xtype:'tbtext',
-        	id:'forgot',
-        	text:'<a href="javascript:forgotPassword();"><font color="grey">forgot password?</font></a>',
-        	margin: '0 0 0 180',
-        }
+//        {
+//        	xtype:'tbtext',
+//        	id:'forgot',
+//        	text:'<a href="javascript:forgotPassword();"><font color="grey">forgot password?</font></a>',
+//        	margin: '0 0 0 180',
+//        }
     ],
     
     buttons: [
-        { text:'Register',
-        	id: 'regist',
-        	handler: function(){
-        		regist.show();
-        	}
-        },
+//        { text:'Register',
+//        	id: 'regist',
+//        	handler: function(){
+//        		regist.show();
+//        	}
+//        },
         { text:'Login' ,
         	id: 'login',
         	handler: function(){

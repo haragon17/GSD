@@ -75,7 +75,7 @@ public class ProjectsController {
 		THB = "";
 		EUR = "";
 		
-		if(type == 0){
+		if(type == 0 || type == 1 || type == 2){
 			return new ModelAndView("ProjectsAdmin");
 		}else{
 			return new ModelAndView("Projects");
@@ -380,6 +380,7 @@ public class ProjectsController {
 		int cus_id = Integer.parseInt(request.getParameter("ccus_id"));
 		String file = request.getParameter("file");
 		String time = request.getParameter("ctime");
+		String actual_time = request.getParameter("cactual_time");
 		String price = request.getParameter("cprice");
 		String currency = request.getParameter("ccurrency");
 		String proj_ref_desc = request.getParameter("cproj_ref_desc");
@@ -420,13 +421,14 @@ public class ProjectsController {
 				System.out.println("file type = " + uploadItem.getFile().getContentType());
 				System.out.println("file size = " + uploadItem.getFile().getSize());
 				try {
-					// File createMain = new File("C:/files");
-					File createMain = new File("/Users/gsd/files");
+//					File createMain = new File("/Users/gsd/files");
+					File createMain = new File("/jview/files");
 					if (!createMain.exists()) {
 						createMain.mkdir();
 					}
 					   String fileName = uploadItem.getFile().getOriginalFilename();  
-					   String filePath = "/Users/gsd/files/" + proj.getProj_id();
+//					   String filePath = "/Users/gsd/files/" + proj.getProj_id();
+					   String filePath = "/jview/files/" + proj.getProj_id();
 					   File newFile = new File(filePath);
 					   if(!newFile.exists()){
 						   newFile.mkdir();
@@ -468,6 +470,11 @@ public class ProjectsController {
 				projRef.setTime(Integer.parseInt(time));
 			} else {
 				projRef.setTime(0);
+			}
+			if (!actual_time.equals("Time in minutes")) {
+				projRef.setActual_time(Integer.parseInt(actual_time));
+			} else {
+				projRef.setActual_time(0);
 			}
 			if (!price.equals("Project Price")) {
 				projRef.setPrice(Float.parseFloat(price));
@@ -556,12 +563,12 @@ public class ProjectsController {
 					dFile2.delete();
 
 					try {
-						   File createMain = new File("/Users/gsd/files");  
+						   File createMain = new File("/jview/files");  
 						   if(!createMain.exists()){
 							   createMain.mkdir();
 						   }
 						   String fileName = uploadItem.getFile().getOriginalFilename();  
-						   String filePath = "/Users/gsd/files/" + proj.getProj_id();
+						   String filePath = "/jview/files/" + proj.getProj_id();
 						   File newFile = new File(filePath);
 						   if(!newFile.exists()){
 							   newFile.mkdir();
@@ -599,12 +606,12 @@ public class ProjectsController {
 					System.out.println("file type = " + uploadItem.getFile().getContentType());
 					System.out.println("file size = " + uploadItem.getFile().getSize());
 					try {
-						File createMain = new File("/Users/gsd/files");
+						File createMain = new File("/jview/files");
 						if (!createMain.exists()) {
 							createMain.mkdir();
 						}
 						   String fileName = uploadItem.getFile().getOriginalFilename();  
-						   String filePath = "/Users/gsd/files/" + proj.getProj_id();
+						   String filePath = "/jview/files/" + proj.getProj_id();
 						   File newFile = new File(filePath);
 						   if(!newFile.exists()){
 							   newFile.mkdir();
@@ -647,6 +654,7 @@ public class ProjectsController {
 		int proj_id = Integer.parseInt(request.getParameter("aproj_id"));
 		int itm_id = Integer.parseInt(request.getParameter("aitm_id"));
 		String time = request.getParameter("atime");
+		String actual_time = request.getParameter("aactual_time");
 		String price = request.getParameter("aprice");
 		String currency = request.getParameter("acurrency");
 		String proj_ref_desc = request.getParameter("aproj_ref_desc");
@@ -660,6 +668,11 @@ public class ProjectsController {
 			projRef.setTime(Integer.parseInt(time));
 		} else {
 			projRef.setTime(0);
+		}
+		if (!actual_time.equals("Time in minutes")) {
+			projRef.setActual_time(Integer.parseInt(actual_time));
+		} else {
+			projRef.setActual_time(0);
 		}
 		if (!price.equals("Project Price")) {
 			projRef.setPrice(Float.parseFloat(price));
@@ -690,6 +703,7 @@ public class ProjectsController {
 		int proj_ref_id = Integer.parseInt(request.getParameter("eproj_ref_id"));
 		int itm_id = Integer.parseInt(request.getParameter("eitm_id"));
 		String time = request.getParameter("etime");
+		String actual_time = request.getParameter("eactual_time");
 		String price = request.getParameter("eprice");
 		String currency = request.getParameter("ecurrency");
 		String proj_ref_desc = request.getParameter("eproj_ref_desc");
@@ -702,6 +716,11 @@ public class ProjectsController {
 			projRef.setTime(Integer.parseInt(time));
 		} else {
 			projRef.setTime(0);
+		}
+		if (!actual_time.equals("Time in minutes")) {
+			projRef.setActual_time(Integer.parseInt(actual_time));
+		} else {
+			projRef.setActual_time(0);
 		}
 		if (!price.equals("Project Price")) {
 			projRef.setPrice(Float.parseFloat(price));

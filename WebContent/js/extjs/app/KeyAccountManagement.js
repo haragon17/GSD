@@ -240,13 +240,6 @@ Ext.onReady(function() {
 		} ],
 		buttons : [
 				{
-					text : 'Reset',
-					width : 100,
-					handler : function() {
-						Ext.getCmp('editform').getForm().reset();
-					}
-				},
-				{
 					text : 'Update',
 					width : 100,
 					id : 'ebtn',
@@ -286,6 +279,12 @@ Ext.onReady(function() {
 								animateTarget : 'ebtn',
 							});
 						}
+					}
+				},{
+					text : 'Reset',
+					width : 100,
+					handler : function() {
+						Ext.getCmp('editform').getForm().reset();
 					}
 				} ],
 		listeners : {
@@ -340,12 +339,6 @@ Ext.onReady(function() {
 		} ],
 		buttons : [
 				{
-					text : 'Reset',
-					handler : function() {
-						Ext.getCmp('addform').getForm().reset();
-					}
-				},
-				{
 					text : 'Add',
 					id : 'btnRegist',
 					handler : function() {
@@ -384,6 +377,11 @@ Ext.onReady(function() {
 								animateTarget : 'btnRegist',
 							});
 						}
+					}
+				},{
+					text : 'Reset',
+					handler : function() {
+						Ext.getCmp('addform').getForm().reset();
 					}
 				} ],
 		listeners : {

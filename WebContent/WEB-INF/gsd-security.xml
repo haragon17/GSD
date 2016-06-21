@@ -40,8 +40,10 @@
                 class="com.gsd.security.UserDetailServices">
     </beans:bean>
     
-    <beans:bean id="encoder" 
-    			class="org.springframework.security.crypto.password.StandardPasswordEncoder" >
+<!--     <beans:bean id="encoder" 
+    			class="org.springframework.security.crypto.password.StandardPasswordEncoder" > -->
+   	<beans:bean id="encoder" 
+   			class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" >
     </beans:bean>
     
     <authentication-manager alias="authenManager">

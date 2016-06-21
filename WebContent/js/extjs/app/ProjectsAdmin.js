@@ -123,7 +123,7 @@ Ext.onReady(function() {
 		                    }
 		                ]
 					},{
-						fieldLabel : 'Time(minutes)',
+						fieldLabel : 'Target Time',
 						name : 'stime',
 						combineErrors: true,
 						xtype: 'fieldcontainer',
@@ -143,6 +143,7 @@ Ext.onReady(function() {
 		                        labelSeparator : '',
 		                        margin: '0 0 0 0',
 		                        msgTarget : 'side',
+		                        emptyText : 'Minutes',
 		                        minValue : 0,
 		                        width: 50,
 		                        listeners: {
@@ -167,6 +168,7 @@ Ext.onReady(function() {
 		                        id	: 'time_limit',
 		                        labelSeparator : '',
 //		                        msgTarget : 'side',
+		                        emptyText : 'Minutes',
 		                        minValue : 0,
 		                        width: 50,
 		                        listeners: {
@@ -260,7 +262,7 @@ Ext.onReady(function() {
 						fields : [ 'itm_id', 'itm_name' ],
 						proxy : {
 							type : 'ajax',
-							url : 'showItem.htm',
+							url : 'showItem.htm?id=0',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -728,8 +730,25 @@ Ext.onReady(function() {
 		            						myEuro = '-';
 		            					}
 		            			if(rec.data.proj_id == v){
+		            				var actual_time = "";
+		            				var target_time = "";
+		            				if(rec.data.actual_time == 0){
+		            					actual_time = '<td bgcolor=#FE7575>Actual Time: <b>'+rec.data.actual_time+'</b></td>';
+		            				}else if((rec.data.actual_time - rec.data.time) > 0){
+		            					actual_time = '<td bgcolor=#FE7575>Actual Time: <b>'+rec.data.actual_time+'</b></td>';
+		            				}else{
+		            					actual_time = '<td bgcolor=#F0F0F0>Actual Time: <b>'+rec.data.actual_time+'</b></td>';
+		            				}
+		            				if(rec.data.time == 0){
+		            					target_time = '<td bgcolor=#FE7575>Target Time: <b>'+rec.data.time+'</b></td>';
+		            				}else{
+		            					target_time = '<td bgcolor=#F0F0F0>Target Time: <b>'+rec.data.time+'</b></td>';
+		            				}
 		            				 myText += '<tr><td bgcolor=#F0F0F0>Item: <b>'+rec.data.itm_name+'</b></td>'+
-		            				 '<td bgcolor=#F0F0F0>Time: <b>'+rec.data.time+'</b></td>'+
+//		            				 '<td bgcolor=#F0F0F0>Target Time: <b>'+rec.data.time+'</b></td>'+
+		            				 target_time+
+//		            				 '<td bgcolor=#F0F0F0>Actual Time: <b>'+rec.data.actual_time+'</b></td>'+
+		            				 actual_time+
 		            				 '<td bgcolor=#F0F0F0>Price: <b>'+(Math.round(rec.data.price*100)/100)+' '+rec.data.currency+'</b></td>'+
 		            				 '<td bgcolor=#F0F0F0>Price(Euro): <b>'+myEuro+'</b></td>'+
 		            				 '<td bgcolor=#F0F0F0>Description: <b>'+myDesc+'</b></td>'+
@@ -776,6 +795,9 @@ Ext.define('projRefModel', {
 		type : 'int'
 	}, {
 		name : 'time',
+		type : 'int'
+	}, {
+		name : 'actual_time',
 		type : 'int'
 	}, {
 		name : 'price',
@@ -930,284 +952,6 @@ var currency = Ext.create('Ext.data.Store', {
         //...
     ]
 });
-
-//editProject = new Ext.create('Ext.window.Window', {
-//	title : 'Edit Project',
-//	width : 420,
-//	height : 470,
-//	animateTarget : 'edit',
-//	modal : true,
-//	resizable : false,
-//	closeAction : 'hide',
-//	items : [ {
-//		xtype : 'form',
-//		id : 'editform',
-//		items:[{
-//        	xtype:'textfield',
-//        	margin: '20 0 0 30',
-//            allowBlank: false,
-//            fieldLabel: 'Project Name <font color="red">*</font> ',
-//            labelWidth: 120,
-//            width: 300,
-//            name: 'eproj_name',
-//            id: 'eproj_name',
-//            msgTarget: 'side',
-//            emptyText: 'Project Name'
-//        },{
-//			xtype : 'combobox',
-//			fieldLabel : 'Customer Name <font color="red">*</font> ',
-//			name : 'ecus_name',
-//			id: 'ecus_name',
-//			allowBlank: false,
-//			queryMode : 'local',
-//			labelWidth : 120,
-//			margin : '10 0 0 30',
-//			width : 300,
-//			emptyText : 'Customer Name',
-//			store : {
-//				fields : [ 'cus_id', 'cus_name', 'cus_code' ],
-//				proxy : {
-//					type : 'ajax',
-//					url : 'searchCustomer.htm',
-//					reader : {
-//						type : 'json',
-//						root : 'records',
-//						idProperty : 'cus_id'
-//					}
-//				},
-//				autoLoad : true
-//			},
-//			valueField : 'cus_name',
-//			displayField : 'cus_name',
-//			listeners : {
-//
-//				select : function() {
-//					
-//					var v = this.getValue();
-//					var record = this.findRecord(this.valueField || this.displayField, v);
-//					var myIndex = this.store.indexOf(record);
-//					var myValue = this.store.getAt(myIndex).data.cus_code;
-//					var myId = this.store.getAt(myIndex).data.cus_id;
-//					Ext.getCmp('ccus_id').setValue(myId);
-//					Ext.getCmp('ccus_code').setValue(myValue);
-//					
-//					console.log("cus_code: "+myValue);
-//				}
-//
-//			}
-//		}, {
-//			xtype : 'combobox',
-//			fieldLabel : 'Customer Code <font color="red">*</font> ',
-//			name : 'ecus_code',
-//			id : 'ecus_code',
-//			allowBlank: false,
-//			queryMode : 'local',
-//			labelWidth : 120,
-//			margin : '10 0 0 30',
-//			width : 300,
-//			emptyText : 'Customer Code',
-//			store : {
-//				fields : [ 'cus_id', 'cus_code', 'cus_name' ],
-//				proxy : {
-//					type : 'ajax',
-//					url : 'searchCustomer.htm',
-//					reader : {
-//						type : 'json',
-//						root : 'records',
-//						idProperty : 'cus_id'
-//					}
-//				},
-//				autoLoad : true
-//			},
-//			valueField : 'cus_code',
-//			displayField : 'cus_code',
-//			listeners : {
-//
-//				select : function() {
-//					
-//					var v = this.getValue();
-//					var record = this.findRecord(this.valueField || this.displayField, v);
-//					var myIndex = this.store.indexOf(record);
-//					var myValue = this.store.getAt(myIndex).data.cus_name;
-//					var myId = this.store.getAt(myIndex).data.cus_id;
-//					Ext.getCmp('ccus_id').setValue(myId);
-//					Ext.getCmp('ccus_name').setValue(myValue);
-//					
-//					console.log("cus_name: "+myValue);
-//				}
-//
-//			}
-//		},{
-//			xtype: 'combobox',
-//			fieldLabel : 'Item Name <font color="red">*</font> ',
-//			name : 'eitm_id',
-//			id : 'eitm_id',
-//			allowBlank: false,
-//			queryMode : 'local',
-//			labelWidth : 120,
-//			margin : '10 0 0 30',
-//			width : 300,
-//			emptyText : 'Item Name',
-//			store : {
-//				fields : [ 'itm_id', 'itm_name' ],
-//				proxy : {
-//					type : 'ajax',
-//					url : 'showItem.htm',
-//					reader : {
-//						type : 'json',
-//						root : 'records',
-//						idProperty : 'itm_id'
-//					}
-//				},
-//				autoLoad : true
-//			},
-//			valueField : 'itm_id',
-//			displayField : 'itm_name'
-//		},{
-//	    	xtype:'filefield',
-//	    	margin: '10 0 0 30',
-//	    	labelWidth: 120,
-//            width: 350,
-//	        fieldLabel: 'Briefing File ',
-//	        name: 'file',
-//	        id: 'efile',
-//	        msgTarget: 'side',
-////	        allowBlank: false,
-//	        emptyText: 'Browse to change..',
-//	        listeners: {
-//                change: function(fld, value) {
-//                    var newValue = value.replace(/C:\\fakepath\\/g, '');
-//                    fld.setRawValue(newValue);
-//                }
-//            }
-//	    },{
-//	    	xtype:'numberfield',
-//	    	margin: '10 0 0 30',
-//	    	labelWidth: 120,
-//            width: 300,
-//	    	fieldLabel: 'Time(minutes) ',
-//	    	emptyText : 'Time in minutes',
-//	    	minValue : 0,
-//	    	msgTarget : 'under',
-//	    	name: 'etime',
-//	    	id: 'etime',
-////	    	emptyText: 'java,art,animal,etc...'
-//	    },{
-//	    	xtype:'numberfield',
-//	    	margin: '10 0 0 30',
-//	    	labelWidth: 120,
-//            width: 300,
-//	    	fieldLabel: 'Price ',
-//	    	name: 'eprice',
-//	    	id: 'eprice',
-//	    	minValue : 0,
-//	    	msgTarget : 'under',
-//	    	emptyText : 'Project Price',
-//	    	listeners: {
-//	            change: function(field, value) {
-//	                if(value == null || value <= 0){
-//	                	Ext.getCmp('ecurrency').setValue("");
-//	                	Ext.getCmp('ecurrency').clearInvalid();
-////	                	Ext.getCmp('ecurrency').setDisabled(true);
-//	                	Ext.getCmp('ecurrency').allowBlank = true;
-//	                }else{
-//	                	Ext.getCmp('ecurrency').markInvalid('Currency Required!');
-//	                	Ext.getCmp('ecurrency').allowBlank = false;
-////	                	Ext.getCmp('ecurrency').setDisabled(false);
-//	                }
-//	            }
-//	        }
-////	    	emptyText: 'java,art,animal,etc...'
-//	    },{
-//			xtype : 'combobox',
-//			fieldLabel : 'Currency ',
-//			name : 'ecurrency',
-//			id : 'ecurrency',
-//			queryMode : 'local',
-//			labelWidth : 120,
-//			margin : '10 0 0 30',
-//			width : 300,
-//			emptyText : 'Price Currency',
-//			editable : false,
-//			msgTarget : 'side',
-//			store : currency,
-////			disabled : true,
-//			valueField : 'currency',
-//			displayField : 'name',
-//		},{
-//	    	xtype: 'textarea',
-//	    	margin: '10 0 20 30',
-//	    	labelWidth: 120,
-//            width: 300,
-//	    	fieldLabel: 'Project Detail',
-//	    	name: 'eproj_ref_desc',
-//	    	id: 'eproj_ref_desc',
-//	    	emptyText: 'Project Details'
-//	    },{
-//			xtype : 'hidden',
-//			id : 'ecus_id',
-//			name : 'ecus_id'
-//		},{
-//			xtype : 'hidden',
-//			id : 'eproj_ref_id',
-//			name : 'eproj_ref_id'
-//		},{
-//			xtype : 'hidden',
-//			id : 'efile_id',
-//			name : 'efile_id'
-//		}]
-//	} ],
-//	buttons : [
-//			{
-//				text : 'Reset',
-//				width : 100,
-//				handler : function() {
-//					Ext.getCmp('editform').getForm().reset();
-//				}
-//			},
-//			{
-//				text : 'Update',
-//				width : 100,
-//				id : 'ebtn',
-//				handler : function() {
-//					var form = Ext.getCmp('editform').getForm();
-//					if (form.isValid()) {
-//						form.submit({
-//							url : 'updateProjectsReference.htm',
-//							waitTitle : 'Update Project',
-//							waitMsg : 'Please wait...',
-//							standardSubmit : false,
-//							failure : function(form, action) {
-//								Ext.MessageBox.show({
-//									title : 'Information',
-//									msg : 'Project Has Been Update!',
-//									buttons : Ext.MessageBox.OK,
-//									icon : Ext.MessageBox.INFO,
-//									animateTarget : 'ebtn',
-//									fn : function() {
-//										editProject.hide();
-//										store.projectsRef.reload();
-//									}
-//								});
-//							}
-//						});
-//					} else {
-//						Ext.MessageBox.show({
-//							title : 'Failed',
-//							msg : ' Please Insert All Required Field',
-//							buttons : Ext.MessageBox.OK,
-//							icon : Ext.MessageBox.ERROR,
-//							animateTarget : 'ebtn',
-//						});
-//					}
-//				}
-//			} ],
-//	listeners : {
-//		'beforehide' : function() {
-//			Ext.getCmp('editform').getForm().reset();
-//		}
-//	}
-//});
 
 editProject = new Ext.create('Ext.window.Window', {
 	title : 'Edit Project',
@@ -1430,13 +1174,6 @@ editProject = new Ext.create('Ext.window.Window', {
 	}],
 	buttons : [
 			{
-				text : 'Reset',
-				width : 100,
-				handler : function() {
-					Ext.getCmp('editform').getForm().reset();
-				}
-			},
-			{
 				text : 'Update',
 				width : 100,
 				id : 'ejbtn',
@@ -1472,6 +1209,12 @@ editProject = new Ext.create('Ext.window.Window', {
 							animateTarget : 'ejbtn',
 						});
 					}
+				}
+			},{
+				text : 'Reset',
+				width : 100,
+				handler : function() {
+					Ext.getCmp('editform').getForm().reset();
 				}
 			} ],
 	listeners : {
@@ -1521,7 +1264,7 @@ addItem = new Ext.create('Ext.window.Window', {
 					fields : [ 'itm_id', 'itm_name' ],
 					proxy : {
 						type : 'ajax',
-						url : 'showItem.htm',
+						url : 'showItem.htm?id=0',
 						reader : {
 							type : 'json',
 							root : 'records',
@@ -1535,12 +1278,21 @@ addItem = new Ext.create('Ext.window.Window', {
 			},{
     	    	xtype:'numberfield',
     	    	labelWidth: 120,
-    	    	fieldLabel: 'Time(minutes) ',
+    	    	fieldLabel: 'Target Time(mins) ',
     	    	emptyText : 'Time in minutes',
     	    	minValue : 0,
     	    	msgTarget : 'under',
     	    	name: 'atime',
-    	    	id: 'atime',
+    	    	id: 'atime'
+    	    },{
+    	    	xtype:'numberfield',
+    	    	labelWidth: 120,
+    	    	fieldLabel: 'Actual Time(mins) ',
+    	    	emptyText : 'Time in minutes',
+    	    	minValue : 0,
+    	    	msgTarget : 'under',
+    	    	name: 'aactual_time',
+    	    	id: 'aactual_time'
     	    },{
     	    	xtype:'numberfield',
     	    	labelWidth: 120,
@@ -1561,7 +1313,6 @@ addItem = new Ext.create('Ext.window.Window', {
     	                }
     	            }
     	        }
-//    	    	emptyText: 'java,art,animal,etc...'
     	    },{
 				xtype : 'combobox',
 				fieldLabel : 'Currency ',
@@ -1591,13 +1342,7 @@ addItem = new Ext.create('Ext.window.Window', {
 				name : 'aproj_id'
             }]
     		}],
-            buttons:[{
-            	text: 'Reset',
-            	width:100,
-            	handler: function(){
-            		Ext.getCmp('addItemForm').getForm().reset();
-            	}
-            },{	
+            buttons:[{	
            		  text: 'Add',
           		  width:100,
           		  id: 'abtn',
@@ -1639,7 +1384,13 @@ addItem = new Ext.create('Ext.window.Window', {
         					});
         				}
         		}
-               	}],
+               	},{
+                	text: 'Reset',
+                	width:100,
+                	handler: function(){
+                		Ext.getCmp('addItemForm').getForm().reset();
+                	}
+                }],
                	listeners:{
                		'beforehide':function(){
                			Ext.getCmp('addItemForm').getForm().reset();
@@ -1883,7 +1634,7 @@ addProject = new Ext.create('Ext.window.Window', {
 					fields : [ 'itm_id', 'itm_name' ],
 					proxy : {
 						type : 'ajax',
-						url : 'showItem.htm',
+						url : 'showItem.htm?id=0',
 						reader : {
 							type : 'json',
 							root : 'records',
@@ -1897,12 +1648,21 @@ addProject = new Ext.create('Ext.window.Window', {
 			},{
     	    	xtype:'numberfield',
     	    	labelWidth: 120,
-    	    	fieldLabel: 'Time(minutes) ',
+    	    	fieldLabel: 'Target Time(mins) ',
     	    	emptyText : 'Time in minutes',
     	    	minValue : 0,
     	    	msgTarget : 'under',
     	    	name: 'ctime',
     	    	id: 'ctime',
+    	    },{
+    	    	xtype:'numberfield',
+    	    	labelWidth: 120,
+    	    	fieldLabel: 'Actual Time(mins) ',
+    	    	emptyText : 'Time in minutes',
+    	    	minValue : 0,
+    	    	msgTarget : 'under',
+    	    	name: 'cactual_time',
+    	    	id: 'cactual_time',
     	    },{
     	    	xtype:'numberfield',
     	    	labelWidth: 120,
@@ -1953,14 +1713,8 @@ addProject = new Ext.create('Ext.window.Window', {
 				name : 'ccus_id'
 			}],
     }],
-    buttons:[{
-    	text: 'Reset',
-    	width:100,
-    	handler: function(){
-    		Ext.getCmp('projectsform').getForm().reset();
-    	}
-    },{	
-   		  text: 'Create',
+    buttons:[{	
+   		  text: 'Add',
   		  width:100,
   		  id: 'btn',
          handler: function(){
@@ -1974,6 +1728,7 @@ addProject = new Ext.create('Ext.window.Window', {
         		 Ext.getCmp('citm_id').clearInvalid();
         		 Ext.getCmp('citm_id').setValue('');
         		 Ext.getCmp('ctime').setValue('');
+        		 Ext.getCmp('cactual_time').setValue('');
         		 Ext.getCmp('cprice').setValue('');
         		 Ext.getCmp('ccurrency').setValue('');
         		 Ext.getCmp('cproj_ref_desc').setValue('');
@@ -2012,7 +1767,13 @@ addProject = new Ext.create('Ext.window.Window', {
 					});
 				}
 		}
-       	}],
+       	},{
+        	text: 'Reset',
+        	width:100,
+        	handler: function(){
+        		Ext.getCmp('projectsform').getForm().reset();
+        	}
+        }],
        	listeners:{
        		'beforehide':function(){
        			Ext.getCmp('projectsform').getForm().reset();
@@ -2020,278 +1781,6 @@ addProject = new Ext.create('Ext.window.Window', {
        	}
 	});
 
-
-//addProject = new Ext.create('Ext.window.Window', {
-//	title: 'Create Project',
-//    width: 450,
-//    height: 570,
-//    animateTarget: 'icreate',
-//    modal : true,
-//    resizable:false,
-//    closeAction: 'hide',
-//    items :[{
-//            xtype:'form',
-//            id:'projectsform',
-//            items:[{
-//            	xtype:'textfield',
-//            	margin: '20 0 0 30',
-//                allowBlank: false,
-//                fieldLabel: 'Project Name <font color="red">*</font> ',
-//                labelWidth: 120,
-//                width: 300,
-//                name: 'cproj_name',
-//                id: 'cproj_name',
-//                msgTarget: 'side',
-//                emptyText: 'Project Name'
-//            },{
-//				xtype : 'combobox',
-//				fieldLabel : 'Customer Name <font color="red">*</font> ',
-//				name : 'ccus_name',
-//				id: 'ccus_name',
-//				allowBlank: false,
-//				queryMode : 'local',
-//				labelWidth : 120,
-//				margin : '10 0 0 30',
-//				width : 300,
-//				emptyText : 'Customer Name',
-//				store : {
-//					fields : [ 'cus_id', 'cus_name', 'cus_code' ],
-//					proxy : {
-//						type : 'ajax',
-//						url : 'searchCustomer.htm',
-//						reader : {
-//							type : 'json',
-//							root : 'records',
-//							idProperty : 'cus_id'
-//						}
-//					},
-//					autoLoad : true
-//				},
-//				valueField : 'cus_name',
-//				displayField : 'cus_name',
-//				listeners : {
-//
-//					select : function() {
-//						
-//						var v = this.getValue();
-//						var record = this.findRecord(this.valueField || this.displayField, v);
-//						var myIndex = this.store.indexOf(record);
-//						var myValue = this.store.getAt(myIndex).data.cus_code;
-//						var myId = this.store.getAt(myIndex).data.cus_id;
-//						Ext.getCmp('ccus_id').setValue(myId);
-//						Ext.getCmp('ccus_code').setValue(myValue);
-//						
-//						console.log("cus_code: "+myValue);
-//					}
-//
-//				}
-//			}, {
-//				xtype : 'combobox',
-//				fieldLabel : 'Customer Code <font color="red">*</font> ',
-//				name : 'ccus_code',
-//				id : 'ccus_code',
-//				allowBlank: false,
-//				queryMode : 'local',
-//				labelWidth : 120,
-//				margin : '10 0 0 30',
-//				width : 300,
-//				emptyText : 'Customer Code',
-//				store : {
-//					fields : [ 'cus_id', 'cus_code', 'cus_name' ],
-//					proxy : {
-//						type : 'ajax',
-//						url : 'searchCustomer.htm',
-//						reader : {
-//							type : 'json',
-//							root : 'records',
-//							idProperty : 'cus_id'
-//						}
-//					},
-//					autoLoad : true
-//				},
-//				valueField : 'cus_code',
-//				displayField : 'cus_code',
-//				listeners : {
-//
-//					select : function() {
-//						
-//						var v = this.getValue();
-//						var record = this.findRecord(this.valueField || this.displayField, v);
-//						var myIndex = this.store.indexOf(record);
-//						var myValue = this.store.getAt(myIndex).data.cus_name;
-//						var myId = this.store.getAt(myIndex).data.cus_id;
-//						Ext.getCmp('ccus_id').setValue(myId);
-//						Ext.getCmp('ccus_name').setValue(myValue);
-//						
-//						console.log("cus_name: "+myValue);
-//					}
-//
-//				}
-//			},{
-//    	    	xtype:'filefield',
-//    	    	margin: '10 0 0 30',
-//    	    	labelWidth: 120,
-//                width: 350,
-//    	        fieldLabel: 'Briefing File ',
-//    	        name: 'file',
-//    	        id: 'file',
-//    	        msgTarget: 'side',
-////    	        allowBlank: false,
-//    	        emptyText: 'Browse File...',
-//    	        listeners: {
-//                    change: function(fld, value) {
-//                        var newValue = value.replace(/C:\\fakepath\\/g, '');
-//                        fld.setRawValue(newValue);
-//                    }
-//                }
-//    	    },{
-//    	    	xtype: 'textarea',
-//    	    	margin: '10 0 20 30',
-//    	    	labelWidth: 120,
-//                width: 300,
-//    	    	fieldLabel: 'Project Detail',
-//    	    	name: 'cproj_desc',
-//    	    	id: 'cproj_desc',
-//    	    	emptyText: 'Project Details'
-//    	    },{
-//				xtype: 'combobox',
-//				fieldLabel : 'Item Name <font color="red">*</font> ',
-//				name : 'citm_id',
-//				id : 'citm_id',
-//				allowBlank: false,
-//				queryMode : 'local',
-//				labelWidth : 120,
-//				margin : '10 0 0 30',
-//				width : 300,
-//				emptyText : 'Item Name',
-//				store : {
-//					fields : [ 'itm_id', 'itm_name' ],
-//					proxy : {
-//						type : 'ajax',
-//						url : 'showItem.htm',
-//						reader : {
-//							type : 'json',
-//							root : 'records',
-//							idProperty : 'itm_id'
-//						}
-//					},
-//					autoLoad : true
-//				},
-//				valueField : 'itm_id',
-//				displayField : 'itm_name'
-//			},{
-//    	    	xtype:'numberfield',
-//    	    	margin: '10 0 0 30',
-//    	    	labelWidth: 120,
-//                width: 300,
-//    	    	fieldLabel: 'Time(minutes) ',
-//    	    	emptyText : 'Time in minutes',
-//    	    	minValue : 0,
-//    	    	msgTarget : 'under',
-//    	    	name: 'ctime',
-//    	    	id: 'ctime',
-////    	    	emptyText: 'java,art,animal,etc...'
-//    	    },{
-//    	    	xtype:'numberfield',
-//    	    	margin: '10 0 0 30',
-//    	    	labelWidth: 120,
-//                width: 300,
-//    	    	fieldLabel: 'Price ',
-//    	    	minValue : 0,
-//    	    	msgTarget : 'under',
-//    	    	name: 'cprice',
-//    	    	id: 'cprice',
-//    	    	emptyText : 'Project Price',
-//    	    	listeners: {
-//    	            change: function(field, value) {
-//    	                if(value !== null){
-//    	                	Ext.getCmp('ccurrency').markInvalid('Currency Required!');
-//    	                	Ext.getCmp('ccurrency').allowBlank = false;
-//    	                }else{
-//    	                	Ext.getCmp('ccurrency').clearInvalid();
-//    	                	Ext.getCmp('ccurrency').allowBlank = true;
-//    	                }
-//    	            }
-//    	        }
-////    	    	emptyText: 'java,art,animal,etc...'
-//    	    },{
-//				xtype : 'combobox',
-//				fieldLabel : 'Currency ',
-//				name : 'ccurrency',
-//				id : 'ccurrency',
-//				queryMode : 'local',
-//				labelWidth : 120,
-//				margin : '10 0 0 30',
-//				width : 300,
-//				emptyText : 'Price Currency',
-//				editable : false,
-//				msgTarget : 'side',
-//				store : currency,
-//				valueField : 'currency',
-//				displayField : 'name',
-//			},{
-//    	    	xtype: 'textarea',
-//    	    	margin: '10 0 20 30',
-//    	    	labelWidth: 120,
-//                width: 300,
-//    	    	fieldLabel: 'Item Detail',
-//    	    	name: 'cproj_ref_desc',
-//    	    	id: 'cproj_ref_desc',
-//    	    	emptyText: 'Item Details'
-//    	    },{
-//				xtype : 'hidden',
-//				id : 'ccus_id',
-//				name : 'ccus_id'
-//			}],
-//    }],
-//    buttons:[{
-//    	text: 'Reset',
-//    	width:100,
-//    	handler: function(){
-//    		Ext.getCmp('projectsform').getForm().reset();
-//    	}
-//    },{	
-//   		  text: 'Create',
-//  		  width:100,
-//  		  id: 'btn',
-//         handler: function(){
-////        	 var desc = Ext.getCmp('desc1').getValue();
-////        	 var comment = Ext.getCmp('comment1').getValue();
-//        	 var form = Ext.getCmp('projectsform').getForm();
-//        	 if(form.isValid()){
-//				 form.submit({
-//				 url: 'createProjects.htm',
-//				 waitTitle: 'Creating Project',
-//				 waitMsg: 'Please wait...',
-//				 standardSubmit: true,
-//                 failure: function(form, action) {
-//                	 Ext.MessageBox.show({
-//  						title: 'Information',
-//  						msg: 'Project Has Been Created!',
-//  						buttons: Ext.MessageBox.OK,
-//  						icon: Ext.MessageBox.INFO,
-//  						animateTarget: 'btn',
-//  						fn: function(){addProject.hide();}
-//  					});
-//                    }
-//      			});
-//        	 }else {
-//					Ext.MessageBox.show({
-//						title: 'Failed',
-//						msg: ' Please Insert All Required Field',
-//						buttons: Ext.MessageBox.OK,
-//						icon: Ext.MessageBox.ERROR,
-//						animateTarget: 'btn',
-//					});
-//				}
-//		}
-//       	}],
-//       	listeners:{
-//       		'beforehide':function(){
-//       			Ext.getCmp('projectsform').getForm().reset();
-//       		}
-//       	}
-//	});
 
 editItem = new Ext.create('Ext.window.Window', {
 	title : 'Edit Item',
@@ -2333,7 +1822,7 @@ editItem = new Ext.create('Ext.window.Window', {
 					fields : [ 'itm_id', 'itm_name' ],
 					proxy : {
 						type : 'ajax',
-						url : 'showItem.htm',
+						url : 'showItem.htm?id=0',
 						reader : {
 							type : 'json',
 							root : 'records',
@@ -2347,12 +1836,21 @@ editItem = new Ext.create('Ext.window.Window', {
 			},{
     	    	xtype:'numberfield',
     	    	labelWidth: 120,
-    	    	fieldLabel: 'Time(minutes) ',
+    	    	fieldLabel: 'Target Time(mins) ',
     	    	emptyText : 'Time in minutes',
     	    	minValue : 0,
     	    	msgTarget : 'under',
     	    	name: 'etime',
     	    	id: 'etime',
+    	    },{
+    	    	xtype:'numberfield',
+    	    	labelWidth: 120,
+    	    	fieldLabel: 'Actual Time(mins) ',
+    	    	emptyText : 'Time in minutes',
+    	    	minValue : 0,
+    	    	msgTarget : 'under',
+    	    	name: 'eactual_time',
+    	    	id: 'eactual_time',
     	    },{
     	    	xtype:'numberfield',
     	    	labelWidth: 120,
@@ -2403,13 +1901,6 @@ editItem = new Ext.create('Ext.window.Window', {
 	}],
 	buttons : [
 			{
-				text : 'Reset',
-				width : 100,
-				handler : function() {
-					Ext.getCmp('editItemForm').getForm().reset();
-				}
-			},
-			{
 				text : 'Update',
 				width : 100,
 				id : 'ebtn',
@@ -2451,6 +1942,12 @@ editItem = new Ext.create('Ext.window.Window', {
 						});
 					}
 				}
+			},{
+				text : 'Reset',
+				width : 100,
+				handler : function() {
+					Ext.getCmp('editItemForm').getForm().reset();
+				}
 			} ],
 	listeners : {
 		'beforehide' : function() {
@@ -2463,6 +1960,7 @@ function editItemFunction(v){
 	var myData = store.projectsRef.getAt(v);
 	Ext.getCmp('eitm_id').setValue(myData.data.itm_id);
 	Ext.getCmp('etime').setValue(myData.data.time);
+	Ext.getCmp('eactual_time').setValue(myData.data.actual_time);
 	Ext.getCmp('eprice').setValue(myData.data.price);
 	Ext.getCmp('ecurrency').setValue(myData.data.currency);
 	Ext.getCmp('eproj_ref_desc').setValue(myData.data.proj_ref_desc);
@@ -2489,6 +1987,8 @@ function deleteItem(proj_ref_id){
 						store.projects.reload();
 					},
 					failure : function(response, opts) {
+						store.projectsRef.reload();
+						store.projects.reload();
 						var responseOject = Ext.util.JSON
 								.decode(response.responseText);
 						Ext.Msg.alert(responseOject.messageHeader,

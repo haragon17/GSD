@@ -321,7 +321,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	@Override
 	public void createProjectsReference(ProjectsReference proj) {
 		// TODO Auto-generated method stub
-		String sql = "INSERT INTO projects_reference VALUES (?,?,?,?,?,?,now(),now(),?,?)";
+		String sql = "INSERT INTO projects_reference VALUES (?,?,?,?,?,?,now(),now(),?,?,?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[] { 
 				proj.getProj_ref_id(),
@@ -331,7 +331,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				proj.getPrice(),
 				proj.getCretd_usr(),
 				proj.getCurrency(),
-				proj.getProj_ref_desc()
+				proj.getProj_ref_desc(),
+				proj.getActual_time()
 		});
 	}
 	
@@ -397,7 +398,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				+ "price=?, "
 				+ "update_date=now(), "
 				+ "currency=?, "
-				+ "proj_ref_desc=? "
+				+ "proj_ref_desc=?, "
+				+ "actual_time=?"
 				+ "where proj_ref_id=?";
 		
 		this.getJdbcTemplate().update(sql, new Object[] { 
@@ -406,6 +408,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				proj.getPrice(),
 				proj.getCurrency(),
 				proj.getProj_ref_desc(),
+				proj.getActual_time(),
 				proj.getProj_ref_id()
 		});
 		

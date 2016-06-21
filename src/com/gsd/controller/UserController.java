@@ -13,6 +13,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -41,7 +42,8 @@ public class UserController {
 	public void setChk(int chk){
 		this.chkPush = chk;
 	}
-	static final PasswordEncoder passwordEncoder = new StandardPasswordEncoder();
+//	static final PasswordEncoder passwordEncoder = new StandardPasswordEncoder();
+	static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 //	String hashUser = passwordEncoder.encode("user");
 //	String hashAdmin = passwordEncoder.encode("admin");
 
@@ -124,6 +126,7 @@ public class UserController {
 			mail.put("name", usr_name);
 			mail.put("pass", password);
 			mail.put("to", email);
+			mail.put("fname", fname);
 
 			sentMail.sentRegistMail(request, mail);
 		} catch (Exception e) {
@@ -291,8 +294,9 @@ public class UserController {
 		User userNull = new User();
 		List<User> userLs = new ArrayList<User>();
 		int id = user.getUserModel().getUsr_id();
-
-		if (opass.equals(user.getPassword())) {
+		
+		if(passwordEncoder.matches(opass, user.getPassword())){
+//		if (passwordEncoder.encode(opass).equals(user.getPassword())) {
 			userDao.changePassword(id, passwordEncoder.encode(npass));
 			userLs.add(user.getUserModel());
 		} else {

@@ -29,8 +29,8 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 	@Override
 	public void createUser(User user) {
 		// TODO Auto-generated method stub
-		String sql = "INSERT INTO users (usr_id,usr_name,password,fname,lname,birthday,email,phone,usr_type,cretd_date,update_date) "
-				+ "VALUES (?,?,?,?,?,?,?,?,?,now(),now())";
+		String sql = "INSERT INTO users (usr_id,usr_name,password,fname,lname,email,phone,usr_type,cretd_date,update_date) "
+				+ "VALUES (?,?,?,?,?,?,?,?,now(),now())";
 		
 		this.getJdbcTemplate().update(sql, new Object[] { 
 				user.getUsr_id(),
@@ -38,7 +38,6 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 				user.getPassword(),
 				user.getFname(),
 				user.getLname(),
-				user.getBirthdayDate(),
 				user.getEmail(),
 				user.getPhone(),
 				user.getUsr_type()
@@ -96,7 +95,6 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 
 		String sql = "update users set fname=?, "
 				+ "lname=?, "
-				+ "birthday=?, "
 				+ "email=?, "
 				+ "phone=?, "
 				+ "usr_type=?, "
@@ -106,7 +104,6 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 		this.getJdbcTemplate().update(sql, new Object[] { 
 				user.getFname(),
 				user.getLname(),
-				user.getBirthdayDate(),
 				user.getEmail(),
 				user.getPhone(),
 				user.getUsr_type(),

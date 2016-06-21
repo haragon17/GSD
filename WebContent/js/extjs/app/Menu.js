@@ -105,7 +105,7 @@ Ext.onReady(function(){
 edit = new Ext.create('Ext.window.Window', {
 	title: 'Edit Profile',
     width: 500,
-    height: 285,
+//    height: 285,
     animateTarget: 'ep',
     modal : true,
     resizable:false,
@@ -150,18 +150,18 @@ edit = new Ext.create('Ext.window.Window', {
                 	maxLength: 25,
            		maxLengthText: 'Maximum input 25 Character',
                 },
-                 { xtype: 'datefield',
-                    fieldLabel: 'Date of Birth <font color="red">*</font>',
-                    name: 'pdob',
-                    id: 'pdob',
-                    allowBlank: false,
-                    maxValue: new Date(),
-                    emptyText: 'Date of Birth',
-                    format: 'd-m-Y',
-                    editable: false,
-                	labelWidth : 145, 
-                	msgTarget: 'side',
-                },
+//                 { xtype: 'datefield',
+//                    fieldLabel: 'Date of Birth <font color="red">*</font>',
+//                    name: 'pdob',
+//                    id: 'pdob',
+//                    allowBlank: false,
+//                    maxValue: new Date(),
+//                    emptyText: 'Date of Birth',
+//                    format: 'd-m-Y',
+//                    editable: false,
+//                	labelWidth : 145, 
+//                	msgTarget: 'side',
+//                },
                 {
                	 allowBlank:false,
                	 fieldLabel: 'Email <font color="red">*</font>  ', 
@@ -194,13 +194,7 @@ edit = new Ext.create('Ext.window.Window', {
                    ]
            }],
     }],
-    buttons:[{
-   		text: 'Change Password',
-   		id: 'cp',
-   		handler: function(){
-   			changePass.show();
-   		}
-   	},{	
+    buttons:[{	
    		  text: 'Update',
   		  width:100,
   		  id: 'epbtn',
@@ -208,7 +202,7 @@ edit = new Ext.create('Ext.window.Window', {
         	 var form = Ext.getCmp('epform').getForm();
         	 var pfname = Ext.getCmp('pfname');
    		  	var plname = Ext.getCmp('plname');
-   		  	var pdob = Ext.getCmp('pdob');
+//   		  	var pdob = Ext.getCmp('pdob');
    		  	var pemail = Ext.getCmp('pemail');
    		  	var pphone = Ext.getCmp('pphone');
             	 if(form.isValid()){
@@ -222,7 +216,7 @@ edit = new Ext.create('Ext.window.Window', {
        				url : 'updateProfile.htm',
        				params: {pfname: pfname.getValue(),
     					plname: plname.getValue(),
-    					pdob: pdob.getValue(),
+//    					pdob: pdob.getValue(),
     					pemail: pemail.getValue(),
     					pphone: pphone.getValue(),
        				},
@@ -253,6 +247,12 @@ edit = new Ext.create('Ext.window.Window', {
 					});
 				}
 		}
+       	},{
+       		text: 'Change Password',
+       		id: 'cp',
+       		handler: function(){
+       			changePass.show();
+       		}
        	}],
        	listeners:{
        		'beforehide':function(){
@@ -265,7 +265,7 @@ function editProfile(){
 	edit.show();
 	Ext.getCmp('pfname').setValue(pfname);
     Ext.getCmp('plname').setValue(plname);
-    Ext.getCmp('pdob').setValue(pdob);
+//    Ext.getCmp('pdob').setValue(pdob);
     Ext.getCmp('pemail').setValue(pemail);
     Ext.getCmp('pphone').setValue(pphone);
     Ext.getCmp('pid').setValue(pid);
@@ -273,7 +273,7 @@ function editProfile(){
 
 changePass = new Ext.create('Ext.window.Window', {
 	title: 'Change Password',
-	    height: 215,
+	    height: 220,
 	    width: 400,
 	    animateTarget: 'ep',
 	    modal : true,

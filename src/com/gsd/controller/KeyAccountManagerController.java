@@ -53,7 +53,7 @@ public class KeyAccountManagerController {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		int type = user.getUserModel().getUsr_type();
 		
-		if(type == 0){
+		if(type == 0 || type == 1){
 			return new ModelAndView("KeyAccountManagement");
 		}else{
 			return new ModelAndView("AccessDenied");

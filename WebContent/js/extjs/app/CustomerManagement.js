@@ -3,6 +3,15 @@ panels = {};
 
 Ext.onReady(function() {
 
+	Ext.apply(Ext.form.field.VTypes, {
+	    ephone: function(val, field) {
+	        var reg= /^[0-9,-]/i;
+	        return reg.test(val);
+	    },
+	    ephoneText: 'Must be a number with -',
+	    ephoneMask: /^[0-9,-]/i
+	});
+	
 	cusid = new Ext.form.Hidden({
 		name : 'cusid',
 		id : 'cusid'
@@ -294,6 +303,7 @@ Ext.onReady(function() {
 							contact_person = grid.getStore().getAt(rowIndex).get('contact_person');
 							key_acc_id = grid.getStore().getAt(rowIndex).get('key_acc_id');
 							cus_email = grid.getStore().getAt(rowIndex).get('cus_email');
+							cus_phone = grid.getStore().getAt(rowIndex).get('cus_phone');
 
 							Ext.getCmp('ecus_name').setValue(cus_name);
 							Ext.getCmp('ecus_code').setValue(cus_code);
@@ -302,6 +312,7 @@ Ext.onReady(function() {
 							Ext.getCmp('ecus_email').setValue(cus_email);
 							Ext.getCmp('ekey_acc_mng').setValue(key_acc_id);
 							Ext.getCmp('ecus_id').setValue(cus_id);
+							Ext.getCmp('ecus_phone').setValue(cus_phone);
 							editCustomer.show();
 						}
 					} ]
@@ -333,9 +344,10 @@ Ext.onReady(function() {
 		plugins: [{
 	        ptype: 'rowexpander',
 	        rowBodyTpl : new Ext.XTemplate(
-	        		'<p><b>Adress:</b> {address:this.chkAdd}</p>',
+	        		'<p><b>Adress:</b> {address:this.chkEmpty}</p>',
+	        		'<p><b>Phone :</b> {cus_phone:this.chkEmpty}</p>',
 	        		{
-	        			chkAdd: function(v){
+	        			chkEmpty: function(v){
 	        				if(v == ""){
 	        					return '-';
 	        				}else{
@@ -408,6 +420,9 @@ Ext.define('cusModel', {
 		type : 'string'
 	}, {
 		name : 'cus_email',
+		type : 'string'
+	}, {
+		name : 'cus_phone',
 		type : 'string'
 	}
 
@@ -511,6 +526,17 @@ editCustomer = new Ext.create('Ext.window.Window', {
 	           		 }
 	           	 }
 			}, {
+				allowBlank : true,
+				fieldLabel : 'Contact Person ',
+				name : 'econtact_person',
+				id : 'econtact_person',
+				emptyText : 'Contact Person',
+				labelWidth : 145,
+				msgTarget : 'side',
+				// vtype: 'phone',
+				maxLength : 30,
+				maxLengthText : 'Maximum input 30 Character',
+			}, {
 				xtype : 'textareafield',
 				allowBlank : true,
 				fieldLabel : 'Address ',
@@ -523,15 +549,15 @@ editCustomer = new Ext.create('Ext.window.Window', {
 				maxLengthText : 'Maximum input 100 Character',
 			}, {
 				allowBlank : true,
-				fieldLabel : 'Contact Person ',
-				name : 'econtact_person',
-				id : 'econtact_person',
-				emptyText : 'Contact Person',
+				fieldLabel : 'Phone Number ',
+				name : 'ecus_phone',
+				id : 'ecus_phone',
+				emptyText : 'Phone Number',
 				labelWidth : 145,
 				msgTarget : 'side',
-				// vtype: 'phone',
-				maxLength : 30,
-				maxLengthText : 'Maximum input 30 Character',
+				vtype: 'ephone',
+				maxLength : 50,
+				maxLengthText : 'Maximum input 50 Character',
 			}, {
 				allowBlank : true,
 				fieldLabel : 'E-mail ',
@@ -578,13 +604,6 @@ editCustomer = new Ext.create('Ext.window.Window', {
 	} ],
 	buttons : [
 			{
-				text : 'Reset',
-				width : 100,
-				handler : function() {
-					Ext.getCmp('editform').getForm().reset();
-				}
-			},
-			{
 				text : 'Update',
 				width : 100,
 				id : 'ebtn',
@@ -624,6 +643,12 @@ editCustomer = new Ext.create('Ext.window.Window', {
 							animateTarget : 'ebtn',
 						});
 					}
+				}
+			},{
+				text : 'Reset',
+				width : 100,
+				handler : function() {
+					Ext.getCmp('editform').getForm().reset();
 				}
 			} ],
 	listeners : {
@@ -708,6 +733,17 @@ addCustomer = new Ext.create('Ext.window.Window', {
 	           		 }
 	           	 }
 			}, {
+				allowBlank : true,
+				fieldLabel : 'Contact Person ',
+				name : 'acontact_person',
+				id : 'acontact_person',
+				emptyText : 'Contact Person',
+				labelWidth : 145,
+				msgTarget : 'side',
+				// vtype: 'phone',
+				maxLength : 30,
+				maxLengthText : 'Maximum input 30 Character',
+			}, {
 				xtype : 'textareafield',
 				allowBlank : true,
 				fieldLabel : 'Address ',
@@ -720,15 +756,15 @@ addCustomer = new Ext.create('Ext.window.Window', {
 				maxLengthText : 'Maximum input 100 Character',
 			}, {
 				allowBlank : true,
-				fieldLabel : 'Contact Person ',
-				name : 'acontact_person',
-				id : 'acontact_person',
-				emptyText : 'Contact Person',
+				fieldLabel : 'Phone Number ',
+				name : 'acus_phone',
+				id : 'acus_phone',
+				emptyText : 'Phone Number',
 				labelWidth : 145,
 				msgTarget : 'side',
-				// vtype: 'phone',
-				maxLength : 30,
-				maxLengthText : 'Maximum input 30 Character',
+				vtype: 'ephone',
+				maxLength : 50,
+				maxLengthText : 'Maximum input 50 Character',
 			}, {
 				allowBlank : true,
 				fieldLabel : 'E-mail ',
@@ -771,12 +807,6 @@ addCustomer = new Ext.create('Ext.window.Window', {
 	} ],
 	buttons : [
 			{
-				text : 'Reset',
-				handler : function() {
-					Ext.getCmp('addform').getForm().reset();
-				}
-			},
-			{
 				text : 'Add',
 				id : 'btnRegist',
 				handler : function() {
@@ -815,6 +845,11 @@ addCustomer = new Ext.create('Ext.window.Window', {
 							animateTarget : 'btnRegist',
 						});
 					}
+				}
+			},{
+				text : 'Reset',
+				handler : function() {
+					Ext.getCmp('addform').getForm().reset();
 				}
 			} ],
 	listeners : {
