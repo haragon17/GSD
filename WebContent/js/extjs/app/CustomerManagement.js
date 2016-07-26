@@ -2,15 +2,6 @@ store = {};
 panels = {};
 
 Ext.onReady(function() {
-
-	Ext.apply(Ext.form.field.VTypes, {
-	    ephone: function(val, field) {
-	        var reg= /^[0-9,-]/i;
-	        return reg.test(val);
-	    },
-	    ephoneText: 'Must be a number with -',
-	    ephoneMask: /^[0-9,-]/i
-	});
 	
 	cusid = new Ext.form.Hidden({
 		name : 'cusid',
@@ -228,14 +219,14 @@ Ext.onReady(function() {
 
 	});
 
-	Ext.create('Ext.grid.Panel', {
+	panels.grid = Ext.create('Ext.grid.Panel', {
 		renderTo : document.body,
 		xtype: 'row-expander-grid',
 		title : 'Customer',
-		split : true,
-		forceFit : true,
-		loadMask : true,
-		autoWidth : true,
+//		split : true,
+//		forceFit : true,
+//		loadMask : true,
+//		autoWidth : true,
 		frame : true,
 		store : store.searchCustomer,
 		tools : [ {
@@ -254,43 +245,56 @@ Ext.onReady(function() {
 			"margin-top" : "15px",
 			"margin-bottom" : "auto"
 		},
-		width : 900,
-		height : 350,
+		width : 1200,
+		height : 500,
 		columns : [
 				{
 					text : "Customer Name",
-					width : 100,
+					flex : 1,
 					sortable : true,
 					dataIndex : 'cus_name'
 				},
 				{
 					text : "Customer Code",
-					width : 80,
+					flex : 0.6,
 					sortable : true,
 					dataIndex : 'cus_code'
 				},
 				{
-					text : "Contact Person",
-					width : 100,
-					sortable : true,
-					dataIndex : 'contact_person'
-				},
-				{
 					text : "E-mail",
-					width : 120,
+					flex : 1.2,
 					sortable : true,
 					dataIndex : 'cus_email'
 				},
 				{
+					text : "Contact Person",
+					flex : 0.9,
+					sortable : true,
+					dataIndex : 'contact_person'
+				},
+				{
 					text : "Key Account Mng",
-					width : 100,
+					flex : 0.7,
 					sortable : true,
 					dataIndex : 'key_acc_name'
 				},
 				{
+					text : "Bill to",
+					flex : 0.6,
+					sortable : true,
+					dataIndex : 'bill_to'
+				},
+				{
+					text : "Payment",
+					flex : 0.4,
+					sortable : true,
+					dataIndex : 'payment'
+				},
+				{
 					text : 'Edit',
 					xtype : 'actioncolumn',
-					width : 60,
+					flex : 0.25,
+					sortable : false,
 					align : 'center',
 					id : 'edit',
 					items : [ {
@@ -304,6 +308,9 @@ Ext.onReady(function() {
 							key_acc_id = grid.getStore().getAt(rowIndex).get('key_acc_id');
 							cus_email = grid.getStore().getAt(rowIndex).get('cus_email');
 							cus_phone = grid.getStore().getAt(rowIndex).get('cus_phone');
+							bill_to = grid.getStore().getAt(rowIndex).get('bill_to');
+							payment = grid.getStore().getAt(rowIndex).get('payment');
+							transfer_dtl = grid.getStore().getAt(rowIndex).get('transfer_dtl');
 
 							Ext.getCmp('ecus_name').setValue(cus_name);
 							Ext.getCmp('ecus_code').setValue(cus_code);
@@ -313,6 +320,9 @@ Ext.onReady(function() {
 							Ext.getCmp('ekey_acc_mng').setValue(key_acc_id);
 							Ext.getCmp('ecus_id').setValue(cus_id);
 							Ext.getCmp('ecus_phone').setValue(cus_phone);
+							Ext.getCmp('ebill_to').setValue(bill_to);
+							Ext.getCmp('epayment').setValue(payment);
+							Ext.getCmp('etransfer_dtl').setValue(transfer_dtl);
 							editCustomer.show();
 						}
 					} ]
@@ -320,7 +330,8 @@ Ext.onReady(function() {
 				{
 					text : 'Delete',
 					xtype : 'actioncolumn',
-					width : 60,
+					flex : 0.3,
+					sortable : false,
 					align : 'center',
 					id : 'del',
 					items : [ {
@@ -341,11 +352,40 @@ Ext.onReady(function() {
 					} ]
 				}, ],
 		columnLines : true,
+		listeners: {
+			viewready: function (grid) {
+		        var view = grid.view;
+		        this.toolTip = Ext.create('Ext.tip.ToolTip', {
+		            target: view.el,
+		            delegate: view.cellSelector,
+//		            width: 'auto',
+//		            autoWidth: true,
+		            trackMouse: true,
+		            renderTo: Ext.getBody(),
+		            listeners: {
+		                beforeshow: function(tip) {
+		                    var trigger = tip.triggerElement,
+		                        parent = tip.triggerElement.parentElement,
+		                        columnTitle = view.getHeaderByCell(trigger).text,
+		                        columnDataIndex = view.getHeaderByCell(trigger).dataIndex,
+		                        columnText = view.getRecord(parent).get(columnDataIndex).toString();
+		                    if (columnText){
+//		                        tip.update("<b>" + columnTitle + ":</b> " + columnText);
+		                        tip.update("<b>"+columnText+"</b>");
+		                    } else {
+		                        return false;
+		                    }
+		                }
+		            }
+		        });
+	        }
+	    },
 		plugins: [{
 	        ptype: 'rowexpander',
 	        rowBodyTpl : new Ext.XTemplate(
 	        		'<p><b>Adress:</b> {address:this.chkEmpty}</p>',
 	        		'<p><b>Phone :</b> {cus_phone:this.chkEmpty}</p>',
+	        		'<p><b>Transfer Detail:</b> <br>{transfer_dtl:this.chkTransfer}</p>',
 	        		{
 	        			chkEmpty: function(v){
 	        				if(v == ""){
@@ -354,34 +394,16 @@ Ext.onReady(function() {
 	        					return v;
 	        				}
 	        			}
+	        		},
+	        		{
+	        			chkTransfer: function(v){
+	        				if(v == ""){
+	        					return '-';
+	        				}else{
+	        					return v.replace(/\r\n|\n/gi, "<br>");
+	        				}
+	        			}
 	        		}
-//	        		'{cus_id:this.myTest}',
-//	            {
-//	            	myTest: function(v){
-//	            		var myText = "";
-//	            		 store.jobs.each(function(rec){
-///            			 alert(rec.data.cus_id);
-//	            			if(rec.data.cus_id == v){
-//	            				 myText += '<tr><td><b><u>Project Name:</u></b> '+rec.data.job_name+'</td>'+
-//	            				 '<td><u><b>Description:</b></u> '+rec.data.job_desc+'</td>';
-//	            			}
-//	            		})
-//	            		if(myText !== ""){
-//	            			return "<table cellspacing=8>"+myText+"</table>";
-//	            		}else{
-//	            			return "<b>No Project Assign...</b>";
-//	            		}
-//	            	}
-//	            }
-//	            '<p><b>Project Name:</b> '+store.jobs.getAt(0).data.proj_name+'</p>',
-//	            '<tpl for="$foo=1 to 3">',
-//	            	'<p>$foo</p>',
-//	            '</tpl>'
-//	            store.jobs.each(function(rec){
-//	            '<tpl if="cus_id &gt;= "'+rec.data.cus_id+'">',
-//	            	'<p>HY !!</p>',
-//	            '</tpl>',
-//	            })
 	        )
 	    }],
 		bbar : Ext.create('Ext.PagingToolbar', {
@@ -424,6 +446,18 @@ Ext.define('cusModel', {
 	}, {
 		name : 'cus_phone',
 		type : 'string'
+	}, {
+		name : 'bill_from',
+		type : 'string'
+	}, {
+		name : 'bill_to',
+		type : 'string'
+	}, {
+		name : 'payment',
+		type : 'string'
+	}, {
+		name : 'transfer_dtl',
+		type : 'string'
 	}
 
 	]
@@ -432,7 +466,7 @@ Ext.define('cusModel', {
 store.searchCustomer = Ext.create('Ext.data.JsonStore', {
 	model : 'cusModel',
 	id : 'cusStore',
-	pageSize : 9,
+	pageSize : 15,
 	autoLoad : true,
 	proxy : {
 		type : 'ajax',
@@ -450,6 +484,23 @@ store.searchCustomer = Ext.create('Ext.data.JsonStore', {
 // }]
 });
 
+var billingTo = Ext.create('Ext.data.Store', {
+	fields: ['name'],
+	data : [
+	        {"name":"Customer"},
+	        {"name":"GSDI (Direct)"},
+	        {"name":"GSDI (Angebote)"}
+	]
+});
+
+var paymentTerms = Ext.create('Ext.data.Store', {
+	fields: ['name'],
+	data : [
+	        {"name":"Monthly"},
+	        {"name":"Biweekly"},
+	        {"name":"Project"}
+	]
+});
 
 editCustomer = new Ext.create('Ext.window.Window', {
 	title : 'Edit Customer',
@@ -545,8 +596,8 @@ editCustomer = new Ext.create('Ext.window.Window', {
 				emptyText : 'Address',
 				labelWidth : 145,
 				msgTarget : 'side',
-				maxLength : 100,
-				maxLengthText : 'Maximum input 100 Character',
+				maxLength : 150,
+				maxLengthText : 'Maximum input 150 Character',
 			}, {
 				allowBlank : true,
 				fieldLabel : 'Phone Number ',
@@ -554,7 +605,7 @@ editCustomer = new Ext.create('Ext.window.Window', {
 				id : 'ecus_phone',
 				emptyText : 'Phone Number',
 				labelWidth : 145,
-				msgTarget : 'side',
+				msgTarget : 'under',
 				vtype: 'ephone',
 				maxLength : 50,
 				maxLengthText : 'Maximum input 50 Character',
@@ -595,6 +646,39 @@ editCustomer = new Ext.create('Ext.window.Window', {
 				},
 				valueField : 'key_acc_id',
 				displayField : 'key_acc_name'
+			},{
+				xtype : 'combobox',
+				labelWidth : 145,
+				fieldLabel : 'Billing To',
+				name : 'ebill_to',
+				id : 'ebill_to',
+				emptyText : 'Billing To',
+				editable : false,
+				store : billingTo,
+				valueField : 'name',
+				displayField : 'name'
+			},{
+				xtype : 'combobox',
+				labelWidth : 145,
+				fieldLabel : 'Payment Terms',
+				name : 'epayment',
+				id : 'epayment',
+				emptyText : 'Payment Terms',
+				editable : false,
+				store : paymentTerms,
+				valueField : 'name',
+				displayField : 'name'
+			}, {
+				xtype : 'textareafield',
+				allowBlank : true,
+				fieldLabel : 'Transfer Detail ',
+				name : 'etransfer_dtl',
+				id : 'etransfer_dtl',
+				emptyText : 'Transfer Detail',
+				labelWidth : 145,
+				msgTarget : 'side',
+				maxLength : 100,
+				maxLengthText : 'Maximum input 100 Character',
 			}, {
 				xtype : 'hidden',
 				id : 'ecus_id',
@@ -752,8 +836,8 @@ addCustomer = new Ext.create('Ext.window.Window', {
 				emptyText : 'Address',
 				labelWidth : 145,
 				msgTarget : 'side',
-				maxLength : 100,
-				maxLengthText : 'Maximum input 100 Character',
+				maxLength : 150,
+				maxLengthText : 'Maximum input 150 Character',
 			}, {
 				allowBlank : true,
 				fieldLabel : 'Phone Number ',
@@ -761,7 +845,7 @@ addCustomer = new Ext.create('Ext.window.Window', {
 				id : 'acus_phone',
 				emptyText : 'Phone Number',
 				labelWidth : 145,
-				msgTarget : 'side',
+				msgTarget : 'under',
 				vtype: 'ephone',
 				maxLength : 50,
 				maxLengthText : 'Maximum input 50 Character',
@@ -802,6 +886,39 @@ addCustomer = new Ext.create('Ext.window.Window', {
 				},
 				valueField : 'key_acc_id',
 				displayField : 'key_acc_name'
+			},{
+				xtype : 'combobox',
+				labelWidth : 145,
+				fieldLabel : 'Billing To',
+				name : 'abill_to',
+				id : 'abill_to',
+				emptyText : 'Billing To',
+				editable : false,
+				store : billingTo,
+				valueField : 'name',
+				displayField : 'name'
+			},{
+				xtype : 'combobox',
+				labelWidth : 145,
+				fieldLabel : 'Payment Terms',
+				name : 'apayment',
+				id : 'apayment',
+				emptyText : 'Payment Terms',
+				editable : false,
+				store : paymentTerms,
+				valueField : 'name',
+				displayField : 'name'
+			}, {
+				xtype : 'textareafield',
+				allowBlank : true,
+				fieldLabel : 'Transfer Detail ',
+				name : 'atransfer_dtl',
+				id : 'atransfer_dtl',
+				emptyText : 'Transfer Detail',
+				labelWidth : 145,
+				msgTarget : 'side',
+				maxLength : 100,
+				maxLengthText : 'Maximum input 100 Character',
 			} ]
 		} ],
 	} ],

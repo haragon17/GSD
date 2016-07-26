@@ -75,7 +75,7 @@ public class ProjectsController {
 		THB = "";
 		EUR = "";
 		
-		if(type == 0 || type == 1 || type == 2){
+		if(type == 0 || type == 1){
 			return new ModelAndView("ProjectsAdmin");
 		}else{
 			return new ModelAndView("Projects");

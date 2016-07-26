@@ -352,13 +352,12 @@ editMember = new Ext.create('Ext.window.Window', {
 	                    id: 'eusr_type',
 	                    labelWidth : 145,
 	                    // Arrange radio buttons into two columns, distributed vertically
-	                    columns: 2,
+	                    columns: 3,
 	                    vertical: true,
 	                    items: [
-	                        { boxLabel: 'JMD', name: 'usr_type', inputValue: '3', checked: true },
-	                        { boxLabel: 'PM', name: 'usr_type', inputValue: '2'},
-	                        { boxLabel: 'BUM/Sale', name: 'usr_type', inputValue: '1'},
-	                        { boxLabel: 'Admin', name: 'usr_type', inputValue: '0'},
+							{ boxLabel: 'Admin', name: 'usr_type', inputValue: '0'},
+							{ boxLabel: 'Manager', name: 'usr_type', inputValue: '1'},
+							{ boxLabel: 'JMD', name: 'usr_type', inputValue: '2'},
 	                    ]
 	                },
 	                {
@@ -581,13 +580,12 @@ addMember = new Ext.create('Ext.window.Window', {
          labelWidth : 145,
          id:'type',
          // Arrange radio buttons into two columns, distributed vertically
-         columns: 2,
+         columns: 3,
          vertical: true,
          items: [
-			{ boxLabel: 'JMD', name: 'usr_type', inputValue: '3', checked: true },
-			{ boxLabel: 'PM', name: 'usr_type', inputValue: '2'},
-			{ boxLabel: 'BUM/Sale', name: 'usr_type', inputValue: '1'},
-			{ boxLabel: 'Admin', name: 'usr_type', inputValue: '0'},
+            { boxLabel: 'Admin', name: 'usr_type', inputValue: '0'},
+            { boxLabel: 'Manager', name: 'usr_type', inputValue: '1'},
+			{ boxLabel: 'JMD', name: 'usr_type', inputValue: '2', checked: true },
          ]
      }
         ]

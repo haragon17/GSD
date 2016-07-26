@@ -121,7 +121,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	@Override
 	public List<Projects> searchProjects(Map<String, String> data){
 		String sql = "SELECT DISTINCT projects.proj_id, customer.cus_name, projects.proj_name, projects.proj_desc, projects.cus_id, \n" +
-				"customer.cus_code, projects.file_id\n" +
+				"customer.cus_code, projects.file_id, customer.bill_to, customer.payment\n" +
 				"FROM projects\n" +
 				"LEFT JOIN projects_reference ON projects_reference.proj_id = projects.proj_id\n" +
 				"LEFT JOIN customer ON customer.cus_id = projects.cus_id\n" +
@@ -207,7 +207,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	public List<ProjectsReference> searchProjectsReferences(Map<String, String> data) {
 		
 		String sql = "SELECT projects_reference.proj_ref_id, projects_reference.proj_id, projects.proj_name, \n" +
-				"projects_reference.itm_id, item.itm_name, projects_reference.\"time\", \n" +
+				"projects_reference.itm_id, item.itm_name, projects_reference.\"time\", projects_reference.actual_time, \n" +
 				"projects_reference.price, projects_reference.currency, projects_reference.proj_ref_desc\n" +
 				"FROM projects_reference\n" +
 				"LEFT JOIN projects ON projects.proj_id = projects_reference.proj_id\n" +

@@ -34,7 +34,7 @@ public class ItemDaoImpl extends JdbcDaoSupport implements ItemDao {
 		if(proj_id != 0){
 			sql += "WHERE proj_id = "+proj_id;
 		}
-		
+		sql += "\nORDER BY itm_name";
 		List<Item> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Item>(Item.class));
 		return result;
 	}

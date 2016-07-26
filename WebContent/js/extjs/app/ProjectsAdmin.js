@@ -269,7 +269,11 @@ Ext.onReady(function() {
 								idProperty : 'itm_id'
 							}
 						},
-						autoLoad : true
+						autoLoad : true,
+						sorters: [{
+					         property: 'itm_name',
+					         direction: 'ASC'
+					     }]
 					},
 					valueField : 'itm_id',
 					displayField : 'itm_name'
@@ -526,41 +530,39 @@ Ext.onReady(function() {
 			"margin-top" : "15px",
 			"margin-bottom" : "10px"
 		},
-		width : 900,
-		height : 400,
+		width : 1200,
+		height : 500,
 		columns : [
 				{
 					text : "Project Name",
-					width : 150,
+					flex : 1.5,
 					sortable : true,
 					dataIndex : 'proj_name'
 				},
 				{
 					text : "Customer Name",
-					width : 150,
+					flex : 1.5,
 					sortable : true,
 					dataIndex : 'cus_name'
 				},
 				{
 					text : "Project Description",
-					width : 200,
+					flex : 2,
 					sortable : true,
 					dataIndex : 'proj_desc'
 				},
-//				{
-//					text : "Item Name",
-//					width : 100,
-//					sortable : true,
-//					dataIndex : 'itm_name'
-//				},
-//				{
-//					text : "Time",
-//					width : 60,
-//					sortable : true,
-//					renderer : renderTime,
-//					align : 'center',
-//					dataIndex : 'time'
-//				},
+				{
+					text : "Bill to",
+					flex : 0.8,
+					sortable : true,
+					dataIndex : 'bill_to'
+				},
+				{
+					text : "Payment",
+					flex : 0.5,
+					sortable : true,
+					dataIndex : 'payment'
+				},
 //				{
 //					text : "Price",
 //					width : 80,
@@ -577,7 +579,7 @@ Ext.onReady(function() {
 //				},
 				{
 					text : 'Briefing',
-					width : 60,
+					flex : 0.5,
 					xtype : 'actioncolumn',
 					align : 'center',
 					id : 'open',
@@ -629,7 +631,7 @@ Ext.onReady(function() {
 				},
 				{
 					text : 'Add',
-					width : 50,
+					flex : 0.3,
 					xtype : 'actioncolumn',
 					align : 'center',
 					id : 'add',
@@ -647,7 +649,7 @@ Ext.onReady(function() {
 				{
 					text : 'Edit',
 					xtype : 'actioncolumn',
-					width : 50,
+					flex : 0.3,
 					align : 'center',
 					id : 'edit',
 					items : [ {
@@ -675,7 +677,7 @@ Ext.onReady(function() {
 				{
 					text : 'Delete',
 					xtype : 'actioncolumn',
-					width : 50,
+					flex : 0.35,
 					align : 'center',
 					id : 'del',
 					items : [ {
@@ -697,6 +699,34 @@ Ext.onReady(function() {
 					} ]
 				}, ],
 		columnLines : true,
+		listeners: {
+			viewready: function (grid) {
+		        var view = grid.view;
+		        this.toolTip = Ext.create('Ext.tip.ToolTip', {
+		            target: view.el,
+		            delegate: view.cellSelector,
+//		            width: 'auto',
+//		            autoWidth: true,
+		            trackMouse: true,
+		            renderTo: Ext.getBody(),
+		            listeners: {
+		                beforeshow: function(tip) {
+		                    var trigger = tip.triggerElement,
+		                        parent = tip.triggerElement.parentElement,
+		                        columnTitle = view.getHeaderByCell(trigger).text,
+		                        columnDataIndex = view.getHeaderByCell(trigger).dataIndex,
+		                        columnText = view.getRecord(parent).get(columnDataIndex).toString();
+		                    if (columnText){
+//		                        tip.update("<b>" + columnTitle + ":</b> " + columnText);
+		                        tip.update("<b>"+(columnText.replace(/\r\n|\n/gi, "<br>"))+"</b>");
+		                    } else {
+		                        return false;
+		                    }
+		                }
+		            }
+		        });
+	        }
+	    },
 		plugins: [{
 	        ptype: 'rowexpander',
 	        rowBodyTpl : new Ext.XTemplate(
@@ -732,6 +762,8 @@ Ext.onReady(function() {
 		            			if(rec.data.proj_id == v){
 		            				var actual_time = "";
 		            				var target_time = "";
+//		            				alert(rec.data.proj_id);
+//		            				alert(rec.data.actual_time);
 		            				if(rec.data.actual_time == 0){
 		            					actual_time = '<td bgcolor=#FE7575>Actual Time: <b>'+rec.data.actual_time+'</b></td>';
 		            				}else if((rec.data.actual_time - rec.data.time) > 0){
@@ -867,6 +899,12 @@ Ext.define('projModel', {
 		type : 'string'
 	}, {
 		name : 'cus_code',
+		type : 'string'
+	}, {
+		name : 'bill_to',
+		type : 'string'
+	}, {
+		name : 'payment',
 		type : 'string'
 	}
 
@@ -1155,8 +1193,8 @@ editProject = new Ext.create('Ext.window.Window', {
 	    	name: 'eproj_desc',
 	    	id: 'eproj_desc',
 	    	emptyText: 'Project Details',
-	    	maxLength : 50,
-			maxLengthText : 'Maximum input 50 Character'
+	    	maxLength : 500,
+			maxLengthText : 'Maximum input 500 Character'
 	    }]
         },{
 			xtype : 'hidden',
@@ -1271,7 +1309,11 @@ addItem = new Ext.create('Ext.window.Window', {
 							idProperty : 'itm_id'
 						}
 					},
-					autoLoad : true
+					autoLoad : true,
+					sorters: [{
+				         property: 'itm_name',
+				         direction: 'ASC'
+				     }]
 				},
 				valueField : 'itm_id',
 				displayField : 'itm_name'
@@ -1333,8 +1375,8 @@ addItem = new Ext.create('Ext.window.Window', {
     	    	name: 'aproj_ref_desc',
     	    	id: 'aproj_ref_desc',
     	    	emptyText: 'Item Details',
-    	    	maxLength : 50,
-				maxLengthText : 'Maximum input 50 Character',
+    	    	maxLength : 100,
+				maxLengthText : 'Maximum input 100 Character',
     	    }]
             },{
 				xtype : 'hidden',
@@ -1598,8 +1640,8 @@ addProject = new Ext.create('Ext.window.Window', {
     	    	name: 'cproj_desc',
     	    	id: 'cproj_desc',
     	    	emptyText: 'Project Details',
-    	    	maxLength : 50,
-				maxLengthText : 'Maximum input 50 Character',
+    	    	maxLength : 500,
+				maxLengthText : 'Maximum input 500 Character',
     	    }]
             },{
             id: 'itmf',
@@ -1641,7 +1683,11 @@ addProject = new Ext.create('Ext.window.Window', {
 							idProperty : 'itm_id'
 						}
 					},
-					autoLoad : true
+					autoLoad : true,
+					sorters: [{
+				         property: 'itm_name',
+				         direction: 'ASC'
+				     }]
 				},
 				valueField : 'itm_id',
 				displayField : 'itm_name'
@@ -1704,8 +1750,8 @@ addProject = new Ext.create('Ext.window.Window', {
     	    	name: 'cproj_ref_desc',
     	    	id: 'cproj_ref_desc',
     	    	emptyText: 'Item Details',
-    	    	maxLength : 50,
-				maxLengthText : 'Maximum input 50 Character',
+    	    	maxLength : 100,
+				maxLengthText : 'Maximum input 100 Character',
     	    }]
             },{
 				xtype : 'hidden',
@@ -1829,7 +1875,11 @@ editItem = new Ext.create('Ext.window.Window', {
 							idProperty : 'itm_id'
 						}
 					},
-					autoLoad : true
+					autoLoad : true,
+					sorters: [{
+				         property: 'itm_name',
+				         direction: 'ASC'
+				     }]
 				},
 				valueField : 'itm_id',
 				displayField : 'itm_name'
@@ -1891,7 +1941,9 @@ editItem = new Ext.create('Ext.window.Window', {
     	    	fieldLabel: 'Item Detail',
     	    	name: 'eproj_ref_desc',
     	    	id: 'eproj_ref_desc',
-    	    	emptyText: 'Item Details'
+    	    	emptyText: 'Item Details',
+    	    	maxLength : 100,
+				maxLengthText : 'Maximum input 100 Character'
     	    }]
             },{
 				xtype : 'hidden',

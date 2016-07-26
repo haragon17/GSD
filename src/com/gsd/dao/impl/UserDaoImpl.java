@@ -21,7 +21,8 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 	}
 	
 	public int countLastUpdateProject(){
-		String sql = "select count(*) from projects where update_date BETWEEN current_date - interval '6' day and now()";
+//		String sql = "select count(*) from projects where update_date BETWEEN current_date - interval '6' day and now()";
+		String sql = "select count(*) from projects_reference where update_date BETWEEN current_date - interval '6' day and now()";
 		int id = getJdbcTemplate().queryForInt(sql);
 		return id;
 	}
@@ -65,7 +66,7 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 	@Override
 	public List<User> searchMember(Map<String, String> data) {
 
-		String sql = "select * from users where usr_id !=0\n";
+		String sql = "select * from users where usr_id !="+data.get("id")+"\n";
 		
 		if(data.get("uname")==null || data.get("uname").isEmpty()){
 		}else{
@@ -84,7 +85,7 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 			sql += "AND email LIKE '%"+data.get("email")+"%'\n";
 		}
 		
-		System.out.println(sql);
+		sql += "ORDER BY usr_name";
 		
 		List<User> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<User>(User.class));
 		return result;

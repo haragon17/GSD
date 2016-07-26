@@ -50,7 +50,10 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 				+ "contact_person=?, "
 				+ "cus_email=?, "
 				+ "update_date=now(), "
-				+ "cus_phone=? "
+				+ "cus_phone=?, "
+				+ "bill_to=?, "
+				+ "payment=?, "
+				+ "transfer_dtl=? "
 				+ "where cus_id=?";
 		
 		this.getJdbcTemplate().update(sql, new Object[]{
@@ -61,6 +64,9 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			cus.getContact_person(),
 			cus.getCus_email(),
 			cus.getCus_phone(),
+			cus.getBill_to(),
+			cus.getPayment(),
+			cus.getTransfer_dtl(),
 			cus.getCus_id()
 		});
 		
@@ -78,7 +84,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 	@Override
 	public void createCustomer(Customer cus) {
 		
-		String sql = "INSERT INTO customer VALUES (?,?,?,?,?,?,?,now(),now(),?,?)";
+		String sql = "INSERT INTO customer VALUES (?,?,?,?,?,?,?,now(),now(),?,?,?,?,?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[]{
 			cus.getCus_id(),
@@ -89,7 +95,10 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			cus.getContact_person(),
 			cus.getCretd_usr(),
 			cus.getCus_email(),
-			cus.getCus_phone()
+			cus.getCus_phone(),
+			cus.getBill_to(),
+			cus.getPayment(),
+			cus.getTransfer_dtl()
 		});
 		
 	}

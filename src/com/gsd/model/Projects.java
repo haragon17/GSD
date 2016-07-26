@@ -13,6 +13,8 @@ public class Projects {
 	private int proj_count;
 	private String cus_name;
 	private String cus_code;
+	private String bill_to;
+	private String payment;
 	
 	public int getProj_id() {
 		return proj_id;
@@ -79,6 +81,18 @@ public class Projects {
 	}
 	public void setCus_code(String cus_code) {
 		this.cus_code = cus_code;
+	}
+	public String getBill_to() {
+		return bill_to;
+	}
+	public void setBill_to(String bill_to) {
+		this.bill_to = bill_to;
+	}
+	public String getPayment() {
+		return payment;
+	}
+	public void setPayment(String payment) {
+		this.payment = payment;
 	}
 	
 }

@@ -134,53 +134,6 @@ public class CustomerController {
 		return new ModelAndView("jsonView", jobj);
 	}
 	
-	@RequestMapping(value="/updateCustomer")
-	public ModelAndView updateCustomer(HttpServletRequest request, HttpServletResponse response){
-		
-		int cus_id = Integer.parseInt(request.getParameter("ecus_id"));
-		String cus_name = request.getParameter("ecus_name");
-		String cus_code = request.getParameter("ecus_code");
-		String address = request.getParameter("eaddress");
-		String cus_phone = request.getParameter("ecus_phone");
-		String contact_person = request.getParameter("econtact_person");
-		int key_acc_id = Integer.parseInt(request.getParameter("ekey_acc_mng"));
-		String cus_email = request.getParameter("ecus_email");
-		
-		Customer cus = new Customer();
-		cus.setCus_id(cus_id);
-		cus.setCus_name(cus_name);
-		cus.setCus_code(cus_code);
-		cus.setKey_acc_id(key_acc_id);
-		
-		if(!address.equals("Address")){
-			cus.setAddress(address);
-		}else{
-			cus.setAddress("");
-			}
-		if(!contact_person.equals("Contact Person")){
-			cus.setContact_person(contact_person);
-		}else{
-			cus.setContact_person("");
-		}
-		if(!cus_email.equals("E-mail")){
-			cus.setCus_email(cus_email);
-		}else{
-			cus.setCus_email("");
-		}
-		if(!cus_phone.equals("Phone Number")){
-			cus.setCus_phone(cus_phone);
-		}else{
-			cus.setCus_phone("");
-		}
-		
-		customerDao.updateCustomer(cus);
-		
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("success", true);
-//		return new ModelAndView("redirect:customer.htm");
-		return new ModelAndView("jsonView", model);
-	}
-	
 	@RequestMapping(value="/addCustomer")
 	public ModelAndView addCustomer(HttpServletRequest request, HttpServletResponse response){
 		
@@ -193,6 +146,9 @@ public class CustomerController {
 		String cus_phone = request.getParameter("acus_phone");
 		int key_acc_id = Integer.parseInt(request.getParameter("akey_acc_mng"));
 		String cus_email = request.getParameter("acus_email");
+		String bill_to = request.getParameter("abill_to");
+		String payment = request.getParameter("apayment");
+		String transfer_dtl = request.getParameter("atransfer_dtl");
 		
 		Customer cus = new Customer();
 		cus.setCus_id(customerDao.getLastCustomerId());
@@ -221,6 +177,21 @@ public class CustomerController {
 		}else{
 			cus.setCus_phone("");
 		}
+		if(!bill_to.equals("Billing To")){
+			cus.setBill_to(bill_to);
+		}else{
+			cus.setBill_to("");
+		}
+		if(!payment.equals("Payment Terms")){
+			cus.setPayment(payment);
+		}else{
+			cus.setPayment("");
+		}
+		if(!transfer_dtl.equals("Transfer Detail")){
+			cus.setTransfer_dtl(transfer_dtl);
+		}else{
+			cus.setTransfer_dtl("");
+		}
 		
 		customerDao.createCustomer(cus);
 		
@@ -230,6 +201,71 @@ public class CustomerController {
 		return new ModelAndView("jsonView", model);
 	}
 	
+	@RequestMapping(value="/updateCustomer")
+		public ModelAndView updateCustomer(HttpServletRequest request, HttpServletResponse response){
+			
+			int cus_id = Integer.parseInt(request.getParameter("ecus_id"));
+			String cus_name = request.getParameter("ecus_name");
+			String cus_code = request.getParameter("ecus_code");
+			String address = request.getParameter("eaddress");
+			String cus_phone = request.getParameter("ecus_phone");
+			String contact_person = request.getParameter("econtact_person");
+			int key_acc_id = Integer.parseInt(request.getParameter("ekey_acc_mng"));
+			String cus_email = request.getParameter("ecus_email");
+			String bill_to = request.getParameter("ebill_to");
+			String payment = request.getParameter("epayment");
+			String transfer_dtl = request.getParameter("etransfer_dtl");
+			
+			Customer cus = new Customer();
+			cus.setCus_id(cus_id);
+			cus.setCus_name(cus_name);
+			cus.setCus_code(cus_code);
+			cus.setKey_acc_id(key_acc_id);
+			
+			if(!address.equals("Address")){
+				cus.setAddress(address);
+			}else{
+				cus.setAddress("");
+				}
+			if(!contact_person.equals("Contact Person")){
+				cus.setContact_person(contact_person);
+			}else{
+				cus.setContact_person("");
+			}
+			if(!cus_email.equals("E-mail")){
+				cus.setCus_email(cus_email);
+			}else{
+				cus.setCus_email("");
+			}
+			if(!cus_phone.equals("Phone Number")){
+				cus.setCus_phone(cus_phone);
+			}else{
+				cus.setCus_phone("");
+			}
+			if(!bill_to.equals("Billing To")){
+				cus.setBill_to(bill_to);
+			}else{
+				cus.setBill_to("");
+			}
+			if(!payment.equals("Payment Terms")){
+				cus.setPayment(payment);
+			}else{
+				cus.setPayment("");
+			}
+			if(!transfer_dtl.equals("Transfer Detail")){
+				cus.setTransfer_dtl(transfer_dtl);
+			}else{
+				cus.setTransfer_dtl("");
+			}
+			
+			customerDao.updateCustomer(cus);
+			
+			Map<String, Object> model = new HashMap<String, Object>();
+			model.put("success", true);
+	//		return new ModelAndView("redirect:customer.htm");
+			return new ModelAndView("jsonView", model);
+		}
+
 	@RequestMapping(value = "/deleteCustomer")
 	public void deleteMember(HttpServletRequest request, HttpServletResponse response) {
 

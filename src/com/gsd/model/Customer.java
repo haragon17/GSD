@@ -14,6 +14,9 @@ public class Customer {
 	private String key_acc_name;
 	private String cus_email;
 	private String cus_phone;
+	private String bill_to;
+	private String payment;
+	private String transfer_dtl;
 	
 	public int getCus_id() {
 		return cus_id;
@@ -86,6 +89,24 @@ public class Customer {
 	}
 	public void setCus_phone(String cus_phone) {
 		this.cus_phone = cus_phone;
+	}
+	public String getBill_to() {
+		return bill_to;
+	}
+	public void setBill_to(String bill_to) {
+		this.bill_to = bill_to;
+	}
+	public String getPayment() {
+		return payment;
+	}
+	public void setPayment(String payment) {
+		this.payment = payment;
+	}
+	public String getTransfer_dtl() {
+		return transfer_dtl;
+	}
+	public void setTransfer_dtl(String transfer_dtl) {
+		this.transfer_dtl = transfer_dtl;
 	}
 	
 }

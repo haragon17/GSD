@@ -175,10 +175,12 @@ public class UserController {
 	@RequestMapping(value = "/searchMember")
 	public ModelAndView searchMember(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+		UserDetailsApp userLoginDetail = UserLoginDetail.getUser();
 		List<User> user = null;
 		List<User> userLs = new ArrayList<User>();
 		Map<String, String> map = new HashMap<String, String>();
 
+		map.put("id", Integer.toString(userLoginDetail.getUserModel().getUsr_id()));
 		map.put("uname", uname);
 		map.put("fname", fname);
 		map.put("lname", lname);
@@ -187,9 +189,6 @@ public class UserController {
 		int start = Integer.parseInt(request.getParameter("start"));
 		int limit = Integer.parseInt(request.getParameter("limit"));
 
-		System.out.println("start: "+start);
-		System.out.println("limit: "+limit);
-		
 		try {
 			user = userDao.searchMember(map);
 

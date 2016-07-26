@@ -36,11 +36,11 @@ Ext.onReady(function(){
 		    
 		    Ext.apply(Ext.form.field.VTypes, {
 			    ephone: function(val, field) {
-			        var reg= /^[0-9,-]/i;
+			        var reg= /^([\d\-+, ])/i;
 			        return reg.test(val);
 			    },
-			    ephoneText: 'Must be a number with -',
-			    ephoneMask: /^[0-9,-]/i
+			    ephoneText: 'Must be a number with - or + or ,',
+			    ephoneMask: /^[\d\-+, ]/i
 			});
 			
 			Ext.apply(Ext.form.field.VTypes, {
@@ -247,8 +247,8 @@ edit = new Ext.create('Ext.window.Window', {
                  	 labelWidth : 145,
                  	 msgTarget: 'side',
                  	 vtype: 'ephone',
-                 	maxLength: 20,
-           		maxLengthText: 'Maximum input 20 Character',
+                 	maxLength: 50,
+           		maxLengthText: 'Maximum input 50 Character',
                 },
                 {
                 	xtype: 'hidden',
