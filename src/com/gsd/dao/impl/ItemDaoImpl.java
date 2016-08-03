@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 import com.gsd.dao.ItemDao;
 import com.gsd.model.Item;
+import com.gsd.security.UserDetailsApp;
+import com.gsd.security.UserLoginDetail;
 
 public class ItemDaoImpl extends JdbcDaoSupport implements ItemDao {
 
@@ -47,10 +49,21 @@ public class ItemDaoImpl extends JdbcDaoSupport implements ItemDao {
 		int id = getJdbcTemplate().queryForInt(sql);
 		return id+1;
 	}
+	
+	public int getLastAuditId() {
+		
+		String sql = "SELECT max(aud_id) from audit_logging";
+		
+		int id = getJdbcTemplate().queryForInt(sql);
+		return id+1;
+	}
 
 	@Override
 	public void updateItem(Item itm) {
-		// TODO Auto-generated method stub
+		
+		Item itm_audit = new Item();
+		itm_audit = getJdbcTemplate().queryForObject("select * from item where itm_id="+itm.getItm_id(), new BeanPropertyRowMapper<Item>(Item.class));
+		
 		String sql = "update item set itm_name=?, "
 				+ "itm_desc=?, "
 				+ "update_date=now() "
@@ -61,6 +74,36 @@ public class ItemDaoImpl extends JdbcDaoSupport implements ItemDao {
 				itm.getItm_desc(),
 				itm.getItm_id()
 			});
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		if(!itm_audit.getItm_desc().equals(itm.getItm_desc())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				itm.getItm_id(),
+				"Item List",
+				user.getUserModel().getUsr_name(),
+				"Item Description",
+				itm_audit.getItm_desc(),
+				itm.getItm_desc(),
+				"Updated"
+			});
+		}
+		
+		if(!itm_audit.getItm_name().equals(itm.getItm_name())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				itm.getItm_id(),
+				"Item List",
+				user.getUserModel().getUsr_name(),
+				"Item Name",
+				itm_audit.getItm_name(),
+				itm.getItm_name(),
+				"Updated"
+			});
+		}
 	}
 
 	@Override
@@ -75,14 +118,37 @@ String sql = "INSERT INTO item VALUES (?,?,?,?,now(),now())";
 			itm.getCretd_usr()
 		});
 		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc) VALUES (?,?,?,?,now(),?)";
+		this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				itm.getItm_id(),
+				"Item List",
+				user.getUserModel().getUsr_name(),
+				"Created row on Item List name="+itm.getItm_name()+", item_desc="+itm.getItm_desc()
+		});
 	}
 
 	@Override
 	public void deleteItem(int id) {
 		
+		Item itm = new Item();
+		itm = getJdbcTemplate().queryForObject("select * from item where itm_id="+id, new BeanPropertyRowMapper<Item>(Item.class));
+		
 		String sql = "delete from item where itm_id = "+id;
 		
 		getJdbcTemplate().update(sql);
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc) VALUES (?,?,?,?,now(),?)";
+		this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				id,
+				"Item List",
+				user.getUserModel().getUsr_name(),
+				"Deleted all Item name="+itm.getItm_name()+", item_desc="+itm.getItm_desc()
+		});
 	}
 
 	@Override

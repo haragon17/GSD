@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 import com.gsd.dao.KeyAccountManagerDao;
 import com.gsd.model.KeyAccountManager;
+import com.gsd.security.UserDetailsApp;
+import com.gsd.security.UserLoginDetail;
 
 public class KeyAccountManagerDaoImpl extends JdbcDaoSupport implements KeyAccountManagerDao {
 
@@ -44,7 +46,10 @@ public class KeyAccountManagerDaoImpl extends JdbcDaoSupport implements KeyAccou
 	
 	@Override
 	public void updateKeyAccMng(KeyAccountManager keyAccMng) {
-		// TODO Auto-generated method stub
+		
+		KeyAccountManager keyAccMng_audit = new KeyAccountManager();
+		keyAccMng_audit = getJdbcTemplate().queryForObject("select * from key_account_mng where key_acc_id ="+keyAccMng.getKey_acc_id(), new BeanPropertyRowMapper<KeyAccountManager>(KeyAccountManager.class));
+		
 		String sql = "update key_account_mng set key_acc_name=?, "
 				+ "update_date=now() "
 				+ "where key_acc_id=?";
@@ -52,7 +57,23 @@ public class KeyAccountManagerDaoImpl extends JdbcDaoSupport implements KeyAccou
 		this.getJdbcTemplate().update(sql, new Object[]{
 				keyAccMng.getKey_acc_name(),
 				keyAccMng.getKey_acc_id()
+		});
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		if(!keyAccMng_audit.getKey_acc_name().equals(keyAccMng.getKey_acc_name())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastKeyAccId(),
+				keyAccMng.getKey_acc_id(),
+				"Key Account Manager",
+				user.getUserModel().getUsr_name(),
+				"Name",
+				keyAccMng_audit.getKey_acc_name(),
+				keyAccMng.getKey_acc_name(),
+				"Updated"
 			});
+		}
 	}
 	
 	@Override
@@ -64,14 +85,46 @@ public class KeyAccountManagerDaoImpl extends JdbcDaoSupport implements KeyAccou
 			keyAccMng.getKey_acc_id(),
 			keyAccMng.getKey_acc_name(),
 		});
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+		this.getJdbcTemplate().update(audit, new Object[]{
+			getLastKeyAccId(),
+			keyAccMng.getKey_acc_id(),
+			"Key Account Manager",
+			user.getUserModel().getUsr_name(),
+			"Name",
+			"",
+			keyAccMng.getKey_acc_name(),
+			"Created"
+		});
 	}
 	
 	@Override
 	public void deleteKeyAccMng(int id) {
 		
+		KeyAccountManager keyAccMng = new KeyAccountManager();
+		keyAccMng = getJdbcTemplate().queryForObject("select * from key_account_mng where key_acc_id ="+id, new BeanPropertyRowMapper<KeyAccountManager>(KeyAccountManager.class));
+		
+		
 		String sql = "delete from key_account_mng where key_acc_id = "+id;
 		
 		getJdbcTemplate().update(sql);
+		
+UserDetailsApp user = UserLoginDetail.getUser();
+		
+		String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+		this.getJdbcTemplate().update(audit, new Object[]{
+			getLastKeyAccId(),
+			keyAccMng.getKey_acc_id(),
+			"Key Account Manager",
+			user.getUserModel().getUsr_name(),
+			"Name",
+			keyAccMng.getKey_acc_name(),
+			"",
+			"Deleted"
+		});
 	}
 
 	@Override

@@ -84,8 +84,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
 		if(!cus_audit.getTransfer_dtl().equals(cus.getTransfer_dtl())){
-			String cus_name = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
-			this.getJdbcTemplate().update(cus_name, new Object[]{
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
@@ -98,8 +98,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getPayment().equals(cus.getPayment())){
-			String cus_name = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
-			this.getJdbcTemplate().update(cus_name, new Object[]{
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
@@ -112,8 +112,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getBill_to().equals(cus.getBill_to())){
-			String cus_name = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
-			this.getJdbcTemplate().update(cus_name, new Object[]{
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
@@ -126,8 +126,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getCus_phone().equals(cus.getCus_phone())){
-			String cus_name = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
-			this.getJdbcTemplate().update(cus_name, new Object[]{
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
@@ -140,8 +140,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getCus_email().equals(cus.getCus_email())){
-			String cus_name = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
-			this.getJdbcTemplate().update(cus_name, new Object[]{
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
@@ -154,8 +154,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getContact_person().equals(cus.getContact_person())){
-			String cus_name = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
-			this.getJdbcTemplate().update(cus_name, new Object[]{
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
@@ -168,8 +168,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getAddress().equals(cus.getAddress())){
-			String cus_name = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
-			this.getJdbcTemplate().update(cus_name, new Object[]{
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
@@ -182,8 +182,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(cus_audit.getKey_acc_id() != cus.getKey_acc_id()){
-			String cus_name = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
-			this.getJdbcTemplate().update(cus_name, new Object[]{
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
@@ -196,8 +196,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getCus_code().equals(cus.getCus_code())){
-			String cus_name = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
-			this.getJdbcTemplate().update(cus_name, new Object[]{
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
@@ -210,8 +210,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getCus_name().equals(cus.getCus_name())){
-			String cus_name = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
-			this.getJdbcTemplate().update(cus_name, new Object[]{
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",

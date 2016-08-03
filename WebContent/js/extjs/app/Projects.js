@@ -69,118 +69,112 @@ Ext.onReady(function() {
 					emptyText : 'Project Name'
 				    
 				    }, {
-					xtype : 'combobox',
-					fieldLabel : 'Customer Name ',
-					name : 'scus_name',
-					id: 'scus_name',
-					queryMode : 'local',
-					labelWidth : 110,
-					margin : '0 0 10 0',
-					width : 260,
-					emptyText : 'Customer Name',
-					store : {
-						fields : [ 'cus_id', 'cus_name', 'cus_code' ],
-						proxy : {
-							type : 'ajax',
-							url : 'searchCustomer.htm',
-							reader : {
-								type : 'json',
-								root : 'records',
-								idProperty : 'cus_id'
-							}
+						xtype : 'combobox',
+						fieldLabel : 'Customer Name ',
+						name : 'scus_name',
+						id: 'scus_name',
+						queryMode : 'local',
+						labelWidth : 110,
+						margin : '0 0 10 0',
+						width : 260,
+						emptyText : 'Customer Name',
+						store : {
+							fields : [ 'cus_id', 'cus_name', 'cus_code' ],
+							proxy : {
+								type : 'ajax',
+								url : 'showCustomer.htm',
+								reader : {
+									type : 'json',
+									root : 'records',
+									idProperty : 'cus_id'
+								}
+							},
+							autoLoad : true,
+							sorters: [{
+						         property: 'cus_name',
+						         direction: 'ASC'
+						     }]
 						},
-						autoLoad : true
-					},
-					valueField : 'cus_name',
-					displayField : 'cus_name',
-					listeners : {
+						valueField : 'cus_name',
+						displayField : 'cus_name',
+						listeners : {
 
-						select : function() {
-							
-							var v = this.getValue();
-							var record = this.findRecord(this.valueField || this.displayField, v);
-							var myIndex = this.store.indexOf(record);
-							var myValue = this.store.getAt(myIndex).data.cus_code;
-							var myId = this.store.getAt(myIndex).data.cus_id;
-							Ext.getCmp('cusid').setValue(myId);
-							Ext.getCmp('scus_code').setValue(myValue);
-							
-							console.log("cus_code: "+myValue);
-						},
-						blur : function() {
-							var v = this.getValue();
-							var record = this.findRecord(this.valueField || this.displayField, v);
-							if(record !== false){
+							select : function() {
+								
+								var v = this.getValue();
+								var record = this.findRecord(this.valueField || this.displayField, v);
 								var myIndex = this.store.indexOf(record);
-								var myValue = this.store.getAt(myIndex).data.cus_name;
+								var myValue = this.store.getAt(myIndex).data.cus_code;
 								var myId = this.store.getAt(myIndex).data.cus_id;
 								Ext.getCmp('cusid').setValue(myId);
 								Ext.getCmp('scus_code').setValue(myValue);
-							}else{
-								Ext.getCmp('cusid').setValue("");
-								Ext.getCmp('scus_name').setValue("");
-								Ext.getCmp('scus_code').setValue("");
+								
+								console.log("cus_code: "+myValue);
+							},
+							blur : function() {
+								var v = this.getValue();
+								var record = this.findRecord(this.valueField || this.displayField, v);
+								if(record == false){
+									Ext.getCmp('cusid').setValue("");
+									Ext.getCmp('scus_name').setValue("");
+									Ext.getCmp('scus_code').setValue("");
+								}
 							}
 						}
-
-					}
-				}, {
-					xtype : 'combobox',
-					fieldLabel : 'Customer Code ',
-					name : 'scus_code',
-					id : 'scus_code',
-					queryMode : 'local',
-					labelWidth : 110,
-					margin : '0 0 10 0',
-					width : 260,
-					emptyText : 'Customer Code',
-					store : {
-						fields : [ 'cus_id', 'cus_code', 'cus_name' ],
-						proxy : {
-							type : 'ajax',
-							url : 'searchCustomer.htm',
-							reader : {
-								type : 'json',
-								root : 'records',
-								idProperty : 'cus_id'
-							}
+					}, {
+						xtype : 'combobox',
+						fieldLabel : 'Customer Code ',
+						name : 'scus_code',
+						id : 'scus_code',
+						queryMode : 'local',
+						labelWidth : 110,
+						margin : '0 0 10 0',
+						width : 260,
+						emptyText : 'Customer Code',
+						store : {
+							fields : [ 'cus_id', 'cus_code', 'cus_name' ],
+							proxy : {
+								type : 'ajax',
+								url : 'showCustomer.htm',
+								reader : {
+									type : 'json',
+									root : 'records',
+									idProperty : 'cus_id'
+								}
+							},
+							autoLoad : true,
+							sorters: [{
+						         property: 'cus_code',
+						         direction: 'ASC'
+						     }]
 						},
-						autoLoad : true
-					},
-					valueField : 'cus_code',
-					displayField : 'cus_code',
-					listeners : {
+						valueField : 'cus_code',
+						displayField : 'cus_code',
+						listeners : {
 
-						select : function() {
-							
-							var v = this.getValue();
-							var record = this.findRecord(this.valueField || this.displayField, v);
-							var myIndex = this.store.indexOf(record);
-							var myValue = this.store.getAt(myIndex).data.cus_name;
-							var myId = this.store.getAt(myIndex).data.cus_id;
-							Ext.getCmp('cusid').setValue(myId);
-							Ext.getCmp('scus_name').setValue(myValue);
-							
-							console.log("cus_name: "+myValue);
-						},
-						blur : function() {
-							var v = this.getValue();
-							var record = this.findRecord(this.valueField || this.displayField, v);
-							if(record !== false){
+							select : function() {
+								
+								var v = this.getValue();
+								var record = this.findRecord(this.valueField || this.displayField, v);
 								var myIndex = this.store.indexOf(record);
 								var myValue = this.store.getAt(myIndex).data.cus_name;
 								var myId = this.store.getAt(myIndex).data.cus_id;
 								Ext.getCmp('cusid').setValue(myId);
 								Ext.getCmp('scus_name').setValue(myValue);
-							}else{
-								Ext.getCmp('cusid').setValue("");
-								Ext.getCmp('scus_code').setValue("");
-								Ext.getCmp('scus_name').setValue("");
+								
+								console.log("cus_name: "+myValue);
+							},
+							blur : function() {
+								var v = this.getValue();
+								var record = this.findRecord(this.valueField || this.displayField, v);
+								if(record == false){
+									Ext.getCmp('cusid').setValue("");
+									Ext.getCmp('scus_name').setValue("");
+									Ext.getCmp('scus_code').setValue("");
+								}
 							}
 						}
-
-					}
-				} ]
+					} ]
 			}, {
 				columnWidth : 0.36,
 				style : {
@@ -215,7 +209,16 @@ Ext.onReady(function() {
 						autoLoad : true
 					},
 					valueField : 'itm_id',
-					displayField : 'itm_name'
+					displayField : 'itm_name',
+					listeners : {
+						blur : function() {
+							var v = this.getValue();
+							var record = this.findRecord(this.valueField || this.displayField, v);
+							if(record == false){
+								Ext.getCmp('sitm_id').setValue("");
+							}
+						}
+					}
 				}, 
 				,{
 					xtype: 'combobox',
@@ -357,30 +360,30 @@ Ext.onReady(function() {
 			"margin-top" : "15px",
 			"margin-bottom" : "15px"
 		},
-		width : 850,
-		height : 400,
+		width : 1200,
+		height : 500,
 		columns : [
 				{
 					text : "Project Name",
-					width : 150,
+					flex : 1.5,
 					sortable : true,
 					dataIndex : 'proj_name'
 				},
 				{
 					text : "Customer Name",
-					width : 150,
+					flex : 1.5,
 					sortable : true,
 					dataIndex : 'cus_name'
 				},
 				{
 					text : "Project Description",
-					width : 200,
+					flex : 2,
 					sortable : true,
 					dataIndex : 'proj_desc'
 				},
 				{
 					text : 'Briefing',
-					width : 60,
+					flex : 0.5,
 					xtype : 'actioncolumn',
 					align : 'center',
 					id : 'open',

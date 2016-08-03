@@ -76,8 +76,11 @@ Ext.onReady(function() {
 	        		  }
 	            },
 			    onTriggerClick: function(){
-			    	store.keyAccMng.load({
-						url : 'searchKeyAccMng.htm?search='+Ext.getCmp('quickSearch').getValue().toLowerCase()
+			    	Ext.Ajax.request({
+						url : 'searchKeyAccMngParam.htm?search='+Ext.getCmp('quickSearch').getValue().toLowerCase(),
+						success : function(response, opts) {
+							store.keyAccMng.loadPage(1);
+						}
 					});
                 }
 			  },
@@ -88,7 +91,7 @@ Ext.onReady(function() {
 	store.keyAccMng = Ext.create('Ext.data.JsonStore', {
 		model : 'keyAccModel',
 		id : 'keyAccStore',
-		pageSize : 13,
+		pageSize : 11,
 		autoLoad : true,
 		proxy : {
 			type : 'ajax',

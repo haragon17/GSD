@@ -27,6 +27,7 @@ public class KeyAccountManagerController {
 
 	private ApplicationContext context;
 	private KeyAccountManagerDao keyAccMngDao;
+	private String key_acc_name;
 
 	public KeyAccountManagerController() {
 		this.context = new ClassPathXmlApplicationContext("META-INF/gsd-context.xml");
@@ -60,22 +61,26 @@ public class KeyAccountManagerController {
 		}
 	}
 	
+	@RequestMapping(value = "/searchKeyAccMngParam")
+	public void searchItemParam(HttpServletRequest request, HttpServletResponse response){
+		key_acc_name = request.getParameter("search");
+	}
+	
 	@RequestMapping(value = "/searchKeyAccMng")
 	public ModelAndView searchItem(HttpServletRequest request, HttpServletResponse response) {
 
 		List<KeyAccountManager> itm = null;
 		List<KeyAccountManager> itmLs = new ArrayList<KeyAccountManager>();
-		String search = request.getParameter("search");
 
-		if (search == null) {
-			search = "";
+		if (key_acc_name == null) {
+			key_acc_name = "";
 		}
 
 		int start = Integer.parseInt(request.getParameter("start"));
 		int limit = Integer.parseInt(request.getParameter("limit"));
 
 		try {
-			itm = keyAccMngDao.searchKeyAccMng(search);
+			itm = keyAccMngDao.searchKeyAccMng(key_acc_name);
 
 			if (limit + start > itm.size()) {
 				limit = itm.size();

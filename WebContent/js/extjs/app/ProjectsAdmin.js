@@ -276,7 +276,16 @@ Ext.onReady(function() {
 					     }]
 					},
 					valueField : 'itm_id',
-					displayField : 'itm_name'
+					displayField : 'itm_name',
+					listeners : {
+						blur : function() {
+							var v = this.getValue();
+							var record = this.findRecord(this.valueField || this.displayField, v);
+							if(record == false){
+								Ext.getCmp('sitm_id').setValue("");
+							}
+						}
+					}
 				}, {
 					xtype : 'combobox',
 					fieldLabel : 'Customer Name ',
@@ -320,22 +329,15 @@ Ext.onReady(function() {
 							
 							console.log("cus_code: "+myValue);
 						},
-//						blur : function() {
-//							var v = this.getValue();
-//							var record = this.findRecord(this.valueField || this.displayField, v);
-//							if(record !== false){
-//								var myIndex = this.store.indexOf(record);
-//								var myValue = this.store.getAt(myIndex).data.cus_name;
-//								var myId = this.store.getAt(myIndex).data.cus_id;
-//								Ext.getCmp('cusid').setValue(myId);
-//								Ext.getCmp('scus_code').setValue(myValue);
-//							}else{
-//								Ext.getCmp('cusid').setValue("");
-//								Ext.getCmp('scus_name').setValue("");
-//								Ext.getCmp('scus_code').setValue("");
-//							}
-//						}
-
+						blur : function() {
+							var v = this.getValue();
+							var record = this.findRecord(this.valueField || this.displayField, v);
+							if(record == false){
+								Ext.getCmp('cusid').setValue("");
+								Ext.getCmp('scus_name').setValue("");
+								Ext.getCmp('scus_code').setValue("");
+							}
+						}
 					}
 				}, {
 					xtype : 'combobox',
@@ -383,16 +385,10 @@ Ext.onReady(function() {
 						blur : function() {
 							var v = this.getValue();
 							var record = this.findRecord(this.valueField || this.displayField, v);
-							if(record !== false){
-								var myIndex = this.store.indexOf(record);
-								var myValue = this.store.getAt(myIndex).data.cus_name;
-								var myId = this.store.getAt(myIndex).data.cus_id;
-								Ext.getCmp('cusid').setValue(myId);
-								Ext.getCmp('scus_name').setValue(myValue);
-							}else{
+							if(record == false){
 								Ext.getCmp('cusid').setValue("");
-								Ext.getCmp('scus_code').setValue("");
 								Ext.getCmp('scus_name').setValue("");
+								Ext.getCmp('scus_code').setValue("");
 							}
 						}
 
@@ -1350,8 +1346,10 @@ addItem = new Ext.create('Ext.window.Window', {
     	                	Ext.getCmp('acurrency').clearInvalid();
     	                	Ext.getCmp('acurrency').allowBlank = true;
     	                }else{
-    	                	Ext.getCmp('acurrency').markInvalid('Currency Required!');
-    	                	Ext.getCmp('acurrency').allowBlank = false;
+    	                	if(Ext.getCmp('acurrency').value == null){
+	    	                	Ext.getCmp('acurrency').markInvalid('Currency Required!');
+	    	                	Ext.getCmp('acurrency').allowBlank = false;
+    	                	}
     	                }
     	            }
     	        }
@@ -1724,8 +1722,10 @@ addProject = new Ext.create('Ext.window.Window', {
     	                	Ext.getCmp('ccurrency').clearInvalid();
     	                	Ext.getCmp('ccurrency').allowBlank = true;
     	                }else{
-    	                	Ext.getCmp('ccurrency').markInvalid('Currency Required!');
-    	                	Ext.getCmp('ccurrency').allowBlank = false;
+    	                	if(Ext.getCmp('ccurrency').value == null){
+	    	                	Ext.getCmp('ccurrency').markInvalid('Currency Required!');
+	    	                	Ext.getCmp('ccurrency').allowBlank = false;
+    	                	}
     	                }
     	            }
     	        }
@@ -1916,8 +1916,10 @@ editItem = new Ext.create('Ext.window.Window', {
     	                	Ext.getCmp('ecurrency').clearInvalid();
     	                	Ext.getCmp('ecurrency').allowBlank = true;
     	                }else{
+    	                	if(Ext.getCmp('ecurrency').value == null){
     	                	Ext.getCmp('ecurrency').markInvalid('Currency Required!');
     	                	Ext.getCmp('ecurrency').allowBlank = false;
+    	                	}
     	                }
     	            }
     	        }

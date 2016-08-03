@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -43,6 +44,8 @@ public class ProjectsController {
 	private String proj_name, itm_id, cus_id, timeStart, timeLimit, priceStart, priceLimit, key_acc_id, updateStart, updateLimit;
 	private String AUD, CHF, GBP, THB, EUR;
 
+	private static final Logger logger = Logger.getLogger(ProjectsController.class);
+	
 	public ProjectsController() {
 		this.context = new ClassPathXmlApplicationContext("META-INF/gsd-context.xml");
 		this.projectsDao = (ProjectsDao) this.context.getBean("ProjectsDao");
@@ -54,6 +57,8 @@ public class ProjectsController {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		UserController uc = new UserController();
 		int type = user.getUserModel().getUsr_type();
+		
+		logger.info("Hi!");
 		
 		if(request.getParameter("l7d") != null){
 			uc.setChk(1);
@@ -422,13 +427,13 @@ public class ProjectsController {
 				System.out.println("file size = " + uploadItem.getFile().getSize());
 				try {
 //					File createMain = new File("/Users/gsd/files");
-					File createMain = new File("/jview/files");
+					File createMain = new File("/mnt/eSTUDIO/_COMMON/.jview/files");
 					if (!createMain.exists()) {
 						createMain.mkdir();
 					}
 					   String fileName = uploadItem.getFile().getOriginalFilename();  
 //					   String filePath = "/Users/gsd/files/" + proj.getProj_id();
-					   String filePath = "/jview/files/" + proj.getProj_id();
+					   String filePath = "/mnt/eSTUDIO/_COMMON/.jview/files/" + proj.getProj_id();
 					   File newFile = new File(filePath);
 					   if(!newFile.exists()){
 						   newFile.mkdir();
@@ -559,16 +564,20 @@ public class ProjectsController {
 					System.out.println("file size = " + uploadItem.getFile().getSize());
 					
 					FileModel dfile = projectsDao.getFile(file_id);
-					File dFile2 = new File(dfile.getFile_path());
-					dFile2.delete();
+					File dFile2 = new File(dfile.getFile_path()+"/"+dfile.getFile_name());
+					
+					if(dFile2.delete()){}
+					else{
+						logger.error("cannot delete file on Projects id="+proj_id);
+					}
 
 					try {
-						   File createMain = new File("/jview/files");  
+						   File createMain = new File("/mnt/eSTUDIO/_COMMON/.jview/files");  
 						   if(!createMain.exists()){
 							   createMain.mkdir();
 						   }
 						   String fileName = uploadItem.getFile().getOriginalFilename();  
-						   String filePath = "/jview/files/" + proj.getProj_id();
+						   String filePath = "/mnt/eSTUDIO/_COMMON/.jview/files/" + proj.getProj_id();
 						   File newFile = new File(filePath);
 						   if(!newFile.exists()){
 							   newFile.mkdir();
@@ -590,11 +599,17 @@ public class ProjectsController {
 						   // TODO Auto-generated catch block
 						   e.printStackTrace();
 						  }
-
+					
+					FileModel file_audit = new FileModel();
+					file_audit = projectsDao.getFile(file_id);
+					proj.setFile_name(file_audit.getFile_name());
 					projectsDao.updateFile(fileModel);
 					proj.setFile_id(fileModel.getFile_id());
 					projectsDao.updateProjects(proj);
 				} else {
+					FileModel file_audit = new FileModel();
+					file_audit = projectsDao.getFile(file_id);
+					proj.setFile_name(file_audit.getFile_name());
 					proj.setFile_id(file_id);
 					projectsDao.updateProjects(proj);
 				}
@@ -606,12 +621,12 @@ public class ProjectsController {
 					System.out.println("file type = " + uploadItem.getFile().getContentType());
 					System.out.println("file size = " + uploadItem.getFile().getSize());
 					try {
-						File createMain = new File("/jview/files");
+						File createMain = new File("/mnt/eSTUDIO/_COMMON/.jview/files");
 						if (!createMain.exists()) {
 							createMain.mkdir();
 						}
 						   String fileName = uploadItem.getFile().getOriginalFilename();  
-						   String filePath = "/jview/files/" + proj.getProj_id();
+						   String filePath = "/mnt/eSTUDIO/_COMMON/.jview/files/" + proj.getProj_id();
 						   File newFile = new File(filePath);
 						   if(!newFile.exists()){
 							   newFile.mkdir();
@@ -635,10 +650,12 @@ public class ProjectsController {
 						e.printStackTrace();
 					}
 
+					proj.setFile_name("");
 					projectsDao.createFile(fileModel);
 					proj.setFile_id(fileModel.getFile_id());
 					projectsDao.updateProjects(proj);
 				} else {
+					proj.setFile_name("");
 					proj.setFile_id(0);
 					projectsDao.updateProjects(proj);
 				}
@@ -779,29 +796,32 @@ public class ProjectsController {
 	@RequestMapping(value = "/deleteProjects")
 	public void deleteProjects(HttpServletRequest request,
 			HttpServletResponse response){
-//		LOG.debug("Inside LogListing page on method view");
 
 		int id = Integer.parseInt(request.getParameter("id"));
 		int fid = Integer.parseInt(request.getParameter("fid"));
 		
 		if(fid != 0){
-		FileModel dfile = projectsDao.getFile(fid);
-		
-		File dFile2 = new File(dfile.getFile_path()+"/"+dfile.getFile_name());
-		File dFile3 = new File(dfile.getFile_path());
-		
-		if(dFile2.delete()){
-			projectsDao.deleteProjects(id);
-			projectsDao.deleteFile(fid);
-			dFile3.delete();
-			System.out.println("delete Projects "+id);
+			FileModel dfile = projectsDao.getFile(fid);
+			
+			File dFile2 = new File(dfile.getFile_path()+"/"+dfile.getFile_name());
+			File dFile3 = new File(dfile.getFile_path());
+			
+			if(dFile2.delete()){
+				projectsDao.deleteProjects(id);
+				projectsDao.deleteFile(fid);
+				dFile3.delete();
+				logger.info("delete file and Projects id="+id);
+				System.out.println("delete file and Projects id="+id);
+			}else{
+				logger.error("can't delete file on Projects id="+id);
+				System.out.println("can't delete file on Projects id="+id);
+			}
 		}else{
-			System.out.println("can't delete Projects or file on proj_id = "+id);
-		}
-		}else{
 			projectsDao.deleteProjects(id);
-			System.out.println("delete Projects "+id);
+			logger.info("delete Projects id="+id);
+			System.out.println("delete Projects id="+id);
 		}
+
 	}
 	
 }

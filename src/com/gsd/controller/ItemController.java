@@ -27,6 +27,7 @@ public class ItemController {
 
 	private ApplicationContext context;
 	private ItemDao itemDao;
+	private String itm_name;
 
 	public ItemController() {
 		this.context = new ClassPathXmlApplicationContext("META-INF/gsd-context.xml");
@@ -65,22 +66,26 @@ public class ItemController {
 		return new ModelAndView("jsonView", jobj);
 	}
 
+	@RequestMapping(value = "/searchItemParam")
+	public void searchItemParam(HttpServletRequest request, HttpServletResponse response){
+		itm_name = request.getParameter("search");
+	}
+	
 	@RequestMapping(value = "/searchItem")
 	public ModelAndView searchItem(HttpServletRequest request, HttpServletResponse response) {
 
 		List<Item> itm = null;
 		List<Item> itmLs = new ArrayList<Item>();
-		String search = request.getParameter("search");
 
-		if (search == null) {
-			search = "";
+		if (itm_name == null) {
+			itm_name = "";
 		}
 
 		int start = Integer.parseInt(request.getParameter("start"));
 		int limit = Integer.parseInt(request.getParameter("limit"));
 
 		try {
-			itm = itemDao.searchItem(search);
+			itm = itemDao.searchItem(itm_name);
 
 			if (limit + start > itm.size()) {
 				limit = itm.size();
