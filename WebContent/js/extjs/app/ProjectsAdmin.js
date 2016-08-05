@@ -1312,7 +1312,16 @@ addItem = new Ext.create('Ext.window.Window', {
 				     }]
 				},
 				valueField : 'itm_id',
-				displayField : 'itm_name'
+				displayField : 'itm_name',
+				listeners : {
+					blur : function() {
+						var v = this.getValue();
+						var record = this.findRecord(this.valueField || this.displayField, v);
+						if(record == false){
+							Ext.getCmp('aitm_id').setValue("");
+						}
+					}
+				}
 			},{
     	    	xtype:'numberfield',
     	    	labelWidth: 120,
@@ -1688,7 +1697,16 @@ addProject = new Ext.create('Ext.window.Window', {
 				     }]
 				},
 				valueField : 'itm_id',
-				displayField : 'itm_name'
+				displayField : 'itm_name',
+				listeners : {
+					blur : function() {
+						var v = this.getValue();
+						var record = this.findRecord(this.valueField || this.displayField, v);
+						if(record == false){
+							Ext.getCmp('citm_id').setValue("");
+						}
+					}
+				}
 			},{
     	    	xtype:'numberfield',
     	    	labelWidth: 120,
@@ -1882,7 +1900,16 @@ editItem = new Ext.create('Ext.window.Window', {
 				     }]
 				},
 				valueField : 'itm_id',
-				displayField : 'itm_name'
+				displayField : 'itm_name',
+				listeners : {
+					blur : function() {
+						var v = this.getValue();
+						var record = this.findRecord(this.valueField || this.displayField, v);
+						if(record == false){
+							Ext.getCmp('eitm_id').setValue("");
+						}
+					}
+				}
 			},{
     	    	xtype:'numberfield',
     	    	labelWidth: 120,

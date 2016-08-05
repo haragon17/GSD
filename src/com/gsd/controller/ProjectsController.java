@@ -214,7 +214,7 @@ public class ProjectsController {
 			}
 
 		} catch (Exception e) {
-			System.out.println("Error: " + e.getMessage());
+			logger.error(e.getMessage());
 		}
 
 		JSONObject jobj = new JSONObject();

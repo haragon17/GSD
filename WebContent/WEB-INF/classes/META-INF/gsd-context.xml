@@ -86,5 +86,9 @@
 	<bean id="JobsDao" class="com.gsd.dao.impl.JobsDaoImpl">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+	
+	<bean id="AuditLoggingDao" class="com.gsd.dao.impl.AuditLoggingDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
 
 </beans>

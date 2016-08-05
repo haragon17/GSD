@@ -59,7 +59,12 @@ Ext.onReady(function(){
 		    	    handler : function(){
 			    	    window.location = 'memberManagement.htm';
 			    	    }
-		          };
+		    	};
+		    	admin_menu2 = {text: 'History State',
+			    		handler : function(){
+			    			window.location = 'auditLogging.htm';
+			    		}
+			    	};
 		    }else{
 		    	admin_menu = "";
 		    }
@@ -138,7 +143,7 @@ Ext.onReady(function(){
 	        	window.location = 'keyAccountManagerment.htm'
 	        	}
 	      },
-	      admin_menu,
+	      admin_menu,admin_menu2,
           {
         	xtype: 'tbfill'  
           },
