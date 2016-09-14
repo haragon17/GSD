@@ -37,6 +37,8 @@ public class ItemController {
 	@RequestMapping(value = "/itemManagement")
 	public ModelAndView viewItemManament(HttpServletRequest request, HttpServletResponse response) {
 
+		itm_name = "";
+		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		int type = user.getUserModel().getUsr_type();
 

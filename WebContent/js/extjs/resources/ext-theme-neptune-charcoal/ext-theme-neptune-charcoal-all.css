@@ -6,6 +6,14 @@ img {
 	border: 0
 }
 
+.x-livesearch-match {
+	font-weight: bold; background-color: yellow; 
+}
+
+.x-status-valid {
+	background: transparent url(../../src/ux/statusbar/images/accept.png) no-repeat ;
+}
+
 .my-icon {
 	background-image: url(images/icon-d.png) !important;
 }
@@ -15,10 +23,18 @@ img {
 }
 
 .x-action-col-cell img.icon-d1 {
-background-image: url(images/icon-d.png);
+	background-image: url(images/icon-d.png);
 }
 .x-action-col-cell img.icon-d2 {
     background-image: url(images/icon-nd.png);
+}
+
+.icon-go {
+	background-image: url(../../images/icons/fam/application_go.png) !important;
+}
+
+.icon-print {
+	background-image: url(../../images/icons/fam/printer.png) !important;
 }
 
 .icon-add {
@@ -43,6 +59,10 @@ background-image: url(images/icon-d.png);
 
 .icon-print {
 	background-image: url(../../images/icons/fam/printer.png) !important;
+}
+
+.icon-excel {
+	background-image: url(../../images/icons/fam/page_excel.png) !important;
 }
 
 .icon-camera {

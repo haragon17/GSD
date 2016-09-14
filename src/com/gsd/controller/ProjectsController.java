@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -41,8 +42,8 @@ public class ProjectsController {
 
 	private ApplicationContext context;
 	private ProjectsDao projectsDao;
-	private String proj_name, itm_id, cus_id, timeStart, timeLimit, priceStart, priceLimit, key_acc_id, updateStart, updateLimit;
-	private String AUD, CHF, GBP, THB, EUR;
+//	private String proj_name, itm_id, cus_id, timeStart, timeLimit, priceStart, priceLimit, key_acc_id, updateStart, updateLimit;
+//	private String AUD, CHF, GBP, THB, EUR;
 
 	private static final Logger logger = Logger.getLogger(ProjectsController.class);
 	
@@ -58,27 +59,42 @@ public class ProjectsController {
 		UserController uc = new UserController();
 		int type = user.getUserModel().getUsr_type();
 		
-		logger.info("Hi!");
-		
 		if(request.getParameter("l7d") != null){
 			uc.setChk(1);
 		}
 		
-		proj_name = "";
-		itm_id = "";
-		cus_id = "";
-		timeStart = "";
-		timeLimit = "";
-		priceStart = "";
-		priceLimit = "";
-		key_acc_id = "";
-		updateStart = "";
-		updateLimit = "";
-		AUD = "";
-		CHF = "";
-		GBP = "";
-		THB = "";
-		EUR = "";
+//		proj_name = "";
+//		itm_id = "";
+//		cus_id = "";
+//		timeStart = "";
+//		timeLimit = "";
+//		priceStart = "";
+//		priceLimit = "";
+//		key_acc_id = "";
+//		updateStart = "";
+//		updateLimit = "";
+//		AUD = "";
+//		CHF = "";
+//		GBP = "";
+//		THB = "";
+//		EUR = "";
+		
+		HttpSession session = request.getSession();
+		session.setAttribute("proj_name", "");
+		session.setAttribute("itm_id", "");
+		session.setAttribute("cus_id", "");
+		session.setAttribute("timeStart", "");
+		session.setAttribute("timeLimit", "");
+		session.setAttribute("priceStart", "");
+		session.setAttribute("priceLimit", "");
+		session.setAttribute("key_acc_id", "");
+		session.setAttribute("updateStart", "");
+		session.setAttribute("updateLimit", "");
+		session.setAttribute("AUD", "");
+		session.setAttribute("CHF", "");
+		session.setAttribute("GBP", "");
+		session.setAttribute("THB", "");
+		session.setAttribute("EUR", "");
 		
 		if(type == 0 || type == 1){
 			return new ModelAndView("ProjectsAdmin");
@@ -108,67 +124,86 @@ public class ProjectsController {
 	
 	@RequestMapping(value = "/searchProjectsParam")
 	public void searchProjectsParam(HttpServletRequest request, HttpServletResponse response) {
-		proj_name = request.getParameter("sproj_name");
-		itm_id = request.getParameter("sitm_id");
-		cus_id = request.getParameter("cus_id");
-		timeStart = request.getParameter("time_start");
-		timeLimit = request.getParameter("time_limit");
-		priceStart = request.getParameter("price_start");
-		priceLimit = request.getParameter("price_limit");
-		key_acc_id = request.getParameter("skey_acc_mng");
-		updateStart = request.getParameter("update_start");
-		updateLimit = request.getParameter("update_limit");
-		AUD = request.getParameter("AUD");
-		CHF = request.getParameter("CHF");
-		GBP = request.getParameter("GBP");
-		THB = request.getParameter("THB");
-		EUR = request.getParameter("EUR");
+		
+		HttpSession session = request.getSession();
+		session.setAttribute("proj_name", request.getParameter("sproj_name"));
+		session.setAttribute("itm_id", request.getParameter("sitm_id"));
+		session.setAttribute("cus_id", request.getParameter("cus_id"));
+		session.setAttribute("timeStart", request.getParameter("time_start"));
+		session.setAttribute("timeLimit", request.getParameter("time_limit"));
+		session.setAttribute("priceStart", request.getParameter("price_start"));
+		session.setAttribute("priceLimit", request.getParameter("price_limit"));
+		session.setAttribute("key_acc_id", request.getParameter("skey_acc_mng"));
+		session.setAttribute("updateStart", request.getParameter("update_start"));
+		session.setAttribute("updateLimit", request.getParameter("update_limit"));
+		session.setAttribute("AUD", request.getParameter("AUD"));
+		session.setAttribute("CHF", request.getParameter("CHF"));
+		session.setAttribute("GBP", request.getParameter("GBP"));
+		session.setAttribute("THB", request.getParameter("THB"));
+		session.setAttribute("EUR", request.getParameter("EUR"));
+//		proj_name = request.getParameter("sproj_name");
+//		itm_id = request.getParameter("sitm_id");
+//		cus_id = request.getParameter("cus_id");
+//		timeStart = request.getParameter("time_start");
+//		timeLimit = request.getParameter("time_limit");
+//		priceStart = request.getParameter("price_start");
+//		priceLimit = request.getParameter("price_limit");
+//		key_acc_id = request.getParameter("skey_acc_mng");
+//		updateStart = request.getParameter("update_start");
+//		updateLimit = request.getParameter("update_limit");
+//		AUD = request.getParameter("AUD");
+//		CHF = request.getParameter("CHF");
+//		GBP = request.getParameter("GBP");
+//		THB = request.getParameter("THB");
+//		EUR = request.getParameter("EUR");
 	}
 
 	@RequestMapping(value = "/searchProjectsReference")
 	public ModelAndView searchProjectsReference(HttpServletRequest request, HttpServletResponse response) {
 
+		HttpSession session = request.getSession();
 		List<ProjectsReference> projRef = null;
-//		List<Projects> projLs = new ArrayList<Projects>();
 		Map<String, String> map = new HashMap<String, String>();
 
-		map.put("proj_name", proj_name);
-		map.put("itm_id", itm_id);
-		map.put("cus_id", cus_id);
-		map.put("timeStart", timeStart);
-		map.put("timeLimit", timeLimit);
-		map.put("priceStart", priceStart);
-		map.put("priceLimit", priceLimit);
-		map.put("key_acc_id", key_acc_id);
-		map.put("updateStart", updateStart);
-		map.put("updateLimit", updateLimit);
-		map.put("AUD", AUD);
-		map.put("CHF", CHF);
-		map.put("GBP", GBP);
-		map.put("THB", THB);
-		map.put("EUR", EUR);
-
-//		int start = Integer.parseInt(request.getParameter("start"));
-//		int limit = Integer.parseInt(request.getParameter("limit"));
-
+//		map.put("proj_name", proj_name);
+//		map.put("itm_id", itm_id);
+//		map.put("cus_id", cus_id);
+//		map.put("timeStart", timeStart);
+//		map.put("timeLimit", timeLimit);
+//		map.put("priceStart", priceStart);
+//		map.put("priceLimit", priceLimit);
+//		map.put("key_acc_id", key_acc_id);
+//		map.put("updateStart", updateStart);
+//		map.put("updateLimit", updateLimit);
+//		map.put("AUD", AUD);
+//		map.put("CHF", CHF);
+//		map.put("GBP", GBP);
+//		map.put("THB", THB);
+//		map.put("EUR", EUR);
+		
+		map.put("proj_name", (String)session.getAttribute("proj_name"));
+		map.put("itm_id", (String)session.getAttribute("itm_id"));
+		map.put("cus_id", (String)session.getAttribute("cus_id"));
+		map.put("timeStart", (String)session.getAttribute("timeStart"));
+		map.put("timeLimit", (String)session.getAttribute("timeLimit"));
+		map.put("priceStart", (String)session.getAttribute("priceStart"));
+		map.put("priceLimit", (String)session.getAttribute("priceLimit"));
+		map.put("key_acc_id", (String)session.getAttribute("key_acc_id"));
+		map.put("updateStart", (String)session.getAttribute("updateStart"));
+		map.put("updateLimit", (String)session.getAttribute("updateLimit"));
+		map.put("AUD", (String)session.getAttribute("AUD"));
+		map.put("CHF", (String)session.getAttribute("CHF"));
+		map.put("GBP", (String)session.getAttribute("GBP"));
+		map.put("THB", (String)session.getAttribute("THB"));
+		map.put("EUR", (String)session.getAttribute("EUR"));
+		
 		try {
 			projRef = projectsDao.searchProjectsReferences(map);
-
-//			if (limit + start > proj.size()) {
-//				limit = proj.size();
-//			} else {
-//				limit += start;
-//			}
-//			for (int i = start; i < (limit); i++) {
-//				projLs.add(proj.get(i));
-//			}
-
 		} catch (Exception e) {
-			System.out.println("Error: " + e.getMessage());
+			logger.error(e.getMessage());
 		}
 
 		JSONObject jobj = new JSONObject();
-//		jobj.put("records", projLs);
 		jobj.put("records", projRef);
 		jobj.put("total", projRef.size());
 
@@ -178,26 +213,43 @@ public class ProjectsController {
 	@RequestMapping(value = "/searchProjects")
 	public ModelAndView searchProjects(HttpServletRequest request, HttpServletResponse response) {
 
+		HttpSession session = request.getSession();
 		List<Projects> proj = null;
 		List<Projects> projLs = new ArrayList<Projects>();
 		Map<String, String> map = new HashMap<String, String>();
 
-		map.put("proj_name", proj_name);
-		map.put("itm_id", itm_id);
-		map.put("cus_id", cus_id);
-		map.put("timeStart", timeStart);
-		map.put("timeLimit", timeLimit);
-		map.put("priceStart", priceStart);
-		map.put("priceLimit", priceLimit);
-		map.put("key_acc_id", key_acc_id);
-		map.put("updateStart", updateStart);
-		map.put("updateLimit", updateLimit);
-		map.put("AUD", AUD);
-		map.put("CHF", CHF);
-		map.put("GBP", GBP);
-		map.put("THB", THB);
-		map.put("EUR", EUR);
+//		map.put("proj_name", proj_name);
+//		map.put("itm_id", itm_id);
+//		map.put("cus_id", cus_id);
+//		map.put("timeStart", timeStart);
+//		map.put("timeLimit", timeLimit);
+//		map.put("priceStart", priceStart);
+//		map.put("priceLimit", priceLimit);
+//		map.put("key_acc_id", key_acc_id);
+//		map.put("updateStart", updateStart);
+//		map.put("updateLimit", updateLimit);
+//		map.put("AUD", AUD);
+//		map.put("CHF", CHF);
+//		map.put("GBP", GBP);
+//		map.put("THB", THB);
+//		map.put("EUR", EUR);
 
+		map.put("proj_name", (String)session.getAttribute("proj_name"));
+		map.put("itm_id", (String)session.getAttribute("itm_id"));
+		map.put("cus_id", (String)session.getAttribute("cus_id"));
+		map.put("timeStart", (String)session.getAttribute("timeStart"));
+		map.put("timeLimit", (String)session.getAttribute("timeLimit"));
+		map.put("priceStart", (String)session.getAttribute("priceStart"));
+		map.put("priceLimit", (String)session.getAttribute("priceLimit"));
+		map.put("key_acc_id", (String)session.getAttribute("key_acc_id"));
+		map.put("updateStart", (String)session.getAttribute("updateStart"));
+		map.put("updateLimit", (String)session.getAttribute("updateLimit"));
+		map.put("AUD", (String)session.getAttribute("AUD"));
+		map.put("CHF", (String)session.getAttribute("CHF"));
+		map.put("GBP", (String)session.getAttribute("GBP"));
+		map.put("THB", (String)session.getAttribute("THB"));
+		map.put("EUR", (String)session.getAttribute("EUR"));
+		
 		int start = Integer.parseInt(request.getParameter("start"));
 		int limit = Integer.parseInt(request.getParameter("limit"));
 
@@ -234,7 +286,7 @@ public class ProjectsController {
 		try {
 			proj = projectsDao.showProjects(cus_id);
 		} catch (Exception e) {
-			System.out.println("Error: " + e.getMessage());
+			logger.error(e.getMessage());
 		}
 
 		JSONObject jobj = new JSONObject();
@@ -254,7 +306,7 @@ public class ProjectsController {
 		try {
 			projRef = projectsDao.showProjectsReference(proj_id);
 		} catch (Exception e) {
-			System.out.println("Error: " + e.getMessage());
+			logger.error(e.getMessage());
 		}
 
 		JSONObject jobj = new JSONObject();
@@ -453,8 +505,7 @@ public class ProjectsController {
 					fileModel.setCretd_usr(user.getUserModel().getUsr_id());
 
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error(e.getMessage());
 				}
 
 				projectsDao.createFile(fileModel);
@@ -646,8 +697,7 @@ public class ProjectsController {
 						fileModel.setCretd_usr(user.getUserModel().getUsr_id());
 
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						logger.error(e.getMessage());
 					}
 
 					proj.setFile_name("");
@@ -661,7 +711,6 @@ public class ProjectsController {
 				}
 			}
 		}
-		System.out.println("DONE");
 		return new ModelAndView("redirect:projects.htm");
 	}
 	
@@ -779,7 +828,7 @@ public class ProjectsController {
 			response.flushBuffer();
 			in.close();
 		}catch(Exception e){
-			System.out.println(e.getMessage());
+			logger.error(e.getMessage());
 		}
 	}
 	

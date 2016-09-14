@@ -19,14 +19,17 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 
 		String sql = "select * from customer,key_account_mng "
 				+ "where customer.key_acc_id = key_account_mng.key_acc_id\n";
-		
-		if(data.get("cus_name")==null || data.get("cus_name").isEmpty()){
+//		if(data.get("cus_name")==null || data.get("cus_name").isEmpty()){
+//		}else{
+//			sql += "AND cus_name = '"+data.get("cus_name")+"'\n";
+//		}
+//		if(data.get("cus_code")==null || data.get("cus_code").isEmpty()){
+//		}else{
+//			sql += "AND cus_code = '"+data.get("cus_code")+"'\n";
+//		}
+		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
 		}else{
-			sql += "AND cus_name = '"+data.get("cus_name")+"'\n";
-		}
-		if(data.get("cus_code")==null || data.get("cus_code").isEmpty()){
-		}else{
-			sql += "AND cus_code = '"+data.get("cus_code")+"'\n";
+			sql += "AND cus_id = "+data.get("cus_id")+"\n";
 		}
 		if(data.get("key_acc_id")==null || data.get("key_acc_id").isEmpty()){
 		}else{
@@ -38,7 +41,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		sql += "ORDER BY cus_name";
-		//System.out.println(sql);
+//		System.out.println(sql);
 		
 		List<Customer> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Customer>(Customer.class));
 		return result;
@@ -64,7 +67,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 				+ "cus_phone=?, "
 				+ "bill_to=?, "
 				+ "payment=?, "
-				+ "transfer_dtl=? "
+				+ "transfer_dtl=?, "
+				+ "regist_date=? "
 				+ "where cus_id=?";
 		
 		this.getJdbcTemplate().update(sql, new Object[]{
@@ -78,10 +82,43 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			cus.getBill_to(),
 			cus.getPayment(),
 			cus.getTransfer_dtl(),
+			cus.getRegist_date_ts(),
 			cus.getCus_id()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		if(cus.getRegist_date_ts() != null){
+			if(!cus.getRegist_date_ts().toString().contains(((cus_audit.getRegist_date() == null) ? "no" : cus_audit.getRegist_date()))){
+				String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+				this.getJdbcTemplate().update(audit, new Object[]{
+						getLastAuditId(),
+						cus.getCus_id(),
+						"Customer",
+						user.getUserModel().getUsr_name(),
+						"Regist Date",
+						cus_audit.getRegist_date(),
+						cus.getRegist_date_ts().toString(),
+						"Updated",
+						cus.getCus_name()
+				});
+			}
+		}else{
+			if(cus_audit.getRegist_date() != null){
+				String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+				this.getJdbcTemplate().update(audit, new Object[]{
+						getLastAuditId(),
+						cus.getCus_id(),
+						"Customer",
+						user.getUserModel().getUsr_name(),
+						"Regist Date",
+						cus_audit.getRegist_date(),
+						"",
+						"Updated",
+						cus.getCus_name()
+				});
+			}
+		}
 		
 		if(!cus_audit.getTransfer_dtl().equals(cus.getTransfer_dtl())){
 			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
@@ -255,7 +292,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 	@Override
 	public void createCustomer(Customer cus) {
 		
-		String sql = "INSERT INTO customer VALUES (?,?,?,?,?,?,?,now(),now(),?,?,?,?,?)";
+		String sql = "INSERT INTO customer VALUES (?,?,?,?,?,?,?,now(),now(),?,?,?,?,?,?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[]{
 			cus.getCus_id(),
@@ -269,7 +306,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			cus.getCus_phone(),
 			cus.getBill_to(),
 			cus.getPayment(),
-			cus.getTransfer_dtl()
+			cus.getTransfer_dtl(),
+			cus.getRegist_date_ts()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
@@ -285,7 +323,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 				user.getUserModel().getUsr_name(),
 				"Created row on Customer name="+cus.getCus_name()+", code="+cus.getCus_code()+", key_account="+key_acc.getKey_acc_name()
 				+", address="+cus.getAddress()+", contact_person="+cus.getContact_person()+", e-mail="+cus.getCus_email()
-				+", phone="+cus.getCus_phone()+", bill_to="+cus.getBill_to()+", payment="+cus.getPayment()+", transfer_dtl="+cus.getTransfer_dtl(),
+				+", phone="+cus.getCus_phone()+", bill_to="+cus.getBill_to()+", payment="+cus.getPayment()+", transfer_dtl="+cus.getTransfer_dtl()
+				+", regist_date="+((cus.getRegist_date_ts()==null) ? "" : cus.getRegist_date_ts().toString()),
 				cus.getCus_name()
 		});
 		

@@ -67,6 +67,7 @@ Ext.onReady(function(){
 			    	};
 		    }else{
 		    	admin_menu = "";
+		    	admin_menu2 = "";
 		    }
 		    
 			
@@ -122,10 +123,9 @@ Ext.onReady(function(){
     		window.location = 'projects.htm';
           		}
           },
-          {text: 'Job Report',
-        	disabled : true,
+          {text: 'Jobs',
           	handler : function(){
-      		window.location = 'jobReport.htm';
+      		window.location = 'jobs.htm';
             		}
           },
           {text: 'Customer Management',

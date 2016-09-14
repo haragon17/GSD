@@ -24,81 +24,81 @@ Ext.onReady(function() {
 		]
 	});
 
-	formHead = new Ext.Container({
-    	border : 0,
-        layout:'column',
-        layoutConfig: {
-            padding:'5',
-            pack:'center',
-            align:'middle'
-          },
-        width: 560,
-        style: {
-            "margin-left": "auto",
-            "margin-right": "auto",
-            "margin-top": "70px"
-        },
-        defaults : {
-            xtype:'container',
-            layout: 'form',
-            layoutConfig: {
-                padding:'5',
-                pack:'center',
-                align:'middle'
-              },
-            columnWidth: 1,
-            labelWidth: 0,
-            anchor:'100%',
-            hideBorders : false,
-           
-        },
-		items: [{
-			columnWidth:0.57,
-			xtype:'splitter',
-		},{	
-				columnWidth : 0.12,
-			    xtype: 'label',
-			    text: 'Search :',
-			    style: 'padding: 3px; font-size: 15px; ',
-			    width: 10
-			  },
-			  {
-				columnWidth : 0.3,
-			    xtype: 'trigger',
-			    triggerCls : Ext.baseCSSPrefix + 'form-search-trigger',
-			    name: 'quickSearch',
-			    id: 'quickSearch',
-			    emptyText: 'Search Items',
-			    allowBlank: true,
-			    style: 'margin-left: 5px',
-			    listeners: {
-	        		  specialkey: function(field, e){
-	        			  if (e.getKey() == e.ENTER) {
-	        			  this.onTriggerClick();
-	        			  }
-	        		  }
-	            },
-			    onTriggerClick: function(){
-			    	Ext.Ajax.request({
-						url : 'searchItemParam.htm?search='+Ext.getCmp('quickSearch').getValue().toLowerCase(),
-						success : function(response, opts) {
-							store.item.loadPage(1);
-						}
-			    	});
-                }
-			  },
-			  ],
-			  renderTo: document.body
-    });
+//	formHead = new Ext.Container({
+//    	border : 0,
+//        layout:'column',
+//        layoutConfig: {
+//            padding:'5',
+//            pack:'center',
+//            align:'middle'
+//          },
+//        width: 560,
+//        style: {
+//            "margin-left": "auto",
+//            "margin-right": "auto",
+//            "margin-top": "70px"
+//        },
+//        defaults : {
+//            xtype:'container',
+//            layout: 'form',
+//            layoutConfig: {
+//                padding:'5',
+//                pack:'center',
+//                align:'middle'
+//              },
+//            columnWidth: 1,
+//            labelWidth: 0,
+//            anchor:'100%',
+//            hideBorders : false,
+//           
+//        },
+//		items: [{
+//			columnWidth:0.57,
+//			xtype:'splitter',
+//		},{	
+//				columnWidth : 0.12,
+//			    xtype: 'label',
+//			    text: 'Search :',
+//			    style: 'padding: 3px; font-size: 15px; ',
+//			    width: 10
+//			  },
+//			  {
+//				columnWidth : 0.3,
+//			    xtype: 'trigger',
+//			    triggerCls : Ext.baseCSSPrefix + 'form-search-trigger',
+//			    name: 'quickSearch',
+//			    id: 'quickSearch',
+//			    emptyText: 'Search Items',
+//			    allowBlank: true,
+//			    style: 'margin-left: 5px',
+//			    listeners: {
+//	        		  specialkey: function(field, e){
+//	        			  if (e.getKey() == e.ENTER) {
+//	        			  this.onTriggerClick();
+//	        			  }
+//	        		  }
+//	            },
+//			    onTriggerClick: function(){
+//			    	Ext.Ajax.request({
+//						url : 'searchItemParam.htm?search='+Ext.getCmp('quickSearch').getValue().toLowerCase(),
+//						success : function(response, opts) {
+//							store.item.loadPage(1);
+//						}
+//			    	});
+//                }
+//			  },
+//			  ],
+//			  renderTo: document.body
+//    });
 	
 	store.item = Ext.create('Ext.data.JsonStore', {
 		model : 'cusModel',
 		id : 'cusStore',
-		pageSize : 11,
+		pageSize : 30,
 		autoLoad : true,
 		proxy : {
 			type : 'ajax',
-			url : 'searchItem.htm',
+			url : 'showItem.htm?id=0',
 			reader : {
 				type : 'json',
 				root : 'records',
@@ -106,20 +106,26 @@ Ext.onReady(function() {
 				totalProperty : 'total'
 			}
 		},
+		sorters: [{
+	         property: 'itm_name',
+	         direction: 'ASC'
+	     }]
 	});
 
-	panels.itemList = Ext.create('Ext.grid.Panel', {
+	panels.itemList = Ext.create('Ext.ux.LiveFilterGridPanel', {
 		frame : true,
+		id : 'itemPanel',
 		title : 'GSD Item List',
-		bodyPadding : 5,
-		layout : 'column',
+//		bodyPadding : 5,
+//		layout : 'column',
 		renderTo : document.body,
-		width : 560,
-		height : 400,
+		indexes : ['itm_name','itm_desc'],
+		width : 700,
+		height : 500,
 		style: {
             "margin-left": "auto",
             "margin-right": "auto",
-            "margin-top": "5px"
+            "margin-top": "75px"
         },
         tools : [ {
 			xtype : 'button',
@@ -186,26 +192,34 @@ Ext.onReady(function() {
 				} ]
 			}
 			],
-//			listeners : {
-//				cellClick : {
-//					fn: function(td, cellIndex, record, tr, rowIndex, e, eOpts){
-//						itm_id = store.item.getAt(e).get('itm_id');
-//						itm_name = store.item.getAt(e).get('itm_name');
-//						itm_desc = store.item.getAt(e).get('itm_desc');
-//						
-//						Ext.getCmp('etn').setValue(itm_name);
-//						Ext.getCmp('etd').setValue(itm_desc);
-//						}
-//				}
-//			}
-		bbar : Ext.create('Ext.PagingToolbar', {
-			store : store.item,
-			displayInfo : true,
-			displayMsg : 'Displaying Item {0} - {1} of {2}',
-			emptyMsg : "No Item to display",
-			plugins : Ext.create('Ext.ux.ProgressBarPager', {})
-		})
-
+			listeners: {
+				viewready: function (grid) {
+			        var view = grid.view;
+			        this.toolTip = Ext.create('Ext.tip.ToolTip', {
+			            target: view.el,
+			            delegate: view.cellSelector,
+//			            width: 'auto',
+//			            autoWidth: true,
+			            trackMouse: true,
+			            renderTo: Ext.getBody(),
+			            listeners: {
+			                beforeshow: function(tip) {
+			                    var trigger = tip.triggerElement,
+			                        parent = tip.triggerElement.parentElement,
+			                        columnTitle = view.getHeaderByCell(trigger).text,
+			                        columnDataIndex = view.getHeaderByCell(trigger).dataIndex,
+			                        columnText = view.getRecord(parent).get(columnDataIndex).toString();
+			                    if (columnText){
+//			                        tip.update("<b>" + columnTitle + ":</b> " + columnText);
+			                        tip.update("<b>"+(columnText.replace(/\r\n|\n/gi, "<br>"))+"</b>");
+			                    } else {
+			                        return false;
+			                    }
+			                }
+			            }
+			        });
+		        }
+		    },
 	});
 	
 	editItem = new Ext.create('Ext.window.Window', {
@@ -244,8 +258,8 @@ Ext.onReady(function() {
 					labelWidth : 145,
 					msgTarget : 'under',
 					// vtype: 'alpha',
-					maxLength : 30,
-					maxLengthText : 'Maximum input 30 Character',
+					maxLength : 100,
+					maxLengthText : 'Maximum input 100 Character',
 					listeners: {
 		           		 'blur': function(e){
 		           			var itm_name = Ext.getCmp('eitm_name').getValue();
@@ -277,9 +291,9 @@ Ext.onReady(function() {
 					id : 'eitm_desc',
 					emptyText : 'Description',
 					labelWidth : 145,
-					msgTarget : 'side',
+					msgTarget : 'under',
 					maxLength : 100,
-					maxLengthText : 'Maximum input 50 Character',
+					maxLengthText : 'Maximum input 100 Character',
 				}, {
 					xtype : 'hidden',
 					id : 'eitm_id',
@@ -382,8 +396,8 @@ Ext.onReady(function() {
 					labelWidth : 145,
 					msgTarget : 'under',
 					// vtype: 'alpha',
-					maxLength : 30,
-					maxLengthText : 'Maximum input 30 Character',
+					maxLength : 100,
+					maxLengthText : 'Maximum input 100 Character',
 					listeners: {
 		           		 'blur': function(e){
 		           			var itm_name = Ext.getCmp('aitm_name').getValue();
@@ -412,9 +426,9 @@ Ext.onReady(function() {
 					id : 'aitm_desc',
 					emptyText : 'Description',
 					labelWidth : 145,
-					msgTarget : 'side',
+					msgTarget : 'under',
 					maxLength : 100,
-					maxLengthText : 'Maximum input 50 Character',
+					maxLengthText : 'Maximum input 100 Character',
 				} ]
 			} ],
 		} ],

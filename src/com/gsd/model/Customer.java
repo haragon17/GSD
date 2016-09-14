@@ -1,5 +1,7 @@
 package com.gsd.model;
 
+import java.sql.Timestamp;
+
 public class Customer {
 
 	private int cus_id;
@@ -17,6 +19,8 @@ public class Customer {
 	private String bill_to;
 	private String payment;
 	private String transfer_dtl;
+	private String regist_date;
+	private Timestamp regist_date_ts;
 	
 	public int getCus_id() {
 		return cus_id;
@@ -107,6 +111,18 @@ public class Customer {
 	}
 	public void setTransfer_dtl(String transfer_dtl) {
 		this.transfer_dtl = transfer_dtl;
+	}
+	public String getRegist_date() {
+		return regist_date;
+	}
+	public void setRegist_date(String regist_date) {
+		this.regist_date = regist_date;
+	}
+	public Timestamp getRegist_date_ts() {
+		return regist_date_ts;
+	}
+	public void setRegist_date_ts(Timestamp regist_date_ts) {
+		this.regist_date_ts = regist_date_ts;
 	}
 	
 }

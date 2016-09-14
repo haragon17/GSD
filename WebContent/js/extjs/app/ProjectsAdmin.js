@@ -437,7 +437,7 @@ Ext.onReady(function() {
 						success : function(response, opts) {
 //							store.projectsRef.loadPage(1);
 							store.projectsRef.reload();
-							store.projects.loadPage(1);
+							setTimeout(function(){store.projects.loadPage(1)},500);
 //							for(var xyz=0;xyz<store.projects.count();xyz++){
 //								if(Ext.fly(panels.grid.plugins[0].view.getNodes()[xyz]).hasCls(panels.grid.plugins[0].rowCollapsedCls) == true){
 //									panels.grid.plugins[0].toggleRow(xyz, panels.grid.getStore().getAt(xyz));
@@ -1229,7 +1229,7 @@ editProject = new Ext.create('Ext.window.Window', {
 									fn : function() {
 										editProject.hide();
 										store.projectsRef.reload();
-										store.projects.reload();
+										setTimeout(function(){store.projects.reload()},500);
 									}
 								});
 							}
@@ -2003,7 +2003,7 @@ editItem = new Ext.create('Ext.window.Window', {
 									fn : function() {
 										editItem.hide();
 										store.projectsRef.reload();
-										store.projects.reload();
+										setTimeout(function(){store.projects.reload()},500);
 									}
 								});
 							},

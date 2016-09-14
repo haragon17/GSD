@@ -3,7 +3,6 @@ package com.gsd.dao.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
@@ -19,8 +18,6 @@ import com.gsd.security.UserLoginDetail;
 
 public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 
-	private static final Logger logger = Logger.getLogger(ProjectsController.class);
-	
 	@Override
 	public List<Projects> showProjects(int cus_id) {
 		String sql = "SELECT projects.proj_id, \n" +
@@ -47,7 +44,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	public List<ProjectsReference> showProjectsReference(int proj_id) {
 		
 		String sql = "SELECT projects_reference.proj_ref_id, \n" + 
-				"item.itm_name \n" +
+				"item.itm_name, proj_ref_desc \n" +
 				"FROM projects_reference, item\n" +
 				"WHERE projects_reference.itm_id = item.itm_id " +
 				"AND projects_reference.proj_id = "+ proj_id +"\n" +
@@ -618,7 +615,6 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		if(proj.getFile_id() != 0){
 			FileModel file_new = new FileModel();
 			file_new = getFile(proj.getFile_id());
-			logger.debug("file_audit="+proj.getFile_name()+" file_new="+file_new.getFile_name());
 			if(!proj.getFile_name().equals(file_new.getFile_name())){
 				String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 				this.getJdbcTemplate().update(audit, new Object[]{
@@ -672,7 +668,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		ProjectsReference proj_ref = new ProjectsReference();
 		proj_ref = getJdbcTemplate().queryForObject("select * from projects_reference where proj_ref_id="+id, new BeanPropertyRowMapper<ProjectsReference>(ProjectsReference.class));
 		Projects proj = new Projects();
-		proj = getJdbcTemplate().queryForObject("select * from projects where proj_id="+proj_ref.getProj_ref_id(), new BeanPropertyRowMapper<Projects>(Projects.class));
+		proj = getJdbcTemplate().queryForObject("select * from projects where proj_id="+proj_ref.getProj_id(), new BeanPropertyRowMapper<Projects>(Projects.class));
 		Item itm = new Item();
 		itm = getJdbcTemplate().queryForObject("select * from item where itm_id="+proj_ref.getItm_id(), new BeanPropertyRowMapper<Item>(Item.class));
 		Customer cus = new Customer();

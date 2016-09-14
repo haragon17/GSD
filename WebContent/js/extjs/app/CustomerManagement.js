@@ -7,6 +7,11 @@ Ext.onReady(function() {
 		name : 'cusid',
 		id : 'cusid'
 	});
+	
+	scusid = new Ext.form.Hidden({
+		name : 'scusid',
+		id : 'scusid'
+	})
 
 	panels.search = Ext.create('Ext.form.Panel', {
 		title : 'Search Criteria',
@@ -79,23 +84,24 @@ Ext.onReady(function() {
 					valueField : 'cus_name',
 					displayField : 'cus_name',
 					listeners : {
-
 						select : function() {
-							
 							var v = this.getValue();
 							var record = this.findRecord(this.valueField || this.displayField, v);
 							var myIndex = this.store.indexOf(record);
 							var myValue = this.store.getAt(myIndex).data.cus_code;
-//							this.store.reload();
-//							var record2 = Ext.getCmp('scus_code').getStore().findRecord('cus_id',myValue);
-//							var myIndex2 = Ext.getCmp('scus_code').getStore().indexOf(record2);
-//							var search_cus_code = Ext.getCmp('scus_code').getStore().getAt(myIndex2).data.cus_code;
-//							Ext.getCmp('scus_code').setValue(search_cus_code);
+							var myId = this.store.getAt(myIndex).data.cus_id;
+							Ext.getCmp('scusid').setValue(myId);
 							Ext.getCmp('scus_code').setValue(myValue);
-							
-							console.log("cus_code: "+myValue);
+						},
+						blur : function() {
+							var v = this.getValue();
+							var record = this.findRecord(this.valueField || this.displayField, v);
+							if(record == false){
+								Ext.getCmp('scusid').setValue("");
+								Ext.getCmp('scus_name').setValue("");
+								Ext.getCmp('scus_code').setValue("");
+							}
 						}
-
 					}
 				}, {
 					xtype : 'combobox',
@@ -128,21 +134,23 @@ Ext.onReady(function() {
 					listeners : {
 
 						select : function() {
-							
 							var v = this.getValue();
 							var record = this.findRecord(this.valueField || this.displayField, v);
 							var myIndex = this.store.indexOf(record);
 							var myValue = this.store.getAt(myIndex).data.cus_name;
-//							this.store.reload();
-//							var record2 = Ext.getCmp('scus_name').getStore().findRecord('cus_id',myValue);
-//							var myIndex2 = Ext.getCmp('scus_name').getStore().indexOf(record2);
-//							var search_cus_name = Ext.getCmp('scus_name').getStore().getAt(myIndex2).data.cus_name;
-//							Ext.getCmp('scus_name').setValue(search_cus_name);
+							var myId = this.store.getAt(myIndex).data.cus_id;
+							Ext.getCmp('scusid').setValue(myId);
 							Ext.getCmp('scus_name').setValue(myValue);
-							
-							console.log("cus_name: "+myValue);
+						},
+						blur : function() {
+							var v = this.getValue();
+							var record = this.findRecord(this.valueField || this.displayField, v);
+							if(record == false){
+								Ext.getCmp('scusid').setValue("");
+								Ext.getCmp('scus_name').setValue("");
+								Ext.getCmp('scus_code').setValue("");
+							}
 						}
-
 					}
 				} ]
 			}, {
@@ -199,7 +207,7 @@ Ext.onReady(function() {
 				if (form.isValid()) {
 
 					Ext.Ajax.request({
-						url : 'searchCustomerParam.htm' + getParamValues(),
+						url : 'searchCustomerParam.htm' + '?scus_id='+Ext.getCmp('scusid').getValue() + getParamValues(),
 						success : function(response, opts) {
 							store.searchCustomer.loadPage(1);
 						}
@@ -213,7 +221,7 @@ Ext.onReady(function() {
 			text : 'Reset',
 			handler : function() {
 				this.up('form').getForm().reset();
-
+				Ext.getCmp('scusid').setValue("");
 			}
 		} ]
 
@@ -311,7 +319,8 @@ Ext.onReady(function() {
 							bill_to = grid.getStore().getAt(rowIndex).get('bill_to');
 							payment = grid.getStore().getAt(rowIndex).get('payment');
 							transfer_dtl = grid.getStore().getAt(rowIndex).get('transfer_dtl');
-
+							regist_date = grid.getStore().getAt(rowIndex).get('regist_date');
+							
 							Ext.getCmp('ecus_name').setValue(cus_name);
 							Ext.getCmp('ecus_code').setValue(cus_code);
 							Ext.getCmp('eaddress').setValue(address);
@@ -323,6 +332,7 @@ Ext.onReady(function() {
 							Ext.getCmp('ebill_to').setValue(bill_to);
 							Ext.getCmp('epayment').setValue(payment);
 							Ext.getCmp('etransfer_dtl').setValue(transfer_dtl);
+							Ext.getCmp('eregist_date').setValue(regist_date);
 							editCustomer.show();
 						}
 					} ]
@@ -383,12 +393,13 @@ Ext.onReady(function() {
 		plugins: [{
 	        ptype: 'rowexpander',
 	        rowBodyTpl : new Ext.XTemplate(
+	        		'<p><b>Register date:</b> {regist_date:this.formatDate}</p>',
 	        		'<p><b>Adress:</b> {address:this.chkEmpty}</p>',
 	        		'<p><b>Phone :</b> {cus_phone:this.chkEmpty}</p>',
 	        		'<p><b>Transfer Detail:</b> <br>{transfer_dtl:this.chkTransfer}</p>',
 	        		{
 	        			chkEmpty: function(v){
-	        				if(v == ""){
+	        				if(v == "" || v == null){
 	        					return '-';
 	        				}else{
 	        					return v;
@@ -401,6 +412,30 @@ Ext.onReady(function() {
 	        					return '-';
 	        				}else{
 	        					return v.replace(/\r\n|\n/gi, "<br>");
+	        				}
+	        			}
+	        		},
+	        		{
+	        			formatDate: function(v){
+	        				if(v == "" || v == null){
+	        					return '-';
+	        				}else{
+//	        					var myDate = v.getFullYear() + "-";
+//	        					if((v.getMonth() + 1).length > 1){
+//	        						myDate += (v.getMonth() + 1) + "-";
+//	        					}else{
+//	        						myDate += "0" + (v.getMonth() + 1) + "-";
+//	        					}
+//	        					if(v.getDate().length > 1){
+//	        						myDate += v.getDate();
+//	        					}else{
+//	        						myDate += "0" + v.getDate();
+//	        					}
+	        					var options = {
+	        						    weekday: "long", year: "numeric", month: "short",
+	        						    day: "numeric"
+	        						};
+	        					return v.toLocaleDateString("en-us", options);
 	        				}
 	        			}
 	        		}
@@ -458,6 +493,11 @@ Ext.define('cusModel', {
 	}, {
 		name : 'transfer_dtl',
 		type : 'string'
+	}, {
+		name : 'regist_date',
+//		type : 'string'
+		type : 'date',
+		dateFormat: 'Y-m-d H:i:s'
 	}
 
 	]
@@ -538,8 +578,8 @@ editCustomer = new Ext.create('Ext.window.Window', {
 				labelWidth : 145,
 				msgTarget : 'side',
 				// vtype: 'alpha',
-				maxLength : 30,
-				maxLengthText : 'Maximum input 30 Character',
+				maxLength : 50,
+				maxLengthText : 'Maximum input 50 Character',
 			}, {
 				allowBlank : false,
 				fieldLabel : 'Customer Code <font color="red">*</font>  ',
@@ -585,8 +625,8 @@ editCustomer = new Ext.create('Ext.window.Window', {
 				labelWidth : 145,
 				msgTarget : 'side',
 				// vtype: 'phone',
-				maxLength : 30,
-				maxLengthText : 'Maximum input 30 Character',
+				maxLength : 60,
+				maxLengthText : 'Maximum input 60 Character',
 			}, {
 				xtype : 'textareafield',
 				allowBlank : true,
@@ -677,8 +717,18 @@ editCustomer = new Ext.create('Ext.window.Window', {
 				emptyText : 'Transfer Detail',
 				labelWidth : 145,
 				msgTarget : 'side',
-				maxLength : 100,
-				maxLengthText : 'Maximum input 100 Character',
+				maxLength : 200,
+				maxLengthText : 'Maximum input 200 Character',
+			}, {
+				xtype: 'datefield',
+				allowBlank : true,
+				fieldLabel : 'Register Date ',
+				name : 'eregist_date',
+				id : 'eregist_date',
+				labelWidth : 145,
+				emptyText : 'Register Date',
+				editable: false,
+				format: 'Y-m-d',
 			}, {
 				xtype : 'hidden',
 				id : 'ecus_id',
@@ -781,8 +831,8 @@ addCustomer = new Ext.create('Ext.window.Window', {
 				labelWidth : 145,
 				msgTarget : 'side',
 				// vtype: 'alpha',
-				maxLength : 30,
-				maxLengthText : 'Maximum input 30 Character',
+				maxLength : 50,
+				maxLengthText : 'Maximum input 50 Character',
 			}, {
 				allowBlank : false,
 				fieldLabel : 'Customer Code <font color="red">*</font>  ',
@@ -825,8 +875,8 @@ addCustomer = new Ext.create('Ext.window.Window', {
 				labelWidth : 145,
 				msgTarget : 'side',
 				// vtype: 'phone',
-				maxLength : 30,
-				maxLengthText : 'Maximum input 30 Character',
+				maxLength : 60,
+				maxLengthText : 'Maximum input 60 Character',
 			}, {
 				xtype : 'textareafield',
 				allowBlank : true,
@@ -917,8 +967,18 @@ addCustomer = new Ext.create('Ext.window.Window', {
 				emptyText : 'Transfer Detail',
 				labelWidth : 145,
 				msgTarget : 'side',
-				maxLength : 100,
-				maxLengthText : 'Maximum input 100 Character',
+				maxLength : 200,
+				maxLengthText : 'Maximum input 200 Character',
+			}, {
+				xtype: 'datefield',
+				allowBlank : true,
+				fieldLabel : 'Register Date ',
+				name : 'aregist_date',
+				id : 'aregist_date',
+				labelWidth : 145,
+				emptyText : 'Register Date',
+				editable: false,
+				format: 'Y-m-d',
 			} ]
 		} ],
 	} ],
@@ -944,6 +1004,8 @@ addCustomer = new Ext.create('Ext.window.Window', {
 									fn : function() {
 										addCustomer.hide();
 										store.searchCustomer.reload();
+										Ext.getCmp('scus_name').getStore().reload();
+										Ext.getCmp('scus_code').getStore().reload();
 									}
 								});
 							},
@@ -1001,7 +1063,7 @@ function confirmChk(btn) {
 function getParamValues() {
 	var url = "";
 	var param = "";
-	var prefix = "?";
+	var prefix = "&";
 	var queryStr = "";
 	var i = 1;
 	var count = 0;

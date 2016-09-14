@@ -81,7 +81,12 @@ Ext.onReady(function(){
             handler : function(){
         	window.location = 'projects.htm';
               	}
-            },
+          },
+          {text: 'Jobs',
+            handler : function(){
+          	window.location = 'jobs.htm';
+                }
+          },
           {
         	xtype: 'tbfill'  
           },

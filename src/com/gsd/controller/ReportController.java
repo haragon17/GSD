@@ -107,40 +107,40 @@ public class ReportController {
 		return new ModelAndView("jsonView", jObj);
 	}
 
-	@RequestMapping(value = "/printReport")
-	public ModelAndView printReport(HttpServletRequest request, HttpServletResponse response) {
-
-		Map<String, String> map = new HashMap<String, String>();
-
-		map.put("name", name);
-		map.put("cate1", cate1);
-		map.put("cate2", cate2);
-		map.put("cate3", cate3);
-		map.put("screate", screate);
-		map.put("ecreate", ecreate);
-		map.put("supdate", supdate);
-		map.put("eupdate", eupdate);
-
-		List<Report> list;
-		try {
-			list = reportDao.searchReport(map);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		Map<String, Object> map1 = new HashMap<String, Object>();
-		map1.put("list", list);
-		map1.put("name", name);
-		map1.put("cate1", cate1);
-		map1.put("cate2", cate2);
-		map1.put("cate3", cate3);
-		map1.put("screate", screate);
-		map1.put("ecreate", ecreate);
-		map1.put("supdate", supdate);
-		map1.put("eupdate", eupdate);
-
-		return new ModelAndView("report-print", map1);
-	}
+//	@RequestMapping(value = "/printReport")
+//	public ModelAndView printReport(HttpServletRequest request, HttpServletResponse response) {
+//
+//		Map<String, String> map = new HashMap<String, String>();
+//
+//		map.put("name", name);
+//		map.put("cate1", cate1);
+//		map.put("cate2", cate2);
+//		map.put("cate3", cate3);
+//		map.put("screate", screate);
+//		map.put("ecreate", ecreate);
+//		map.put("supdate", supdate);
+//		map.put("eupdate", eupdate);
+//
+//		List<Report> list;
+//		try {
+//			list = reportDao.searchReport(map);
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return null;
+//		}
+//		Map<String, Object> map1 = new HashMap<String, Object>();
+//		map1.put("list", list);
+//		map1.put("name", name);
+//		map1.put("cate1", cate1);
+//		map1.put("cate2", cate2);
+//		map1.put("cate3", cate3);
+//		map1.put("screate", screate);
+//		map1.put("ecreate", ecreate);
+//		map1.put("supdate", supdate);
+//		map1.put("eupdate", eupdate);
+//
+//		return new ModelAndView("report-print", map1);
+//	}
 
 }

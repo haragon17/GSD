@@ -7,11 +7,13 @@ public class Jobs {
 	private int job_id;
 	private String job_name;
 	private int proj_ref_id;
-	private int amount;
+	private float amount;
 	private String dept;
+	private String job_status;
 	private String job_in;
 	private String job_out;
 	private String job_dtl;
+	private String job_number;
 	private int cretd_usr;
 	private String cretd_date;
 	private String update_date;
@@ -48,10 +50,10 @@ public class Jobs {
 	public void setProj_ref_id(int proj_ref_id) {
 		this.proj_ref_id = proj_ref_id;
 	}
-	public int getAmount() {
+	public float getAmount() {
 		return amount;
 	}
-	public void setAmount(int amount) {
+	public void setAmount(float amount) {
 		this.amount = amount;
 	}
 	public String getDept() {
@@ -59,6 +61,12 @@ public class Jobs {
 	}
 	public void setDept(String dept) {
 		this.dept = dept;
+	}
+	public String getJob_status() {
+		return job_status;
+	}
+	public void setJob_status(String job_status) {
+		this.job_status = job_status;
 	}
 	public String getJob_in() {
 		return job_in;
@@ -77,6 +85,12 @@ public class Jobs {
 	}
 	public void setJob_dtl(String job_dtl) {
 		this.job_dtl = job_dtl;
+	}
+	public String getJob_number() {
+		return job_number;
+	}
+	public void setJob_number(String job_number) {
+		this.job_number = job_number;
 	}
 	public int getCretd_usr() {
 		return cretd_usr;

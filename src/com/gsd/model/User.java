@@ -17,6 +17,7 @@ public class User {
 	private String email;
 	private String phone;
 	private int usr_type;
+	private String dept;
 	
 	public User(){}
 	
@@ -87,5 +88,13 @@ public class User {
 			System.out.println(e.getMessage());
 		}
 		this.birthdayDate = startDate;
+	}
+
+	public String getDept() {
+		return dept;
+	}
+
+	public void setDept(String dept) {
+		this.dept = dept;
 	}
 }

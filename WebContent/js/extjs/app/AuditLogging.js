@@ -96,22 +96,39 @@ Ext.onReady(function() {
 		plugins: [{
 	        ptype: 'rowexpander',
 	        rowBodyTpl : new Ext.XTemplate(
-	        		'{commit_desc:this.myDesc}',
+	        		'<head><META HTTP-EQUIV="content-type" CONTENT="text/html; charset=utf-8"></head>{commit_desc:this.myDesc}',
 	        		{
 	        			myDesc: function(v){
 	        				if(v.length > 7){
-	        					myText = v.replace(/, /gi, "<br>");
-	        					myText = myText.replace(/=/gi, " = ");
+	        					myText = v.replace(/, code=/gi, "<br>Code = ");
+	        					myText = myText.replace(/, key_account=/gi, "<br>Key Account Manager = ");
+	        					myText = myText.replace(/, address=/gi, "<br>Address = ");
+	        					myText = myText.replace(/, contact_person=/gi, "<br>Contact Person = ");
+	        					myText = myText.replace(/, e-mail=/gi, "<br>E-mail = ");
+	        					myText = myText.replace(/, phone=/gi, "<br>Phone = ");
+	        					myText = myText.replace(/, bill_to=/gi, "<br>Bill to = ");
+	        					myText = myText.replace(/, payment=/gi, "<br>Payment = ");
+	        					myText = myText.replace(/, transfer_dtl=/gi, "<br>Transfer detail = ");
+	        					myText = myText.replace(/, regist_date=/gi, "<br>Register Date = ");
+	        					myText = myText.replace(/, desc=/gi, "<br>Description = ");
+	        					myText = myText.replace(/, customer=/gi, "<br>Customer = ");
+	        					myText = myText.replace(/, file_Name=/gi, "<br>File Name = ");
+	        					myText = myText.replace(/, target_time=/gi, "<br>Target Time = ");
+	        					myText = myText.replace(/, actual_time=/gi, "<br>Actual Time = ");
+	        					myText = myText.replace(/, price=/gi, "<br>Price = ");
+	        					myText = myText.replace(/, currency=/gi, "<br>Currency = ");
+	        					myText = myText.replace(/, item_desc=/gi, "<br>Description = ");
+	        					myText = myText.replace(/Item List/gi, "Item");
 	        					myText = myText.replace('Created row on ', "");
 	        					myText = myText.replace('Created ', "");
-
+	        					myText = myText.replace(/name=/gi, "Name = ");
+	        					myText = myText.replace(/\r\n|\n/gi, " ");
+//
 	        					var res = myText.split("<br>");
 	        					var test = new Array();
 	        					for (var i = 0; i < res.length; i++) {
 	        						var x = res[i].split("=");
 	        						if(x.length == 2){
-	        							x[0] = x[0].replace('desc', "Description");
-	        							x[0] = x[0].replace('_', " ");
 	        							test.push("<b>"+x[0]+"</b>");
 	        							test.push(x[1]);
 	        						}else{
@@ -130,7 +147,7 @@ Ext.onReady(function() {
 
 	        					return sumText;
 	        				}else{
-	        					return v;
+	        					return '<b>'+v+'</b>';
 	        				}
 	        			}
 	        		}
