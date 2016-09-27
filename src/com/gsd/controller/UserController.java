@@ -101,6 +101,7 @@ public class UserController {
 		String email = request.getParameter("email");
 		String phone = request.getParameter("phone");
 		int usr_type = Integer.parseInt(request.getParameter("usr_type"));
+		String dept = request.getParameter("dept");
 
 		User user = new User();
 		user.setUsr_id(userDao.getLastUserId());
@@ -112,6 +113,7 @@ public class UserController {
 		user.setEmail(email);
 		user.setPhone(phone);
 		user.setUsr_type(usr_type);
+		user.setDept(dept);
 
 		userDao.createUser(user);
 		
@@ -223,6 +225,7 @@ public class UserController {
 		String email = request.getParameter("eemail");
 		String phone = request.getParameter("ephone");
 		int type = Integer.parseInt(request.getParameter("usr_type"));
+		String dept = request.getParameter("edept");
 
 		User user = new User();
 		user.setUsr_id(id);
@@ -231,6 +234,7 @@ public class UserController {
 		user.setBirthdayDate(birthday);
 		user.setEmail(email);
 		user.setUsr_type(type);
+		user.setDept(dept);
 
 		if (!phone.equals("Phone Number")) {
 			user.setPhone(phone);
@@ -327,6 +331,7 @@ public class UserController {
 		userLs.setBirthday(birthday);
 		userLs.setEmail(email);
 		userLs.setUsr_type(user.getUserModel().getUsr_type());
+		userLs.setDept(user.getUserModel().getDept());
 
 		if (!phone.equals("Phone Number")) {
 			userLs.setPhone(phone);

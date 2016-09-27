@@ -21,7 +21,8 @@ public class AuditLoggingDaoImpl extends JdbcDaoSupport implements AuditLoggingD
 				"ELSE 'Got some error...'\n"+
 				"END AS commit_type, aud.commit_desc, aud.commit_date,\n"+
 				"CASE\n"+
-				"WHEN aud.parent_object LIKE '%Reference%' THEN 'Projects Item'\n"+
+				"WHEN aud.parent_object LIKE '%Projects Reference%' THEN 'Projects Item'\n"+
+				"WHEN aud.parent_object LIKE '%Jobs Reference%' THEN 'Jobs Item'\n"+
 				"ELSE aud.parent_object\n"+
 				"END AS parent_type\n"+
 				"FROM audit_logging aud\n"+

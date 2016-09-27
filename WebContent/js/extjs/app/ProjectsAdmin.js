@@ -429,7 +429,7 @@ Ext.onReady(function() {
 			handler : function() {
 				var form = this.up('form').getForm();
 				if (form.isValid()) {
-					Ext.getCmp('ireport').setDisabled(false);
+//					Ext.getCmp('ireport').setDisabled(false);
 					Ext.Ajax.request({
 						url : 'searchProjectsParam.htm?AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
 						'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+

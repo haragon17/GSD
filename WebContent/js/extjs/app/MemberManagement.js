@@ -262,6 +262,18 @@ store.searchMember = Ext.create('Ext.data.JsonStore', {
 //    }]
 });
 
+var department = Ext.create('Ext.data.Store', {
+	fields: ['name'],
+	data : [
+	        {"name":"E-Studio"},
+	        {"name":"Publication"},
+	        {"name":"PP"},
+	        {"name":"CM"},
+	        {"name":"KK"},
+	        {"name":"BKK"}
+	]
+});
+
 editMember = new Ext.create('Ext.window.Window', {
 	title: 'Edit Member',
 	    width: 500,
@@ -359,6 +371,21 @@ editMember = new Ext.create('Ext.window.Window', {
 							{ boxLabel: 'Manager', name: 'usr_type', inputValue: '1'},
 							{ boxLabel: 'JMD', name: 'usr_type', inputValue: '2'},
 	                    ]
+	                },
+	                {
+	                	xtype : 'combobox',
+	    				fieldLabel : 'Department <font color="red">*</font> ',
+	    				name : 'edept',
+	    				id : 'edept',
+	    				queryMode : 'local',
+	    				labelWidth : 120,
+	    				emptyText : 'Department',
+	    				allowBlank: false,
+	    				editable : false,
+	    				msgTarget: 'under',
+	    				store : department,
+	    				valueField : 'name',
+	    				displayField : 'name',
 	                },
 	                {
 	                	xtype: 'hidden',
@@ -576,7 +603,7 @@ addMember = new Ext.create('Ext.window.Window', {
      },
      {
     	 xtype: 'radiogroup',
-         fieldLabel: 'User Type ',
+         fieldLabel: 'User Type <font color="red">*</font>  ',
          labelWidth : 145,
          id:'type',
          // Arrange radio buttons into two columns, distributed vertically
@@ -587,6 +614,21 @@ addMember = new Ext.create('Ext.window.Window', {
             { boxLabel: 'Manager', name: 'usr_type', inputValue: '1'},
 			{ boxLabel: 'JMD', name: 'usr_type', inputValue: '2', checked: true },
          ]
+     },
+     {
+    	 xtype : 'combobox',
+			fieldLabel : 'Department <font color="red">*</font>  ',
+			name : 'adept',
+			id : 'adept',
+			queryMode : 'local',
+			labelWidth : 120,
+			emptyText : 'Department',
+			allowBlank: false,
+			editable : false,
+			msgTarget: 'under',
+			store : department,
+			valueField : 'name',
+			displayField : 'name',
      }
         ]
 }],
@@ -599,7 +641,7 @@ buttons: [{
 	  var passc = Ext.getCmp('pass-cfrm');
 	  var fname = Ext.getCmp('afname');
 	  var lname = Ext.getCmp('alname');
-//	  var dob = Ext.getCmp('adob');
+	  var dept = Ext.getCmp('adept');
 	  var email = Ext.getCmp('aemail');
 	  var phone = Ext.getCmp('aphone');
 	  
@@ -617,7 +659,7 @@ buttons: [{
 				pass: pass.getValue(),
 				fname: fname.getValue(),
 				lname: lname.getValue(),
-//				dob: dob.getValue(),
+				dept: dept.getValue(),
 				email: email.getValue(),
 				phone: phone.getValue(),
 				usr_type: Ext.getCmp('type').getValue().usr_type
@@ -657,7 +699,7 @@ buttons: [{
 			Ext.getCmp('pass-cfrm').reset();
 			Ext.getCmp('afname').reset();
 			Ext.getCmp('alname').reset();
-//			Ext.getCmp('adob').reset();
+			Ext.getCmp('adept').reset();
 			Ext.getCmp('aemail').reset();
 			Ext.getCmp('aphone').reset();
 	  }
@@ -670,7 +712,7 @@ listeners:{
 			Ext.getCmp('pass-cfrm').reset();
 			Ext.getCmp('afname').reset();
 			Ext.getCmp('alname').reset();
-//			Ext.getCmp('adob').reset();
+			Ext.getCmp('adept').reset();
 			Ext.getCmp('aemail').reset();
 			Ext.getCmp('aphone').reset();
 		}

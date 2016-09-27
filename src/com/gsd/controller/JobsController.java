@@ -2,6 +2,11 @@ package com.gsd.controller;
 
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -27,8 +33,10 @@ import com.gsd.dao.JobsDao;
 import com.gsd.model.Jobs;
 import com.gsd.model.JobsReference;
 import com.gsd.report.PrintJobTicket;
+import com.gsd.report.PrintJobTicket_iText;
 import com.gsd.security.UserDetailsApp;
 import com.gsd.security.UserLoginDetail;
+import com.itextpdf.text.DocumentException;
 
 import net.sf.json.JSONObject;
 
@@ -94,27 +102,52 @@ public class JobsController {
 	}
 	
 	@RequestMapping(value = "/printJobTicket")
-	public void printJobTicket(HttpServletRequest request, HttpServletResponse response){
-		
+	public void printJobTicket(HttpServletRequest request, HttpServletResponse response) throws IOException{
+	
 		int id = Integer.parseInt(request.getParameter("job_ref_id"));
-		JobsReference myJob = jobsDao.searchJobsReferenceByID(id);
+		JobsReference job = jobsDao.searchJobsReferenceByID(id);
+		
+		try {
+			new PrintJobTicket_iText().createPdf(request,response, job);
+		} catch (IOException | DocumentException e) {
+			logger.error(e.getMessage());
+		}
+		
+//		FileOutputStream fileOut = new FileOutputStream("/Users/gsd/Desktop/GSD-JobTicket.pdf");
+//
+//		fileOut.close();
+//		return response;
 		
 //		try {
 //            String cn = UIManager.getSystemLookAndFeelClassName();
 //            UIManager.setLookAndFeel(cn);
 //        } catch (Exception cnf) {
 //        }
-        PrinterJob job = PrinterJob.getPrinterJob();
-        job.setPrintable(new PrintJobTicket(myJob));
-        boolean ok = job.printDialog();
-        if (ok) {
-            try {
-                job.print();
-            } catch (PrinterException ex) {
-            	logger.error(ex.getMessage());
-            }
-        }
+//        PrinterJob job = PrinterJob.getPrinterJob();
+//        job.setPrintable(new PrintJobTicket(myJob));
+//        boolean ok = job.printDialog();
+//        if (ok) {
+//            try {
+//                job.print();
+//            } catch (PrinterException ex) {
+//            	logger.error(ex.getMessage());
+//            }
+//        }
 //        System.exit(0);
+	}
+	
+	@RequestMapping(value="/chkJobRefName")
+	public ModelAndView chkCusCode(@RequestParam("records") String job_ref_name, HttpServletRequest request,
+			HttpServletResponse response){
+		
+		List<JobsReference> jobRef = null;
+		
+		jobRef = jobsDao.searchJobReferenceByName(job_ref_name);
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", jobRef);
+		
+		return new ModelAndView("jsonView", jobj);
 	}
 	
 	@RequestMapping(value="/searchJobsParam")
@@ -129,7 +162,7 @@ public class JobsController {
 //		session.setAttribute("start", request.getParameter("sbtw_start"));
 //		session.setAttribute("end", request.getParameter("sbtw_end"));
 		session.setAttribute("status", request.getParameter("sjob_status"));
-		
+		session.setAttribute("first", request.getParameter("first"));
 	}
 	
 	@RequestMapping(value="/searchJobs")
@@ -145,6 +178,12 @@ public class JobsController {
 		map.put("job_name", (String)session.getAttribute("job_name"));
 		map.put("dept", (String)session.getAttribute("dept"));
 		map.put("status", (String)session.getAttribute("status"));
+		if(((String)session.getAttribute("first")) != null){
+			map.put("first", (String)session.getAttribute("first"));
+			session.setAttribute("first", "");
+		}else{
+			map.put("first", "");
+		}
 		
 		int start = Integer.parseInt(request.getParameter("start"));
 		int limit = Integer.parseInt(request.getParameter("limit"));
@@ -318,13 +357,14 @@ public class JobsController {
 		String job_in = request.getParameter("ajob_in");
 		String job_out = request.getParameter("ajob_out");
 		String job_dtl = request.getParameter("ajob_ref_dtl");
-		String print = request.getParameter("print");
+		String job_ref_status = request.getParameter("ajob_ref_status");
 		
 		JobsReference jobRef = new JobsReference();
 		jobRef.setJob_ref_id(jobsDao.getLastJobReferenceId());
 		jobRef.setJob_id(job_id);
 		jobRef.setJob_ref_name(job_ref_name);
 		jobRef.setCretd_usr(usr_id);
+		jobRef.setJob_ref_status(job_ref_status);
 		
 		if(!job_in.equals("Date in")){
 			try{
@@ -369,23 +409,26 @@ public class JobsController {
 		
 		jobsDao.createJobReference(jobRef);
 		
-		if(print == null){
-		}else if(print.equals("yes")){
-			JobsReference myJob = jobsDao.searchJobsReferenceByID(jobRef.getJob_ref_id());
-			PrinterJob printerJob = PrinterJob.getPrinterJob();
-			printerJob.setPrintable(new PrintJobTicket(myJob));
-	        boolean ok = printerJob.printDialog();
-	        if (ok) {
-	            try {
-	            	printerJob.print();
-	            } catch (PrinterException ex) {
-	            	logger.error(ex.getMessage());
-	            }
-	        }
-		}
+//		if(print == null){
+//		}else if(print.equals("yes")){
+//			JobsReference myJob = jobsDao.searchJobsReferenceByID(jobRef.getJob_ref_id());
+//			PrinterJob printerJob = PrinterJob.getPrinterJob();
+//			printerJob.setPrintable(new PrintJobTicket(myJob));
+//	        boolean ok = printerJob.printDialog();
+//	        if (ok) {
+//	            try {
+//	            	printerJob.print();
+//	            } catch (PrinterException ex) {
+//	            	logger.error(ex.getMessage());
+//	            }
+//	        }
+//		}
 		
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("success", true);
+//		model.put("records", jobRef);
+//		JSONObject jobj = new JSONObject();
+//		jobj.put("job_id", jobRef.getJob_ref_id());
 		return new ModelAndView("jsonView", model);
 	}
 	
@@ -402,10 +445,12 @@ public class JobsController {
 		String job_in = request.getParameter("ejob_in");
 		String job_out = request.getParameter("ejob_out");
 		String job_dtl = request.getParameter("ejob_ref_dtl");
+		String job_ref_status = request.getParameter("ejob_ref_status");
 		
 		JobsReference jobRef = new JobsReference();
 		jobRef.setJob_ref_id(job_ref_id);
 		jobRef.setJob_ref_name(job_ref_name);
+		jobRef.setJob_ref_status(job_ref_status);
 		
 		if(!job_in.equals("Date in")){
 			try{

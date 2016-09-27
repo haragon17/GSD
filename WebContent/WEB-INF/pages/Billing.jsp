@@ -21,7 +21,7 @@ table.myTable th {
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/src/ux/DateTimeField.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/src/ux/DateTimePicker.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/Billing.js"></script>
-<title>Billing Report</title>
+<title>Jobs &nbsp</title>
 </head>
 <body>
 </body>

@@ -9,6 +9,8 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import com.gsd.dao.JobsDao;
 import com.gsd.model.Jobs;
 import com.gsd.model.JobsReference;
+import com.gsd.security.UserDetailsApp;
+import com.gsd.security.UserLoginDetail;
 
 public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 
@@ -19,6 +21,10 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				+ "LEFT JOIN projects proj ON proj.proj_id = jobs.proj_id\n"
 				+ "LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"
 				+ "WHERE job_id != 0\n";
+		if(data.get("first")==null || data.get("first").isEmpty()){
+		}else{
+			sql += "AND job_status != 'Billed'\n";
+		}
 		if(data.get("job_name")==null || data.get("job_name").isEmpty()){
 		}else{
 			sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
@@ -40,6 +46,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 			sql += "AND job_status = '"+data.get("status")+"'\n";
 		}
 		sql += "ORDER BY jobs.cretd_date DESC";	
+		
+//		System.out.println(sql);
 		
 		List<Jobs> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
 		return result;
@@ -71,7 +79,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	
 	@Override
 	public JobsReference searchJobsReferenceByID(int id) {
-		String sql = "SELECT job_ref_id, job_ref_name, cus_name, cus_code, proj_name, itm_name, job_name, amount, job_in, job_out, dept\n"+
+		String sql = "SELECT job_ref_id, jobs.job_id, job_ref_name, cus_name, cus_code, proj_name, itm_name, job_name, amount, job_in, job_out, job_ref_dtl, job_ref_status, dept, jobs_reference.proj_ref_id\n"+
 				"FROM jobs_reference\n"+
 				"LEFT JOIN jobs ON jobs.job_id = jobs_reference.job_id\n"+
 				"LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"+
@@ -85,12 +93,27 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	@Override
 	public List<JobsReference> searchJobsReference(int id, String sort) {
 		
-		String sql = "SELECT job_ref_id, job_ref_name, job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, itm_name\n"
+		String sql = "SELECT job_ref_id, job_ref_name, job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, itm_name\n"
 				+ "FROM jobs_reference\n"
 				+ "LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"
 				+ "LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n"
-				+ "WHERE job_id="+id
-				+ " ORDER BY jobs_reference.job_in "+sort+" ,job_ref_id "+sort;
+				+ "WHERE job_id="+id;
+		
+		if(sort == "DESC"){
+			sql+= "\nORDER BY \n"
+				+ "CASE job_ref_status\n"
+				+ "WHEN 'New' 	THEN 1\n"
+				+ "WHEN 'CC'  	THEN 2\n"
+				+ "WHEN 'CC2'  	THEN 3\n"
+				+ "WHEN 'CC3'  	THEN 4\n"
+				+ "WHEN 'Final' THEN 5\n"
+				+ "WHEN 'Hold'  THEN 6\n"
+				+ "WHEN 'Sent' 	THEN 7\n"
+				+ "ELSE 8\n"
+				+ "END,jobs_reference.job_in DESC ,job_ref_id DESC";
+		}else{
+			sql+= " ORDER BY jobs_reference.job_in ASC ,job_ref_id ASC";
+		}
 		
 		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
 		return result;
@@ -167,6 +190,14 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		return result;
 	}
 	
+	public List<JobsReference> searchJobReferenceByName(String name){
+		
+		String sql = "SELECT * FROM jobs_reference WHERE job_ref_name='"+name+"' ORDER BY cretd_date DESC";
+		
+		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
+		return result;
+	}
+	
 	@Override
 	public void createJob(Jobs job) {
 		
@@ -181,12 +212,27 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 			job.getDept(),
 			job.getCretd_usr()
 		});
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		Jobs job2 = searchJobsByID(job.getJob_id());
+		
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				job.getJob_id(),
+				"Jobs",
+				user.getUserModel().getUsr_name(),
+				"Created Jobs name="+job.getJob_name()+" on Projects name="+job2.getProj_name()+", customer="+job2.getCus_name()
+				+", job_dtl="+job.getJob_dtl()+", job_status="+job.getJob_status()+", dept="+job.getDept(),
+				job.getJob_name()
+		});
 	}
 
 	@Override
 	public void createJobReference(JobsReference jobRef) {
 		
-		String sql = "INSERT INTO jobs_reference VALUES (?,?,?,?,?,?,?,?,?,now(),now())";
+		String sql = "INSERT INTO jobs_reference VALUES (?,?,?,?,?,?,?,?,?,now(),now(),?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[] {
 				jobRef.getJob_ref_id(),
@@ -197,7 +243,24 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				jobRef.getJob_in_ts(),
 				jobRef.getJob_out_ts(),
 				jobRef.getJob_ref_dtl(),
-				jobRef.getCretd_usr()
+				jobRef.getCretd_usr(),
+				jobRef.getJob_ref_status()
+		});
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		JobsReference jobRef2 = searchJobsReferenceByID(jobRef.getJob_ref_id());
+		
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Created Jobs Reference name="+jobRef.getJob_ref_name()+" on Jobs name="+jobRef2.getJob_name()+", Item name="+jobRef2.getItm_name()
+				+", amount="+jobRef.getAmount()+", job_in="+jobRef2.getJob_in()+", job_out="+jobRef2.getJob_out()+", job_status="+jobRef2.getJob_ref_status()
+				+", job_ref_dtl="+jobRef.getJob_ref_dtl(),
+				jobRef2.getJob_name()+" : "+jobRef.getJob_ref_name()
 		});
 	}
 	
@@ -218,9 +281,19 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		int id = getJdbcTemplate().queryForInt(sql);
 		return id+1;
 	}
+	
+	public int getLastAuditId() {
+		
+		String sql = "SELECT max(aud_id) from audit_logging";
+		
+		int id = getJdbcTemplate().queryForInt(sql);
+		return id+1;
+	}
 
 	@Override
 	public void updateJob(Jobs job){
+		
+		Jobs job_audit = searchJobsByID(job.getJob_id());
 		
 		String sql = "UPDATE jobs set "
 				+ "job_name=?, "
@@ -240,10 +313,90 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 			job.getJob_id()
 		});
 		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		if(!job_audit.getDept().equals(job.getDept())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				job.getJob_id(),
+				"Jobs",
+				user.getUserModel().getUsr_name(),
+				"Jobs Department",
+				job_audit.getDept(),
+				job.getDept(),
+				"Updated",
+				job.getJob_name()
+			});
+		}
+		
+		if(!job_audit.getJob_status().equals(job.getJob_status())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				job.getJob_id(),
+				"Jobs",
+				user.getUserModel().getUsr_name(),
+				"Jobs Status",
+				job_audit.getJob_status(),
+				job.getJob_status(),
+				"Updated",
+				job.getJob_name()
+			});
+		}
+		
+		if(!job_audit.getJob_dtl().equals(job.getJob_dtl())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				job.getJob_id(),
+				"Jobs",
+				user.getUserModel().getUsr_name(),
+				"Job's Project Description",
+				job_audit.getJob_dtl(),
+				job.getJob_dtl(),
+				"Updated",
+				job.getJob_name()
+			});
+		}
+		
+		if(job_audit.getProj_id() != job.getProj_id()){
+			Jobs job_new = searchJobsByID(job.getJob_id());
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				job.getJob_id(),
+				"Jobs",
+				user.getUserModel().getUsr_name(),
+				"Projects Name",
+				job_audit.getProj_name(),
+				job_new.getProj_name(),
+				"Updated",
+				job.getJob_name()
+			});
+		}
+		
+		if(!job_audit.getJob_name().equals(job.getJob_name())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				job.getJob_id(),
+				"Jobs",
+				user.getUserModel().getUsr_name(),
+				"Job's Project Name",
+				job_audit.getJob_name(),
+				job.getJob_name(),
+				"Updated",
+				job.getJob_name()
+			});
+		}
+		
 	}
 	
 	@Override
 	public void updateJobReference(JobsReference jobRef){
+		
+		JobsReference jobRef_audit = searchJobsReferenceByID(jobRef.getJob_ref_id());
 		
 		String sql = "UPDATE jobs_reference set "
 				+ "job_ref_name=?, "
@@ -252,6 +405,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				+ "job_in=?, "
 				+ "job_out=?, "
 				+ "job_ref_dtl=?, "
+				+ "job_ref_status=?, "
 				+ "update_date=now() "
 				+ "where job_ref_id=?";
 		
@@ -262,21 +416,158 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				jobRef.getJob_in_ts(),
 				jobRef.getJob_out_ts(),
 				jobRef.getJob_ref_dtl(),
+				jobRef.getJob_ref_status(),
 				jobRef.getJob_ref_id()
 		});
 		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		JobsReference jobRef_new = searchJobsReferenceByID(jobRef.getJob_ref_id());
+		
+		if(!jobRef_audit.getJob_ref_status().equals(jobRef.getJob_ref_status())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Jobs Status",
+				jobRef_audit.getJob_ref_status(),
+				jobRef.getJob_ref_status(),
+				"Updated",
+				jobRef_audit.getJob_name()+" : "+jobRef.getJob_ref_name()
+			});
+		}
+		
+		if(!jobRef_audit.getJob_ref_dtl().equals(jobRef.getJob_ref_dtl())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Jobs Description",
+				jobRef_audit.getJob_ref_dtl(),
+				jobRef.getJob_ref_dtl(),
+				"Updated",
+				jobRef_audit.getJob_name()+" : "+jobRef.getJob_ref_name()
+			});
+		}
+		
+		if(!jobRef_audit.getJob_out().equals(jobRef_new.getJob_out())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Date Out",
+				jobRef_audit.getJob_out(),
+				jobRef_new.getJob_out(),
+				"Updated",
+				jobRef_audit.getJob_name()+" : "+jobRef.getJob_ref_name()
+			});
+		}
+		
+		if(!jobRef_audit.getJob_in().equals(jobRef_new.getJob_in())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Date In",
+				jobRef_audit.getJob_in(),
+				jobRef_new.getJob_in(),
+				"Updated",
+				jobRef_audit.getJob_name()+" : "+jobRef.getJob_ref_name()
+			});
+		}
+		
+		if(jobRef_audit.getAmount() != jobRef.getAmount()){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Amount",
+				jobRef_audit.getAmount(),
+				jobRef.getAmount(),
+				"Updated",
+				jobRef_audit.getJob_name()+" : "+jobRef.getJob_ref_name()
+			});
+		}
+		
+		if(jobRef_audit.getProj_ref_id() != jobRef.getProj_ref_id()){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Item Name",
+				jobRef_audit.getItm_name(),
+				jobRef_new.getItm_name(),
+				"Updated",
+				jobRef_audit.getJob_name()+" : "+jobRef.getJob_ref_name()
+			});
+		}
+		
+		if(!jobRef_audit.getJob_ref_name().equals(jobRef.getJob_ref_name())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Jobs Name",
+				jobRef_audit.getJob_ref_name(),
+				jobRef.getJob_ref_name(),
+				"Updated",
+				jobRef_audit.getJob_name()+" : "+jobRef.getJob_ref_name()
+			});
+		}
 	}
 	
 	@Override
 	public void deleteJob(int id) {
+		
+		Jobs job_audit = searchJobsByID(id);
+		
 		String sql = "DELETE from jobs where job_id="+id;
 		this.getJdbcTemplate().update(sql);
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				id,
+				"Jobs",
+				user.getUserModel().getUsr_name(),
+				"Deleted all Jobs on Job's Projects name="+job_audit.getJob_name()+", customer="+job_audit.getCus_name(),
+				job_audit.getJob_name()
+		});
 	}
 	
 	@Override
 	public void deleteJobReference(int id) {
+		
+		JobsReference jobRef_audit = searchJobsReferenceByID(id);
+		
 		String sql = "DELETE from jobs_reference where job_ref_id="+id;
 		this.getJdbcTemplate().update(sql);
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				id,
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Deleted Jobs name="+jobRef_audit.getJob_ref_name()+"on Job's Project Name="+jobRef_audit.getJob_name(),
+				jobRef_audit.getJob_name()+" : "+jobRef_audit.getJob_ref_name()
+		});
 	}
 	
 	@Override

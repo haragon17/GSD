@@ -118,6 +118,14 @@ Ext.onReady(function() {
 	        					myText = myText.replace(/, price=/gi, "<br>Price = ");
 	        					myText = myText.replace(/, currency=/gi, "<br>Currency = ");
 	        					myText = myText.replace(/, item_desc=/gi, "<br>Description = ");
+	        					myText = myText.replace(/, job_dtl=/gi, "<br>Description = ");
+	        					myText = myText.replace(/, job_status=/gi, "<br>Status = ");
+	        					myText = myText.replace(/, dept=/gi, "<br>Department = ");
+	        					myText = myText.replace(/, Item name=/gi, "<br>Item Name = ");
+	        					myText = myText.replace(/, amount=/gi, "<br>Amount = ");
+	        					myText = myText.replace(/, job_in=/gi, "<br>Date in = ");
+	        					myText = myText.replace(/, job_out=/gi, "<br>Date out = ");
+	        					myText = myText.replace(/, job_ref_dtl=/gi, "<br>Description = ");
 	        					myText = myText.replace(/Item List/gi, "Item");
 	        					myText = myText.replace('Created row on ', "");
 	        					myText = myText.replace('Created ', "");

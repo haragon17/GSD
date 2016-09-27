@@ -28,6 +28,13 @@ Ext.override(Ext.chart.axis.Radial, {
 
 Ext.onReady(function() {
 
+	Ext.Ajax.request({
+		url : 'searchJobsParam.htm?first=yes',
+		success : function(response, opts) {
+			store.jobs.loadPage(1);
+		}
+	});
+	
 	jobid = new Ext.form.Hidden({
 		name : 'jobid',
 		id : 'jobid'
@@ -773,6 +780,9 @@ Ext.define('jobRefModel', {
 	},{
 		name : 'itm_name',
 		type : 'string'
+	},{
+		name : 'job_ref_status',
+		type : 'string'
 	}
 	]
 });
@@ -780,7 +790,7 @@ Ext.define('jobRefModel', {
 store.jobsRef = Ext.create('Ext.data.JsonStore', {
 	model : 'jobRefModel',
 	id : 'jobRefStore',
-	pageSize : 13,
+	pageSize : 20,
 //	autoLoad : true,
 	proxy : {
 		type : 'ajax',
@@ -834,8 +844,8 @@ Ext.define('jobModel', {
 store.jobs = Ext.create('Ext.data.JsonStore', {
 	model : 'jobModel',
 	id : 'jobStore',
-	pageSize : 13,
-	autoLoad : true,
+	pageSize : 20,
+//	autoLoad : true,
 	proxy : {
 		type : 'ajax',
 		url : 'searchJobs.htm',
@@ -880,6 +890,19 @@ var jobStatus = Ext.create('Ext.data.Store', {
 	        {"name":"Sent"},
 	        {"name":"Checked"},
 	        {"name":"Billed"},
+	        {"name":"Hold"}     
+	]
+});
+
+var jobRefStatus = Ext.create('Ext.data.Store', {
+	fields: ['name'],
+	data : [
+	        {"name":"New"},
+	        {"name":"CC"},
+	        {"name":"CC2"},
+	        {"name":"CC3"},
+	        {"name":"Final"},
+	        {"name":"Sent"},
 	        {"name":"Hold"}     
 	]
 });
@@ -1126,12 +1149,12 @@ var gridRef = Ext.create('Ext.grid.Panel', {
 //				sortable : true,
 //				dataIndex : 'dept'
 //			},
-//			{
-//				text : "Status",
-//				flex : 1,
-//				sortable : true,
-//				dataIndex : 'job_status'
-//			},
+			{
+				text : "Status",
+				flex : 1,
+				sortable : true,
+				dataIndex : 'job_ref_status'
+			},
 			{
 				text : 'Print',
 				xtype : 'actioncolumn',
@@ -1143,16 +1166,18 @@ var gridRef = Ext.create('Ext.grid.Panel', {
 					handler : function(grid, rowIndex, colIndex) {
 						job_ref_id = grid.getStore().getAt(rowIndex).get('job_ref_id');
 						
-						Ext.Ajax.request({
-							url : 'printJobTicket.htm?job_ref_id='+job_ref_id,
-							success: function(response, opts){
-								
-							},
-							failure: function(response, opts){
-								var responseOject = Ext.util.JSON.decode(response.responseText);
-								Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
-							}
-						});
+						window.open('printJobTicket.htm?job_ref_id='+job_ref_id, '_blank');
+						
+//						Ext.Ajax.request({
+//							url : 'printJobTicket.htm?job_ref_id='+job_ref_id,
+//							success: function(response, opts){
+//								
+//							},
+//							failure: function(response, opts){
+//								var responseOject = Ext.util.JSON.decode(response.responseText);
+//								Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+//							}
+//						});
 					}
 				} ]
 			},
@@ -1173,6 +1198,7 @@ var gridRef = Ext.create('Ext.grid.Panel', {
 						job_in = grid.getStore().getAt(rowIndex).get('job_in');
 						job_out = grid.getStore().getAt(rowIndex).get('job_out');
 						proj_id = Ext.getCmp('projid').getValue();
+						job_ref_status = grid.getStore().getAt(rowIndex).get('job_ref_status');
 						
 						Ext.getCmp('eproj_ref_id').getStore().load({
 							url: 'showProjectsReference.htm?id='+proj_id
@@ -1185,6 +1211,7 @@ var gridRef = Ext.create('Ext.grid.Panel', {
 						Ext.getCmp('eamount').setValue(amount);
 						Ext.getCmp('ejob_in').setValue(job_in);
 						Ext.getCmp('ejob_out').setValue(job_out);
+						Ext.getCmp('ejob_ref_status').setValue(job_ref_status);
 						editJobRef.show();
 					}
 				} ]
@@ -1198,7 +1225,7 @@ var gridRef = Ext.create('Ext.grid.Panel', {
 				items : [ {
 					iconCls : 'icon-delete',
 					handler : function(grid, rowIndex, colIndex) {
-						job_id = grid.getStore().getAt(rowIndex).get('job_id');
+						job_ref_id = grid.getStore().getAt(rowIndex).get('job_ref_id');
 						Ext.getCmp('jobrefid').setValue(job_ref_id);
 						Ext.MessageBox.show({
 							title : 'Confirm',
@@ -1867,6 +1894,21 @@ addJobRef = new Ext.create('Ext.window.Window', {
     	    	id: 'ajob_ref_name',
     	    },
     	    {
+				xtype : 'combobox',
+				fieldLabel : 'Job Status <font color="red">*</font> ',
+				name : 'ajob_ref_status',
+				id : 'ajob_ref_status',
+				queryMode : 'local',
+				labelWidth : 120,
+				emptyText : 'Job Status',
+				allowBlank: false,
+				editable : false,
+				msgTarget: 'under',
+				store : jobRefStatus,
+				valueField : 'name',
+				displayField : 'name',
+			},
+    	    {
 				fieldLabel : 'Job in-out ',
 				name : 'ajob_date',
 				combineErrors: true,
@@ -2008,6 +2050,7 @@ addJobRef = new Ext.create('Ext.window.Window', {
             	id: 'apbtn',
                 handler: function(){
                	 var form = Ext.getCmp('addJobRefForm').getForm();
+               	 job_ref_name = Ext.getCmp('ajob_ref_name').getValue();
                	 if(form.isValid()){
        				 form.submit({
        				 url: 'createJobReference.htm?print=yes',
@@ -2015,6 +2058,19 @@ addJobRef = new Ext.create('Ext.window.Window', {
        				 waitMsg: 'Please wait...',
        				 standardSubmit: false,
                         success: function(form, action) {
+                        	Ext.Ajax.request({
+    	           				url : 'chkJobRefName.htm',
+    	           				params: {records : job_ref_name},
+    	           				success: function(response, opts){
+    	           					var responseOject = Ext.decode(response.responseText);
+    	           					job_ref_id = responseOject.records[0].job_ref_id;
+    	           					window.open('printJobTicket.htm?job_ref_id='+job_ref_id, '_blank');
+    	           				},
+    	           				failure: function(response, opts){
+    	           					var responseOject = Ext.util.JSON.decode(response.responseText);
+    	           					Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+    	           				}
+    	           			});	
                        	 Ext.MessageBox.show({
          						title: 'Information',
          						msg: 'Job Has Been Add!',
@@ -2133,6 +2189,20 @@ editJobRef = new Ext.create('Ext.window.Window', {
     	    	name: 'ejob_ref_name',
     	    	id: 'ejob_ref_name',
     	    },{
+				xtype : 'combobox',
+				fieldLabel : 'Job Status <font color="red">*</font> ',
+				name : 'ejob_ref_status',
+				id : 'ejob_ref_status',
+				queryMode : 'local',
+				labelWidth : 120,
+				emptyText : 'Job Status',
+				allowBlank: false,
+				editable : false,
+				msgTarget: 'under',
+				store : jobRefStatus,
+				valueField : 'name',
+				displayField : 'name',
+			},{
 				xtype: 'combobox',
 				fieldLabel : 'Item Name ',
 				name : 'eproj_ref_id',
