@@ -88,7 +88,7 @@ Ext.onReady(function() {
 		                        labelSeparator : '',
 		                        margin: '0 0 0 0',
 		                        msgTarget : 'side',
-		                        minValue : 0,
+//		                        minValue : 0,
 		                        width: 50,
 		                        listeners: {
 		                        	   "blur": function () {
@@ -112,7 +112,7 @@ Ext.onReady(function() {
 		                        id	: 'price_limit',
 		                        labelSeparator : '',
 		                        msgTarget : 'side',
-		                        minValue : 0,
+//		                        minValue : 0,
 		                        width: 50,
 		                        listeners: {
 		                        	"blur": function () {
@@ -1344,14 +1344,14 @@ addItem = new Ext.create('Ext.window.Window', {
     	    	xtype:'numberfield',
     	    	labelWidth: 120,
     	    	fieldLabel: 'Price ',
-    	    	minValue : 0,
+//    	    	minValue : 0,
     	    	msgTarget : 'under',
     	    	name: 'aprice',
     	    	id: 'aprice',
     	    	emptyText : 'Project Price',
     	    	listeners: {
     	            change: function(field, value) {
-    	                if(value == null || value <= 0){
+    	                if(value == null || value == 0){
     	                	Ext.getCmp('acurrency').clearInvalid();
     	                	Ext.getCmp('acurrency').allowBlank = true;
     	                }else{
@@ -1729,14 +1729,14 @@ addProject = new Ext.create('Ext.window.Window', {
     	    	xtype:'numberfield',
     	    	labelWidth: 120,
     	    	fieldLabel: 'Price ',
-    	    	minValue : 0,
+//    	    	minValue : 0,
     	    	msgTarget : 'under',
     	    	name: 'cprice',
     	    	id: 'cprice',
     	    	emptyText : 'Project Price',
     	    	listeners: {
     	            change: function(field, value) {
-    	                if(value == null || value <= 0){
+    	                if(value == null || value == 0){
     	                	Ext.getCmp('ccurrency').clearInvalid();
     	                	Ext.getCmp('ccurrency').allowBlank = true;
     	                }else{
@@ -1932,14 +1932,14 @@ editItem = new Ext.create('Ext.window.Window', {
     	    	xtype:'numberfield',
     	    	labelWidth: 120,
     	    	fieldLabel: 'Price ',
-    	    	minValue : 0,
+//    	    	minValue : 0,
     	    	msgTarget : 'under',
     	    	name: 'eprice',
     	    	id: 'eprice',
     	    	emptyText : 'Project Price',
     	    	listeners: {
     	            change: function(field, value) {
-    	                if(value == null || value <= 0){
+    	                if(value == null || value == 0){
     	                	Ext.getCmp('ecurrency').clearInvalid();
     	                	Ext.getCmp('ecurrency').allowBlank = true;
     	                }else{

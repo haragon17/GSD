@@ -1,8 +1,12 @@
 package com.gsd.dao.impl;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
@@ -11,6 +15,9 @@ import com.gsd.model.Jobs;
 import com.gsd.model.JobsReference;
 import com.gsd.security.UserDetailsApp;
 import com.gsd.security.UserLoginDetail;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 
@@ -72,6 +79,89 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				"LEFT JOIN item ON item.itm_id = proj_ref.itm_id\n"+
 				"WHERE job_id = "+id+"\n"+
 				"ORDER BY 1";
+		
+		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
+		return result;
+	}
+	
+	public List<Jobs> searchTodayJobs(Map<String, String> data){
+		String sql = "SELECT DISTINCT jobs.job_id, job_name, jobs.proj_id, proj_name, cus_name, cus_code, cus.cus_id, job_dtl, job_status, dept, job_ref_status, job_ref.job_out\tFROM jobs\n"+
+				"LEFT JOIN projects proj ON proj.proj_id = jobs.proj_id\n"+
+				"LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"+
+				"LEFT JOIN jobs_reference job_ref ON job_ref.job_id = jobs.job_id\n"+
+				"WHERE date (job_out) = current_date\n"+
+				"AND job_ref_status <> 'Sent'\n";
+				
+		if(data.get("job_name")==null || data.get("job_name").isEmpty()){
+		}else{
+			sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
+		}
+		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
+		}else{
+			sql += "AND cus.cus_id = "+data.get("cus_id")+"\n";
+		}
+		if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
+		}else{
+			sql += "AND jobs.proj_id = "+data.get("proj_id")+"\n";
+		}
+		if(data.get("dept")==null || data.get("dept").isEmpty()){
+		}else{
+			sql += "AND dept = '"+data.get("dept")+"'\n";
+		}
+		if(data.get("status")==null || data.get("status").isEmpty()){
+		}else{
+			sql += "AND job_status = '"+data.get("status")+"'\n";
+		}
+		
+		sql += "ORDER BY job_ref.job_out ASC";
+		
+		List<Jobs> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
+		return result;
+	}
+	
+	public List<JobsReference> searchTodayJobsReference(Map<String, String> data){
+		
+		String sql = "SELECT job_ref_id, job_ref_name, jobs.job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, itm_name\n"+
+				"FROM jobs_reference\n"+
+				"LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"+
+				"LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n"+
+				"LEFT JOIN jobs on jobs.job_id = jobs_reference.job_id\n"+
+				"WHERE date (job_out) = current_date\n"+
+				"AND job_ref_status <> 'Sent'\n";
+				
+		if(data.get("job_name")==null || data.get("job_name").isEmpty()){
+		}else{
+			sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
+		}
+		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
+		}else{
+			sql += "AND cus.cus_id = "+data.get("cus_id")+"\n";
+		}
+		if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
+		}else{
+			sql += "AND jobs.proj_id = "+data.get("proj_id")+"\n";
+		}
+		if(data.get("dept")==null || data.get("dept").isEmpty()){
+		}else{
+			sql += "AND dept = '"+data.get("dept")+"'\n";
+		}
+		if(data.get("status")==null || data.get("status").isEmpty()){
+		}else{
+			sql += "AND job_status = '"+data.get("status")+"'\n";
+		}
+		
+		sql += 	"ORDER BY\n"+
+				"CASE job_ref_status\n"+
+				"WHEN 'New' 	THEN 1\n"+
+				"WHEN 'CC' 		THEN 2\n"+
+				"WHEN 'CC2' 	THEN 3\n"+
+				"WHEN 'CC3' 	THEN 4\n"+
+				"WHEN 'Final' 	THEN 5\n"+
+				"WHEN 'Hold' 	THEN 6\n"+
+				"WHEN 'Sent' 	THEN 7\n"+
+				"ELSE 8\n"+
+				"END,"+
+				"jobs_reference.job_out ASC";
 		
 		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
 		return result;
@@ -454,7 +544,23 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 			});
 		}
 		
-		if(!jobRef_audit.getJob_out().equals(jobRef_new.getJob_out())){
+		if(jobRef_audit.getJob_out() == null){
+			if(jobRef_new.getJob_out() != null){
+				String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+				this.getJdbcTemplate().update(audit, new Object[]{
+					getLastAuditId(),
+					jobRef.getJob_ref_id(),
+					"Jobs Reference:"+jobRef_audit.getJob_id(),
+					user.getUserModel().getUsr_name(),
+					"Date Out",
+					jobRef_audit.getJob_out(),
+					jobRef_new.getJob_out(),
+					"Updated",
+					jobRef_audit.getJob_name()+" : "+jobRef.getJob_ref_name()
+				});
+			}
+		}
+		else if(!jobRef_audit.getJob_out().equals(jobRef_new.getJob_out())){
 			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
 				getLastAuditId(),
@@ -469,7 +575,23 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 			});
 		}
 		
-		if(!jobRef_audit.getJob_in().equals(jobRef_new.getJob_in())){
+		if(jobRef_audit.getJob_in() == null){
+			if(jobRef_new.getJob_in() != null){
+				String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+				this.getJdbcTemplate().update(audit, new Object[]{
+					getLastAuditId(),
+					jobRef.getJob_ref_id(),
+					"Jobs Reference:"+jobRef_audit.getJob_id(),
+					user.getUserModel().getUsr_name(),
+					"Date In",
+					jobRef_audit.getJob_in(),
+					jobRef_new.getJob_in(),
+					"Updated",
+					jobRef_audit.getJob_name()+" : "+jobRef.getJob_ref_name()
+				});
+			}
+		}
+		else if(!jobRef_audit.getJob_in().equals(jobRef_new.getJob_in())){
 			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
 				getLastAuditId(),
@@ -569,6 +691,238 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				jobRef_audit.getJob_name()+" : "+jobRef_audit.getJob_ref_name()
 		});
 	}
+	
+	@Override
+	public JobsReference getDataFromJson(Object data) {
+		// TODO Auto-generated method stub
+		JSONObject jsonObject = JSONObject.fromObject(data);
+		JobsReference jobsRef = (JobsReference) JSONObject.toBean(jsonObject, JobsReference.class);
+		return jobsRef;
+	}
+	
+	@Override
+	public List<JobsReference> getListDataFromJson(Object data) {
+		// TODO Auto-generated method stub
+		JSONArray jsonArray = JSONArray.fromObject(data);
+		List<JobsReference> jobsRefLs = (List<JobsReference>) JSONArray.toCollection(jsonArray,JobsReference.class);
+		return jobsRefLs;
+	}
+
+	@Override
+	public List<JobsReference> getListDataFromRequest(Object data) {
+		// TODO Auto-generated method stub
+		List<JobsReference> jobsRefLs;
+
+		//it is an array - have to cast to array object
+		if (data.toString().indexOf('[') > -1){
+
+			jobsRefLs = getListDataFromJson(data);
+
+		} else { //it is only one object - cast to object/bean
+
+			JobsReference jobsRef = getDataFromJson(data);
+
+			jobsRefLs = new ArrayList<JobsReference>();
+			jobsRefLs.add(jobsRef);
+
+		}
+
+		return jobsRefLs;
+	}
+	
+	@Override
+	public void updateJobReferenceBatch(List<JobsReference> jobRefLs){
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		List<JobsReference> jobRefLs_audit = new ArrayList<JobsReference>();
+		JobsReference jobRef = null;
+		
+		for(int x=0;x<jobRefLs.size();x++){
+			jobRef = searchJobsReferenceByID(jobRefLs.get(x).getJob_ref_id());
+			jobRefLs_audit.add(jobRef);
+		}
+		
+		try{
+			String sql = "UPDATE jobs_reference set "
+					+ "job_ref_name=?, "
+					+ "proj_ref_id=?, "
+					+ "amount=?, "
+					+ "job_in=?, "
+					+ "job_out=?, "
+					+ "job_ref_dtl=?, "
+					+ "job_ref_status=?, "
+					+ "update_date=now() "
+					+ "where job_ref_id=?";
+			
+			this.getJdbcTemplate().batchUpdate(sql,new BatchPreparedStatementSetter() {
+
+				@Override
+				public void setValues(PreparedStatement ps, int i) throws SQLException {
+					JobsReference jobRef = jobRefLs.get(i);
+					ps.setString(1, jobRef.getJob_ref_name());
+					ps.setInt(2, jobRef.getProj_ref_id());
+					ps.setFloat(3, jobRef.getAmount());
+					ps.setTimestamp(4, jobRef.getJob_in_ts());
+					ps.setTimestamp(5, jobRef.getJob_out_ts());
+					ps.setString(6, jobRef.getJob_ref_dtl());
+					ps.setString(7, jobRef.getJob_ref_status());
+					ps.setInt(8, jobRef.getJob_ref_id());
+				}
+				
+				@Override
+				public int getBatchSize() {
+					return jobRefLs.size();
+				}
+				
+			});
+			
+			for(int y=0;y<jobRefLs.size();y++){
+				JobsReference jobRef_new = searchJobsReferenceByID(jobRefLs.get(y).getJob_ref_id());
+				
+				if(!jobRefLs_audit.get(y).getJob_ref_status().equals(jobRef_new.getJob_ref_status())){
+					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					this.getJdbcTemplate().update(audit, new Object[]{
+						getLastAuditId(),
+						jobRef_new.getJob_ref_id(),
+						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
+						user.getUserModel().getUsr_name(),
+						"Jobs Status",
+						jobRefLs_audit.get(y).getJob_ref_status(),
+						jobRef_new.getJob_ref_status(),
+						"Updated",
+						jobRefLs_audit.get(y).getJob_name()+" : "+jobRef_new.getJob_ref_name()
+					});
+				}
+				
+				if(!jobRefLs_audit.get(y).getJob_ref_dtl().equals(jobRef_new.getJob_ref_dtl())){
+					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					this.getJdbcTemplate().update(audit, new Object[]{
+						getLastAuditId(),
+						jobRef_new.getJob_ref_id(),
+						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
+						user.getUserModel().getUsr_name(),
+						"Jobs Description",
+						jobRefLs_audit.get(y).getJob_ref_dtl(),
+						jobRef_new.getJob_ref_dtl(),
+						"Updated",
+						jobRefLs_audit.get(y).getJob_name()+" : "+jobRef_new.getJob_ref_name()
+					});
+				}
+				
+				if(jobRefLs_audit.get(y).getJob_out() == null){
+					if(jobRef_new.getJob_out() != null){
+						String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+						this.getJdbcTemplate().update(audit, new Object[]{
+							getLastAuditId(),
+							jobRef_new.getJob_ref_id(),
+							"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
+							user.getUserModel().getUsr_name(),
+							"Date Out",
+							jobRefLs_audit.get(y).getJob_out(),
+							jobRef_new.getJob_out(),
+							"Updated",
+							jobRefLs_audit.get(y).getJob_name()+" : "+jobRef_new.getJob_ref_name()
+						});
+					}
+				}
+				else if(!jobRefLs_audit.get(y).getJob_out().equals(jobRef_new.getJob_out())){
+					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					this.getJdbcTemplate().update(audit, new Object[]{
+						getLastAuditId(),
+						jobRef_new.getJob_ref_id(),
+						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
+						user.getUserModel().getUsr_name(),
+						"Date Out",
+						jobRefLs_audit.get(y).getJob_out(),
+						jobRef_new.getJob_out(),
+						"Updated",
+						jobRefLs_audit.get(y).getJob_name()+" : "+jobRef_new.getJob_ref_name()
+					});
+				}
+				
+				if(jobRefLs_audit.get(y).getJob_in() == null){
+					if(jobRef_new.getJob_in() != null){
+						String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+						this.getJdbcTemplate().update(audit, new Object[]{
+							getLastAuditId(),
+							jobRef_new.getJob_ref_id(),
+							"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
+							user.getUserModel().getUsr_name(),
+							"Date In",
+							jobRefLs_audit.get(y).getJob_in(),
+							jobRef_new.getJob_in(),
+							"Updated",
+							jobRefLs_audit.get(y).getJob_name()+" : "+jobRef_new.getJob_ref_name()
+						});
+					}
+				}
+				else if(!jobRefLs_audit.get(y).getJob_in().equals(jobRef_new.getJob_in())){
+					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					this.getJdbcTemplate().update(audit, new Object[]{
+						getLastAuditId(),
+						jobRef_new.getJob_ref_id(),
+						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
+						user.getUserModel().getUsr_name(),
+						"Date In",
+						jobRefLs_audit.get(y).getJob_in(),
+						jobRef_new.getJob_in(),
+						"Updated",
+						jobRefLs_audit.get(y).getJob_name()+" : "+jobRef_new.getJob_ref_name()
+					});
+				}
+				
+				if(jobRefLs_audit.get(y).getAmount() != jobRef_new.getAmount()){
+					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					this.getJdbcTemplate().update(audit, new Object[]{
+						getLastAuditId(),
+						jobRef_new.getJob_ref_id(),
+						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
+						user.getUserModel().getUsr_name(),
+						"Amount",
+						jobRefLs_audit.get(y).getAmount(),
+						jobRef_new.getAmount(),
+						"Updated",
+						jobRefLs_audit.get(y).getJob_name()+" : "+jobRef_new.getJob_ref_name()
+					});
+				}
+				
+				if(jobRefLs_audit.get(y).getProj_ref_id() != jobRef_new.getProj_ref_id()){
+					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					this.getJdbcTemplate().update(audit, new Object[]{
+						getLastAuditId(),
+						jobRef_new.getJob_ref_id(),
+						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
+						user.getUserModel().getUsr_name(),
+						"Item Name",
+						jobRefLs_audit.get(y).getItm_name(),
+						jobRef_new.getItm_name(),
+						"Updated",
+						jobRefLs_audit.get(y).getJob_name()+" : "+jobRef_new.getJob_ref_name()
+					});
+				}
+				
+				if(!jobRefLs_audit.get(y).getJob_ref_name().equals(jobRef_new.getJob_ref_name())){
+					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					this.getJdbcTemplate().update(audit, new Object[]{
+						getLastAuditId(),
+						jobRef_new.getJob_ref_id(),
+						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
+						user.getUserModel().getUsr_name(),
+						"Jobs Name",
+						jobRefLs_audit.get(y).getJob_ref_name(),
+						jobRef_new.getJob_ref_name(),
+						"Updated",
+						jobRefLs_audit.get(y).getJob_name()+" : "+jobRef_new.getJob_ref_name()
+					});
+				}
+			}
+			
+		}catch(Exception e){
+			logger.error(e.getMessage());
+		}
+		
+	}
+	
 	
 	@Override
 	public List<Jobs> radarItem(Map<String, String> data) {
@@ -905,6 +1259,13 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				
 		List<Jobs> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
 		return result;
+	}
+
+	@Override
+	public Jobs findByJobName(String name) {
+		
+		String sql = "select * from jobs where lower(job_name)=lower('"+name+"')";
+		return getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
 	}
 
 }

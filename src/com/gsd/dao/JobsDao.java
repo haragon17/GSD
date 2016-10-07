@@ -16,9 +16,15 @@ public interface JobsDao {
 	
 	public Jobs searchJobsByID(int id);
 	
-	public List<JobsReference> getItemNameFromJobID(int id);
+	public Jobs findByJobName(String name);
 	
 	public List<Jobs> searchJobsReference_old(Map<String, String> data);
+	
+	public List<Jobs> searchTodayJobs(Map<String, String> data);
+	
+	public List<JobsReference> searchTodayJobsReference(Map<String, String> data);
+	
+	public List<JobsReference> getItemNameFromJobID(int id);
 	
 	public List<JobsReference> searchJobsReference(int id, String sort);
 	
@@ -37,6 +43,14 @@ public interface JobsDao {
 	public void updateJobReference(JobsReference jobRef);
 	
 	public void deleteJobReference(int id);
+	
+	public JobsReference getDataFromJson(Object data);
+	
+	public void updateJobReferenceBatch(List<JobsReference> jobRefLs);
+	
+	public List<JobsReference> getListDataFromJson(Object data);
+	
+	public List<JobsReference> getListDataFromRequest(Object data);
 	
 	public List<Jobs> radarItem(Map<String, String> data);
 	

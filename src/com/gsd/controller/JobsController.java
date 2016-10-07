@@ -101,6 +101,25 @@ public class JobsController {
 		}
 	}
 	
+	@RequestMapping(value = "/chkJobName")
+	public ModelAndView chkJobName(@RequestParam("records") String name, HttpServletRequest request,
+			HttpServletResponse response){
+		
+		List<Jobs> jobLs = new ArrayList<Jobs>();
+		Jobs jobNull = new Jobs();
+		
+		try{
+			jobLs.add(jobsDao.findByJobName(name));
+		} catch (Exception e){
+			jobLs.add(jobNull);
+		}
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", jobLs);
+
+		return new ModelAndView("jsonView", jobj);
+	}
+	
 	@RequestMapping(value = "/printJobTicket")
 	public void printJobTicket(HttpServletRequest request, HttpServletResponse response) throws IOException{
 	
@@ -163,6 +182,7 @@ public class JobsController {
 //		session.setAttribute("end", request.getParameter("sbtw_end"));
 		session.setAttribute("status", request.getParameter("sjob_status"));
 		session.setAttribute("first", request.getParameter("first"));
+		session.setAttribute("job_id", request.getParameter("job_id"));
 	}
 	
 	@RequestMapping(value="/searchJobs")
@@ -208,8 +228,9 @@ public class JobsController {
 	
 	@RequestMapping(value="/searchJobsReference")
 	public ModelAndView searchJobsReference(HttpServletRequest request, HttpServletResponse response){
-	
-		int job_id = Integer.parseInt(request.getParameter("id"));
+		
+		HttpSession session = request.getSession();
+		int job_id = Integer.parseInt((String) session.getAttribute("job_id"));
 		
 		List<JobsReference> jobRef = null;
 		List<JobsReference> jobRefLs = new ArrayList<JobsReference>();
@@ -229,12 +250,77 @@ public class JobsController {
 		}
 		
 		JSONObject jobj = new JSONObject();
-		jobj.put("records", jobRef);
+		jobj.put("records", jobRefLs);
 		jobj.put("total", jobRef.size());
 
 		return new ModelAndView("jsonView", jobj);
 	}
+	
+	@RequestMapping(value="/searchTodayJobs")
+	public ModelAndView searchTodayJobs(HttpServletRequest request, HttpServletResponse response){
 		
+		HttpSession session = request.getSession();
+		List<Jobs> job = null;
+		List<Jobs> jobLs = new ArrayList<Jobs>();
+		Map<String, String> map = new HashMap<String, String>();
+		
+		map.put("cus_id", (String)session.getAttribute("cus_id"));
+		map.put("proj_id", (String)session.getAttribute("proj_id"));
+		map.put("job_name", (String)session.getAttribute("job_name"));
+		map.put("dept", (String)session.getAttribute("dept"));
+		map.put("status", (String)session.getAttribute("status"));
+	
+		int start = Integer.parseInt(request.getParameter("start"));
+		int limit = Integer.parseInt(request.getParameter("limit"));
+		
+		try{
+			job = jobsDao.searchTodayJobs(map);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		
+		if(limit + start > job.size()) {
+			limit = job.size();
+		} else {
+			limit += start;
+		}
+		for (int i = start; i < limit; i++) {
+			jobLs.add(job.get(i));
+		}
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", job);
+		jobj.put("total", job.size());
+		
+		return new ModelAndView("jsonView", jobj);
+	}
+	
+	@RequestMapping(value="/searchTodayJobsReference")
+	public ModelAndView searchTodayJobsReference(HttpServletRequest request, HttpServletResponse response){
+		
+		HttpSession session = request.getSession();
+		List<JobsReference> jobRef = null;
+		Map<String, String> map = new HashMap<String, String>();
+		
+		map.put("cus_id", (String)session.getAttribute("cus_id"));
+		map.put("proj_id", (String)session.getAttribute("proj_id"));
+		map.put("job_name", (String)session.getAttribute("job_name"));
+		map.put("dept", (String)session.getAttribute("dept"));
+		map.put("status", (String)session.getAttribute("status"));
+	
+		try{
+			jobRef = jobsDao.searchTodayJobsReference(map);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", jobRef);
+		jobj.put("total", jobRef.size());
+		
+		return new ModelAndView("jsonView", jobj);
+	}
+	
 //	@RequestMapping(value="/searchJobsReference")
 //	public ModelAndView searchJobsReference(HttpServletRequest request, HttpServletResponse response){
 //		
@@ -355,7 +441,7 @@ public class JobsController {
 		String job_ref_name = request.getParameter("ajob_ref_name");
 		String amount = request.getParameter("aamount");
 		String job_in = request.getParameter("ajob_in");
-		String job_out = request.getParameter("ajob_out");
+		String job_out = request.getParameter("ajob_out")+" "+request.getParameter("atime");
 		String job_dtl = request.getParameter("ajob_ref_dtl");
 		String job_ref_status = request.getParameter("ajob_ref_status");
 		
@@ -443,7 +529,7 @@ public class JobsController {
 		String job_ref_name = request.getParameter("ejob_ref_name");
 		String amount = request.getParameter("eamount");
 		String job_in = request.getParameter("ejob_in");
-		String job_out = request.getParameter("ejob_out");
+		String job_out = request.getParameter("ejob_out")+" "+request.getParameter("etime");
 		String job_dtl = request.getParameter("ejob_ref_dtl");
 		String job_ref_status = request.getParameter("ejob_ref_status");
 		
@@ -498,6 +584,61 @@ public class JobsController {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("success", true);
 		return new ModelAndView("jsonView", model);
+	}
+	
+	@RequestMapping(value="/updateJobReferenceBatch")
+	public ModelAndView updateJobReferenceBatch(HttpServletRequest request, HttpServletResponse response){
+		
+//		try{
+			Object data = request.getParameter("data");
+			List<JobsReference> jobRefLs = jobsDao.getListDataFromRequest(data);
+			
+//			System.out.println("data = "+data);
+//			System.out.println("model.size() = "+jobRefLs.size());
+			
+			if(jobRefLs.size() != 0){
+				for(int i=0;i<jobRefLs.size();i++){
+					
+					Timestamp job_in_ts = null;
+					Timestamp job_out_ts = null;
+					
+						try{
+							String job_in = jobRefLs.get(i).getJob_in();
+							SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+						    Date parsedJobIn = dateFormat.parse(job_in);
+						    job_in_ts = new java.sql.Timestamp(parsedJobIn.getTime());
+						}catch(Exception e){
+							logger.error(e.getMessage());
+						}
+					
+						try{
+							String job_out = jobRefLs.get(i).getJob_out();
+							SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+							Date parsedJobOut = dateFormat.parse(job_out);
+							job_out_ts = new java.sql.Timestamp(parsedJobOut.getTime());
+						}catch(Exception e){
+							logger.error(e.getMessage());
+						}
+
+					jobRefLs.get(i).setJob_in_ts(job_in_ts);
+					jobRefLs.get(i).setJob_out_ts(job_out_ts);
+				}
+				jobsDao.updateJobReferenceBatch(jobRefLs);
+			}
+			
+			Map<String, Object> model = new HashMap<String, Object>();
+			model.put("success", true);
+			return new ModelAndView("jsonView", model);
+			
+//		}catch(Exception e){
+//			logger.error(e.getMessage());
+//			Map<String,Object> modelMap = new HashMap<String,Object>();
+//			modelMap.put("message", e.getMessage());
+//			modelMap.put("success", false);
+//
+//			return new ModelAndView("jsonView",modelMap);
+//		}
+		
 	}
 	
 	@RequestMapping(value="/deleteJob")

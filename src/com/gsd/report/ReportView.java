@@ -53,7 +53,7 @@ public class ReportView extends AbstractJExcelView{
         
         //Header
         Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-        ws.addCell(new Label(0,0,job.getCus_name(),ws.getWritableCell(0, 0).getCellFormat()));
+        ws.addCell(new Label(0,0,job.getCus_name()+"("+job.getProj_name()+") : " +fileName,ws.getWritableCell(0, 0).getCellFormat()));
         for(int x=0;x<item.size();x++){
         	int y=x+2;
         	ws.addCell(new Label(y,1,item.get(x).getItm_name(),ws.getWritableCell(y, 1).getCellFormat()));

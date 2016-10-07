@@ -55,15 +55,15 @@ Ext.onReady(function(){
 			});
 		    
 		    if(usr_type == 0){
-		    	admin_menu = {text: 'Member Management',
-		    	    handler : function(){
-			    	    window.location = 'memberManagement.htm';
-			    	    }
+		    	admin_menu = {
+		    			text: 'Member Management', 
+		    			href: 'memberManagement.htm',
+		  			  	hrefTarget: '_self'
 		    	};
-		    	admin_menu2 = {text: 'History State',
-			    		handler : function(){
-			    			window.location = 'auditLogging.htm';
-			    		}
+		    	admin_menu2 = {
+		    			text: 'History State', 
+		    			href: 'auditLogging.htm',
+		    			hrefTarget: '_self'
 			    	};
 		    }else{
 		    	admin_menu = "";
@@ -118,30 +118,45 @@ Ext.onReady(function(){
 //    		window.location = 'categoryManagement.htm';
 //          		}
 //          },
-		  {text: 'Projects',
-        	handler : function(){
-    		window.location = 'projects.htm';
-          		}
+		  {
+			  text: 'Projects',
+			  href: 'projects.htm',
+			  hrefTarget: '_self'
+//        	handler : function(){
+//    		window.location = 'projects.htm';
+//          		}
           },
-          {text: 'Jobs',
-          	handler : function(){
-      		window.location = 'jobs.htm';
-            		}
+          {
+        	  text: 'Jobs',
+        	  href: 'jobs.htm',
+			  hrefTarget: '_self'
+//          	handler : function(){
+//      		window.location = 'jobs.htm';
+//            		}
           },
-          {text: 'Customer Management',
-          	handler : function(){
-      		window.location = 'customer.htm';
-            	}
+          {
+        	  text: 'Customer Management',
+        	  href: 'customer.htm',
+			  hrefTarget: '_self'
+//          	handler : function(){
+//      		window.location = 'customer.htm';
+//            	}
           },
-          {text: 'Item Management',
-            	handler : function(){
-        		window.location = 'itemManagement.htm';
-              	}
+          {
+        	  text: 'Item Management',
+        	  href: 'itemManagement.htm',
+			  hrefTarget: '_self'
+//            	handler : function(){
+//        		window.location = 'itemManagement.htm';
+//              	}
 	      },
-	      {text: 'Key Account Management',
-	        	handler : function(){
-	        	window.location = 'keyAccountManagerment.htm'
-	        	}
+	      {
+	    	  text: 'Key Account Management',
+	    	  href: 'keyAccountManagerment.htm',
+			  hrefTarget: '_self'
+//	        	handler : function(){
+//	        	window.location = 'keyAccountManagerment.htm'
+//	        	}
 	      },
 	      admin_menu,admin_menu2,
           {

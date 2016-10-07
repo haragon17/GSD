@@ -51,46 +51,50 @@ public class PrintJobTicket_iText {
         g2d.drawLine(520, 40, 520, 100);
         g2d.drawLine(45, 100, 520, 100);
         
-        //Job name & Customer
+        //Job name
         g2d.drawLine(45, 110, 520, 110);
         g2d.drawLine(45, 135, 520, 135);
         g2d.drawLine(45, 110, 45, 135);
         g2d.drawLine(520, 110, 520, 135);
-        g2d.drawLine(282, 110, 282, 135);
+
+        //Customer
+        g2d.drawLine(45, 145, 520, 145);
+        g2d.drawLine(45, 170, 520, 170);
+        g2d.drawLine(45, 145, 45, 170);
+        g2d.drawLine(520, 145, 520, 170);
         
         //Deadline
-        g2d.drawLine(45, 145, 520, 145);
-        g2d.drawLine(520, 145, 520, 180);
         g2d.drawLine(45, 180, 520, 180);
-        g2d.drawLine(45, 145, 45, 180);
+        g2d.drawLine(520, 180, 520, 215);
+        g2d.drawLine(45, 215, 520, 215);
+        g2d.drawLine(45, 180, 45, 215);
         
         //Item & Qty
-        g2d.drawLine(45, 190, 520, 190);
-        g2d.drawLine(45, 215, 520, 215);
-        g2d.drawLine(45, 190, 45, 215);
-        g2d.drawLine(520, 190, 520, 215);
-        g2d.drawLine(400, 190, 400, 215);
+        g2d.drawLine(45, 225, 520, 225);
+        g2d.drawLine(45, 250, 520, 250);
+        g2d.drawLine(45, 225, 45, 250);
+        g2d.drawLine(520, 225, 520, 250);
+        g2d.drawLine(400, 225, 400, 250);
         
         //Remark
-        g2d.drawLine(45, 230, 520, 230);
-        g2d.drawLine(45, 400, 520, 400);
-        g2d.drawLine(45, 230, 45, 400);
-        g2d.drawLine(520, 230, 520, 400);
+        g2d.drawLine(45, 265, 520, 265);
+        g2d.drawLine(45, 435, 520, 435);
+        g2d.drawLine(45, 265, 45, 435);
+        g2d.drawLine(520, 265, 520, 435);
         
         //Status
-        g2d.drawLine(45, 415, 520, 415);
-        g2d.drawLine(45, 440, 520, 440);
-        g2d.drawLine(45, 465, 520, 465);
-        g2d.drawLine(45, 490, 520, 490);
-        g2d.drawLine(45, 515, 520, 515);
-        g2d.drawLine(45, 540, 520, 540);
-        g2d.drawLine(45, 415, 45, 540);
-        g2d.drawLine(520, 415, 520, 540);
-        g2d.drawLine(150, 415, 150, 540);
-        g2d.drawLine(335, 415, 335, 540);
+        g2d.drawLine(45, 450, 520, 450);
+        g2d.drawLine(45, 475, 520, 475);
+        g2d.drawLine(45, 500, 520, 500);
+        g2d.drawLine(45, 525, 520, 525);
+        g2d.drawLine(45, 550, 520, 550);
+        g2d.drawLine(45, 575, 520, 575);
+        g2d.drawLine(45, 450, 45, 575);
+        g2d.drawLine(520, 450, 520, 575);
+        g2d.drawLine(150, 450, 150, 575);
+        g2d.drawLine(335, 450, 335, 575);
         
         //Note
-        g2d.drawLine(45, 590, 520, 590);
         g2d.drawLine(45, 615, 520, 615);
         g2d.drawLine(45, 640, 520, 640);
         g2d.drawLine(45, 665, 520, 665);
@@ -112,13 +116,15 @@ public class PrintJobTicket_iText {
         g2d.drawString("GSD JobTicket", 210, 65);
         
         g2d.setFont(f1);
+        Color c = new Color(240, 10, 10);
+        g2d.setColor(c);
         String mydate = job.getJob_out();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		try {
 			String dateFormat2 = new SimpleDateFormat("E, MMM d, yyyy").format(dateFormat.parse(mydate));
 			String timeFomat = new SimpleDateFormat("HH:mm").format(dateFormat.parse(mydate));
-			g2d.drawString(dateFormat2, 95, 170);
-			g2d.drawString(timeFomat, 450, 170);
+			g2d.drawString(dateFormat2, 95, 205);
+			g2d.drawString(timeFomat, 450, 205);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -129,21 +135,23 @@ public class PrintJobTicket_iText {
         g2d.drawString("Project Number:", 287, 85);
         
         g2d.drawString("Job Name:", 50, 120);
-        g2d.drawString("Customer:", 287, 120);
         
-        g2d.drawString("Deadline:", 50, 155);
+        g2d.drawString("Customer:", 50, 155);
         
-        g2d.drawString("Item:", 50, 200);
-        g2d.drawString("Qty:", 405, 200);
+        g2d.drawString("Deadline:", 50, 190);
         
-        g2d.drawString("Remark:", 50, 240);
+        g2d.drawString("Item:", 50, 235);
+        g2d.drawString("Qty:", 405, 235);
+        
+        g2d.drawString("Remark:", 50, 275);
         
         g2d.setFont(f3);
-        g2d.drawString("PREPARE", 55, 432);
-        g2d.drawString("MASKING", 55, 457);
-        g2d.drawString("RETOUCH", 55, 482);
-        g2d.drawString("PAGING", 55, 507);
-        g2d.drawString("QC", 55, 532);
+        g2d.setColor(Color.darkGray);
+        g2d.drawString("PREPARE", 55, 467);
+        g2d.drawString("MASKING", 55, 492);
+        g2d.drawString("RETOUCH", 55, 517);
+        g2d.drawString("PAGING", 55, 542);
+        g2d.drawString("QC", 55, 567);
         
         g2d.setFont(f4);
         g2d.setColor(Color.BLACK);
@@ -151,15 +159,15 @@ public class PrintJobTicket_iText {
         g2d.drawString(((job.getJob_name()==null)||(job.getJob_name().isEmpty())? "-" : job.getJob_name()), 350, 90);
 
         g2d.drawString(job.getJob_ref_name(), 95, 125);
-        g2d.drawString(job.getCus_name(), 330, 125);
+        g2d.drawString(job.getCus_name(), 95, 160);
         
         DecimalFormat df = new DecimalFormat("###.##");
-        g2d.drawString(((job.getItm_name()==null)||(job.getItm_name().isEmpty())? "-" : job.getItm_name()), 75, 205);
-        g2d.drawString(df.format(job.getAmount()), 460, 205);
+        g2d.drawString(((job.getItm_name()==null)||(job.getItm_name().isEmpty())? "-" : job.getItm_name()), 75, 240);
+        g2d.drawString(df.format(job.getAmount()), 460, 240);
         
         String str = ((job.getJob_ref_dtl()==null)||(job.getJob_ref_dtl().isEmpty())? "-" : job.getJob_ref_dtl());
         int x = 90;
-        int y = 234;
+        int y = 269;
         for (String line : str.split("\n")){
         	if(line.length() <= 80){
         		g2d.drawString(line, x, y += g2d.getFontMetrics().getHeight());

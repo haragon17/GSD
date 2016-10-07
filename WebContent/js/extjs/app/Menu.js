@@ -67,25 +67,15 @@ Ext.onReady(function(){
     	renderTo: 'menu2',
     	margin: '-1 0 0 0',
         tbar:[
-//          {text: 'Workings',
-//        	handler : function(){
-//    		window.location = 'workings.htm';
-//          	}
-//          },
-//          {text: 'Report',
-//          	handler : function(){
-//      		window.location = 'report.htm';
-//            	}
-//            },
-          {text: 'Projects',
-            handler : function(){
-        	window.location = 'projects.htm';
-              	}
+          {
+			  text: 'Projects',
+			  href: 'projects.htm',
+			  hrefTarget: '_self'
           },
-          {text: 'Jobs',
-            handler : function(){
-          	window.location = 'jobs.htm';
-                }
+          {
+        	  text: 'Jobs',
+        	  href: 'jobs.htm',
+			  hrefTarget: '_self'
           },
           {
         	xtype: 'tbfill'  

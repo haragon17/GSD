@@ -45,6 +45,10 @@ img {
 	background-image: url(../../images/icons/fam/delete.png) !important;
 }
 
+.icon-save {
+	background-image: url(../../images/icons/icon-save.png) !important;
+}
+
 .table-add {
 	background-image: url(../../images/icons/fam/table_add.png) !important;
 }
@@ -83,6 +87,50 @@ img {
 
 .chart-pie {
 	background-image: url(../../images/icons/fam/chart_pie.png) !important;
+}
+
+.process-row .x-grid-cell { 
+    background-color: #FFFBD8 !important; 
+    color: black; 
+} 
+ 
+.hold-row .x-grid-cell { 
+    background-color: #EFD1C9 !important; 
+    color: black; 
+}
+
+.check-row .x-grid-cell { 
+    background-color: #E4E0F1 !important; 
+    color: black; 
+} 
+ 
+.bill-row .x-grid-cell { 
+    background-color: #EAF1FA !important; 
+    color: black; 
+}
+
+.sent-row .x-grid-cell { 
+    background-color: #DBE9D4 !important; 
+    color: black; 
+}
+
+a.ux-linkbutton {
+    background-image: none;
+    border: 0px none;
+    margin-top: 1px;
+}
+
+a.ux-linkbutton.x-btn-default-small-focus {
+    background-color: inherit;
+}
+
+a.ux-linkbutton * {
+    font-size: inherit !important;
+}
+
+a.ux-linkbutton:hover {
+    text-decoration: underline;
+    background-color: inherit;
 }
 
 .x-border-box, .x-border-box * {
