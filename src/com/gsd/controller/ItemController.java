@@ -139,6 +139,8 @@ public class ItemController {
 		itm.setItm_name(itm_name);
 
 		if (!itm_desc.equals("Description")) {
+			itm_desc = itm_desc.replace("\u2028", "\n");
+			itm_desc = itm_desc.replace("\u2029", "\n");
 			itm.setItm_desc(itm_desc);
 		} else {
 			itm.setItm_desc("");
@@ -166,6 +168,8 @@ public class ItemController {
 		itm.setCretd_usr(user.getUserModel().getUsr_id());
 
 		if (!itm_desc.equals("Description")) {
+			itm_desc = itm_desc.replace("\u2028", "\n");
+			itm_desc = itm_desc.replace("\u2029", "\n");
 			itm.setItm_desc(itm_desc);
 		} else {
 			itm.setItm_desc("");

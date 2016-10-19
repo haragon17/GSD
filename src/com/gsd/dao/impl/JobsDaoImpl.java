@@ -23,11 +23,13 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 
 	@Override
 	public List<Jobs> searchJobs(Map<String, String> data) {
-		String sql = "SELECT job_id, job_name, jobs.proj_id, proj_name, cus_name, cus_code, cus.cus_id, job_dtl, job_status, dept\n"
+		String sql = "SELECT jobs.job_id, job_name, jobs.proj_id, proj_name, cus_name, cus_code, cus.cus_id, job_dtl, job_status, dept,\n"
+				+ "CASE WHEN x.total_amount IS NULL THEN 0 ELSE x.total_amount END\n"
 				+ "FROM jobs\n"
 				+ "LEFT JOIN projects proj ON proj.proj_id = jobs.proj_id\n"
 				+ "LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"
-				+ "WHERE job_id != 0\n";
+				+ "LEFT JOIN (select job_id, sum(amount) as total_amount from jobs_reference group by job_id) x on x.job_id = jobs.job_id\n"
+				+ "WHERE jobs.job_id != 0\n";
 		if(data.get("first")==null || data.get("first").isEmpty()){
 		}else{
 			sql += "AND job_status != 'Billed'\n";
@@ -52,7 +54,16 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}else{
 			sql += "AND job_status = '"+data.get("status")+"'\n";
 		}
-		sql += "ORDER BY jobs.cretd_date DESC";	
+		sql += "ORDER BY\n"+
+				"CASE job_status\n"+
+				"WHEN 'Processing' 	THEN 1\n"+
+				"WHEN 'Sent' 		THEN 2\n"+
+				"WHEN 'Checked'		THEN 3\n"+
+				"WHEN 'Hold' 		THEN 4\n"+
+				"WHEN 'Billed' 		THEN 5\n"+
+				"ELSE 6\n"+
+				"END,"+
+				"jobs.cretd_date DESC";	
 		
 //		System.out.println(sql);
 		
@@ -121,13 +132,18 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	
 	public List<JobsReference> searchTodayJobsReference(Map<String, String> data){
 		
-		String sql = "SELECT job_ref_id, job_ref_name, jobs.job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, itm_name\n"+
+		String sql = "SELECT job_ref_id, job_ref_name, jobs.job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, itm_name, job_name, proj_name, cus_name, dept, jobs.proj_id\n"+
 				"FROM jobs_reference\n"+
 				"LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"+
 				"LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n"+
 				"LEFT JOIN jobs on jobs.job_id = jobs_reference.job_id\n"+
-				"WHERE date (job_out) = current_date\n"+
-				"AND job_ref_status <> 'Sent'\n";
+				"LEFT JOIN projects proj on proj.proj_id = jobs.proj_id\n"+
+				"LEFT JOIN customer cus on cus.cus_id = proj.cus_id\n"+
+				"WHERE job_ref_status <> 'Sent'\n"+
+				"AND date (job_out) BETWEEN current_date AND (CASE\n"+
+				"WHEN extract(dow from job_out) = 6 THEN (current_date+2)\n"+
+				"WHEN extract(dow from job_out) = 7 THEN (current_date+1)\n"+
+				"ELSE current_date END)";
 				
 		if(data.get("job_name")==null || data.get("job_name").isEmpty()){
 		}else{
@@ -280,11 +296,11 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		return result;
 	}
 	
-	public List<JobsReference> searchJobReferenceByName(String name){
+	public JobsReference searchJobReferenceByName(String name){
 		
 		String sql = "SELECT * FROM jobs_reference WHERE job_ref_name='"+name+"' ORDER BY cretd_date DESC";
 		
-		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
+		JobsReference result = getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
 		return result;
 	}
 	

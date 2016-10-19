@@ -207,6 +207,8 @@ public class CustomerController {
 		cus.setRegist_date_ts(regist_date_ts);
 		
 		if(!address.equals("Address")){
+			address = address.replace("\u2028", "\n");
+			address = address.replace("\u2029", "\n");
 			cus.setAddress(address);
 		}else{
 			cus.setAddress("");
@@ -237,6 +239,8 @@ public class CustomerController {
 			cus.setPayment("");
 		}
 		if(!transfer_dtl.equals("Transfer Detail")){
+			transfer_dtl = transfer_dtl.replace("\u2028", "\n");
+			transfer_dtl = transfer_dtl.replace("\u2029", "\n");
 			cus.setTransfer_dtl(transfer_dtl);
 		}else{
 			cus.setTransfer_dtl("");
@@ -287,6 +291,8 @@ public class CustomerController {
 			}
 			
 			if(!address.equals("Address")){
+				address = address.replace("\u2028", "\n");
+				address = address.replace("\u2029", "\n");
 				cus.setAddress(address);
 			}else{
 				cus.setAddress("");
@@ -317,6 +323,8 @@ public class CustomerController {
 				cus.setPayment("");
 			}
 			if(!transfer_dtl.equals("Transfer Detail")){
+				transfer_dtl = transfer_dtl.replace("\u2028", "\n");
+				transfer_dtl = transfer_dtl.replace("\u2029", "\n");
 				cus.setTransfer_dtl(transfer_dtl);
 			}else{
 				cus.setTransfer_dtl("");

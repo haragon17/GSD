@@ -30,7 +30,7 @@ public interface JobsDao {
 	
 	public JobsReference searchJobsReferenceByID(int id);
 	
-	public List<JobsReference> searchJobReferenceByName(String name);
+	public JobsReference searchJobReferenceByName(String name);
 	
 	public void createJob(Jobs job);
 	

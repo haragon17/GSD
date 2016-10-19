@@ -453,6 +453,8 @@ public class ProjectsController {
 		proj.setCretd_usr(user.getUserModel().getUsr_id());
 
 		if (!proj_desc.equals("Project Details")) {
+			proj_desc = proj_desc.replace("\u2028", "\n");
+			proj_desc = proj_desc.replace("\u2029", "\n");
 			proj.setProj_desc(proj_desc);
 		} else {
 			proj.setProj_desc("");
@@ -543,6 +545,8 @@ public class ProjectsController {
 				projRef.setCurrency("");
 			}
 			if (!proj_ref_desc.equals("Item Details")) {
+				proj_ref_desc = proj_ref_desc.replace("\u2028", "\n");
+				proj_ref_desc = proj_ref_desc.replace("\u2029", "\n");
 				projRef.setProj_ref_desc(proj_ref_desc);
 			} else {
 				projRef.setProj_ref_desc("");
@@ -588,6 +592,8 @@ public class ProjectsController {
 		proj.setCus_id(cus_id);
 
 		if (!proj_desc.equals("Project Details")) {
+			proj_desc = proj_desc.replace("\u2028", "\n");
+			proj_desc = proj_desc.replace("\u2029", "\n");
 			proj.setProj_desc(proj_desc);
 		} else {
 			proj.setProj_desc("");
@@ -751,6 +757,8 @@ public class ProjectsController {
 			projRef.setCurrency("");
 		}
 		if (!proj_ref_desc.equals("Item Details")) {
+			proj_ref_desc = proj_ref_desc.replace("\u2028", "\n");
+			proj_ref_desc = proj_ref_desc.replace("\u2029", "\n");
 			projRef.setProj_ref_desc(proj_ref_desc);
 		} else {
 			projRef.setProj_ref_desc("");
@@ -799,6 +807,8 @@ public class ProjectsController {
 			projRef.setCurrency("");
 		}
 		if (!proj_ref_desc.equals("Item Details")) {
+			proj_ref_desc = proj_ref_desc.replace("\u2028", "\n");
+			proj_ref_desc = proj_ref_desc.replace("\u2029", "\n");
 			projRef.setProj_ref_desc(proj_ref_desc);
 		} else {
 			projRef.setProj_ref_desc("");

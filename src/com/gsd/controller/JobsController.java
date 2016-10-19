@@ -159,12 +159,20 @@ public class JobsController {
 	public ModelAndView chkCusCode(@RequestParam("records") String job_ref_name, HttpServletRequest request,
 			HttpServletResponse response){
 		
-		List<JobsReference> jobRef = null;
+		List<JobsReference> jobRefLs = new ArrayList<JobsReference>();;
+		JobsReference jobRef = null;
 		
-		jobRef = jobsDao.searchJobReferenceByName(job_ref_name);
+		String[] name = job_ref_name.split("\n");
+		for(int i=0; i<name.length; i++){
+			if(name[i].length() > 0){
+//				jobRef = jobsDao.searchJobReferenceByName(name[i]);
+				jobRefLs.add(jobsDao.searchJobReferenceByName(name[i]));
+			}
+		}
 		
 		JSONObject jobj = new JSONObject();
-		jobj.put("records", jobRef);
+		jobj.put("records", jobRefLs);
+		jobj.put("total", jobRefLs.size());
 		
 		return new ModelAndView("jsonView", jobj);
 	}
@@ -173,16 +181,20 @@ public class JobsController {
 	public void searchJobParam(HttpServletRequest request, HttpServletResponse response){
 		
 		HttpSession session = request.getSession();
-		session.setAttribute("cus_id", request.getParameter("scus_id"));
-		session.setAttribute("proj_id", request.getParameter("sproj_id"));
-//		session.setAttribute("itm_id", request.getParameter("sitm_id"));
-		session.setAttribute("job_name", request.getParameter("sjob_name"));
-		session.setAttribute("dept", request.getParameter("sdept"));
-//		session.setAttribute("start", request.getParameter("sbtw_start"));
-//		session.setAttribute("end", request.getParameter("sbtw_end"));
-		session.setAttribute("status", request.getParameter("sjob_status"));
-		session.setAttribute("first", request.getParameter("first"));
-		session.setAttribute("job_id", request.getParameter("job_id"));
+		if(request.getParameter("job_id") == "" || request.getParameter("job_id") == null){
+			session.setAttribute("cus_id", request.getParameter("scus_id"));
+			session.setAttribute("proj_id", request.getParameter("sproj_id"));
+	//		session.setAttribute("itm_id", request.getParameter("sitm_id"));
+			session.setAttribute("job_name", request.getParameter("sjob_name"));
+			session.setAttribute("dept", request.getParameter("sdept"));
+	//		session.setAttribute("start", request.getParameter("sbtw_start"));
+	//		session.setAttribute("end", request.getParameter("sbtw_end"));
+			session.setAttribute("status", request.getParameter("sjob_status"));
+			session.setAttribute("first", request.getParameter("first"));
+			session.setAttribute("job_id", request.getParameter("job_id"));
+		}else{
+			session.setAttribute("job_id", request.getParameter("job_id"));
+		}
 	}
 	
 	@RequestMapping(value="/searchJobs")
@@ -198,27 +210,30 @@ public class JobsController {
 		map.put("job_name", (String)session.getAttribute("job_name"));
 		map.put("dept", (String)session.getAttribute("dept"));
 		map.put("status", (String)session.getAttribute("status"));
-		if(((String)session.getAttribute("first")) != null){
+//		if(((String)session.getAttribute("first")) != null){
 			map.put("first", (String)session.getAttribute("first"));
-			session.setAttribute("first", "");
-		}else{
-			map.put("first", "");
-		}
+//		}else{
+//			map.put("first", "");
+//		}
 		
 		int start = Integer.parseInt(request.getParameter("start"));
 		int limit = Integer.parseInt(request.getParameter("limit"));
 		
-		job = jobsDao.searchJobs(map);
-		
-		if(limit + start > job.size()) {
-			limit = job.size();
-		} else {
-			limit += start;
+		try{
+			job = jobsDao.searchJobs(map);
+	
+			if(limit + start > job.size()) {
+				limit = job.size();
+			} else {
+				limit += start;
+			}
+			for (int i = start; i < limit; i++) {
+				jobLs.add(job.get(i));
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage());
 		}
-		for (int i = start; i < limit; i++) {
-			jobLs.add(job.get(i));
-		}
-		
+			
 		JSONObject jobj = new JSONObject();
 		jobj.put("records", jobLs);
 		jobj.put("total", job.size());
@@ -385,6 +400,8 @@ public class JobsController {
 		job.setJob_status(status);
 		
 		if(!job_dtl.equals("Details")){
+			job_dtl = job_dtl.replace("\u2028", "\n");
+			job_dtl = job_dtl.replace("\u2029", "\n");
 			job.setJob_dtl(job_dtl);
 		}else{
 			job.setJob_dtl("");
@@ -416,6 +433,8 @@ public class JobsController {
 		job.setJob_status(status);
 		
 		if(!job_dtl.equals("Details")){
+			job_dtl = job_dtl.replace("\u2028", "\n");
+			job_dtl = job_dtl.replace("\u2029", "\n");
 			job.setJob_dtl(job_dtl);
 		}else{
 			job.setJob_dtl("");
@@ -445,10 +464,9 @@ public class JobsController {
 		String job_dtl = request.getParameter("ajob_ref_dtl");
 		String job_ref_status = request.getParameter("ajob_ref_status");
 		
+		List<JobsReference> jobRefLs = new ArrayList<JobsReference>();
 		JobsReference jobRef = new JobsReference();
-		jobRef.setJob_ref_id(jobsDao.getLastJobReferenceId());
 		jobRef.setJob_id(job_id);
-		jobRef.setJob_ref_name(job_ref_name);
 		jobRef.setCretd_usr(usr_id);
 		jobRef.setJob_ref_status(job_ref_status);
 		
@@ -488,13 +506,29 @@ public class JobsController {
 		}
 		
 		if(!job_dtl.equals("Job Details")){
+			job_dtl = job_dtl.replace("\u2028", "\n");
+			job_dtl = job_dtl.replace("\u2029", "\n");
 			jobRef.setJob_ref_dtl(job_dtl);
 		}else{
 			jobRef.setJob_ref_dtl("");
 		}
 		
-		jobsDao.createJobReference(jobRef);
+		String[] name = job_ref_name.split("\n");
+		for(int i=0; i<name.length; i++){
+			if(name[i].length() > 0){
+				jobRef.setJob_ref_id(jobsDao.getLastJobReferenceId());
+				jobRef.setJob_ref_name(name[i]);
+				JobsReference jobRef2 = new JobsReference();
+				jobRef2.setJob_ref_id(jobRef.getJob_ref_id());
+				jobRefLs.add(jobRef2);
+				jobsDao.createJobReference(jobRef);
+			}
+		}
 		
+//		for(int x=0;x<jobRefLs.size(); x++){
+//			System.out.println(jobRefLs.get(x).getJob_ref_id());
+//		}
+//		
 //		if(print == null){
 //		}else if(print.equals("yes")){
 //			JobsReference myJob = jobsDao.searchJobsReferenceByID(jobRef.getJob_ref_id());
@@ -512,9 +546,9 @@ public class JobsController {
 		
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("success", true);
-//		model.put("records", jobRef);
-//		JSONObject jobj = new JSONObject();
-//		jobj.put("job_id", jobRef.getJob_ref_id());
+		model.put("records", jobRefLs);
+		model.put("total", jobRefLs.size());
+		
 		return new ModelAndView("jsonView", model);
 	}
 	
@@ -574,6 +608,8 @@ public class JobsController {
 		}
 		
 		if(!job_dtl.equals("Job Details")){
+			job_dtl = job_dtl.replace("\u2028", "\n");
+			job_dtl = job_dtl.replace("\u2029", "\n");
 			jobRef.setJob_ref_dtl(job_dtl);
 		}else{
 			jobRef.setJob_ref_dtl("");

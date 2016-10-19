@@ -118,14 +118,14 @@ public class PrintJobTicket_iText {
         g2d.setFont(f1);
         Color c = new Color(240, 10, 10);
         g2d.setColor(c);
-        String mydate = job.getJob_out();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		try {
+			String mydate = job.getJob_out();
 			String dateFormat2 = new SimpleDateFormat("E, MMM d, yyyy").format(dateFormat.parse(mydate));
 			String timeFomat = new SimpleDateFormat("HH:mm").format(dateFormat.parse(mydate));
 			g2d.drawString(dateFormat2, 95, 205);
 			g2d.drawString(timeFomat, 450, 205);
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
         
