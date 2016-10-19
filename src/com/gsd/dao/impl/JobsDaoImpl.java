@@ -141,8 +141,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				"LEFT JOIN customer cus on cus.cus_id = proj.cus_id\n"+
 				"WHERE job_ref_status <> 'Sent'\n"+
 				"AND date (job_out) BETWEEN current_date AND (CASE\n"+
-				"WHEN extract(dow from job_out) = 6 THEN (current_date+2)\n"+
-				"WHEN extract(dow from job_out) = 7 THEN (current_date+1)\n"+
+				"WHEN extract(dow from current_date) = 6 THEN (current_date+2)\n"+
+				"WHEN extract(dow from current_date) = 7 THEN (current_date+1)\n"+
 				"ELSE current_date END)";
 				
 		if(data.get("job_name")==null || data.get("job_name").isEmpty()){
