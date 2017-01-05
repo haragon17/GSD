@@ -24,11 +24,13 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	@Override
 	public List<Jobs> searchJobs(Map<String, String> data) {
 		String sql = "SELECT jobs.job_id, job_name, jobs.proj_id, proj_name, cus_name, cus_code, cus.cus_id, job_dtl, job_status, dept,\n"
+				+ "CASE WHEN y.remain_job IS NULL THEN 0 ELSE y.remain_job END,\n"
 				+ "CASE WHEN x.total_amount IS NULL THEN 0 ELSE x.total_amount END\n"
 				+ "FROM jobs\n"
 				+ "LEFT JOIN projects proj ON proj.proj_id = jobs.proj_id\n"
 				+ "LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"
 				+ "LEFT JOIN (select job_id, sum(amount) as total_amount from jobs_reference group by job_id) x on x.job_id = jobs.job_id\n"
+				+ "LEFT JOIN (select job_id, count(*) as remain_job from jobs_reference where job_ref_status != 'Sent' group by job_id) y on y.job_id = jobs.job_id\n"
 				+ "WHERE jobs.job_id != 0\n";
 		if(data.get("first")==null || data.get("first").isEmpty()){
 		}else{
@@ -139,11 +141,11 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				"LEFT JOIN jobs on jobs.job_id = jobs_reference.job_id\n"+
 				"LEFT JOIN projects proj on proj.proj_id = jobs.proj_id\n"+
 				"LEFT JOIN customer cus on cus.cus_id = proj.cus_id\n"+
-				"WHERE job_ref_status <> 'Sent'\n"+
-				"AND date (job_out) BETWEEN current_date AND (CASE\n"+
-				"WHEN extract(dow from current_date) = 6 THEN (current_date+2)\n"+
-				"WHEN extract(dow from current_date) = 7 THEN (current_date+1)\n"+
-				"ELSE current_date END)";
+				"WHERE job_ref_status <> 'Sent'\n";
+//				"AND date (job_out) <= (CASE\n"+
+//				"WHEN extract(dow from current_date) = 6 THEN (current_date+2)\n"+
+//				"WHEN extract(dow from current_date) = 7 THEN (current_date+1)\n"+
+//				"ELSE current_date END)\n";
 				
 		if(data.get("job_name")==null || data.get("job_name").isEmpty()){
 		}else{
@@ -167,15 +169,20 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		
 		sql += 	"ORDER BY\n"+
-				"CASE job_ref_status\n"+
-				"WHEN 'New' 	THEN 1\n"+
-				"WHEN 'CC' 		THEN 2\n"+
-				"WHEN 'CC2' 	THEN 3\n"+
-				"WHEN 'CC3' 	THEN 4\n"+
-				"WHEN 'Final' 	THEN 5\n"+
-				"WHEN 'Hold' 	THEN 6\n"+
-				"WHEN 'Sent' 	THEN 7\n"+
-				"ELSE 8\n"+
+//				"CASE job_ref_status\n"+
+//				"WHEN 'New' 	THEN 1\n"+
+//				"WHEN 'CC' 		THEN 2\n"+
+//				"WHEN 'CC2' 	THEN 3\n"+
+//				"WHEN 'CC3' 	THEN 4\n"+
+//				"WHEN 'CC+Final' THEN 5\n"+
+//				"WHEN 'Final' 	THEN 6\n"+
+//				"WHEN 'Hold' 	THEN 7\n"+
+//				"WHEN 'Sent' 	THEN 8\n"+
+//				"ELSE 9\n"+
+				"CASE\n"+
+				"WHEN job_ref_status LIKE 'New%'	THEN 1\n"+
+				"WHEN job_ref_status = 'Hold'		THEN 3\n"+
+				"ELSE 2\n"+
 				"END,"+
 				"jobs_reference.job_out ASC";
 		
@@ -212,10 +219,11 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				+ "WHEN 'CC'  	THEN 2\n"
 				+ "WHEN 'CC2'  	THEN 3\n"
 				+ "WHEN 'CC3'  	THEN 4\n"
-				+ "WHEN 'Final' THEN 5\n"
-				+ "WHEN 'Hold'  THEN 6\n"
-				+ "WHEN 'Sent' 	THEN 7\n"
-				+ "ELSE 8\n"
+				+ "WHEN 'CC+Final' THEN 5\n"
+				+ "WHEN 'Final' 	THEN 6\n"
+				+ "WHEN 'Hold' 	THEN 7\n"
+				+ "WHEN 'Sent' 	THEN 8\n"
+				+ "ELSE 9\n"
 				+ "END,jobs_reference.job_in DESC ,job_ref_id DESC";
 		}else{
 			sql+= " ORDER BY jobs_reference.job_in ASC ,job_ref_id ASC";
@@ -396,6 +404,32 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		return id+1;
 	}
 
+	@Override
+	public void billedJobProjects(int id) {
+		
+		Jobs job_audit = searchJobsByID(id);
+		
+		String sql = "UPDATE jobs set job_status = 'Billed' where job_id = "+id;
+		this.getJdbcTemplate().update(sql);
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		if(job_audit.getJob_status() != "Billed"){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				job_audit.getJob_id(),
+				"Jobs",
+				user.getUserModel().getUsr_name(),
+				"Jobs Status",
+				job_audit.getJob_status(),
+				"Billed",
+				"Updated",
+				job_audit.getJob_name()
+			});
+		}
+	}
+	
 	@Override
 	public void updateJob(Jobs job){
 		

@@ -5,7 +5,7 @@ public class ProjectsReference {
 	private int proj_ref_id;
 	private int proj_id;
 	private int itm_id;
-	private int time;
+	private float time;
 	private float price;
 	private int cretd_usr;
 	private String cretd_date;
@@ -15,7 +15,7 @@ public class ProjectsReference {
 	private String itm_name;
 	private String cus_name;
 	private String cus_code;
-	private int actual_time;
+	private float actual_time;
 	
 	public int getProj_ref_id() {
 		return proj_ref_id;
@@ -35,10 +35,10 @@ public class ProjectsReference {
 	public void setItm_id(int itm_id) {
 		this.itm_id = itm_id;
 	}
-	public int getTime() {
+	public float getTime() {
 		return time;
 	}
-	public void setTime(int time) {
+	public void setTime(float time) {
 		this.time = time;
 	}
 	public float getPrice() {
@@ -95,10 +95,10 @@ public class ProjectsReference {
 	public void setCus_code(String cus_code) {
 		this.cus_code = cus_code;
 	}
-	public int getActual_time() {
+	public float getActual_time() {
 		return actual_time;
 	}
-	public void setActual_time(int actual_time) {
+	public void setActual_time(float actual_time) {
 		this.actual_time = actual_time;
 	}
 	

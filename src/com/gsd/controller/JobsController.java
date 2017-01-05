@@ -235,7 +235,8 @@ public class JobsController {
 		}
 			
 		JSONObject jobj = new JSONObject();
-		jobj.put("records", jobLs);
+//		jobj.put("records", jobLs);
+		jobj.put("records", job);
 		jobj.put("total", job.size());
 		
 		return new ModelAndView("jsonView", jobj);
@@ -697,6 +698,24 @@ public class JobsController {
 		}catch(Exception e){
 			logger.error("Cannot delete job_ref_id = "+id+"\n"+e.getMessage());
 		}
+	}
+	
+	@RequestMapping(value="billedProjects")
+	public ModelAndView billedJobProjects(HttpServletRequest request, HttpServletResponse response){
+		
+		int id = Integer.parseInt(request.getParameter("id"));
+		try{
+			jobsDao.billedJobProjects(id);
+		}catch(Exception e){
+			logger.error("Cannot change status to billed on job_id = "+id+"\n"+e.getMessage());
+		}
+		
+		List<Jobs> jobLs = new ArrayList<Jobs>();
+		jobLs.add(jobsDao.searchJobsByID(id));
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("jobs", jobLs);
+		return new ModelAndView("jsonView", jobj);
 	}
 	
 	@RequestMapping(value="printReport")

@@ -41,7 +41,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		sql += "ORDER BY cus_name";
-//		System.out.println(sql);
+		System.out.println(sql);
 		
 		List<Customer> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Customer>(Customer.class));
 		return result;

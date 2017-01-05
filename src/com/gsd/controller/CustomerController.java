@@ -117,7 +117,7 @@ public class CustomerController {
 		map.put("cus_name", (String)session.getAttribute("scus_name"));
 		map.put("cus_code", (String)session.getAttribute("scus_code"));
 		map.put("cus_id", (String)session.getAttribute("scus_id"));
-		map.put("key_acc_id", (String)session.getAttribute("skey_acc_id"));
+		map.put("key_acc_id", (String)session.getAttribute("skey_acc_mng"));
 		map.put("cus_email", (String)session.getAttribute("scus_email"));
 		
 		int start = Integer.parseInt(request.getParameter("start"));

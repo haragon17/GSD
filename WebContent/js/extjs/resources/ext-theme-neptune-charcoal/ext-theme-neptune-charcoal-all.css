@@ -89,6 +89,11 @@ img {
 	background-image: url(../../images/icons/fam/chart_pie.png) !important;
 }
 
+
+.icon-billed {
+	background-image: url(../../images/icons/fam/report.png) !important;
+}
+
 .process-row .x-grid-cell { 
     background-color: #FFFBD8 !important; 
     color: black; 
@@ -111,6 +116,11 @@ img {
 
 .sent-row .x-grid-cell { 
     background-color: #DBE9D4 !important; 
+    color: black; 
+}
+
+.cc-row .x-grid-cell {
+	background-color: #FAE0BA !important; 
     color: black; 
 }
 

@@ -38,6 +38,8 @@ public interface JobsDao {
 	
 	public void deleteJob(int id);
 	
+	public void billedJobProjects(int id);
+	
 	public void createJobReference(JobsReference jobRef);
 	
 	public void updateJobReference(JobsReference jobRef);

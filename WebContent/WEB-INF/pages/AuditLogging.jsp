@@ -19,7 +19,7 @@ table.myTable th {
  var errMessage = '${msg}';
 </script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/AuditLogging.js"></script>
-<title>Projects</title>
+<title>History State</title>
 </head>
 <body>
 </body>

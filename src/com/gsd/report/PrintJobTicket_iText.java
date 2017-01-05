@@ -9,6 +9,7 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -16,9 +17,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -95,6 +98,7 @@ public class PrintJobTicket_iText {
         g2d.drawLine(335, 450, 335, 575);
         
         //Note
+        g2d.setStroke(new BasicStroke((float) 0.3));
         g2d.drawLine(45, 615, 520, 615);
         g2d.drawLine(45, 640, 520, 640);
         g2d.drawLine(45, 665, 520, 665);
@@ -184,6 +188,11 @@ public class PrintJobTicket_iText {
         		}
         	}
         }
+        
+        DateFormat currentDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date currentDate = new Date();
+        String myDate = currentDateFormat.format(currentDate);
+        g2d.drawString("Printed On: "+myDate, 210, 810);
         
         g2d.dispose();
         int pages = ((int)height / (int)maxHeight);

@@ -436,8 +436,8 @@ Ext.onReady(function() {
 		            			 }
 		            			if(rec.data.proj_id == v){
 		            				 myText += '<tr><td>Item: <b>'+rec.data.itm_name+'</b></td>'+
-		            				 '<td>Target Time: <b>'+rec.data.time+'</b></td>'+
-		            				 '<td>Actual Time: <b>'+rec.data.actual_time+'</b></td>'+
+		            				 '<td>Target Time: <b>'+(Math.round(rec.data.time*100)/100)+'</b></td>'+
+		            				 '<td>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td>'+
 		            				 '<td>Description: <b>'+myDesc+'</b></td></tr>';
 		            			}
 		            		})
@@ -477,10 +477,10 @@ Ext.define('projRefModel', {
 		type : 'int'
 	}, {
 		name : 'file_id',
-		type : 'int'
+		type : 'float'
 	}, {
 		name : 'time',
-		type : 'int'
+		type : 'float'
 	}, {
 		name : 'price',
 		type : 'float'

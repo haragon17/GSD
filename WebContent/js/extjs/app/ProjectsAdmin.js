@@ -760,17 +760,18 @@ Ext.onReady(function() {
 		            				var target_time = "";
 //		            				alert(rec.data.proj_id);
 //		            				alert(rec.data.actual_time);
+		            				
 		            				if(rec.data.actual_time == 0){
-		            					actual_time = '<td bgcolor=#FE7575>Actual Time: <b>'+rec.data.actual_time+'</b></td>';
+		            					actual_time = '<td bgcolor=#FE7575>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td>';
 		            				}else if((rec.data.actual_time - rec.data.time) > 0){
-		            					actual_time = '<td bgcolor=#FE7575>Actual Time: <b>'+rec.data.actual_time+'</b></td>';
+		            					actual_time = '<td bgcolor=#FE7575>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td>';
 		            				}else{
-		            					actual_time = '<td bgcolor=#F0F0F0>Actual Time: <b>'+rec.data.actual_time+'</b></td>';
+		            					actual_time = '<td bgcolor=#F0F0F0>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td>';
 		            				}
 		            				if(rec.data.time == 0){
-		            					target_time = '<td bgcolor=#FE7575>Target Time: <b>'+rec.data.time+'</b></td>';
+		            					target_time = '<td bgcolor=#FE7575>Target Time: <b>'+(Math.round(rec.data.time*100)/100)+'</b></td>';
 		            				}else{
-		            					target_time = '<td bgcolor=#F0F0F0>Target Time: <b>'+rec.data.time+'</b></td>';
+		            					target_time = '<td bgcolor=#F0F0F0>Target Time: <b>'+(Math.round(rec.data.time*100)/100)+'</b></td>';
 		            				}
 		            				 myText += '<tr><td bgcolor=#F0F0F0>Item: <b>'+rec.data.itm_name+'</b></td>'+
 //		            				 '<td bgcolor=#F0F0F0>Target Time: <b>'+rec.data.time+'</b></td>'+
@@ -823,10 +824,10 @@ Ext.define('projRefModel', {
 		type : 'int'
 	}, {
 		name : 'time',
-		type : 'int'
+		type : 'float'
 	}, {
 		name : 'actual_time',
-		type : 'int'
+		type : 'float'
 	}, {
 		name : 'price',
 		type : 'float'

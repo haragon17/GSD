@@ -30,6 +30,17 @@ Ext.override(Ext.chart.axis.Radial, {
 
 Ext.onReady(function() {
 
+	map = new Ext.util.KeyMap(document,{
+	    key: [117], // press F6
+	    fn: function(){ 
+	    	if(panels.tabs.activeTab.id == "jobTabs"){
+	    		Ext.get('isave-sync').dom.click();
+	    	}else if(panels.tabs.activeTab.id == "todayTabs"){
+	    		Ext.get('isave-syncToday').dom.click();
+	    	}
+	    }
+	});
+	
 	Ext.Ajax.request({
 		url : 'userModel.htm',
 		success: function(response, opts){
@@ -88,6 +99,7 @@ Ext.onReady(function() {
 		width : 800,
 		height : 240,
 		collapsible : true,
+		collapsed : true,
 		renderTo : document.body,
 		style : {
 			"margin-left" : "auto",
@@ -488,9 +500,30 @@ Ext.onReady(function() {
 //                	},500); 
                 }else if(tab.id == 'jobTabs'){
                 	store.jobs.reload();
+                	Ext.getCmp('filterSearchField').setValue("");
+                	store.jobs.clearFilter();
                 }else if(tab.id == 'projTabs'){
                 	store.jobs.reload();
+                	Ext.getCmp('filterSearchField').setValue("");
+                	store.jobs.clearFilter();
                 }
+            },
+            'afterrender': function(){
+            	grid.down('toolbar').add('->',{
+            		xtype : 'button',
+            		text : "Add Job's Project",
+            		id : 'job_add',
+            		iconCls : 'icon-add',
+            		handler : function() {
+            			Ext.getCmp('adept').setValue(userDept);
+            			addJob.show();
+            		}
+            	});
+            	grid.down('statusbar').add('->',{
+              		xtype : 'tbtext',
+             		 id : 'grid_total',
+              		text : '<b>Total Jobs : '+store.jobs.getTotalCount()+' <b>&nbsp;&nbsp;&nbsp;'
+            	});
             }
         }
 	})
@@ -975,6 +1008,9 @@ Ext.define('jobModel', {
 	}, {
 		name : 'total_amount',
 		type : 'int'
+	}, {
+		name : 'remain_job',
+		type : 'int'
 	}
 	]
 });
@@ -997,6 +1033,9 @@ store.jobs = Ext.create('Ext.data.JsonStore', {
 	},
 	listeners: {
 		load : function(){
+			setTimeout(function(){
+          		Ext.getCmp('grid_total').setText('<b>Total Jobs : '+store.jobs.getTotalCount()+'</b>&nbsp;&nbsp;&nbsp;');
+          	},500);
 			try {
 	 			var record = store.jobs.findRecord('job_id',Ext.getCmp('jobid_ref').getValue());
 				var myIndex = store.jobs.indexOf(record);
@@ -1069,29 +1108,34 @@ var jobRefStatus = Ext.create('Ext.data.Store', {
 	fields: ['name'],
 	data : [
 	        {"name":"New"},
+	        {"name":"New Pic"},
+	        {"name":"New Doc"},
+	        {"name":"New Pic+Doc"},
 	        {"name":"CC"},
 	        {"name":"CC2"},
 	        {"name":"CC3"},
+	        {"name":"CC+Final"},
 	        {"name":"Final"},
 	        {"name":"Sent"},
 	        {"name":"Hold"}     
 	]
 });
 
-var grid = Ext.create('Ext.grid.Panel', {
+var grid = Ext.create('Ext.ux.LiveFilterGridPanel', {
 	id : 'mainGrid',
 	store : store.jobs,
-	tbar : [{
-		xtype : 'button',
-		text : "Add Job's Project",
-		id : 'job_add',
-		iconCls : 'icon-add',
-		handler : function() {
-			Ext.getCmp('adept').setValue(userDept);
-			addJob.show();
-		}
-	}],
-	height : 500,
+	indexes : ['job_name','cus_name','proj_name'],
+//	tbar : [{
+//		xtype : 'button',
+//		text : "Add Job's Project",
+//		id : 'job_add',
+//		iconCls : 'icon-add',
+//		handler : function() {
+//			Ext.getCmp('adept').setValue(userDept);
+//			addJob.show();
+//		}
+//	}],
+	height : 608,
 	columns : [
 		{
 			text : '!',
@@ -1248,13 +1292,13 @@ var grid = Ext.create('Ext.grid.Panel', {
 					});
 		    }
 		},
-		bbar : Ext.create('Ext.PagingToolbar', {
-			store : store.jobs,
-			displayInfo : true,
-			displayMsg : "Job's Projects {0} - {1} of {2}",
-			emptyMsg : "No Job's Project to display",
-			plugins : Ext.create('Ext.ux.ProgressBarPager', {})
-		})
+//		bbar : Ext.create('Ext.PagingToolbar', {
+//			store : store.jobs,
+//			displayInfo : true,
+//			displayMsg : "Job's Projects {0} - {1} of {2}",
+//			emptyMsg : "No Job's Project to display",
+//			plugins : Ext.create('Ext.ux.ProgressBarPager', {})
+//		})
 });
 
 var gridRef = Ext.create('Ext.grid.Panel', {
@@ -1296,6 +1340,56 @@ var gridRef = Ext.create('Ext.grid.Panel', {
 			})
 		}
 	},"->",{
+		xtype : 'button',
+		text : 'Billed',
+		id : 'ibilled',
+		iconCls : 'icon-billed',
+		handler : function() {
+			var record = store.jobs.findRecord('job_id',Ext.getCmp('jobid_ref').getValue());
+			var myIndex = store.jobs.indexOf(record);
+			var myValue = store.jobs.getAt(myIndex).data.remain_job;
+			if(myValue != 0){
+				Ext.MessageBox.show({
+						title: 'Information',
+						msg: "Still Have Jobs Remaining!",
+						buttons: Ext.MessageBox.OK,
+						icon: Ext.MessageBox.ERROR,
+						animateTarget: 'ibilled'
+					});
+			}else{
+				Ext.Ajax.request({
+					url : 'billedProjects.htm?id=' + Ext.getCmp('jobid_ref').getValue(),
+					success : function(response, opts) {
+						var responseObject = Ext.decode(response.responseText);
+						projStatus = responseObject.jobs[0].job_status;
+						if(projStatus == "Billed"){
+							Ext.MessageBox.show({
+	     						title: 'Information',
+	     						msg: "Job's Project Has Been Billed!",
+	     						buttons: Ext.MessageBox.OK,
+	     						icon: Ext.MessageBox.INFO,
+	     						animateTarget: 'ibilled',
+	     						fn: function(){
+	     							panels.tabs.setActiveTab('projTabs');
+	     							Ext.getCmp('jobTabs').setDisabled(true);
+	     							Ext.getCmp('jobTabs').setTitle("Jobs");
+	     							store.jobs.loadPage(1);
+	     							store.jobsRefToday.reload();
+	     							store.jobsToday.reload();
+	     						}
+	     					});
+						}else{
+							
+						}
+					},
+					failure: function(response, opts){
+						var responseOject = Ext.util.JSON.decode(response.responseText);
+						Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+					}
+				});
+			}
+		}
+	},{
 		xtype: 'tbtext',
 		id: 'gridRef_tbar',
         text: 'Loading ...'
@@ -1310,6 +1404,7 @@ var gridRef = Ext.create('Ext.grid.Panel', {
         scope: this,
         handler: function(){
         	store.jobsRef.sync();
+        	store.jobs.reload();
 //            console.debug('Save all data');
         }
 	}],
@@ -1320,7 +1415,7 @@ var gridRef = Ext.create('Ext.grid.Panel', {
 //		"margin-bottom" : "10px"
 //	},
 //	width : 1200,
-	height : 500,
+	height : 608,
 	columns : [
 			{
 				text : "Date in",
@@ -1674,8 +1769,24 @@ var gridToday = Ext.create('Ext.grid.Panel', {
 			flex : 1,
 			sortable : true,
 			dataIndex : 'job_out',
-			renderer: function(val){
-				return '<b><span style="color:red;">'+Ext.util.Format.date(val, 'Y-m-d')+'</span></b>';
+			renderer: function(value, meta, record, rowIndex, colIndex, store){
+				myStatus = record.get('job_ref_status');
+				today = new Date();
+				getDay = today.getDay();
+				if(getDay == 6){
+					today.setDate(today.getDate()+2);
+				}
+				todayFormat = Ext.util.Format.date(today, 'Y-m-d');
+				dateOut = Ext.util.Format.date(value, 'Y-m-d');
+				if(myStatus != "Hold"){
+					if(dateOut <= todayFormat){
+						return '<b><span style="color:red;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+					}else{
+						return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+					}
+				}else{
+					return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+				}
 			},
 			editor: {
 				xtype: 'datefield',
@@ -1696,15 +1807,31 @@ var gridToday = Ext.create('Ext.grid.Panel', {
 			flex : 0.6,
 			sortable : true,
 			dataIndex : 'job_out',
-			renderer: function(val){
-				return '<b><span style="color:red;">'+Ext.util.Format.date(val, 'H:i')+'</span></b>';
+			renderer: function(value, meta, record, rowIndex, colIndex, store){
+				myStatus = record.get('job_ref_status');
+				today = new Date();
+				getDay = today.getDay();
+				if(getDay == 6){
+					today.setDate(today.getDate()+2);
+				}
+				todayFormat = Ext.util.Format.date(today, 'Y-m-d');
+				dateOut = Ext.util.Format.date(value, 'Y-m-d');
+				if(myStatus != "Hold"){
+					if(dateOut <= todayFormat){
+						return '<b><span style="color:red;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+					}else{
+						return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+					}
+				}else{
+					return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+				}
 			},
 			editor: {
 				xtype: 'timefield',
 				id: 'edit_time_today',
 				format: 'H:i',
 				listeners: {
-					select: function () {
+					blur: function () {
 						myTime = Ext.getCmp('edit_time_today').getValue();
 						var myDate = new Date(editorDate.getFullYear(), editorDate.getMonth(), editorDate.getDate(), myTime.getHours(), myTime.getMinutes());
 						Ext.getCmp('edit_time_today').setValue(myDate);
@@ -1807,7 +1934,7 @@ var gridToday = Ext.create('Ext.grid.Panel', {
 			align : 'center',
 			sortable : true,
 			renderer : function(val){
-				if(val == "New"){
+				if(val == "New" || val == "New Pic" || val == "New Doc" || val == "New Pic+Doc"){
 					return '<b><span style="color:blue;">' + val + '</span></b>';
 				}else if(val == "Hold"){
 					return '<b><span style="color:red;">' + val + '</span></b>';
@@ -1834,10 +1961,12 @@ var gridToday = Ext.create('Ext.grid.Panel', {
 		viewConfig: { 
 	        stripeRows: false, 
 	        getRowClass: function(record) { 
-	            if(record.get('job_ref_status') == "Hold"){
+	        	if(record.get('job_ref_status') == "Hold"){
 	        		return 'hold-row';
-	            }else{
+	            }else if(record.get('job_ref_status') == "New" || record.get('job_ref_status') == "New Pic" || record.get('job_ref_status') == "New Doc" || record.get('job_ref_status') == "New Pic+Doc"){
 	        		return 'process-row'; 
+	        	}else{
+	        		return 'cc-row';
 	        	}
 	        } 
 	    },
@@ -1888,6 +2017,18 @@ var gridToday = Ext.create('Ext.grid.Panel', {
 						if(e.field == "itm_name"){
 							if(Ext.getCmp('projrefidtoday').getValue() != 0){
 								e.record.set('proj_ref_id', Ext.getCmp('projrefidtoday').getValue());
+							}
+						}
+					},
+					edit: function (editor, e) {
+						if(e.field == "job_out"){
+							try{
+								myTime = Ext.getCmp('edit_time_today').getValue();
+								var myDate = new Date(editorDate.getFullYear(), editorDate.getMonth(), editorDate.getDate(), myTime.getHours(), myTime.getMinutes());
+								Ext.getCmp('edit_time_today').setValue(myDate);
+								e.record.set('job_out', myDate);
+							}catch(e){
+								console.log(e.message);
 							}
 						}
 					}
@@ -2337,6 +2478,8 @@ addJob = new Ext.create('Ext.window.Window', {
           						fn: function(){
           							addJob.hide();
           							store.jobs.reload();
+          							Ext.getCmp('filterSearchField').setValue("");
+          		                	store.jobs.clearFilter();
           							}
           					});
                             },
@@ -2344,6 +2487,8 @@ addJob = new Ext.create('Ext.window.Window', {
 								Ext.Msg.alert('Failed',
 										action.result ? action.result.message
 												: 'No response');
+								addJob.hide();
+      							store.jobs.reload();
 							}
               			});
                 	 }else {
@@ -2352,7 +2497,7 @@ addJob = new Ext.create('Ext.window.Window', {
         						msg: ' Please Insert All Required Field',
         						buttons: Ext.MessageBox.OK,
         						icon: Ext.MessageBox.ERROR,
-        						animateTarget: 'abtn',
+        						animateTarget: 'ajob_btn',
         					});
         				}
         		}
@@ -2605,6 +2750,26 @@ editJob = new Ext.create('Ext.window.Window', {
 				store : jobStatus,
 				valueField : 'name',
 				displayField : 'name',
+				listeners : {
+					select : function() {
+						var v = this.getValue();
+						var record = store.jobs.findRecord('job_id',Ext.getCmp('ejob_id').getValue());
+						var myIndex = store.jobs.indexOf(record);
+						var myValue = store.jobs.getAt(myIndex).data.remain_job;
+						var oldValue = store.jobs.getAt(myIndex).data.job_status;
+						if(v != "Processing" && v != "Hold"){
+							if(myValue != 0){
+								Ext.getCmp('ejob_status').setValue(oldValue);
+								Ext.MessageBox.show({
+	          						title: 'Information',
+	          						msg: "Still Have Jobs Remaining!",
+	          						buttons: Ext.MessageBox.OK,
+	          						icon: Ext.MessageBox.ERROR
+	          					});
+							}
+						}
+					}
+				}
 			},{
     	    	xtype: 'textarea',
     	    	labelWidth: 120,
@@ -2645,6 +2810,8 @@ editJob = new Ext.create('Ext.window.Window', {
           						fn: function(){
           							editJob.hide();
           							store.jobs.reload();
+          							Ext.getCmp('filterSearchField').setValue("");
+          		                	store.jobs.clearFilter();
           							}
           					});
                             },
@@ -2652,6 +2819,8 @@ editJob = new Ext.create('Ext.window.Window', {
 								Ext.Msg.alert('Failed',
 										action.result ? action.result.message
 												: 'No response');
+								editJob.hide();
+      							store.jobs.reload();
 							}
               			});
                 	 }else {
@@ -2682,9 +2851,17 @@ addJobRef = new Ext.create('Ext.window.Window', {
 	title: 'Add Job',
     animateTarget: 'icreate',
     modal : true,
-    resizable:false,
-    width: 450,
+    resizable:true,
+    pinned:true,
+    dynamic: true,
+    minWidth: 500,
+    minHeight: 526,
+    layout : 'fit',
     closeAction: 'hide',
+    onResize : function(win, height, width, eOpts){
+    	var myHeight = addJobRef.getHeight() - 526 + 150;
+    	Ext.getCmp('ajob_ref_dtl').setHeight(myHeight);
+    },
     items :[{
     	xtype:'form',
         id:'addJobRefForm',
@@ -2692,12 +2869,10 @@ addJobRef = new Ext.create('Ext.window.Window', {
     		xtype:'fieldset',
             title: 'Job Information',
             defaultType: 'textfield',
-            layout: 'anchor',
             padding: 10,
-            width:400,
             style: {
-                "margin-left": "auto",
-                "margin-right": "auto",
+                "margin-left": "10px",
+                "margin-right": "10px",
                 "margin-top": "10px",
                 "margin-bottom": "10px"
             },
@@ -2869,8 +3044,9 @@ addJobRef = new Ext.create('Ext.window.Window', {
     	    	name: 'ajob_ref_dtl',
     	    	id: 'ajob_ref_dtl',
     	    	emptyText: 'Job Details',
-    	    	maxLength : 500,
-				maxLengthText : 'Maximum input 500 Character',
+    	    	height : 150,
+    	    	maxLength : 1000,
+				maxLengthText : 'Maximum input 1000 Character',
     	    }]
             },{
             	xtype : 'hidden',
@@ -2933,7 +3109,7 @@ addJobRef = new Ext.create('Ext.window.Window', {
          						msg: 'Job Has Been Add!',
          						buttons: Ext.MessageBox.OK,
          						icon: Ext.MessageBox.INFO,
-         						animateTarget: 'abtn',
+         						animateTarget: 'apbtn',
          						fn: function(){
          							addJobRef.hide();
          							store.jobs.reload();
@@ -2945,6 +3121,9 @@ addJobRef = new Ext.create('Ext.window.Window', {
 								Ext.Msg.alert('Failed',
 										action.result ? action.result.message
 												: 'No response');
+								addJobRef.hide();
+     							store.jobs.reload();
+     							store.jobsRef.reload();
 							}
              			});
                	 }else {
@@ -2957,7 +3136,10 @@ addJobRef = new Ext.create('Ext.window.Window', {
        					});
        				}
        		}
-            },{xtype: 'tbspacer', width: 110},{	
+            },
+//            {xtype: 'tbspacer', width: 110}
+            '->'
+            ,{	
            		  text: 'Add',
           		  width:100,
           		  id: 'abtn',
@@ -2987,6 +3169,9 @@ addJobRef = new Ext.create('Ext.window.Window', {
 								Ext.Msg.alert('Failed',
 										action.result ? action.result.message
 												: 'No response');
+								addJobRef.hide();
+     							store.jobs.reload();
+     							store.jobsRef.reload();
 							}
               			});
                 	 }else {
@@ -3013,6 +3198,7 @@ addJobRef = new Ext.create('Ext.window.Window', {
                			Ext.getCmp('addJobRefForm').getForm().reset();
                			Ext.getCmp('atime').clearInvalid();
 	                	Ext.getCmp('atime').allowBlank = true;
+	                	addJobRef.setSize(500,526);
                		}
                	}
 });
@@ -3021,9 +3207,17 @@ editJobRef = new Ext.create('Ext.window.Window', {
 	title: 'Edit Job',
     animateTarget: 'edit',
     modal : true,
-    resizable:false,
-    width: 450,
+    resizable:true,
+    pinned:true,
+    dynamic: true,
+    minWidth: 500,
+    minHeight: 473,
+    layout : 'fit',
     closeAction: 'hide',
+    onResize : function(win, height, width, eOpts){
+    	var myHeight = editJobRef.getHeight() - 473 + 150;
+    	Ext.getCmp('ejob_ref_dtl').setHeight(myHeight);
+    },
     items :[{
     	xtype:'form',
         id:'editJobRefForm',
@@ -3033,10 +3227,9 @@ editJobRef = new Ext.create('Ext.window.Window', {
             defaultType: 'textfield',
             layout: 'anchor',
             padding: 10,
-            width:400,
             style: {
-                "margin-left": "auto",
-                "margin-right": "auto",
+                "margin-left": "10px",
+                "margin-right": "10px",
                 "margin-top": "10px",
                 "margin-bottom": "10px"
             },
@@ -3235,8 +3428,9 @@ editJobRef = new Ext.create('Ext.window.Window', {
     	    	name: 'ejob_ref_dtl',
     	    	id: 'ejob_ref_dtl',
     	    	emptyText: 'Job Details',
-    	    	maxLength : 500,
-				maxLengthText : 'Maximum input 500 Character',
+    	    	height : 150,
+    	    	maxLength : 1000,
+				maxLengthText : 'Maximum input 1000 Character',
     	    }]
             },
             {
@@ -3276,6 +3470,9 @@ editJobRef = new Ext.create('Ext.window.Window', {
 								Ext.Msg.alert('Failed',
 										action.result ? action.result.message
 												: 'No response');
+								editJobRef.hide();
+      							store.jobs.reload();
+      							store.jobsRef.reload();
 							}
               			});
                 	 }else {
@@ -3302,6 +3499,7 @@ editJobRef = new Ext.create('Ext.window.Window', {
                			Ext.getCmp('editJobRefForm').getForm().reset();
                			Ext.getCmp('etime').clearInvalid();
 	                	Ext.getCmp('etime').allowBlank = true;
+	                	editJobRef.setSize(500,473);
                		}
                	}
 });

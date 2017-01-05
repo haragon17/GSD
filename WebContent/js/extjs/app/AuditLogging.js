@@ -9,17 +9,15 @@ Ext.onReady(function() {
 //		bodyPadding : 5,
 		renderTo : document.body,
 		width : 1200,
-		height : 500,
-		split : true,
+		height : 737,
 		forceFit : true,
-		loadMask : true,
 //		autoWidth : true,
 		columnLines : true,
 		style: {
             "margin-left": "auto",
             "margin-right": "auto",
-            "margin-top": "75px",
-            "margin-bottom": "auto"
+            "margin-top": "50px",
+            "margin-bottom": "20px"
         },
 		store : store.log,
 		columns : [ {
@@ -29,7 +27,7 @@ Ext.onReady(function() {
 			dataIndex : 'parent_type'
 		}, {
 			text : 'Reference',
-			flex : 3,
+			flex : 2.5,
 			sortable : true,
 			dataIndex : 'parent_ref'
 		}, {
@@ -220,7 +218,7 @@ Ext.define('logModel', {
 store.log = Ext.create('Ext.data.JsonStore', {
 	model : 'logModel',
 	id : 'logStore',
-	pageSize : 15,
+//	pageSize : 15,
 	autoLoad : true,
 	proxy : {
 		type : 'ajax',

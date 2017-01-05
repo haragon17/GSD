@@ -525,12 +525,12 @@ public class ProjectsController {
 			projRef.setProj_id(proj.getProj_id());
 
 			if (!time.equals("Time in minutes")) {
-				projRef.setTime(Integer.parseInt(time));
+				projRef.setTime(Float.parseFloat(time));
 			} else {
 				projRef.setTime(0);
 			}
 			if (!actual_time.equals("Time in minutes")) {
-				projRef.setActual_time(Integer.parseInt(actual_time));
+				projRef.setActual_time(Float.parseFloat(actual_time));
 			} else {
 				projRef.setActual_time(0);
 			}
@@ -737,12 +737,12 @@ public class ProjectsController {
 		projRef.setItm_id(itm_id);
 		
 		if (!time.equals("Time in minutes")) {
-			projRef.setTime(Integer.parseInt(time));
+			projRef.setTime(Float.parseFloat(time));
 		} else {
 			projRef.setTime(0);
 		}
 		if (!actual_time.equals("Time in minutes")) {
-			projRef.setActual_time(Integer.parseInt(actual_time));
+			projRef.setActual_time(Float.parseFloat(actual_time));
 		} else {
 			projRef.setActual_time(0);
 		}
@@ -787,12 +787,12 @@ public class ProjectsController {
 		projRef.setItm_id(itm_id);
 		
 		if (!time.equals("Time in minutes")) {
-			projRef.setTime(Integer.parseInt(time));
+			projRef.setTime(Float.parseFloat(time));
 		} else {
 			projRef.setTime(0);
 		}
 		if (!actual_time.equals("Time in minutes")) {
-			projRef.setActual_time(Integer.parseInt(actual_time));
+			projRef.setActual_time(Float.parseFloat(actual_time));
 		} else {
 			projRef.setActual_time(0);
 		}
@@ -881,6 +881,11 @@ public class ProjectsController {
 			System.out.println("delete Projects id="+id);
 		}
 
+	}
+	
+	@RequestMapping(value = "/translate")
+	public ModelAndView showTranslate(HttpServletRequest request, HttpServletResponse response) {
+		return new ModelAndView("TranslatePage");
 	}
 	
 }

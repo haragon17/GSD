@@ -23,6 +23,7 @@
                                access="hasRole('EDITOR')" />
         <intercept-url pattern="/LogListing*" 
                                        access="hasRole('ADMIN')" /> --> 
+        <intercept-url pattern="/translate.htm" access="permitAll" />                               
         <intercept-url pattern="/forgotPass.htm" access="isAnonymous()" />   
         <intercept-url pattern="/chkUserName.htm" access="permitAll" />
         <intercept-url pattern="/register.htm" access="permitAll" />                            

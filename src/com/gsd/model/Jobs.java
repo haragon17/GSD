@@ -27,6 +27,7 @@ public class Jobs {
 	private int proj_id;
 	private int itm_id;
 	private int total_amount;
+	private int remain_job;
 	private String PP;
 	private String PK;
 	private String BKK;
@@ -170,6 +171,12 @@ public class Jobs {
 	}
 	public void setTotal_amount(int total_amount) {
 		this.total_amount = total_amount;
+	}
+	public int getRemain_job() {
+		return remain_job;
+	}
+	public void setRemain_job(int remain_job) {
+		this.remain_job = remain_job;
 	}
 	public String getPP() {
 		return PP;

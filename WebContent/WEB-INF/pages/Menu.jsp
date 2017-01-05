@@ -5,6 +5,7 @@
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/js/extjs/resources/ext-theme-neptune-charcoal/ext-theme-neptune-charcoal-all.css" />
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/ext-all.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/Menu.js"></script>
+<link rel="shortcut icon" type="image/png" href="<%=request.getContextPath()%>/image/gsd-icon.png">
 
 <div id="menu1" style="width:100%;overflow:hidden"></div>
 <div id="menu2" style="width:100%;overflow:hidden"></div>
