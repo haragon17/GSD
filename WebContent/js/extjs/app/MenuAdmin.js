@@ -178,6 +178,10 @@ Ext.onReady(function(){
     	mainPanels.doComponentLayout();
     	menuPanel.doComponentLayout();
 	});
+    window.onmousemove = function(e) {
+    	mainPanels.doComponentLayout();
+    	menuPanel.doComponentLayout();
+    }
 		},
 		failure: function(response, opts){
 			var responseOject = Ext.util.JSON.decode(response.responseText);

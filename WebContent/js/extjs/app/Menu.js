@@ -88,6 +88,10 @@ Ext.onReady(function(){
     });
     Ext.EventManager.onWindowResize(function () {    		mainPanels.doComponentLayout();    		menuPanel.doComponentLayout();
 	});
+    window.onmousemove = function(e) {
+    	mainPanels.doComponentLayout();
+    	menuPanel.doComponentLayout();
+    }
     
 		},
 		failure: function(response, opts){
