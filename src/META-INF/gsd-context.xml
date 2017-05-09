@@ -90,5 +90,9 @@
 	<bean id="AuditLoggingDao" class="com.gsd.dao.impl.AuditLoggingDaoImpl">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+	
+	<bean id="TimeRecordDao" class="com.gsd.dao.impl.TimeRecordDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
 
 </beans>

@@ -41,7 +41,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		sql += "ORDER BY cus_name";
-		System.out.println(sql);
+//		System.out.println(sql);
 		
 		List<Customer> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Customer>(Customer.class));
 		return result;
@@ -365,6 +365,14 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 
 		List<Customer> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Customer>(Customer.class));
 		return result;
+	}
+
+	@Override
+	public Customer findByCusID(int cus_id) {
+		
+		String sql = "SELECT * from customer where cus_id = "+cus_id;
+		
+		return getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<Customer>(Customer.class));
 	}
 
 }

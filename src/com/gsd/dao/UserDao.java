@@ -9,6 +9,8 @@ public interface UserDao {
 
 	public User findByUserName(String username);
 	
+	public User findByUserID(int usr_id);
+	
 	public void createUser(User user);
 
 	public int getLastUserId();
@@ -24,4 +26,6 @@ public interface UserDao {
 	public void changePassword(int id, String pass);
 	
 	public int countLastUpdateProject();
+	
+	public List<User> showUser(int type);
 }

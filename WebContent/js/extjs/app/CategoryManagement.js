@@ -155,7 +155,8 @@ store.cate1 = Ext.create('Ext.data.JsonStore', {
                     msg: operation.getError(),
                     icon: Ext.MessageBox.ERROR,
                     animateTarget: 'isave1',
-                    buttons: Ext.Msg.OK
+                    buttons: Ext.Msg.OK,
+                    fn: function(){location.reload()}
                 });
             }
         }
@@ -376,7 +377,14 @@ createCate1 = new Ext.create('Ext.window.Window', {
 		  					});
 				        },
 				        failure: function(form, action) {
-				            Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
+//				            Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
+				        	Ext.MessageBox.show({
+			                    title: 'REMOTE EXCEPTION',
+			                    msg: operation.getError(),
+			                    icon: Ext.MessageBox.ERROR,
+			                    buttons: Ext.Msg.OK,
+			                    fn: function(){location.reload()}
+			                });
 				        }
           			});
             	 }else {
@@ -431,7 +439,8 @@ store.cate2 = Ext.create('Ext.data.JsonStore', {
                     msg: operation.getError(),
                     icon: Ext.MessageBox.ERROR,
                     animateTarget: 'isave2',
-                    buttons: Ext.Msg.OK
+                    buttons: Ext.Msg.OK,
+                    fn: function(){location.reload()}
                 });
             }
         }
@@ -654,7 +663,14 @@ createCate2 = new Ext.create('Ext.window.Window', {
 	  					});
 	                    },
 				        failure: function(form, action) {
-				            Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
+//				            Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
+				        	Ext.MessageBox.show({
+			                    title: 'REMOTE EXCEPTION',
+			                    msg: operation.getError(),
+			                    icon: Ext.MessageBox.ERROR,
+			                    buttons: Ext.Msg.OK,
+			                    fn: function(){location.reload()}
+			                });
 				        }
           			});
             	 }else {
@@ -709,7 +725,8 @@ store.cate3 = Ext.create('Ext.data.JsonStore', {
                     msg: operation.getError(),
                     icon: Ext.MessageBox.ERROR,
                     animateTarget: 'isave3',
-                    buttons: Ext.Msg.OK
+                    buttons: Ext.Msg.OK,
+                    fn: function(){location.reload()}
                 });
             }
         }
@@ -929,7 +946,14 @@ createCate3 = new Ext.create('Ext.window.Window', {
 	  					});
 	                    },
 				        failure: function(form, action) {
-				            Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
+//				            Ext.Msg.alert('Failed', action.result ? action.result.message : 'No response');
+				        	Ext.MessageBox.show({
+			                    title: 'REMOTE EXCEPTION',
+			                    msg: operation.getError(),
+			                    icon: Ext.MessageBox.ERROR,
+			                    buttons: Ext.Msg.OK,
+			                    fn: function(){location.reload()}
+			                });
 				        }
           			});
             	 }else {

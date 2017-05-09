@@ -722,7 +722,13 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	public Projects findByProjectName(String name) {
 		// TODO Auto-generated method stub
 		String sql = "select * from projects where lower(proj_name)=lower('"+name+"')";
-		return getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<Projects>(Projects.class)) ;
+		return getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<Projects>(Projects.class));
+	}
+	
+	public Projects findByProjectID(int proj_id){
+		// TODO Auto-generated method stub
+		String sql = "select * from projects where proj_id = "+proj_id;
+		return getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<Projects>(Projects.class));
 	}
 
 }

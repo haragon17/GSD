@@ -134,7 +134,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	
 	public List<JobsReference> searchTodayJobsReference(Map<String, String> data){
 		
-		String sql = "SELECT job_ref_id, job_ref_name, jobs.job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, itm_name, job_name, proj_name, cus_name, dept, jobs.proj_id\n"+
+		String sql = "SELECT job_ref_id, job_ref_name, jobs.job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, job_ref_approve, itm_name, job_name, proj_name, cus_name, dept, jobs.proj_id\n"+
 				"FROM jobs_reference\n"+
 				"LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"+
 				"LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n"+
@@ -192,7 +192,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	
 	@Override
 	public JobsReference searchJobsReferenceByID(int id) {
-		String sql = "SELECT job_ref_id, jobs.job_id, job_ref_name, cus_name, cus_code, proj_name, itm_name, job_name, amount, job_in, job_out, job_ref_dtl, job_ref_status, dept, jobs_reference.proj_ref_id\n"+
+		String sql = "SELECT job_ref_id, jobs.job_id, job_ref_name, cus_name, cus_code, proj_name, itm_name, job_name, amount, job_in, job_out, job_ref_dtl, job_ref_status, job_ref_approve, dept, jobs_reference.proj_ref_id\n"+
 				"FROM jobs_reference\n"+
 				"LEFT JOIN jobs ON jobs.job_id = jobs_reference.job_id\n"+
 				"LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"+
@@ -801,6 +801,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					+ "job_out=?, "
 					+ "job_ref_dtl=?, "
 					+ "job_ref_status=?, "
+					+ "job_ref_approve=?, "
 					+ "update_date=now() "
 					+ "where job_ref_id=?";
 			
@@ -816,7 +817,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					ps.setTimestamp(5, jobRef.getJob_out_ts());
 					ps.setString(6, jobRef.getJob_ref_dtl());
 					ps.setString(7, jobRef.getJob_ref_status());
-					ps.setInt(8, jobRef.getJob_ref_id());
+					ps.setString(8, jobRef.getJob_ref_approve());
+					ps.setInt(9, jobRef.getJob_ref_id());
 				}
 				
 				@Override
@@ -839,6 +841,21 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 						"Jobs Status",
 						jobRefLs_audit.get(y).getJob_ref_status(),
 						jobRef_new.getJob_ref_status(),
+						"Updated",
+						jobRefLs_audit.get(y).getJob_name()+" : "+jobRef_new.getJob_ref_name()
+					});
+				}
+				
+				if(!jobRefLs_audit.get(y).getJob_ref_approve().equals(jobRef_new.getJob_ref_approve())){
+					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					this.getJdbcTemplate().update(audit, new Object[]{
+						getLastAuditId(),
+						jobRef_new.getJob_ref_id(),
+						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
+						user.getUserModel().getUsr_name(),
+						"Jobs Approve",
+						jobRefLs_audit.get(y).getJob_ref_approve(),
+						jobRef_new.getJob_ref_approve(),
 						"Updated",
 						jobRefLs_audit.get(y).getJob_name()+" : "+jobRef_new.getJob_ref_name()
 					});
@@ -1316,6 +1333,42 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		
 		String sql = "select * from jobs where lower(job_name)=lower('"+name+"')";
 		return getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
+	}
+
+	@Override
+	public List<JobsReference> showJobsReferenceByCustomer(int id) {
+		
+		String sql = "SELECT job_ref_id, job_ref_name FROM jobs_reference job_ref\n"+
+				"LEFT JOIN jobs ON jobs.job_id = job_ref.job_id\n"+
+				"LEFT JOIN projects proj ON proj.proj_id = jobs.proj_id\n"+
+				"LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"+
+				"WHERE proj.cus_id = "+id+
+				"\nORDER BY job_ref_name";
+
+		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
+		return result;
+	}
+
+	@Override
+	public List<JobsReference> showJobsReferenceByProject(int id) {
+		
+		String sql = "SELECT job_ref_id, job_ref_name FROM jobs_reference job_ref\n"+
+				"LEFT JOIN jobs ON jobs.job_id = job_ref.job_id\n"+
+				"LEFT JOIN projects proj ON proj.proj_id = jobs.proj_id\n"+
+				"WHERE jobs.proj_id = "+id+
+				"\nORDER BY job_ref_name";
+
+		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
+		return result;
+	}
+	
+	@Override
+	public List<JobsReference> showJobsReference() {
+		
+		String sql = "SELECT job_ref_id, job_ref_name FROM jobs_reference ORDER BY job_ref_name";
+
+		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
+		return result;
 	}
 
 }

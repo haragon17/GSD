@@ -1419,9 +1419,16 @@ addItem = new Ext.create('Ext.window.Window', {
           					});
                             },
                             failure : function(form, action) {
-								Ext.Msg.alert('Failed',
-										action.result ? action.result.message
-												: 'No response');
+//								Ext.Msg.alert('Failed',
+//										action.result ? action.result.message
+//												: 'No response');
+                            	Ext.MessageBox.show({
+                                    title: 'REMOTE EXCEPTION',
+                                    msg: operation.getError(),
+                                    icon: Ext.MessageBox.ERROR,
+                                    buttons: Ext.Msg.OK,
+                                    fn: function(){location.reload()}
+                                });
 							}
               			});
                 	 }else {
@@ -2009,9 +2016,16 @@ editItem = new Ext.create('Ext.window.Window', {
 								});
 							},
 							failure : function(form, action) {
-								Ext.Msg.alert('Failed',
-										action.result ? action.result.message
-												: 'No response');
+//								Ext.Msg.alert('Failed',
+//										action.result ? action.result.message
+//												: 'No response');
+								Ext.MessageBox.show({
+				                    title: 'REMOTE EXCEPTION',
+				                    msg: operation.getError(),
+				                    icon: Ext.MessageBox.ERROR,
+				                    buttons: Ext.Msg.OK,
+				                    fn: function(){location.reload()}
+				                });
 							}
 						});
 					} else {

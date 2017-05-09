@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,6 +35,8 @@ public class UserController {
 	private String uname, fname, lname, email;
 	private static int chkPush;
 
+	private static final Logger logger = Logger.getLogger(UserController.class);
+	
 	public UserController() {
 		this.context = new ClassPathXmlApplicationContext("META-INF/gsd-context.xml");
 		this.userDao = (UserDao) this.context.getBean("UserDao");
@@ -71,6 +74,25 @@ public class UserController {
 
 	}
 
+	@RequestMapping(value = "/showUser")
+	public ModelAndView showUser(HttpServletRequest request, HttpServletResponse response){
+		
+		List<User> userLs = null;
+		int type = Integer.parseInt(request.getParameter("type"));
+		
+		try{
+			userLs = userDao.showUser(type);
+		}catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", userLs);
+		jobj.put("total", userLs.size());
+
+		return new ModelAndView("jsonView", jobj);
+	}
+	
 	@RequestMapping(value = "/chkUserName")
 	public ModelAndView chkUserName(@RequestParam("records") String userName, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {

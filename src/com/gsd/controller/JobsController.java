@@ -101,6 +101,32 @@ public class JobsController {
 		}
 	}
 	
+	@RequestMapping(value = "/showJobRef")
+	public ModelAndView showJobReference(HttpServletRequest request, HttpServletResponse response) {
+
+		List<JobsReference> jobRef = null;
+		int id = Integer.parseInt(request.getParameter("id"));
+		int type = Integer.parseInt(request.getParameter("type"));
+		
+		try{
+			if(type == 1){
+				jobRef = jobsDao.showJobsReferenceByCustomer(id);
+			}else if(type == 2){
+				jobRef = jobsDao.showJobsReferenceByProject(id);
+			}else{
+				jobRef = jobsDao.showJobsReference();
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", jobRef);
+		jobj.put("total", jobRef.size());
+
+		return new ModelAndView("jsonView", jobj);
+	}
+	
 	@RequestMapping(value = "/chkJobName")
 	public ModelAndView chkJobName(@RequestParam("records") String name, HttpServletRequest request,
 			HttpServletResponse response){

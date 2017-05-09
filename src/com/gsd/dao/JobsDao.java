@@ -12,6 +12,12 @@ public interface JobsDao {
 	
 	public int getLastJobReferenceId();
 	
+	public List<JobsReference> showJobsReference();
+	
+	public List<JobsReference> showJobsReferenceByCustomer(int id);
+	
+	public List<JobsReference> showJobsReferenceByProject(int id);
+	
 	public List<Jobs> searchJobs(Map<String, String> data);
 	
 	public Jobs searchJobsByID(int id);

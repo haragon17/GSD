@@ -22,7 +22,9 @@ public class JobsReference {
 	private String proj_name;
 	private String job_name;
 	private String cus_name;
+	private String cus_code;
 	private String job_ref_status;
+	private String job_ref_approve;
 	private String dept;
 	
 	public int getJob_ref_id() {
@@ -133,11 +135,23 @@ public class JobsReference {
 	public void setCus_name(String cus_name) {
 		this.cus_name = cus_name;
 	}
+	public String getCus_code() {
+		return cus_code;
+	}
+	public void setCus_code(String cus_code) {
+		this.cus_code = cus_code;
+	}
 	public String getJob_ref_status() {
 		return job_ref_status;
 	}
 	public void setJob_ref_status(String job_ref_status) {
 		this.job_ref_status = job_ref_status;
+	}
+	public String getJob_ref_approve() {
+		return job_ref_approve;
+	}
+	public void setJob_ref_approve(String job_ref_approve) {
+		this.job_ref_approve = job_ref_approve;
 	}
 	public String getDept() {
 		return dept;

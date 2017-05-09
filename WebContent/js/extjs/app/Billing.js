@@ -3,6 +3,7 @@ panels = {};
 myStackItem = [];
 myRadarItem = [];
 var userDept = "";
+userType = 0;
 editorDate = "";
 
 Ext.override(Ext.chart.axis.Radial, {
@@ -29,7 +30,7 @@ Ext.override(Ext.chart.axis.Radial, {
 });
 
 Ext.onReady(function() {
-
+	
 	map = new Ext.util.KeyMap(document,{
 	    key: [117], // press F6
 	    fn: function(){ 
@@ -46,19 +47,21 @@ Ext.onReady(function() {
 		success: function(response, opts){
 			var responseOject = Ext.decode(response.responseText);
 			userDept = responseOject.user[0].dept;
+			userType = responseOject.user[0].usr_type;
 			Ext.Ajax.request({
 				url : 'searchJobsParam.htm?sdept='+userDept+'&first=yes',
 				success : function(response, opts) {
 					store.jobs.loadPage(1);
 				}
 			});
+			do_a();
 		},
 		failure: function(response, opts){
 			var responseOject = Ext.util.JSON.decode(response.responseText);
 			Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
 		}
 	});
-
+	
 	mydept = new Ext.form.Hidden({
 		name : 'mydept',
 		id : 'mydept'
@@ -432,7 +435,7 @@ Ext.onReady(function() {
 							Ext.getCmp('jobTabs').setTitle("Jobs");
 							store.jobs.loadPage(1);
 							store.jobsRefToday.reload();
-							store.jobsToday.reload();
+//							store.jobsToday.reload();
 						}
 					});
 
@@ -459,358 +462,143 @@ Ext.onReady(function() {
 		} ]
 
 	});
-	
-	panels.tabs = Ext.create('Ext.tab.Panel', {
-		renderTo : document.body,
-		width: 1200,
-//		height: 548,
-		frame: true,
-		style : {
-			"margin-left" : "auto",
-			"margin-right" : "auto",
-			"margin-top" : "15px",
-			"margin-bottom" : "10px"
-		},
-	    items: [{
-	    	id: 'projTabs',
-	    	title: 'Projects',
-	    	items: grid
-	    },{
-	    	id: 'jobTabs',
-	    	disabled: true,
-	    	title: 'Jobs',
-	    	items: gridRef
-	    },{
-	    	id: 'todayTabs',
-	    	title: 'Today Jobs',
-	    	items: gridToday
-	    }],
-	    listeners: {
-            'tabchange': function (tabPanel, tab) {
-                if(tab.id == 'todayTabs'){
-                	store.jobsRefToday.reload();
-                	gridToday.getStore().reload();
-//                	for(var xyz=0;xyz<store.jobsToday.count();xyz++){
-//        				if(Ext.fly(gridToday.plugins[0].view.getNodes()[xyz]).hasCls(gridToday.plugins[0].rowCollapsedCls) == true){
-//        					gridToday.plugins[0].toggleRow(xyz, gridToday.getStore().getAt(xyz));
-//        				}
-//        			}
-//                	setTimeout(function(){
-//                		Ext.getCmp('gridToday_bbar').setText('<b>Total Count : '+store.jobsRefToday.getCount()+'</b>');
-//                	},500); 
-                }else if(tab.id == 'jobTabs'){
-                	store.jobs.reload();
-                	Ext.getCmp('filterSearchField').setValue("");
-                	store.jobs.clearFilter();
-                }else if(tab.id == 'projTabs'){
-                	store.jobs.reload();
-                	Ext.getCmp('filterSearchField').setValue("");
-                	store.jobs.clearFilter();
-                }
-            },
-            'afterrender': function(){
-            	grid.down('toolbar').add('->',{
-            		xtype : 'button',
-            		text : "Add Job's Project",
-            		id : 'job_add',
-            		iconCls : 'icon-add',
-            		handler : function() {
-            			Ext.getCmp('adept').setValue(userDept);
-            			addJob.show();
-            		}
-            	});
-            	grid.down('statusbar').add('->',{
-              		xtype : 'tbtext',
-             		 id : 'grid_total',
-              		text : '<b>Total Jobs : '+store.jobs.getTotalCount()+' <b>&nbsp;&nbsp;&nbsp;'
-            	});
-            }
-        }
-	})
-	
-	/*panels.grid = Ext.create('Ext.grid.Panel', {
-//		renderTo : document.body,
-		title : 'Billing Report',
-		split : true,
-		forceFit : true,
-		loadMask : true,
-		autoWidth : true,
-		frame : true,
-		store : store.jobsRef,
-		tools : [ {
-			xtype : 'button',
-			text : 'Report',
-			id : 'ireport',
-			iconCls : 'icon-excel',
-			disabled : true,
-			handler : function() {
-				alert("Print!");
-			}
-		},{
-			xtype : 'button',
-			text : 'Add Job',
-			id : 'icreate',
-			iconCls : 'icon-add',
-			handler : function() {
-				addJob.show();
-			}
-		} ],
-		style : {
-			"margin-left" : "auto",
-			"margin-right" : "auto",
-			"margin-top" : "15px",
-			"margin-bottom" : "10px"
-		},
-		width : 1200,
-		height : 500,
-		columns : [
-				{
-					text : "Date in",
-					flex : 1,
-					sortable : true,
-					dataIndex : 'job_in',
-					renderer: Ext.util.Format.dateRenderer('Y-m-d')
+	function do_a(){
+		if(userType == 2){
+			panels.tabs = Ext.create('Ext.tab.Panel', {
+				renderTo : document.body,
+				width: 1200,
+				frame: true,
+				style : {
+					"margin-left" : "auto",
+					"margin-right" : "auto",
+					"margin-top" : "15px",
+					"margin-bottom" : "10px"
 				},
-				{
-					text : "Date out",
-					flex : 1,
-					sortable : true,
-					dataIndex : 'job_out',
-					renderer: Ext.util.Format.dateRenderer('Y-m-d')
-				},
-				{
-					text : "Job Name",
-					flex : 2.5,
-					sortable : true,
-					dataIndex : 'job_name'
-				},
-				{
-					text : "Customer Name",
-					flex : 2,
-					sortable : true,
-					dataIndex : 'cus_name'
-				},
-				{
-					text : "Project Name",
-					flex : 2,
-					sortable : true,
-					dataIndex : 'proj_name'
-				},
-				{
-					text : "Item",
-					flex : 2,
-					sortable : true,
-					dataIndex : 'itm_name'
-				},
-				{
-					text : "Amount",
-					flex : 1,
-					sortable : true,
-					dataIndex : 'amount'
-				},
-				{
-					text : "Dept",
-					flex : 0.7,
-					sortable : true,
-					dataIndex : 'dept'
-				},
-				{
-					text : "Status",
-					flex : 1,
-					sortable : true,
-					dataIndex : 'job_status'
-				},
-				{
-					text : 'Print',
-					xtype : 'actioncolumn',
-					flex : 0.7,
-					align : 'center',
-					id : 'print',
-					items : [ {
-						iconCls : 'icon-print',
-						handler : function(grid, rowIndex, colIndex) {
-							job_id = grid.getStore().getAt(rowIndex).get('job_id');
-							
-							Ext.Ajax.request({
-								url : 'printJobTicket.htm?job_id='+job_id,
-								success: function(response, opts){
-									
-								},
-								failure: function(response, opts){
-									var responseOject = Ext.util.JSON.decode(response.responseText);
-									Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
-								}
-							});
-						}
-					} ]
-				},
-				{
-					text : 'Edit',
-					xtype : 'actioncolumn',
-					flex : 0.7,
-					align : 'center',
-					id : 'edit',
-					items : [ {
-						iconCls : 'table-edit',
-						handler : function(grid, rowIndex, colIndex) {
-							job_id = grid.getStore().getAt(rowIndex).get('job_id');
-							job_name = grid.getStore().getAt(rowIndex).get('job_name');
-							cus_id = grid.getStore().getAt(rowIndex).get('cus_id');
-							cus_name = grid.getStore().getAt(rowIndex).get('cus_name');
-							cus_code = grid.getStore().getAt(rowIndex).get('cus_code');
-							proj_id = grid.getStore().getAt(rowIndex).get('proj_id');
-							proj_ref_id = grid.getStore().getAt(rowIndex).get('proj_ref_id');
-							job_dtl = grid.getStore().getAt(rowIndex).get('job_dtl');
-							amount = grid.getStore().getAt(rowIndex).get('amount');
-							dept = grid.getStore().getAt(rowIndex).get('dept');
-							job_in = grid.getStore().getAt(rowIndex).get('job_in');
-							job_out = grid.getStore().getAt(rowIndex).get('job_out');
-							status = grid.getStore().getAt(rowIndex).get('job_status');
-							
-							Ext.getCmp('eproj_id').getStore().load({
-								url: 'showProjects.htm?id='+cus_id
-							});
-							
-							Ext.getCmp('eproj_ref_id').getStore().load({
-								url: 'showProjectsReference.htm?id='+proj_id
-							});
-							
-							Ext.getCmp('ejob_id').setValue(job_id);
-							Ext.getCmp('ejob_name').setValue(job_name);
-							Ext.getCmp('ecus_id').setValue(cus_id);
-							Ext.getCmp('ecus_name').setValue(cus_name);
-							Ext.getCmp('ecus_code').setValue(cus_code);
-							Ext.getCmp('eproj_id').setValue(proj_id);
-							Ext.getCmp('eproj_ref_id').setValue(proj_ref_id);
-							Ext.getCmp('ejob_dtl').setValue(job_dtl);
-							Ext.getCmp('eamount').setValue(amount);
-							Ext.getCmp('edept').setValue(dept);
-							Ext.getCmp('ejob_in').setValue(job_in);
-							Ext.getCmp('ejob_out').setValue(job_out);
-							if(status != "undefined"){
-								Ext.getCmp('estatus').setValue(status);
-							}
-							editJob.show();
-						}
-					} ]
-				},
-				{
-					text : 'Delete',
-					xtype : 'actioncolumn',
-					flex : 0.7,
-					align : 'center',
-					id : 'del',
-					items : [ {
-						iconCls : 'icon-delete',
-						handler : function(grid, rowIndex, colIndex) {
-							job_id = grid.getStore().getAt(rowIndex).get('job_id');
-							Ext.getCmp('jobid').setValue(job_id);
-							Ext.MessageBox.show({
-								title : 'Confirm',
-								msg : 'Are you sure you want to delete this?',
-								buttons : Ext.MessageBox.YESNO,
-								animateTarget : 'del',
-								fn : confirmChk,
-								icon : Ext.MessageBox.QUESTION
-							});
-						}
-					} ]
-				}, ],
-		columnLines : true,
-		listeners: {
-			viewready: function (grid) {
-		        var view = grid.view;
-		        this.toolTip = Ext.create('Ext.tip.ToolTip', {
-		            target: view.el,
-		            delegate: view.cellSelector,
-		            trackMouse: true,
-		            renderTo: Ext.getBody(),
-		            listeners: {
-		                beforeshow: function(tip) {
-		                    var trigger = tip.triggerElement,
-		                        parent = tip.triggerElement.parentElement,
-		                        columnTitle = view.getHeaderByCell(trigger).text,
-		                        columnDataIndex = view.getHeaderByCell(trigger).dataIndex,
-		                        columnText = view.getRecord(parent).get(columnDataIndex).toString();
-		                    if (columnText){
-		                        tip.update("<b>"+columnText+"</b>");
-		                    } else {
-		                        return false;
-		                    }
+			    items: [
+			    {
+			    	id: 'projTabs',
+			    	title: 'Projects',
+			    	items: grid
+			    },{
+			    	id: 'jobTabs',
+			    	disabled: true,
+			    	title: 'Jobs',
+			    	items: gridRef
+			    },
+			    {
+			    	id: 'todayTabs',
+			    	title: 'Publication Jobs',
+			    	items: gridToday
+			    }
+			    ],
+			    listeners: {
+		            'tabchange': function (tabPanel, tab) {
+		                if(tab.id == 'todayTabs'){
+		                	store.jobsRefToday.reload();
+		                	gridToday.getStore().reload();
+		//                	for(var xyz=0;xyz<store.jobsToday.count();xyz++){
+		//        				if(Ext.fly(gridToday.plugins[0].view.getNodes()[xyz]).hasCls(gridToday.plugins[0].rowCollapsedCls) == true){
+		//        					gridToday.plugins[0].toggleRow(xyz, gridToday.getStore().getAt(xyz));
+		//        				}
+		//        			}
+		//                	setTimeout(function(){
+		//                		Ext.getCmp('gridToday_bbar').setText('<b>Total Count : '+store.jobsRefToday.getCount()+'</b>');
+		//                	},500); 
+		                }else if(tab.id == 'jobTabs'){
+		                	store.jobs.reload();
+		                	Ext.getCmp('filterSearchField').setValue("");
+		                	store.jobs.clearFilter();
+		                }else if(tab.id == 'projTabs'){
+		                	store.jobs.reload();
+		                	Ext.getCmp('filterSearchField').setValue("");
+		                	store.jobs.clearFilter();
 		                }
+		            },
+		            'afterrender': function(){
+		            	grid.down('toolbar').add('->',{
+		            		xtype : 'button',
+		            		text : "Add Job's Project",
+		            		id : 'job_add',
+		            		iconCls : 'icon-add',
+		            		handler : function() {
+		            			Ext.getCmp('adept').setValue(userDept);
+		            			addJob.show();
+		            		}
+		            	});
+		            	grid.down('statusbar').add('->',{
+		              		xtype : 'tbtext',
+		             		 id : 'grid_total',
+		              		text : '<b>Total Jobs : '+store.jobs.getTotalCount()+' <b>&nbsp;&nbsp;&nbsp;'
+		            	});
 		            }
-		        });
-	        }
-	    },
-		bbar : Ext.create('Ext.PagingToolbar', {
-			store : store.jobsRef,
-			displayInfo : true,
-			displayMsg : 'Displaying Jobs {0} - {1} of {2}',
-			emptyMsg : "No Job to display",
-			plugins : Ext.create('Ext.ux.ProgressBarPager', {})
-		})
-	});*/
+		        }
+			});
+		}else{
+			panels.tabs = Ext.create('Ext.tab.Panel', {
+				renderTo : document.body,
+				width: 1200,
+				frame: true,
+				style : {
+					"margin-left" : "auto",
+					"margin-right" : "auto",
+					"margin-top" : "15px",
+					"margin-bottom" : "10px"
+				},
+			    items: [
+			    {
+			    	id: 'todayTabs',
+			    	title: 'Publication Jobs',
+			    	items: gridTodayType3
+			    }
+			    ],
+			    listeners: {
+		            'tabchange': function (tabPanel, tab) {
+		                if(tab.id == 'todayTabs'){
+		                	store.jobsRefToday.reload();
+		                	gridToday.getStore().reload();
+		//                	for(var xyz=0;xyz<store.jobsToday.count();xyz++){
+		//        				if(Ext.fly(gridToday.plugins[0].view.getNodes()[xyz]).hasCls(gridToday.plugins[0].rowCollapsedCls) == true){
+		//        					gridToday.plugins[0].toggleRow(xyz, gridToday.getStore().getAt(xyz));
+		//        				}
+		//        			}
+		//                	setTimeout(function(){
+		//                		Ext.getCmp('gridToday_bbar').setText('<b>Total Count : '+store.jobsRefToday.getCount()+'</b>');
+		//                	},500); 
+		                }else if(tab.id == 'jobTabs'){
+		                	store.jobs.reload();
+		                	Ext.getCmp('filterSearchField').setValue("");
+		                	store.jobs.clearFilter();
+		                }else if(tab.id == 'projTabs'){
+		                	store.jobs.reload();
+		                	Ext.getCmp('filterSearchField').setValue("");
+		                	store.jobs.clearFilter();
+		                }
+		            },
+		            'afterrender': function(){
+		            	grid.down('toolbar').add('->',{
+		            		xtype : 'button',
+		            		text : "Add Job's Project",
+		            		id : 'job_add',
+		            		iconCls : 'icon-add',
+		            		handler : function() {
+		            			Ext.getCmp('adept').setValue(userDept);
+		            			addJob.show();
+		            		}
+		            	});
+		            	grid.down('statusbar').add('->',{
+		              		xtype : 'tbtext',
+		             		 id : 'grid_total',
+		              		text : '<b>Total Jobs : '+store.jobs.getTotalCount()+' <b>&nbsp;&nbsp;&nbsp;'
+		            	});
+		            }
+		        }
+			});
+		}
+	}
+	
+	setInterval(function(){store.jobsRefToday.reload()},150000);
 	
 }); //end onReady
-
-//Ext.define('jobRefModel', {
-//	extend : 'Ext.data.Model',
-//	fields : [ {
-//		name : 'job_id',
-//		type : 'int'
-//	}, {
-//		name : 'job_ref_id',
-//		type : 'int'
-//	},{
-//		name : 'job_ref_name',
-//		type : 'string'
-//	}, {
-//		name : 'cus_name',
-//		type : 'string'
-//	}, {
-//		name : 'cus_code',
-//		type : 'string'
-//	}, {
-//		name : 'proj_name',
-//		type : 'string'
-//	}, {
-//		name : 'itm_name',
-//		type : 'string'
-//	}, {
-//		name : 'amount',
-//		type : 'int'
-//	}, {
-//		name : 'job_ref_dtl',
-//		type : 'string'
-//	}, {
-//		name : 'job_in',
-//		type : 'date',
-//		dateFormat: 'Y-m-d H:i:s'
-//	}, {
-//		name : 'job_out',
-//		type : 'date',
-//		dateFormat: 'Y-m-d H:i:s'
-//	}, {
-//		name : 'dept',
-//		type : 'string'
-//	}, {
-//		name : 'cus_id',
-//		type : 'int'
-//	}, {
-//		name : 'proj_ref_id',
-//		type : 'int'
-//	}, {
-//		name : 'itm_id',
-//		type : 'int'
-//	}, {
-//		name : 'proj_id',
-//		type : 'int'
-//	}, {
-//		name : 'job_status',
-//		type : 'string'
-//	}
-//	]
-//});
 
 Ext.define('jobRefModel', {
 	extend : 'Ext.data.Model',
@@ -861,6 +649,9 @@ Ext.define('jobRefModel', {
 	},{
 		name : 'dept',
 		type : 'string'
+	},{
+		name : 'job_ref_approve',
+		type : 'string'
 	}
 	]
 });
@@ -896,7 +687,8 @@ store.jobsRef = Ext.create('Ext.data.JsonStore', {
                     title: 'REMOTE EXCEPTION',
                     msg: operation.getError(),
                     icon: Ext.MessageBox.ERROR,
-                    buttons: Ext.Msg.OK
+                    buttons: Ext.Msg.OK,
+                    fn: function(){location.reload()}
                 });
             }
         }
@@ -949,7 +741,8 @@ store.jobsRefToday = Ext.create('Ext.data.JsonStore', {
                     title: 'REMOTE EXCEPTION',
                     msg: operation.getError(),
                     icon: Ext.MessageBox.ERROR,
-                    buttons: Ext.Msg.OK
+                    buttons: Ext.Msg.OK,
+                    fn: function(){location.reload()}
                 });
             }
         }
@@ -1051,22 +844,22 @@ store.jobs = Ext.create('Ext.data.JsonStore', {
 	}
 })
 
-store.jobsToday = Ext.create('Ext.data.JsonStore', {
-	model : 'jobModel',
-	id : 'jobTodayStore',
-	pageSize : 20,
-	autoLoad : true,
-	proxy : {
-		type : 'ajax',
-		url : 'searchTodayJobs.htm',
-		reader : {
-			type : 'json',
-			root : 'records',
-			idProperty : 'job_id',
-			totalProperty : 'total'
-		}
-	}
-});
+//store.jobsToday = Ext.create('Ext.data.JsonStore', {
+//	model : 'jobModel',
+//	id : 'jobTodayStore',
+//	pageSize : 20,
+//	autoLoad : true,
+//	proxy : {
+//		type : 'ajax',
+//		url : 'searchTodayJobs.htm',
+//		reader : {
+//			type : 'json',
+//			root : 'records',
+//			idProperty : 'job_id',
+//			totalProperty : 'total'
+//		}
+//	}
+//});
 
 var currency = Ext.create('Ext.data.Store', {
     fields: ['currency','name'],
@@ -1118,6 +911,25 @@ var jobRefStatus = Ext.create('Ext.data.Store', {
 	        {"name":"Final"},
 	        {"name":"Sent"},
 	        {"name":"Hold"}     
+	]
+});
+
+var jobRefApprove = Ext.create('Ext.data.Store', {
+	fields: ['name'],
+	data : [
+	        {"name":"Done"},
+	        {"name":"Hold"},
+	        {"name":"Wait Final"},
+	        {"name":"Wait Check"},
+	        {"name":"Checking..."},
+	        {"name":"Retouching..."},
+	        {"name":"Sent PDF Vorab"},
+	        {"name":"Sent PDF Final"},
+	        {"name":"Die Zeit CC1"},
+	        {"name":"Die Zeit CC2"},
+	        {"name":"Die Zeit CC3"},
+	        {"name":"Up Proof"},
+	        {"name":"Wait FI"}     
 	]
 });
 
@@ -1375,7 +1187,7 @@ var gridRef = Ext.create('Ext.grid.Panel', {
 	     							Ext.getCmp('jobTabs').setTitle("Jobs");
 	     							store.jobs.loadPage(1);
 	     							store.jobsRefToday.reload();
-	     							store.jobsToday.reload();
+//	     							store.jobsToday.reload();
 	     						}
 	     					});
 						}else{
@@ -1951,6 +1763,13 @@ var gridToday = Ext.create('Ext.grid.Panel', {
 				editable : false
 			}
 		},
+		{
+			text : "Approve",
+			flex : 1.1,
+			aligh : 'center',
+			sortable : true,
+			dataIndex : 'job_ref_approve'
+		},
 	    {
 			text : "Name",
 			flex : 1.5,
@@ -2048,155 +1867,268 @@ var gridToday = Ext.create('Ext.grid.Panel', {
 			})
 });
 
-//var gridToday = Ext.create('Ext.grid.Panel', {
-//	id : 'TodayGrid',
-//	store : store.jobsToday,
-//	xtype: 'row-expander-grid',
-//	tbar : [{
-//		xtype : 'button',
-//		text : 'Report',
-//		id : 'ireporttoday',
-//		iconCls : 'icon-excel',
-//		disabled: true,
-//		handler : function() {
-//			job_id = Ext.getCmp('jobid_ref').getValue();
-//			myForm = Ext.getCmp('formPanel').getForm();
-//			myForm.submit({
-//				target : '_blank',
-//                        url: 'printReport.htm?job_id='+job_id,
-//                        method: 'POST',
-//                        reset: true,
-//                        standardSubmit: true
-//			})
-//		}
-//	}],
-//	minHeight: 500,
-//	columns : [
-//		{
-//			text : "Name",
-//			flex : 2,
-//			sortable : true,
-//			dataIndex : 'job_name',
-//		},
-//	    {
-//	    	text : "Customer Name",
-//	    	flex : 1.5,
-//	    	sortable : true,
-//	    	dataIndex : 'cus_name',
-//	    },
-//	    {
-//	    	text : "Project Name",
-//			flex : 1.5,
-//			sortable : true,
-//			dataIndex : 'proj_name'
-//	    },
-//	    {
-//	    	text : "Status",
-//			flex : 0.7,
-//			sortable : true,
-//			dataIndex : 'job_status'
-//	    }],
-//		viewConfig: { 
-//	        stripeRows: false, 
-//	        getRowClass: function(record) { 
-//	            if(record.get('job_status') == "Processing"){
-//	        		return 'process-row'; 
-//	        	}else if(record.get('job_status') == "Hold"){
-//	        		return 'hold-row';
-//	        	}else if(record.get('job_status') == "Checked"){
-//	        		return 'check-row';
-//	        	}else if(record.get('job_status') == "Billed"){
-//	        		return 'bill-row';
-//	        	}else if(record.get('job_status') == "Sent"){
-//	        		return 'sent-row';
-//	        	}
-//	        } 
-//	    },
-//		listeners : {
-//			viewready: function (grid) {
-//		        var view = grid.view;
-//		        this.toolTip = Ext.create('Ext.tip.ToolTip', {
-//		            target: view.el,
-//		            delegate: view.cellSelector,
-//		            trackMouse: true,
-//		            renderTo: Ext.getBody(),
-//		            listeners: {
-//		                beforeshow: function(tip) {
-//		                    var trigger = tip.triggerElement,
-//		                        parent = tip.triggerElement.parentElement,
-//		                        columnTitle = view.getHeaderByCell(trigger).text,
-//		                        columnDataIndex = view.getHeaderByCell(trigger).dataIndex,
-//		                        columnText = view.getRecord(parent).get(columnDataIndex).toString();
-//		                    if (columnText){
-//		                        tip.update("<b>"+(columnText.replace(/\r\n|\n/gi, "<br>"))+"</b>");
-//		                    } else {
-//		                        return false;
-//		                    }
-//		                }
-//		            }
-//		        });
-//	        }
-//	    },
-//	    plugins: [{
-//	        ptype: 'rowexpander',
-//	        rowBodyTpl : new Ext.XTemplate(
-//	        		'{job_id:this.myJobRef}',
-//	        		{
-//	        			myJobRef: function(v){
-//	        				var myText = "";
-//	        				store.jobsRefToday.each(function(rec){
-//	        					if(rec.data.job_id == v){
-//	        						var date_in = "";
-//			        				var deadline = "";
-//			        				var item = "";
-//			        				var amount = "";
-//			        				var status = "";
-//			        				if(rec.data.job_in != "" || rec.data.job_in != null){
-//			        					date_in = Ext.Date.format(rec.data.job_in, 'Y-m-d');
-//			            			 }else{
-//			            				 date_in = "-";
-//			            			 }
-//			        				if(rec.data.job_out != "" || rec.data.job_out != null){
-//			        					deadline = Ext.Date.format(rec.data.job_out, 'Y-m-d H:i');
-//			            			 }else{
-//			            				 deadline = "-";
-//			            			 }
-//			        				if(rec.data.itm_name != "" || rec.data.itm_name != null){
-//			        					item = rec.data.itm_name;
-//			            			 }else{
-//			            				 item = "-";
-//			            			 }
-//			        				if(rec.data.amount != 0 || rec.data.amount != "0"){
-//			        					amount = rec.data.amount;
-//			            			 }else{
-//			            				 amount = "-";
-//			            			 }
-//			        				if(rec.data.job_ref_status == "New"){
-//			        					status = "<font color=blue>"+rec.data.job_ref_status+"</font>";
-//			        				}else if(rec.data.job_ref_status == "Hold"){
-//	        							status = "<font color=red>"+rec.data.job_ref_status+"</font>";
-//			        				}else{
-//			        					status = rec.data.job_ref_status;
-//			        				}
-//	        						myText += '<tr><td bgcolor=#FFFBD8>Date in: <b>'+date_in+'</b></td>'+
-//	        						'<td bgcolor=#FFFBD8>Deadline: <b><font color=red>'+deadline+'</font></b></td>'+
-//	        						'<td bgcolor=#FFFBD8>Job Name: <b>'+rec.data.job_ref_name+'</b></td>'+
-//	        						'<td bgcolor=#FFFBD8>Item Name: <b>'+item+'</b></td>'+
-//	        						'<td bgcolor=#FFFBD8>Amount: <b>'+amount+'</b></td>'+
-//	        						'<td bgcolor=#FFFBD8>Status: <b>'+status+'</b></td></tr>';
-//	        					}
-//	        				})
-//							return "<table cellspacing=8 class=\"myTable\">"+myText+"</table>";
-//	        			}
-//	        		}
-//	        )
-//	    }],
-//		bbar : ['->',{
-//			xtype: 'tbtext',
-//			id: 'gridToday_bbar',
-//            text: 'Loading ...'
-//		},{xtype: 'tbspacer', width: 5}]
-//});
+var gridTodayType3 = Ext.create('Ext.grid.Panel', {
+	id : 'TodayGrid',
+	store : store.jobsRefToday,
+	tbar : [{
+		xtype : 'button',
+		text : 'Report',
+		id : 'ireporttoday',
+		iconCls : 'icon-excel',
+		disabled: true,
+		handler : function() {
+			job_id = Ext.getCmp('jobid_ref').getValue();
+			myForm = Ext.getCmp('formPanel').getForm();
+			myForm.submit({
+				target : '_blank',
+                        url: 'printReport.htm?job_id='+job_id,
+                        method: 'POST',
+                        reset: true,
+                        standardSubmit: true
+			})
+		}
+	},"->",
+//	{
+//		xtype: 'tbtext',
+//		id: 'gridToday_tbar',
+//        text: 'Loading ...'
+//	},{xtype: 'tbspacer', width: 5},
+	{
+		iconCls: 'icon-save',
+		text: 'Save All',
+		id: 'isave-syncToday',
+		iconAlign: 'right',
+        tooltip: 'Sync data from server',
+        disabled: false,
+        itemId: 'saveSync',
+        scope: this,
+        handler: function(){
+        	store.jobsRefToday.sync();
+        }
+	}],
+	minHeight: 608,
+	columnLines : true,
+	columns : [
+		{
+			text : "Date in",
+			flex : 1,
+			sortable : true,
+			dataIndex : 'job_in',
+			renderer: Ext.util.Format.dateRenderer('Y-m-d'),
+		},
+		{
+			text : "Date out",
+			flex : 1,
+			sortable : true,
+			dataIndex : 'job_out',
+			renderer: function(value, meta, record, rowIndex, colIndex, store){
+				myStatus = record.get('job_ref_status');
+				today = new Date();
+				getDay = today.getDay();
+				if(getDay == 6){
+					today.setDate(today.getDate()+2);
+				}
+				todayFormat = Ext.util.Format.date(today, 'Y-m-d');
+				dateOut = Ext.util.Format.date(value, 'Y-m-d');
+				if(myStatus != "Hold"){
+					if(dateOut <= todayFormat){
+						return '<b><span style="color:red;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+					}else{
+						return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+					}
+				}else{
+					return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+				}
+			},
+		},
+		{
+			text : "Time",
+			flex : 0.6,
+			sortable : true,
+			dataIndex : 'job_out',
+			renderer: function(value, meta, record, rowIndex, colIndex, store){
+				myStatus = record.get('job_ref_status');
+				today = new Date();
+				getDay = today.getDay();
+				if(getDay == 6){
+					today.setDate(today.getDate()+2);
+				}
+				todayFormat = Ext.util.Format.date(today, 'Y-m-d');
+				dateOut = Ext.util.Format.date(value, 'Y-m-d');
+				if(myStatus != "Hold"){
+					if(dateOut <= todayFormat){
+						return '<b><span style="color:red;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+					}else{
+						return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+					}
+				}else{
+					return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+				}
+			},
+		},
+		{
+	    	text : "Customer Name",
+	    	flex : 2.2,
+	    	sortable : true,
+	    	dataIndex : 'cus_name',
+	    	renderer : renderCustomer
+	    },
+		{
+			text : "Job Name",
+			flex : 2.5,
+			sortable : true,
+			dataIndex : 'job_ref_name',
+		},
+		{
+			text : "Item",
+			flex : 1.5,
+			sortable : true,
+			dataIndex : 'itm_name',
+		},
+		{
+			dataIndex : 'proj_ref_id',
+			hidden : true,
+			hideable : false
+		},
+		{
+			text : "Amount",
+			flex : 0.7,
+			align : 'center',
+			sortable : true,
+			dataIndex : 'amount',
+		},
+		{
+			text : "Status",
+			flex : 0.7,
+			align : 'center',
+			sortable : true,
+			renderer : function(val){
+				if(val == "New" || val == "New Pic" || val == "New Doc" || val == "New Pic+Doc"){
+					return '<b><span style="color:blue;">' + val + '</span></b>';
+				}else if(val == "Hold"){
+					return '<b><span style="color:red;">' + val + '</span></b>';
+				}else{
+					return '<b>'+val+'</b>';
+				}
+			},
+			dataIndex : 'job_ref_status',
+		},
+		{
+			text : "Approve",
+			flex : 1.1,
+			align : 'center',
+			sortable : true,
+			dataIndex : 'job_ref_approve',
+			renderer : function(val){
+				if(val == "Done" || val == "Sent PDF Vorab" || val == "Send PDF Final" || val == "Die Zeit CC1" || val == "Die Zeit CC2" || val == "Die Zeit CC3"){
+					return '<b><span style="color:#13baff;">' + val + '</span></b>';
+				}else if(val == "Hold"){
+					return '<b><span style="color:red;">' + val + '</span></b>';
+				}else if(val == "Wait Final"){
+					return '<b><span style="color:#ec8500;">' + val + '</span></b>';
+				}else{
+					return '<b>'+val+'</b>';
+				}
+			},
+			editor : {
+				xtype : 'combobox',
+				store : jobRefApprove,
+				value : 'name',
+				displayField : 'name',
+				editable : false
+			}
+		},
+	    {
+			text : "Name",
+			flex : 1.5,
+			sortable : true,
+			dataIndex : 'job_name',
+			hidden : true,
+		}],
+		viewConfig: { 
+	        stripeRows: false, 
+	        getRowClass: function(record) { 
+	        	if(record.get('job_ref_status') == "Hold"){
+	        		return 'hold-row';
+	            }else if(record.get('job_ref_status') == "New" || record.get('job_ref_status') == "New Pic" || record.get('job_ref_status') == "New Doc" || record.get('job_ref_status') == "New Pic+Doc"){
+	        		return 'process-row'; 
+	        	}else{
+	        		return 'cc-row';
+	        	}
+	        } 
+	    },
+		listeners : {
+			viewready: function (grid) {
+		        var view = grid.view;
+		        this.toolTip = Ext.create('Ext.tip.ToolTip', {
+		            target: view.el,
+		            delegate: view.cellSelector,
+		            trackMouse: true,
+		            renderTo: Ext.getBody(),
+		            listeners: {
+		                beforeshow: function(tip) {
+		                    var trigger = tip.triggerElement,
+		                        parent = tip.triggerElement.parentElement,
+		                        columnTitle = view.getHeaderByCell(trigger).text,
+		                        columnDataIndex = view.getHeaderByCell(trigger).dataIndex,
+		                        columnText = view.getRecord(parent).get(columnDataIndex).toString();
+		                    if(columnDataIndex == "cus_name"){
+		                    	columnText += "("+view.getRecord(parent).get('proj_name').toString()+")";
+		                    }
+		                    if (columnText){
+		                        tip.update("<b>"+(columnText.replace(/\r\n|\n/gi, "<br>"))+"</b>");
+		                    } else {
+		                        return false;
+		                    }
+		                }
+		            }
+		        });
+	        }
+	    },
+	    plugins: 
+		    [{ 
+		        ptype: 'cellediting',
+		        clicksToEdit: 2,
+		        listeners: {
+			        beforeedit: function (editor, e) {
+			        	Ext.getCmp('projrefidtoday').setValue(0);
+			        	if(e.field == "job_out"){
+							editorDate = e.value;
+			        	}else if(e.field == "itm_name"){
+			        		Ext.getCmp('edit_itm_today').getStore().load({
+								url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
+							});
+			        	}
+					},
+					afteredit: function (editor, e) {
+						if(e.field == "itm_name"){
+							if(Ext.getCmp('projrefidtoday').getValue() != 0){
+								e.record.set('proj_ref_id', Ext.getCmp('projrefidtoday').getValue());
+							}
+						}
+					},
+					edit: function (editor, e) {
+						if(e.field == "job_out"){
+							try{
+								myTime = Ext.getCmp('edit_time_today').getValue();
+								var myDate = new Date(editorDate.getFullYear(), editorDate.getMonth(), editorDate.getDate(), myTime.getHours(), myTime.getMinutes());
+								Ext.getCmp('edit_time_today').setValue(myDate);
+								e.record.set('job_out', myDate);
+							}catch(e){
+								console.log(e.message);
+							}
+						}
+					}
+		        }
+		    }],
+		    bbar : Ext.create('Ext.PagingToolbar', {
+				store : store.jobsRefToday,
+				displayInfo : true,
+				displayMsg : '<b>Total Count : {2} <b>&nbsp;&nbsp;&nbsp;',
+				emptyMsg : "No Job to display",
+//				plugins : Ext.create('Ext.ux.ProgressBarPager', {}),
+			})
+});
 
 addJob = new Ext.create('Ext.window.Window', {
 	title: "Add Job's Project",
@@ -2484,11 +2416,18 @@ addJob = new Ext.create('Ext.window.Window', {
           					});
                             },
                             failure : function(form, action) {
-								Ext.Msg.alert('Failed',
-										action.result ? action.result.message
-												: 'No response');
-								addJob.hide();
-      							store.jobs.reload();
+//								Ext.Msg.alert('Failed',
+//										action.result ? action.result.message
+//												: 'No response');
+//								addJob.hide();
+//      							store.jobs.reload();
+                            	Ext.MessageBox.show({
+				                    title: 'REMOTE EXCEPTION',
+				                    msg: operation.getError(),
+				                    icon: Ext.MessageBox.ERROR,
+				                    buttons: Ext.Msg.OK,
+				                    fn: function(){location.reload()}
+				                });
 							}
               			});
                 	 }else {
@@ -2816,11 +2755,18 @@ editJob = new Ext.create('Ext.window.Window', {
           					});
                             },
                             failure : function(form, action) {
-								Ext.Msg.alert('Failed',
-										action.result ? action.result.message
-												: 'No response');
-								editJob.hide();
-      							store.jobs.reload();
+//								Ext.Msg.alert('Failed',
+//										action.result ? action.result.message
+//												: 'No response');
+//								editJob.hide();
+//      							store.jobs.reload();
+                            	Ext.MessageBox.show({
+				                    title: 'REMOTE EXCEPTION',
+				                    msg: operation.getError(),
+				                    icon: Ext.MessageBox.ERROR,
+				                    buttons: Ext.Msg.OK,
+				                    fn: function(){location.reload()}
+				                });
 							}
               			});
                 	 }else {
@@ -3118,12 +3064,19 @@ addJobRef = new Ext.create('Ext.window.Window', {
          					});
                            },
                            failure : function(form, action) {
-								Ext.Msg.alert('Failed',
-										action.result ? action.result.message
-												: 'No response');
-								addJobRef.hide();
-     							store.jobs.reload();
-     							store.jobsRef.reload();
+//								Ext.Msg.alert('Failed',
+//										action.result ? action.result.message
+//												: 'No response');
+//								addJobRef.hide();
+//     							store.jobs.reload();
+//     							store.jobsRef.reload();
+                        	   Ext.MessageBox.show({
+				                    title: 'REMOTE EXCEPTION',
+				                    msg: operation.getError(),
+				                    icon: Ext.MessageBox.ERROR,
+				                    buttons: Ext.Msg.OK,
+				                    fn: function(){location.reload()}
+				                });
 							}
              			});
                	 }else {
@@ -3166,12 +3119,19 @@ addJobRef = new Ext.create('Ext.window.Window', {
           					});
                             },
                             failure : function(form, action) {
-								Ext.Msg.alert('Failed',
-										action.result ? action.result.message
-												: 'No response');
-								addJobRef.hide();
-     							store.jobs.reload();
-     							store.jobsRef.reload();
+//								Ext.Msg.alert('Failed',
+//										action.result ? action.result.message
+//												: 'No response');
+//								addJobRef.hide();
+//     							store.jobs.reload();
+//     							store.jobsRef.reload();
+                            	Ext.MessageBox.show({
+				                    title: 'REMOTE EXCEPTION',
+				                    msg: operation.getError(),
+				                    icon: Ext.MessageBox.ERROR,
+				                    buttons: Ext.Msg.OK,
+				                    fn: function(){location.reload()}
+				                });
 							}
               			});
                 	 }else {
@@ -3467,12 +3427,19 @@ editJobRef = new Ext.create('Ext.window.Window', {
           					});
                             },
                             failure : function(form, action) {
-								Ext.Msg.alert('Failed',
-										action.result ? action.result.message
-												: 'No response');
-								editJobRef.hide();
-      							store.jobs.reload();
-      							store.jobsRef.reload();
+//								Ext.Msg.alert('Failed',
+//										action.result ? action.result.message
+//												: 'No response');
+//								editJobRef.hide();
+//      							store.jobs.reload();
+//      							store.jobsRef.reload();
+                            	Ext.MessageBox.show({
+				                    title: 'REMOTE EXCEPTION',
+				                    msg: operation.getError(),
+				                    icon: Ext.MessageBox.ERROR,
+				                    buttons: Ext.Msg.OK,
+				                    fn: function(){location.reload()}
+				                });
 							}
               			});
                 	 }else {

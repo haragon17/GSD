@@ -771,6 +771,8 @@ Ext.onReady(function() {
 		})
 	});*/
 	
+	setInterval(function(){store.jobsRefToday.reload()},150000);
+	
 }); //end onReady
 
 //Ext.define('jobRefModel', {
@@ -881,6 +883,9 @@ Ext.define('jobRefModel', {
 	},{
 		name : 'dept',
 		type : 'string'
+	},{
+		name : 'job_ref_approve',
+		type : 'string'
 	}
 	]
 });
@@ -917,7 +922,8 @@ store.jobsRef = Ext.create('Ext.data.JsonStore', {
                     title: 'REMOTE EXCEPTION',
                     msg: operation.getError(),
                     icon: Ext.MessageBox.ERROR,
-                    buttons: Ext.Msg.OK
+                    buttons: Ext.Msg.OK,
+                    fn: function(){location.reload()}
                 });
             }
         }
@@ -981,7 +987,8 @@ store.jobsRefToday = Ext.create('Ext.data.JsonStore', {
                     title: 'REMOTE EXCEPTION',
                     msg: operation.getError(),
                     icon: Ext.MessageBox.ERROR,
-                    buttons: Ext.Msg.OK
+                    buttons: Ext.Msg.OK,
+                    fn: function(){location.reload()}
                 });
             }
         }
@@ -1149,6 +1156,25 @@ var jobRefStatus = Ext.create('Ext.data.Store', {
 	        {"name":"Final"},
 	        {"name":"Sent"},
 	        {"name":"Hold"}     
+	]
+});
+
+var jobRefApprove = Ext.create('Ext.data.Store', {
+	fields: ['name'],
+	data : [
+	        {"name":"Done"},
+	        {"name":"Hold"},
+	        {"name":"Wait Final"},
+	        {"name":"Wait Check"},
+	        {"name":"Checking..."},
+	        {"name":"Retouching..."},
+	        {"name":"Sent PDF Vorab"},
+	        {"name":"Sent PDF Final"},
+	        {"name":"Die Zeit CC1"},
+	        {"name":"Die Zeit CC2"},
+	        {"name":"Die Zeit CC3"},
+	        {"name":"Up Proof"},
+	        {"name":"Wait FI"}     
 	]
 });
 
@@ -1982,6 +2008,20 @@ var gridToday = Ext.create('Ext.grid.Panel', {
 				editable : false
 			}
 		},
+		{
+			text : "Approve",
+			flex : 1.1,
+			aligh : 'center',
+			sortable : true,
+			dataIndex : 'job_ref_approve',
+			editor : {
+				xtype : 'combobox',
+				store : jobRefApprove,
+				value : 'name',
+				displayField : 'name',
+				editable : false
+			}
+		},
 	    {
 			text : "Name",
 			flex : 1.5,
@@ -2530,9 +2570,16 @@ addJob = new Ext.create('Ext.window.Window', {
           					});
                             },
                             failure : function(form, action) {
-								Ext.Msg.alert('Failed',
-										action.result ? action.result.message
-												: 'No response');
+//								Ext.Msg.alert('Failed',
+//										action.result ? action.result.message
+//												: 'No response');
+                            	Ext.MessageBox.show({
+				                    title: 'REMOTE EXCEPTION',
+				                    msg: operation.getError(),
+				                    icon: Ext.MessageBox.ERROR,
+				                    buttons: Ext.Msg.OK,
+				                    fn: function(){location.reload()}
+				                });
 							}
               			});
                 	 }else {
@@ -2860,9 +2907,16 @@ editJob = new Ext.create('Ext.window.Window', {
           					});
                             },
                             failure : function(form, action) {
-								Ext.Msg.alert('Failed',
-										action.result ? action.result.message
-												: 'No response');
+//								Ext.Msg.alert('Failed',
+//										action.result ? action.result.message
+//												: 'No response');
+                            	Ext.MessageBox.show({
+				                    title: 'REMOTE EXCEPTION',
+				                    msg: operation.getError(),
+				                    icon: Ext.MessageBox.ERROR,
+				                    buttons: Ext.Msg.OK,
+				                    fn: function(){location.reload()}
+				                });
 							}
               			});
                 	 }else {
@@ -3220,9 +3274,16 @@ addJobRef = new Ext.create('Ext.window.Window', {
          					});
                            },
                            failure : function(form, action) {
-								Ext.Msg.alert('Failed',
-										action.result ? action.result.message
-												: 'No response');
+//								Ext.Msg.alert('Failed',
+//										action.result ? action.result.message
+//												: 'No response');
+                        	   Ext.MessageBox.show({
+				                    title: 'REMOTE EXCEPTION',
+				                    msg: operation.getError(),
+				                    icon: Ext.MessageBox.ERROR,
+				                    buttons: Ext.Msg.OK,
+				                    fn: function(){location.reload()}
+				                });
 							}
              			});
                	 }else {
@@ -3281,10 +3342,17 @@ addJobRef = new Ext.create('Ext.window.Window', {
                             },
                             failure : function(form, action) {
                             	var responseOject = Ext.decode(action.response.responseText);
-                           	 	alert(responseOject.total);
-								Ext.Msg.alert('Failed',
-										action.result ? action.result.message
-												: 'No response');
+//                           	 	alert(responseOject.total);
+//								Ext.Msg.alert('Failed',
+//										action.result ? action.result.message
+//												: 'No response');
+                           	 Ext.MessageBox.show({
+				                    title: 'REMOTE EXCEPTION',
+				                    msg: operation.getError(),
+				                    icon: Ext.MessageBox.ERROR,
+				                    buttons: Ext.Msg.OK,
+				                    fn: function(){location.reload()}
+				                });
 							}
               			});
                 	 }else {
@@ -3579,9 +3647,16 @@ editJobRef = new Ext.create('Ext.window.Window', {
           					});
                             },
                             failure : function(form, action) {
-								Ext.Msg.alert('Failed',
-										action.result ? action.result.message
-												: 'No response');
+//								Ext.Msg.alert('Failed',
+//										action.result ? action.result.message
+//												: 'No response');
+                            	Ext.MessageBox.show({
+				                    title: 'REMOTE EXCEPTION',
+				                    msg: operation.getError(),
+				                    icon: Ext.MessageBox.ERROR,
+				                    buttons: Ext.Msg.OK,
+				                    fn: function(){location.reload()}
+				                });
 							}
               			});
                 	 }else {

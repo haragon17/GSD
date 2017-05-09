@@ -98,6 +98,8 @@ public class ProjectsController {
 		
 		if(type == 0 || type == 1){
 			return new ModelAndView("ProjectsAdmin");
+		}else if(type == 3){
+			return new ModelAndView("redirect:jobs.htm");
 		}else{
 			return new ModelAndView("Projects");
 		}

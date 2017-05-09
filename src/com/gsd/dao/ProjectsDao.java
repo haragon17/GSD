@@ -44,4 +44,6 @@ public interface ProjectsDao {
 	public void createProjects(Projects proj);
 	
 	public Projects findByProjectName(String name);
+	
+	public Projects findByProjectID(int proj_id);
 }

@@ -17,7 +17,7 @@ Ext.onReady(function(){
 		    pemail = responseOject.user[0].email;
 		    pphone = responseOject.user[0].phone;
 		    pid = responseOject.user[0].usr_id;
-			
+		    usr_type = responseOject.user[0].usr_type;
 		    
 		    
     
@@ -40,6 +40,16 @@ Ext.onReady(function(){
 			    },
 			    epasswordText: 'Passwords do not match'
 			});
+			
+			if(usr_type == 2){
+				jmd_menu = {
+						  text: 'Projects',
+						  href: 'projects.htm',
+						  hrefTarget: '_self'
+			          }
+			}else{
+				jmd_menu = "";
+			}
 		    
 	/**Create a top Panel*/
 	mainPanels = new Ext.Panel({
@@ -67,11 +77,12 @@ Ext.onReady(function(){
     	renderTo: 'menu2',
     	margin: '-1 0 0 0',
         tbar:[
-          {
-			  text: 'Projects',
-			  href: 'projects.htm',
-			  hrefTarget: '_self'
-          },
+//          {
+//			  text: 'Projects',
+//			  href: 'projects.htm',
+//			  hrefTarget: '_self'
+//          },
+		  jmd_menu,
           {
         	  text: 'Jobs',
         	  href: 'jobs.htm',

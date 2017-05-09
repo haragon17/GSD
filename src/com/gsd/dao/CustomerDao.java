@@ -19,5 +19,7 @@ public interface CustomerDao {
 	
 	public Customer findByCusCode(String cus_code);
 	
+	public Customer findByCusID(int cus_id);
+	
 	public List<Customer> showCustomer();
 }

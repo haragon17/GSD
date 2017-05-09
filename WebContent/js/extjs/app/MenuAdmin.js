@@ -135,6 +135,11 @@ Ext.onReady(function(){
 //            		}
           },
           {
+	    	  text: 'Time Record',
+	    	  href: 'timeRecord.htm',
+			  hrefTarget: '_self'
+	      },
+          {
         	  text: 'Customer Management',
         	  href: 'customer.htm',
 			  hrefTarget: '_self'
@@ -158,15 +163,18 @@ Ext.onReady(function(){
 //	        	window.location = 'keyAccountManagerment.htm'
 //	        	}
 	      },
-	      admin_menu,admin_menu2,
+	      admin_menu,
+	      admin_menu2,
           {
         	xtype: 'tbfill'  
           },
           {
         	text: 'Last 7 day = <font color="red">'+last7day+'</font>',
-        	handler : function(){
-        		window.location = 'projects.htm?l7d=yes'
-        	}
+        	href: 'projects.htm?l7d=yes',
+			hrefTarget: '_self'
+//        	handler : function(){
+//        		window.location = 'projects.htm?l7d=yes'
+//        	}
           },
           {
         	  xtype: 'tbtext',
