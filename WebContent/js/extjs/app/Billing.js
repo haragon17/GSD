@@ -918,18 +918,25 @@ var jobRefApprove = Ext.create('Ext.data.Store', {
 	fields: ['name'],
 	data : [
 	        {"name":"Done"},
-	        {"name":"Hold"},
+	        {"name":"Sent PDF Vorab"},
+	        {"name":"Sent PDF K1"},
+	        {"name":"Sent PDF K2"},
+	        {"name":"Sent PDF Final"},
 	        {"name":"Wait Final"},
 	        {"name":"Wait Check"},
-	        {"name":"Checking..."},
-	        {"name":"Retouching..."},
-	        {"name":"Sent PDF Vorab"},
-	        {"name":"Sent PDF Final"},
-	        {"name":"Die Zeit CC1"},
-	        {"name":"Die Zeit CC2"},
-	        {"name":"Die Zeit CC3"},
+	        {"name":"Wait FI"},
 	        {"name":"Up Proof"},
-	        {"name":"Wait FI"}     
+	        {"name":"CC1"},
+	        {"name":"CC2"},
+	        {"name":"CC3"},
+	        {"name":"CC4"},
+	        {"name":"Wait Mask"},
+	        {"name":"Wait Move Mask"},
+	        {"name":"Missing Pic"},
+	        {"name":"Low Quality Pic"},
+	        {"name":"Low Res Pic"},
+	        {"name":"Ask Customer"},
+	        {"name":"Hold Other"}
 	]
 });
 
@@ -1549,6 +1556,16 @@ var gridToday = Ext.create('Ext.grid.Panel', {
 //        text: 'Loading ...'
 //	},{xtype: 'tbspacer', width: 5},
 	{
+		type:'refresh',
+		iconCls: 'icon-refresh',
+	    tooltip: 'Refresh grid below',
+	    // hidden:true,
+	    handler: function() {
+	        // refresh logic
+	    	store.jobsRefToday.reload();
+	    }
+    },
+	{
 		iconCls: 'icon-save',
 		text: 'Save All',
 		id: 'isave-syncToday',
@@ -1656,7 +1673,8 @@ var gridToday = Ext.create('Ext.grid.Panel', {
 	    	flex : 2.2,
 	    	sortable : true,
 	    	dataIndex : 'cus_name',
-	    	renderer : renderCustomer
+	    	renderer : renderCustomer,
+			hidden : true
 	    },
 		{
 			text : "Job Name",
@@ -1765,10 +1783,29 @@ var gridToday = Ext.create('Ext.grid.Panel', {
 		},
 		{
 			text : "Approve",
-			flex : 1.1,
-			aligh : 'center',
+			flex : 1.3,
+			align : 'center',
 			sortable : true,
-			dataIndex : 'job_ref_approve'
+			dataIndex : 'job_ref_approve',
+			renderer : function(val){
+				if(val == "Done" || val == "Sent PDF Vorab" || val == "Sent PDF K1" || val == "Sent PDF K2" || val == "Sent PDF Final" || val == "Up Proof" || val == "CC1" || val == "CC2" || val == "CC3" || val == "CC4"){
+					return '<b><span style="color:#13baff;">' + val + '</span></b>';
+//				}else if(val == "Hold Wait Mask" || val == "Hold Missing" || val == "Hold Low Quality" || val == "Hold Low Res" || val == "Hold Move Mask" || val == "Hold Ask Customer" || val == "Hold Other"){
+				}else if(val == "Wait Mask" || val == "Wait Move Mask" || val == "Missing Pic" || val == "Low Quality Pic" || val == "Low Res Pic" || val == "Ask Customer" || val == "Hold Other"){	
+					return '<b><span style="color:red;">' + val + '</span></b>';
+				}else if(val == "Wait Final" || val == "Wait Check" || val == "Wait FI"){
+					return '<b><span style="color:#ec8500;">' + val + '</span></b>';
+				}else{
+					return '<b>'+val+'</b>';
+				}
+			},
+			editor : {
+				xtype : 'combobox',
+				store : jobRefApprove,
+				value : 'name',
+				displayField : 'name',
+				editable : false
+			}
 		},
 	    {
 			text : "Name",
@@ -1894,6 +1931,16 @@ var gridTodayType3 = Ext.create('Ext.grid.Panel', {
 //        text: 'Loading ...'
 //	},{xtype: 'tbspacer', width: 5},
 	{
+		type:'refresh',
+		iconCls: 'icon-refresh',
+	    tooltip: 'Refresh grid below',
+	    // hidden:true,
+	    handler: function() {
+	        // refresh logic
+	    	store.jobsRefToday.reload();
+	    }
+    },
+	{
 		iconCls: 'icon-save',
 		text: 'Save All',
 		id: 'isave-syncToday',
@@ -1971,7 +2018,8 @@ var gridTodayType3 = Ext.create('Ext.grid.Panel', {
 	    	flex : 2.2,
 	    	sortable : true,
 	    	dataIndex : 'cus_name',
-	    	renderer : renderCustomer
+	    	renderer : renderCustomer,
+			hidden : true
 	    },
 		{
 			text : "Job Name",
@@ -2015,16 +2063,17 @@ var gridTodayType3 = Ext.create('Ext.grid.Panel', {
 		},
 		{
 			text : "Approve",
-			flex : 1.1,
+			flex : 1.3,
 			align : 'center',
 			sortable : true,
 			dataIndex : 'job_ref_approve',
 			renderer : function(val){
-				if(val == "Done" || val == "Sent PDF Vorab" || val == "Send PDF Final" || val == "Die Zeit CC1" || val == "Die Zeit CC2" || val == "Die Zeit CC3"){
+				if(val == "Done" || val == "Sent PDF Vorab" || val == "Sent PDF K1" || val == "Sent PDF K2" || val == "Sent PDF Final" || val == "Up Proof" || val == "CC1" || val == "CC2" || val == "CC3" || val == "CC4"){
 					return '<b><span style="color:#13baff;">' + val + '</span></b>';
-				}else if(val == "Hold"){
+//				}else if(val == "Hold Wait Mask" || val == "Hold Missing" || val == "Hold Low Quality" || val == "Hold Low Res" || val == "Hold Move Mask" || val == "Hold Ask Customer" || val == "Hold Other"){
+				}else if(val == "Wait Mask" || val == "Wait Move Mask" || val == "Missing Pic" || val == "Low Quality Pic" || val == "Low Res Pic" || val == "Ask Customer" || val == "Hold Other"){	
 					return '<b><span style="color:red;">' + val + '</span></b>';
-				}else if(val == "Wait Final"){
+				}else if(val == "Wait Final" || val == "Wait Check" || val == "Wait FI"){
 					return '<b><span style="color:#ec8500;">' + val + '</span></b>';
 				}else{
 					return '<b>'+val+'</b>';
