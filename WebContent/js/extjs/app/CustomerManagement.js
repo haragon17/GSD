@@ -350,17 +350,25 @@ Ext.onReady(function() {
 							cus_id = grid.getStore().getAt(rowIndex).get(
 									'cus_id');
 							Ext.getCmp('cusid').setValue(cus_id);
+//							Ext.MessageBox.show({
+//								title : 'Confirm',
+//								msg : 'Are you sure you want to delete this?',
+//								buttons : Ext.MessageBox.YESNO,
+//								animateTarget : 'del',
+//								fn : confirmChk,
+//								icon : Ext.MessageBox.QUESTION
+//							});
 							Ext.MessageBox.show({
-								title : 'Confirm',
-								msg : 'Are you sure you want to delete this?',
-								buttons : Ext.MessageBox.YESNO,
+								title : 'Information',
+								msg : 'Please contact IT Department for delete !',
+								buttons : Ext.MessageBox.OK,
 								animateTarget : 'del',
-								fn : confirmChk,
-								icon : Ext.MessageBox.QUESTION
+								icon : Ext.MessageBox.INFO
 							});
 						}
 					} ]
-				}, ],
+				}, 
+				],
 		columnLines : true,
 		listeners: {
 			viewready: function (grid) {

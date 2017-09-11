@@ -33,7 +33,7 @@ public class UserController {
 	private ApplicationContext context;
 	private UserDao userDao;
 	private String uname, fname, lname, email;
-	private static int chkPush;
+	private static int chkPush,chkTR;
 
 	private static final Logger logger = Logger.getLogger(UserController.class);
 	
@@ -44,6 +44,10 @@ public class UserController {
 
 	public void setChk(int chk){
 		this.chkPush = chk;
+	}
+	
+	public void setChkTR(int chkTR){
+		this.chkTR = chkTR;
 	}
 //	static final PasswordEncoder passwordEncoder = new StandardPasswordEncoder();
 	static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -66,6 +70,12 @@ public class UserController {
 			chkPush = 0;
 		}else{
 			jobj.put("chk",0);
+		}
+		if(chkTR != 0){
+			jobj.put("chkTR",chkTR);
+			chkTR = 0;
+		}else{
+			jobj.put("chkTR",0);
 		}
 //		System.out.println("user = " + hashUser);
 //		System.out.println("admin = " + hashAdmin);

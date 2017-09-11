@@ -459,7 +459,7 @@ Ext.onReady(function() {
 					width : 300,
 					margin : '0 0 10 0',
 					msgTarget: 'under',
-					store : department,
+					store : 'deptStore',
 					valueField : 'name',
 					displayField : 'name',
 					listeners : {
@@ -486,7 +486,7 @@ Ext.onReady(function() {
 					emptyText : 'Billing Status',
 					width : 300,
 					magin : '0 0 10 0',
-					store : jobStatus,
+					store : 'jobStatus',
 					valueField : 'name',
 					displayField : 'name'
 				},
@@ -588,7 +588,8 @@ Ext.onReady(function() {
 			"margin-bottom" : "10px"
 		},
 		width : 1200,
-		height : 495,
+//		height : 495,
+		minHeight: 495,
 		columns : [
 				{
 					text : "Customer Name",
@@ -686,30 +687,7 @@ Ext.onReady(function() {
 		})
 	});
 
-});
-
-var department = Ext.create('Ext.data.Store', {
-	fields: ['name'],
-	data : [
-	        {"name":"E-Studio"},
-	        {"name":"Publication"},
-	        {"name":"Catalog"}
-//	        {"name":"PP"},
-//	        {"name":"KK"},
-//	        {"name":"BKK"}
-	]
-});
-
-var jobStatus = Ext.create('Ext.data.Store', {
-	fields: ['name'],
-	data : [
-	        {"name":"Processing"},
-	        {"name":"Sent"},
-	        {"name":"Checked"},
-	        {"name":"Billed"},
-	        {"name":"Hold"}     
-	]
-});
+});	//end onReady
 
 Ext.define('timeRecordModel', {
 	extend : 'Ext.data.Model',

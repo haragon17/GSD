@@ -683,17 +683,25 @@ Ext.onReady(function() {
 							file_id = grid.getStore().getAt(rowIndex).get('file_id');
 							Ext.getCmp('projid').setValue(proj_id);
 							Ext.getCmp('fid').setValue(file_id);
+//							Ext.MessageBox.show({
+//								title : 'Confirm',
+//								msg : 'Are you sure you want to delete this?',
+//								buttons : Ext.MessageBox.YESNO,
+//								animateTarget : 'del',
+//								fn : confirmChk,
+//								icon : Ext.MessageBox.QUESTION
+//							});
 							Ext.MessageBox.show({
-								title : 'Confirm',
-								msg : 'Are you sure you want to delete this?',
-								buttons : Ext.MessageBox.YESNO,
+								title : 'Information',
+								msg : 'Please contact IT Department for delete !',
+								buttons : Ext.MessageBox.OK,
 								animateTarget : 'del',
-								fn : confirmChk,
-								icon : Ext.MessageBox.QUESTION
+								icon : Ext.MessageBox.INFO
 							});
 						}
 					} ]
-				}, ],
+				},
+				],
 		columnLines : true,
 		listeners: {
 			viewready: function (grid) {
@@ -782,7 +790,8 @@ Ext.onReady(function() {
 		            				 '<td bgcolor=#F0F0F0>Price(Euro): <b>'+myEuro+'</b></td>'+
 		            				 '<td bgcolor=#F0F0F0>Description: <b>'+myDesc+'</b></td>'+
 		            				 '<td><a href="javascript:editItemFunction('+myIndex+');"><font color=#B0B0B0><u>edit</u></font></a></td>'+
-		            				 '<td><a href="javascript:deleteItem('+rec.data.proj_ref_id+');"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+		            				 '<td><a href="javascript:contactIT();"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+//		            				 '<td><a href="javascript:deleteItem('+rec.data.proj_ref_id+');"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
 		            			}
 		            		})
 		            		if(myText !== ""){
@@ -2094,6 +2103,16 @@ function deleteItem(proj_ref_id){
 	        }
 		}
 		
+	});
+}
+
+function contactIT(){
+	Ext.MessageBox.show({
+		title : 'Information',
+		msg : 'Please contact IT Department for delete !',
+		buttons : Ext.MessageBox.OK,
+		animateTarget : 'del',
+		icon : Ext.MessageBox.INFO
 	});
 }
 

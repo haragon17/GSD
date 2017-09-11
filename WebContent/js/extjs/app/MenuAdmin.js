@@ -32,6 +32,9 @@ Ext.onReady(function(){
 		    	Ext.getCmp('update_start').setValue(last);
 		    	Ext.getCmp('update_limit').setValue(date);
 		    	setTimeout(function() { Ext.get('searchs').dom.click(); }, 800);
+		    }else if(responseOject.chkTR != 0){
+		    	Ext.getCmp('sjob_ref_id').setValue(responseOject.chkTR);
+		    	setTimeout(function() { Ext.get('searchs').dom.click(); }, 800);
 		    }
 		    
 		    Ext.apply(Ext.form.field.VTypes, {

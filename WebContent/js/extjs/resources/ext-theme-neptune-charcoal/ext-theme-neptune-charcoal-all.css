@@ -77,6 +77,10 @@ img {
 	background-image: url(../../images/icons/fam/camera.png) !important;
 }
 
+.icon-clock {
+	background-image: url(../../images/icons/fam/clock_green.png) !important;
+}
+
 .chart-bar {
 	background-image: url(../../images/icons/fam/chart_bar.png) !important;
 }
@@ -125,6 +129,21 @@ img {
 
 .cc-row .x-grid-cell {
 	background-color: #FAE0BA !important; 
+    color: black; 
+}
+
+.estudio-row .x-grid-cell { 
+    background-color: #FDEBFD !important; 
+    color: black; 
+}
+
+.estudio_mm-row .x-grid-cell { 
+    background-color: #DAF4F9 !important; 
+    color: black; 
+}
+
+.estudio_masking-row .x-grid-cell { 
+    background-color: #DFFEF1 !important; 
     color: black; 
 }
 

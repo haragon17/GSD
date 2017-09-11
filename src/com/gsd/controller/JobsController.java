@@ -343,11 +343,13 @@ public class JobsController {
 		HttpSession session = request.getSession();
 		List<JobsReference> jobRef = null;
 		Map<String, String> map = new HashMap<String, String>();
+		String dept = request.getParameter("grid_dept");
 		
 		map.put("cus_id", (String)session.getAttribute("cus_id"));
 		map.put("proj_id", (String)session.getAttribute("proj_id"));
 		map.put("job_name", (String)session.getAttribute("job_name"));
-		map.put("dept", (String)session.getAttribute("dept"));
+//		map.put("dept", (String)session.getAttribute("dept"));
+		map.put("dept", dept);
 		map.put("status", (String)session.getAttribute("status"));
 	
 		try{

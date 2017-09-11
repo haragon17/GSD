@@ -9,6 +9,7 @@
  var errMessage = '${msg}';
 </script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/MemberManagement.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/Store.js"></script>
 <title>Member Management</title>
 </head>
 <body>

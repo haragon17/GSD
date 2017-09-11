@@ -50,7 +50,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		if(data.get("dept")==null || data.get("dept").isEmpty()){
 		}else{
-			sql += "AND dept = '"+data.get("dept")+"'\n";
+			sql += "AND dept LIKE '"+data.get("dept")+"%'\n";
 		}
 		if(data.get("status")==null || data.get("status").isEmpty()){
 		}else{
@@ -81,6 +81,17 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				+ "LEFT JOIN projects proj ON proj.proj_id = jobs.proj_id\n"
 				+ "LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"
 				+ "WHERE job_id = "+id;
+		
+		return getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
+	}
+	
+	public Jobs searchJobsByName(String name){
+		
+		String sql = "SELECT job_id, job_name, jobs.proj_id, proj_name, cus_name, cus_code, cus.cus_id, job_dtl, job_status, dept\n"
+				+ "FROM jobs\n"
+				+ "LEFT JOIN projects proj ON proj.proj_id = jobs.proj_id\n"
+				+ "LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"
+				+ "WHERE job_name = '"+name+"'";
 		
 		return getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
 	}
@@ -161,30 +172,48 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		if(data.get("dept")==null || data.get("dept").isEmpty()){
 		}else{
-			sql += "AND dept = '"+data.get("dept")+"'\n";
+			sql += "AND dept LIKE '"+data.get("dept")+"%'\n";
 		}
 		if(data.get("status")==null || data.get("status").isEmpty()){
 		}else{
 			sql += "AND job_status = '"+data.get("status")+"'\n";
 		}
 		
-		sql += 	"ORDER BY\n"+
-//				"CASE job_ref_status\n"+
-//				"WHEN 'New' 	THEN 1\n"+
-//				"WHEN 'CC' 		THEN 2\n"+
-//				"WHEN 'CC2' 	THEN 3\n"+
-//				"WHEN 'CC3' 	THEN 4\n"+
-//				"WHEN 'CC+Final' THEN 5\n"+
-//				"WHEN 'Final' 	THEN 6\n"+
-//				"WHEN 'Hold' 	THEN 7\n"+
-//				"WHEN 'Sent' 	THEN 8\n"+
-//				"ELSE 9\n"+
-				"CASE\n"+
-				"WHEN job_ref_status LIKE 'New%'	THEN 1\n"+
-				"WHEN job_ref_status = 'Hold'		THEN 3\n"+
-				"ELSE 2\n"+
-				"END,"+
-				"jobs_reference.job_out ASC";
+		if(data.get("dept") == "Publication"){
+			sql += 	"ORDER BY\n"+
+//					"CASE job_ref_status\n"+
+//					"WHEN 'New' 	THEN 1\n"+
+//					"WHEN 'CC' 		THEN 2\n"+
+//					"WHEN 'CC2' 	THEN 3\n"+
+//					"WHEN 'CC3' 	THEN 4\n"+
+//					"WHEN 'CC+Final' THEN 5\n"+
+//					"WHEN 'Final' 	THEN 6\n"+
+//					"WHEN 'Hold' 	THEN 7\n"+
+//					"WHEN 'Sent' 	THEN 8\n"+
+//					"ELSE 9\n"+
+					"CASE\n"+
+					"WHEN job_ref_status LIKE 'New%'	THEN 1\n"+
+					"WHEN job_ref_status = 'Hold'		THEN 3\n"+
+					"ELSE 2\n"+
+					"END,"+
+					"jobs_reference.job_out ASC";
+		}else{
+			sql += 	"ORDER BY\n"+
+					"CASE\n"+
+					"WHEN dept = 'E-Studio'			THEN 1\n"+
+					"WHEN dept = 'E-Studio_OTTO'	THEN 2\n"+
+					"WHEN dept = 'E-Studio_MM'		THEN 3\n"+
+					"ELSE 4\n"+
+					"END,"+
+					"CASE\n"+
+					"WHEN job_ref_status = 'New'	THEN 1\n"+
+					"WHEN job_ref_status = 'Hold'	THEN 3\n"+
+					"ELSE 2\n"+
+					"END,"+
+					"jobs_reference.job_out ASC";
+		}
+		
+//		System.out.println(sql);
 		
 		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
 		return result;
@@ -315,10 +344,10 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	@Override
 	public void createJob(Jobs job) {
 		
-		String sql = "INSERT INTO jobs VALUES (?,?,?,?,?,?,?,now(),now())";
+		String sql = "INSERT INTO jobs VALUES (default,?,?,?,?,?,?,now(),now())";
 		
 		this.getJdbcTemplate().update(sql, new Object[] {
-			job.getJob_id(),
+//			job.getJob_id(),
 			job.getJob_name(),
 			job.getProj_id(),
 			job.getJob_dtl(),
@@ -329,12 +358,12 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
-		Jobs job2 = searchJobsByID(job.getJob_id());
+		Jobs job2 = searchJobsByName(job.getJob_name());
 		
 		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
 				getLastAuditId(),
-				job.getJob_id(),
+				job2.getJob_id(),
 				"Jobs",
 				user.getUserModel().getUsr_name(),
 				"Created Jobs name="+job.getJob_name()+" on Projects name="+job2.getProj_name()+", customer="+job2.getCus_name()
@@ -346,10 +375,10 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	@Override
 	public void createJobReference(JobsReference jobRef) {
 		
-		String sql = "INSERT INTO jobs_reference VALUES (?,?,?,?,?,?,?,?,?,now(),now(),?)";
+		String sql = "INSERT INTO jobs_reference VALUES (default,?,?,?,?,?,?,?,?,now(),now(),?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[] {
-				jobRef.getJob_ref_id(),
+//				jobRef.getJob_ref_id(),
 				jobRef.getJob_id(),
 				jobRef.getJob_ref_name(),
 				jobRef.getProj_ref_id(),

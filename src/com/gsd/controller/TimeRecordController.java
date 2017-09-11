@@ -58,6 +58,11 @@ public class TimeRecordController {
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		int type = user.getUserModel().getUsr_type();
+		UserController uc = new UserController();
+		
+		if(request.getParameter("job_ref_id") != null && request.getParameter("job_ref_id") != null){
+			uc.setChkTR(Integer.parseInt(request.getParameter("job_ref_id")));
+		}
 		
 		HttpSession session = request.getSession();
 		session.setAttribute("tr_name", "");

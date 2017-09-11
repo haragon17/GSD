@@ -180,13 +180,20 @@ Ext.onReady(function() {
 						itm_id = grid.getStore().getAt(rowIndex).get(
 								'itm_id');
 						Ext.getCmp('itmid').setValue(itm_id);
+//						Ext.MessageBox.show({
+//							title : 'Confirm',
+//							msg : 'Are you sure you want to delete this?',
+//							buttons : Ext.MessageBox.YESNO,
+//							animateTarget : 'del',
+//							fn : confirmChk,
+//							icon : Ext.MessageBox.QUESTION
+//						});
 						Ext.MessageBox.show({
-							title : 'Confirm',
-							msg : 'Are you sure you want to delete this?',
-							buttons : Ext.MessageBox.YESNO,
+							title : 'Information',
+							msg : 'Please contact IT Department for delete !',
+							buttons : Ext.MessageBox.OK,
 							animateTarget : 'del',
-							fn : confirmChk,
-							icon : Ext.MessageBox.QUESTION
+							icon : Ext.MessageBox.INFO
 						});
 					}
 				} ]

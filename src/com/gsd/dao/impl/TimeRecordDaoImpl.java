@@ -47,6 +47,10 @@ public class TimeRecordDaoImpl extends JdbcDaoSupport implements TimeRecordDao {
 		}else{
 			sql += "AND jobs.job_status = '"+data.get("job_status")+"'\n";
 		}
+		if(data.get("dept")==null || data.get("dept").isEmpty()){
+		}else{
+			sql += "AND users.dept LIKE '"+data.get("dept")+"%'\n";
+		}
 		if(data.get("process")==null || data.get("process").isEmpty()){
 		}else{
 			sql += "AND tr_process LIKE '"+data.get("process")+"%'\n";

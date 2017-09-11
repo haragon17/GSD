@@ -19,6 +19,7 @@ table.myTable th {
  var errMessage = '${msg}';
 </script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/BillingAdmin.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/Store.js"></script>
 <title>Jobs</title>
 </head>
 <body>

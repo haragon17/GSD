@@ -140,7 +140,7 @@ Ext.onReady(function(){
 	     
 	});
 	
-	Ext.create('Ext.grid.Panel', {
+	memberGrid = Ext.create('Ext.grid.Panel', {
 		renderTo: document.body,
 		title: 'Member',
 		split: true,
@@ -183,7 +183,7 @@ Ext.onReady(function(){
 //		            		 dob = grid.getStore().getAt(rowIndex).get('birthday');
 		            		 phone = grid.getStore().getAt(rowIndex).get('phone');
 		            		 type = grid.getStore().getAt(rowIndex).get('usr_type');
-		            		 
+		            		 dept = grid.getStore().getAt(rowIndex).get('dept');
 		            		 
 		            		 Ext.getCmp('efname').setValue(fname);
 		            		 Ext.getCmp('elname').setValue(lname);
@@ -192,6 +192,7 @@ Ext.onReady(function(){
 		            		 Ext.getCmp('ephone').setValue(phone);
 		            		 Ext.getCmp('eusr_type').setValue({usr_type:type});
 		            		 Ext.getCmp('eid').setValue(usr_id);
+		            		 Ext.getCmp('edept').setValue(dept);
 		            		 editMember.show();
 		            		 }
 		            }]
@@ -235,6 +236,7 @@ Ext.define('mems', {
 //		{name: 'birthday',     type: 'string'},
 		{name: 'email',     type: 'string'},
 		{name: 'phone',    type: 'string'},
+		{name: 'dept',    type: 'string'},
 		{name: 'usr_type', type: 'int'},
 		{name: 'update_date', type: 'date', dateFormat: 'Y-m-d H:i:s'}
 		
@@ -265,12 +267,13 @@ store.searchMember = Ext.create('Ext.data.JsonStore', {
 var department = Ext.create('Ext.data.Store', {
 	fields: ['name'],
 	data : [
-	        {"name":"E-Studio"},
-	        {"name":"Publication"},
-	        {"name":"PP"},
-	        {"name":"CM"},
-	        {"name":"KK"},
-	        {"name":"BKK"}
+			{"name":"Publication"},
+			{"name":"E-Studio"},
+			{"name":"E-Studio_OTTO"},
+			{"name":"E-Studio_MM"},
+			{"name":"E-Studio_Masking"},
+			{"name":"Catalog"},
+			{"name":"Manager"}
 	]
 });
 
@@ -364,12 +367,14 @@ editMember = new Ext.create('Ext.window.Window', {
 	                    id: 'eusr_type',
 	                    labelWidth : 145,
 	                    // Arrange radio buttons into two columns, distributed vertically
-	                    columns: 3,
-	                    vertical: true,
+	                    columns: 2,
+//	                    vertical: true,
+	                    horizon : true,
 	                    items: [
 							{ boxLabel: 'Admin', name: 'usr_type', inputValue: '0'},
 							{ boxLabel: 'Manager', name: 'usr_type', inputValue: '1'},
 							{ boxLabel: 'JMD', name: 'usr_type', inputValue: '2'},
+							{ boxLabel: 'Staff', name: 'usr_type', inputValue: '3'},
 	                    ]
 	                },
 	                {
@@ -378,7 +383,7 @@ editMember = new Ext.create('Ext.window.Window', {
 	    				name : 'edept',
 	    				id : 'edept',
 	    				queryMode : 'local',
-	    				labelWidth : 120,
+	    				labelWidth : 145,
 	    				emptyText : 'Department',
 	    				allowBlank: false,
 	    				editable : false,
@@ -539,7 +544,7 @@ addMember = new Ext.create('Ext.window.Window', {
          "margin-left": "auto",
          "margin-right": "auto",
          "margin-top": "10px",
-         "margin-bottom": "auto"
+         "margin-bottom": "10px"
      },
      defaults: {anchor: '100%'},
      items :[{
@@ -602,26 +607,12 @@ addMember = new Ext.create('Ext.window.Window', {
 		maxLengthText: 'Maximum input 20 Character',
      },
      {
-    	 xtype: 'radiogroup',
-         fieldLabel: 'User Type <font color="red">*</font>  ',
-         labelWidth : 145,
-         id:'type',
-         // Arrange radio buttons into two columns, distributed vertically
-         columns: 3,
-         vertical: true,
-         items: [
-            { boxLabel: 'Admin', name: 'usr_type', inputValue: '0'},
-            { boxLabel: 'Manager', name: 'usr_type', inputValue: '1'},
-			{ boxLabel: 'JMD', name: 'usr_type', inputValue: '2', checked: true },
-         ]
-     },
-     {
     	 xtype : 'combobox',
 			fieldLabel : 'Department <font color="red">*</font>  ',
 			name : 'adept',
 			id : 'adept',
 			queryMode : 'local',
-			labelWidth : 120,
+			labelWidth : 145,
 			emptyText : 'Department',
 			allowBlank: false,
 			editable : false,
@@ -629,7 +620,24 @@ addMember = new Ext.create('Ext.window.Window', {
 			store : department,
 			valueField : 'name',
 			displayField : 'name',
-     }
+     },
+     {
+    	 xtype: 'radiogroup',
+         fieldLabel: 'User Type <font color="red">*</font>  ',
+         labelWidth : 145,
+         id:'type',
+         // Arrange radio buttons into two columns, distributed vertically
+         columns: 2,
+//       vertical: true,
+         horizon : true,
+         items: [
+            { boxLabel: 'Admin', name: 'usr_type', inputValue: '0'},
+            { boxLabel: 'Manager', name: 'usr_type', inputValue: '1'},
+            { boxLabel: 'JMD', name: 'usr_type', inputValue: '2'},
+			{ boxLabel: 'Staff', name: 'usr_type', inputValue: '3', checked: true },
+         ]
+     },
+     
         ]
 }],
 buttons: [{
@@ -677,8 +685,16 @@ buttons: [{
 				});
 			},
 			failure: function(response, opts){
-				var responseOject = Ext.util.JSON.decode(response.responseText);
-				Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+				box1.hide();
+				var responseOject = Ext.decode(response.responseText);
+				Ext.MessageBox.show({
+					title: 'Information',
+					msg: 'Register Successful!',
+					buttons: Ext.MessageBox.OK,
+					icon: Ext.MessageBox.INFO,
+					fn: function(){addMember.hide();location.reload();},
+					animateTarget: 'btnRegist',
+				});
 			}
 		});
 	  }else{
