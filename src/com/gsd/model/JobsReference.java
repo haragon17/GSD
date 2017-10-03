@@ -26,6 +26,8 @@ public class JobsReference {
 	private String job_ref_status;
 	private String job_ref_approve;
 	private String dept;
+	private int sent_amount;
+	private int total_amount;
 	
 	public int getJob_ref_id() {
 		return job_ref_id;
@@ -158,6 +160,18 @@ public class JobsReference {
 	}
 	public void setDept(String dept) {
 		this.dept = dept;
+	}
+	public int getSent_amount() {
+		return sent_amount;
+	}
+	public void setSent_amount(int sent_amount) {
+		this.sent_amount = sent_amount;
+	}
+	public int getTotal_amount() {
+		return total_amount;
+	}
+	public void setTotal_amount(int total_amount) {
+		this.total_amount = total_amount;
 	}
 	
 }

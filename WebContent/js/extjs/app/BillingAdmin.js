@@ -1244,6 +1244,26 @@ Ext.onReady(function() {
 				}
 			},
 			{
+				text : "Sent",
+				flex : 0.5,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'sent_amount',
+				editor: {
+					xtype:'numberfield',
+					id : 'esent_amount',
+					minValue : 0,
+					allowBlank: false
+				}
+			},
+			{
+				text : "Remain",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'total_amount'
+			},
+			{
 				text : "Date in",
 				flex : 1,
 				sortable : true,
@@ -1361,13 +1381,16 @@ Ext.onReady(function() {
 				sortable : true,
 				dataIndex : 'job_ref_approve',
 				renderer : function(val){
-					if(val == "Done" || val == "Sent PDF Vorab" || val == "Sent PDF K1" || val == "Sent PDF K2" || val == "Sent PDF Final" || val == "Up Proof" || val == "CC1" || val == "CC2" || val == "CC3" || val == "CC4"){
-						return '<b><span style="color:#13baff;">' + val + '</span></b>';
-//						}else if(val == "Hold Wait Mask" || val == "Hold Missing" || val == "Hold Low Quality" || val == "Hold Low Res" || val == "Hold Move Mask" || val == "Hold Ask Customer" || val == "Hold Other"){
-					}else if(val == "Wait Mask" || val == "Wait Move Mask" || val == "Missing Pic" || val == "Low Quality Pic" || val == "Low Res Pic" || val == "Ask Customer" || val == "Hold Other"){	
+					if(val == "Done"){
+						return '<b><span style="color:#8F00FF;">' + val + '</span></b>';
+					}else if(val == "Hold Wait Info" || val == "Hold Other"){	
 						return '<b><span style="color:red;">' + val + '</span></b>';
-					}else if(val == "Wait Final" || val == "Wait Check" || val == "Wait FI"){
-						return '<b><span style="color:#ec8500;">' + val + '</span></b>';
+					}else if(val == "Working" || val == "Checking" || val == "Wait FI"){
+						return '<b><span style="color:#FF8F00;">' + val + '</span></b>';
+					}else if(val.indexOf("Wait") !== -1){
+						return '<b><span style="color:#0EB400;">' + val + '</span></b>';
+					}else if(val == "Finish Path"){
+						return '<b><span style="color:#B99200;">' + val + '</span></b>';
 					}else{
 						return '<b>'+val+'</b>';
 					}
@@ -1389,6 +1412,14 @@ Ext.onReady(function() {
 				dataIndex : 'job_name',
 				hidden : true,
 			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
+				}
+			},
 //		    {
 //		    	text : "Dept",
 //				flex : 1,
@@ -1397,27 +1428,20 @@ Ext.onReady(function() {
 //		    }
 			],
 			viewConfig: { 
-		        stripeRows: false,
+		        stripeRows: false, 
 		        getRowClass: function(record) { 
-		            if(record.get('job_ref_status') == "Hold"){
+		        	if(record.get('job_ref_status') == "Hold"){
 		        		return 'hold-row';
 		            }else if(record.get('dept') == "E-Studio"){
-		        		return 'estudio-row'; 
-		        	}else if(record.get('dept') == "E-Studio_OTTO"){
 		        		return 'process-row'; 
+		        	}else if(record.get('dept') == "E-Studio_OTTO"){
+		        		return 'estudio_otto-row'; 
 		        	}else if(record.get('dept') == "E-Studio_MM"){
 		        		return 'estudio_mm-row'; 
 		        	}else{
 		        		return 'estudio_masking-row';
 		        	}
 		        },
-//		        listeners:{
-//		            itemkeydown:function(view, record, item, index, e){
-//		            	if(e.getKey() == 117){
-//		            		Ext.get('isave-syncPub').dom.click();
-//		            	}
-//		            }
-//		        }
 		    },
 			listeners : {
 				viewready: function (grid) {
@@ -1460,6 +1484,9 @@ Ext.onReady(function() {
 				        		Ext.getCmp('edit_itm_today').getStore().load({
 									url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
 								});
+				        	}
+				        	if(e.field == "sent_amount"){
+				        		Ext.getCmp('esent_amount').setMaxValue(e.record.get('amount'));
 				        	}
 						},
 						afteredit: function (editor, e) {
@@ -2600,6 +2627,7 @@ Ext.onReady(function() {
 					store : 'jobRefStatusPublication',
 					valueField : 'name',
 					displayField : 'name',
+					value : 'New'
 				},
 				{
 					xtype : 'datefield',
@@ -3208,6 +3236,12 @@ Ext.define('jobRefModel', {
 	},{
 		name : 'job_ref_approve',
 		type : 'string'
+	},{
+		name : 'sent_amount',
+		type : 'int'
+	},{
+		name : 'total_amount',
+		type : 'int'
 	}
 	]
 });
@@ -3381,7 +3415,7 @@ store.estudioJobRef = Ext.create('Ext.data.JsonStore', {
 						icon: Ext.MessageBox.INFO,
 						animateTarget: 'isave-syncEstudio',
 						fn: function(){
-							store.publicationJobRef.reload();
+							store.estudioJobRef.reload();
 							}
 					});
             }

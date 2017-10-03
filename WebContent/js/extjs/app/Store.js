@@ -94,11 +94,66 @@ Ext.create('Ext.data.Store', {
 	data : [
 	        {"name":"-"},
 	        {"name":"Done"},
-	        {"name":"Processing"},
+	        {"name":"Working"},
+	        {"name":"Checking"},
 	        {"name":"Wait Path"},
 	        {"name":"Wait Check"},
-	        {"name":"Wait FI"},
-	        {"name":"Ask Customer"},
+	        {"name":"Finish Path"},
+	        {"name":"Hold Wait Info"},
 	        {"name":"Hold Other"}
+	]
+});
+
+//Job's Approve E-Studio OTTO
+Ext.create('Ext.data.Store', {
+	storeId: 'jobRefApproveEstudioOTTO',
+	fields: ['name'],
+	data : [
+	        {"name":"-"},
+	        {"name":"Done"},
+	        {"name":"Working"},
+	        {"name":"Checking"},
+	        {"name":"Wait Path"},
+	        {"name":"Wait Check"},
+	        {"name":"Finish Path"},
+	        {"name":"Prepare"},
+	        {"name":"Soft Proof"},
+	        {"name":"Hold Wait Info"}
+	]
+});
+
+//Job's Approve E-Studio MM
+Ext.create('Ext.data.Store', {
+	storeId: 'jobRefApproveEstudioMM',
+	fields: ['name'],
+	data : [
+	        {"name":"-"},
+	        {"name":"Done"},
+	        {"name":"Working"},
+	        {"name":"Checking"},
+	        {"name":"Wait Path"},
+	        {"name":"Wait Check"},
+	        {"name":"Finish Path"},
+	        {"name":"Soft Proof"},
+	        {"name":"Hold Wait Info"}
+	]
+});
+
+//Job's Approve E-Studio Masking
+Ext.create('Ext.data.Store', {
+	storeId: 'jobRefApproveEstudioMasking',
+	fields: ['name'],
+	data : [
+	        {"name":"-"},
+	        {"name":"Done"},
+	        {"name":"Working"},
+	        {"name":"Checking"},
+	        {"name":"Wait Path"},
+	        {"name":"Wait Check"},
+	        {"name":"Wait Check Path"},
+	        {"name":"Wait Retouch/Color"},
+	        {"name":"Wait Check Retouch/Color"},
+	        {"name":"Wait Check Retouch/Do Color"},
+	        {"name":"Wait Color"}
 	]
 });

@@ -40,10 +40,20 @@ Ext.onReady(function() {
 //	    	alert("map.doc");
 	    	if(panels.tabs.activeTab.id == "jobTabs"){
 	    		Ext.get('isave-sync').dom.click();
-	    	}else if(panels.tabs.activeTab.id == "publicationTabs"){
-	    		Ext.get('isave-syncPub').dom.click();
-	    	}else if(panels.tabs.activeTab.id == "estudioTabs"){
-	    		Ext.get('isave-syncEstudio').dom.click();
+	    	}else if(panels.tabs.activeTab.id == "todayTabs"){
+	    		if(userDept == "Publication"){
+	    			if(userType == 3){
+	    				Ext.get('isave-syncPubType3').dom.click();
+	    			}else{
+	    				Ext.get('isave-syncPub').dom.click();
+	    			}
+	    		}else{
+	    			if(userType == 3){
+	    				Ext.get('isave-syncEstudioType3').dom.click();
+	    			}else{
+	    				Ext.get('isave-syncEstudio').dom.click();
+	    			}
+	    		}
 	    	}
 	    }
 	});
@@ -332,6 +342,7 @@ Ext.onReady(function() {
 							Ext.getCmp('jobTabs').setTitle("Jobs");
 							store.jobs.loadPage(1);
 							store.publicationJobRef.reload();
+							store.estudioJobRef.reload();
 						}
 					});
 
@@ -702,7 +713,7 @@ Ext.onReady(function() {
 									idProperty : 'proj_ref_id'
 								}
 							},
-							autoLoad : true,
+//							autoLoad : true,
 							sorters: [{
 						         property: 'itm_name',
 						         direction: 'ASC'
@@ -854,7 +865,7 @@ Ext.onReady(function() {
 								url: 'showProjectsReference.htm?id='+Ext.getCmp('projid').getValue()
 							});
 			        	}else if(e.field == "job_ref_status"){
-			        		if(userDept == "E-Studio"){
+			        		if(userDept.indexOf("E-Studio") !== -1){
 			        			Ext.getCmp('gjob_ref_status').bindStore('jobRefStatusEstudio');
 			        		}else if(userDept == "Publication"){
 			        			Ext.getCmp('gjob_ref_status').bindStore('jobRefStatusPublication');
@@ -936,7 +947,7 @@ Ext.onReady(function() {
 		{
 			iconCls: 'icon-save',
 			text: 'Save All',
-			id: 'isave-syncToday',
+			id: 'isave-syncPub',
 			iconAlign: 'right',
 	        tooltip: 'Sync data from server',
 	        disabled: false,
@@ -1073,7 +1084,7 @@ Ext.onReady(function() {
 								idProperty : 'proj_ref_id'
 							}
 						},
-						autoLoad : true,
+//						autoLoad : true,
 						sorters: [{
 					         property: 'itm_name',
 					         direction: 'ASC'
@@ -1168,7 +1179,7 @@ Ext.onReady(function() {
 				},
 				editor : {
 					xtype : 'combobox',
-					id : 'edit_job_ref_approve_jmd',
+					id : 'edit_job_ref_approve_jmd_pub',
 					store : 'jobRefApprovePublication',
 					value : 'name',
 					displayField : 'name',
@@ -1256,7 +1267,7 @@ Ext.onReady(function() {
 								}
 							}
 							if(e.field == "job_ref_approve"){
-								if(Ext.getCmp('edit_job_ref_approve_jmd').getValue() == "-"){
+								if(Ext.getCmp('edit_job_ref_approve_jmd_pub').getValue() == "-"){
 									e.record.set("job_ref_approve", "");
 								}
 							}
@@ -1293,6 +1304,16 @@ Ext.onReady(function() {
 			}
 		},"->",
 		{
+			type:'refresh',
+			iconCls: 'icon-refresh',
+		    tooltip: 'Refresh grid below',
+		    // hidden:true,
+		    handler: function() {
+		        // refresh logic
+		    	store.estudioJobRef.reload();
+		    }
+	    },
+		{
 			iconCls: 'icon-save',
 			text: 'Save All',
 			id: 'isave-syncEstudio',
@@ -1310,7 +1331,7 @@ Ext.onReady(function() {
 		columns : [
 			{
 		    	text : "Customer Name",
-		    	flex : 2.2,
+		    	flex : 2,
 		    	sortable : true,
 		    	dataIndex : 'cus_name',
 		    	renderer : renderCustomer
@@ -1345,7 +1366,7 @@ Ext.onReady(function() {
 								idProperty : 'proj_ref_id'
 							}
 						},
-						autoLoad : true,
+//						autoLoad : true,
 						sorters: [{
 					         property: 'itm_name',
 					         direction: 'ASC'
@@ -1397,6 +1418,26 @@ Ext.onReady(function() {
 					minValue : 0,
 					allowBlank: false
 				}
+			},
+			{
+				text : "Sent",
+				flex : 0.6,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'sent_amount',
+				editor: {
+					xtype:'numberfield',
+					id : 'esent_amount',
+					minValue : 0,
+					allowBlank: false
+				}
+			},
+			{
+				text : "Remain",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'total_amount'
 			},
 			{
 				text : "Date in",
@@ -1491,10 +1532,12 @@ Ext.onReady(function() {
 				align : 'center',
 				sortable : true,
 				renderer : function(val){
-					if(val == "New" || val == "New Pic" || val == "New Doc" || val == "New Pic+Doc"){
+					if(val == "New"){
 						return '<b><span style="color:blue;">' + val + '</span></b>';
 					}else if(val == "Hold"){
 						return '<b><span style="color:red;">' + val + '</span></b>';
+					}else if(val == "CC"){
+						return '<b><span style="color:b;">' + val + '</span></b>';
 					}else{
 						return '<b>'+val+'</b>';
 					}
@@ -1515,23 +1558,35 @@ Ext.onReady(function() {
 				sortable : true,
 				dataIndex : 'job_ref_approve',
 				renderer : function(val){
-					if(val == "Done" || val == "Sent PDF Vorab" || val == "Sent PDF K1" || val == "Sent PDF K2" || val == "Sent PDF Final" || val == "Up Proof" || val == "CC1" || val == "CC2" || val == "CC3" || val == "CC4"){
-						return '<b><span style="color:#13baff;">' + val + '</span></b>';
-					}else if(val == "Wait Mask" || val == "Wait Move Mask" || val == "Missing Pic" || val == "Low Quality Pic" || val == "Low Res Pic" || val == "Ask Customer" || val == "Hold Other"){	
+					if(val == "Done"){
+						return '<b><span style="color:#8F00FF;">' + val + '</span></b>';
+					}else if(val == "Hold Wait Info" || val == "Hold Other"){	
 						return '<b><span style="color:red;">' + val + '</span></b>';
-					}else if(val == "Wait Final" || val == "Wait Check" || val == "Wait FI"){
-						return '<b><span style="color:#ec8500;">' + val + '</span></b>';
+					}else if(val == "Working" || val == "Checking" || val == "Wait FI"){
+						return '<b><span style="color:#FF8F00;">' + val + '</span></b>';
+					}else if(val.indexOf("Wait") !== -1){
+						return '<b><span style="color:#0EB400;">' + val + '</span></b>';
+					}else if(val == "Finish Path"){
+						return '<b><span style="color:#B99200;">' + val + '</span></b>';
 					}else{
 						return '<b>'+val+'</b>';
 					}
 				},
 				editor : {
 					xtype : 'combobox',
-					id : 'edit_job_ref_approve',
+					id : 'edit_job_ref_approve_jmd_estudio',
 					store : 'jobRefApproveEstudio',
 					value : 'name',
 					displayField : 'name',
 					editable : false
+				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
 				}
 			},
 		    {
@@ -1545,12 +1600,16 @@ Ext.onReady(function() {
 			viewConfig: { 
 		        stripeRows: false, 
 		        getRowClass: function(record) { 
-		            if(record.get('job_ref_status') == "Hold"){
+		        	if(record.get('job_ref_status') == "Hold"){
 		        		return 'hold-row';
-		            }else if(record.get('job_ref_status') == "New" || record.get('job_ref_status') == "New Pic" || record.get('job_ref_status') == "New Doc" || record.get('job_ref_status') == "New Pic+Doc"){
+		            }else if(record.get('dept') == "E-Studio"){
 		        		return 'process-row'; 
+		        	}else if(record.get('dept') == "E-Studio_OTTO"){
+		        		return 'estudio_otto-row'; 
+		        	}else if(record.get('dept') == "E-Studio_MM"){
+		        		return 'estudio_mm-row'; 
 		        	}else{
-		        		return 'cc-row';
+		        		return 'estudio_masking-row';
 		        	}
 		        },
 		    },
@@ -1596,6 +1655,20 @@ Ext.onReady(function() {
 									url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
 								});
 				        	}
+				        	if(e.field == "job_ref_approve"){
+				        		if(e.record.get('dept') == "E-Studio"){
+				        			Ext.getCmp('edit_job_ref_approve_jmd_estudio').bindStore('jobRefApproveEstudio');
+				        		}else if(e.record.get('dept') == "E-Studio_OTTO"){
+				        			Ext.getCmp('edit_job_ref_approve_jmd_estudio').bindStore('jobRefApproveEstudioOTTO');
+				        		}else if(e.record.get('dept') == "E-Studio_MM"){
+				        			Ext.getCmp('edit_job_ref_approve_jmd_estudio').bindStore('jobRefApproveEstudioMM');
+				        		}else if(e.record.get('dept') == "E-Studio_Masking"){
+				        			Ext.getCmp('edit_job_ref_approve_jmd_estudio').bindStore('jobRefApproveEstudioMasking');
+				        		}
+				        	}
+				        	if(e.field == "sent_amount"){
+				        		Ext.getCmp('esent_amount').setMaxValue(e.record.get('amount'));
+				        	}
 						},
 						afteredit: function (editor, e) {
 							if(e.field == "itm_name"){
@@ -1616,7 +1689,7 @@ Ext.onReady(function() {
 								}
 							}
 							if(e.field == "job_ref_approve"){
-								if(Ext.getCmp('edit_job_ref_approve').getValue() == "-"){
+								if(Ext.getCmp('edit_job_ref_approve_jmd_estudio').getValue() == "-"){
 									e.record.set("job_ref_approve", "");
 								}
 							}
@@ -1665,7 +1738,7 @@ Ext.onReady(function() {
 		{
 			iconCls: 'icon-save',
 			text: 'Save All',
-			id: 'isave-syncToday',
+			id: 'isave-syncPubType3',
 			iconAlign: 'right',
 	        tooltip: 'Sync data from server',
 	        disabled: false,
@@ -1802,7 +1875,7 @@ Ext.onReady(function() {
 				},
 				editor : {
 					xtype : 'combobox',
-					id : 'edit_job_ref_approve',
+					id : 'edit_job_ref_approve_pub_type3',
 					store : 'jobRefApprovePublication',
 					value : 'name',
 					displayField : 'name',
@@ -1890,7 +1963,7 @@ Ext.onReady(function() {
 								}
 							}
 							if(e.field == "job_ref_approve"){
-								if(Ext.getCmp('edit_job_ref_approve').getValue() == "-"){
+								if(Ext.getCmp('edit_job_ref_approve_pub_type3').getValue() == "-"){
 									e.record.set("job_ref_approve", "");
 								}
 							}
@@ -1939,19 +2012,39 @@ Ext.onReady(function() {
 		{
 			iconCls: 'icon-save',
 			text: 'Save All',
-			id: 'isave-syncEstudio',
+			id: 'isave-syncEstudioType3',
 			iconAlign: 'right',
 	        tooltip: 'Sync data from server',
 	        disabled: false,
 	        itemId: 'saveSync',
 	        scope: this,
 	        handler: function(){
-	        	store.estudioGrid.sync();
+	        	store.estudioJobRef.sync();
 	        }
 		}],
 		minHeight: 608,
 		columnLines : true,
 		columns : [
+			{
+				text : "Customer Name",
+				flex : 2.2,
+				sortable : true,
+				dataIndex : 'cus_name',
+				renderer : renderCustomer,
+			},
+			{
+				text : "Job Name",
+				flex : 2.5,
+				sortable : true,
+				dataIndex : 'job_ref_name',
+			},
+			{
+				text : "Item",
+				flex : 1.5,
+				sortable : true,
+				hidden : true,
+				dataIndex : 'itm_name',
+			},
 			{
 				text : "Date in",
 				flex : 1,
@@ -2010,26 +2103,6 @@ Ext.onReady(function() {
 				},
 			},
 			{
-		    	text : "Customer Name",
-		    	flex : 2.2,
-		    	sortable : true,
-		    	dataIndex : 'cus_name',
-		    	renderer : renderCustomer,
-				hidden : true
-		    },
-			{
-				text : "Job Name",
-				flex : 2.5,
-				sortable : true,
-				dataIndex : 'job_ref_name',
-			},
-			{
-				text : "Item",
-				flex : 1.5,
-				sortable : true,
-				dataIndex : 'itm_name',
-			},
-			{
 				dataIndex : 'proj_ref_id',
 				hidden : true,
 				hideable : false
@@ -2042,12 +2115,26 @@ Ext.onReady(function() {
 				dataIndex : 'amount',
 			},
 			{
+				text : "Sent",
+				flex : 0.5,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'sent_amount',
+			},
+			{
+				text : "Remain",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'total_amount'
+			},
+			{
 				text : "Status",
 				flex : 0.7,
 				align : 'center',
 				sortable : true,
 				renderer : function(val){
-					if(val == "New" || val == "New Pic" || val == "New Doc" || val == "New Pic+Doc"){
+					if(val == "New"){
 						return '<b><span style="color:blue;">' + val + '</span></b>';
 					}else if(val == "Hold"){
 						return '<b><span style="color:red;">' + val + '</span></b>';
@@ -2064,25 +2151,33 @@ Ext.onReady(function() {
 				sortable : true,
 				dataIndex : 'job_ref_approve',
 				renderer : function(val){
-					if(val == "Done" || val == "Sent PDF Vorab" || val == "Sent PDF K1" || val == "Sent PDF K2" || val == "Sent PDF Final" || val == "Up Proof" || val == "CC1" || val == "CC2" || val == "CC3" || val == "CC4"){
-						return '<b><span style="color:#13baff;">' + val + '</span></b>';
-//					}else if(val == "Hold Wait Mask" || val == "Hold Missing" || val == "Hold Low Quality" || val == "Hold Low Res" || val == "Hold Move Mask" || val == "Hold Ask Customer" || val == "Hold Other"){
-					}else if(val == "Wait Mask" || val == "Wait Move Mask" || val == "Missing Pic" || val == "Low Quality Pic" || val == "Low Res Pic" || val == "Ask Customer" || val == "Hold Other"){	
+					if(val == "Done"){
+						return '<b><span style="color:#8F00FF;">' + val + '</span></b>';
+					}else if(val == "Hold Wait Info" || val == "Hold Other"){	
 						return '<b><span style="color:red;">' + val + '</span></b>';
-					}else if(val == "Wait Final" || val == "Wait Check" || val == "Wait FI"){
-						return '<b><span style="color:#ec8500;">' + val + '</span></b>';
+					}else if(val == "Working" || val == "Checking" || val == "Wait FI"){
+						return '<b><span style="color:#FF8F00;">' + val + '</span></b>';
+					}else if(val.indexOf("Wait") !== -1){
+						return '<b><span style="color:#0EB400;">' + val + '</span></b>';
+					}else if(val == "Finish Path"){
+						return '<b><span style="color:#B99200;">' + val + '</span></b>';
 					}else{
 						return '<b>'+val+'</b>';
 					}
 				},
 				editor : {
 					xtype : 'combobox',
-					id : 'edit_job_ref_approve',
+					id : 'edit_job_ref_approve_estudio_type3',
 					store : 'jobRefApproveEstudio',
 					value : 'name',
 					displayField : 'name',
 					editable : false
 				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_dtl',
 			},
 		    {
 				text : "Name",
@@ -2096,12 +2191,16 @@ Ext.onReady(function() {
 		        getRowClass: function(record) { 
 		        	if(record.get('job_ref_status') == "Hold"){
 		        		return 'hold-row';
-		            }else if(record.get('job_ref_status') == "New" || record.get('job_ref_status') == "New Pic" || record.get('job_ref_status') == "New Doc" || record.get('job_ref_status') == "New Pic+Doc"){
+		            }else if(record.get('dept') == "E-Studio"){
 		        		return 'process-row'; 
+		        	}else if(record.get('dept') == "E-Studio_OTTO"){
+		        		return 'estudio_otto-row'; 
+		        	}else if(record.get('dept') == "E-Studio_MM"){
+		        		return 'estudio_mm-row'; 
 		        	}else{
-		        		return 'cc-row';
+		        		return 'estudio_masking-row';
 		        	}
-		        } 
+		        },
 		    },
 			listeners : {
 				viewready: function (grid) {
@@ -2145,6 +2244,17 @@ Ext.onReady(function() {
 									url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
 								});
 				        	}
+				        	if(e.field == "job_ref_approve"){
+				        		if(e.record.get('dept') == "E-Studio"){
+				        			Ext.getCmp('edit_job_ref_approve_estudio_type3').bindStore('jobRefApproveEstudio');
+				        		}else if(e.record.get('dept') == "E-Studio_OTTO"){
+				        			Ext.getCmp('edit_job_ref_approve_estudio_type3').bindStore('jobRefApproveEstudioOTTO');
+				        		}else if(e.record.get('dept') == "E-Studio_MM"){
+				        			Ext.getCmp('edit_job_ref_approve_estudio_type3').bindStore('jobRefApproveEstudioMM');
+				        		}else if(e.record.get('dept') == "E-Studio_Masking"){
+				        			Ext.getCmp('edit_job_ref_approve_estudio_type3').bindStore('jobRefApproveEstudioMasking');
+				        		}
+				        	}
 						},
 						afteredit: function (editor, e) {
 							if(e.field == "itm_name"){
@@ -2165,7 +2275,7 @@ Ext.onReady(function() {
 								}
 							}
 							if(e.field == "job_ref_approve"){
-								if(Ext.getCmp('edit_job_ref_approve').getValue() == "-"){
+								if(Ext.getCmp('edit_job_ref_approve_estudio_type3').getValue() == "-"){
 									e.record.set("job_ref_approve", "");
 								}
 							}
@@ -2359,7 +2469,7 @@ Ext.onReady(function() {
 								idProperty : 'proj_id'
 							}
 						},
-						autoLoad : true,
+//						autoLoad : true,
 						sorters: [{
 					         property: 'proj_name',
 					         direction: 'ASC'
@@ -2381,6 +2491,7 @@ Ext.onReady(function() {
 					store : 'jobStatus',
 					valueField : 'name',
 					displayField : 'name',
+					value : 'Processing'
 				},{
 	    	    	xtype: 'textarea',
 	    	    	labelWidth: 120,
@@ -2636,7 +2747,7 @@ Ext.onReady(function() {
 								idProperty : 'proj_id'
 							}
 						},
-						autoLoad : true
+//						autoLoad : true
 					},
 					valueField : 'proj_id',
 					displayField : 'proj_name',
@@ -2840,6 +2951,7 @@ Ext.onReady(function() {
 					store : 'jobRefStatusPublication',
 					valueField : 'name',
 					displayField : 'name',
+					value : 'New'
 				},
 				{
 					xtype : 'datefield',
@@ -2932,7 +3044,7 @@ Ext.onReady(function() {
 								idProperty : 'proj_ref_id'
 							}
 						},
-						autoLoad : true,
+//						autoLoad : true,
 						sorters: [{
 					         property: 'itm_name',
 					         direction: 'ASC'
@@ -3194,7 +3306,7 @@ Ext.onReady(function() {
 								idProperty : 'proj_ref_id'
 							}
 						},
-						autoLoad : true
+//						autoLoad : true
 					},
 					valueField : 'proj_ref_id',
 					displayField : 'itm_name'
@@ -3370,8 +3482,8 @@ Ext.onReady(function() {
 			Ext.Ajax.request({
 				url : 'searchJobsParam.htm?sdept='+userDept+'&first=yes',
 				success : function(response, opts) {
-					store.jobs.loadPage(1);
-					grid.job.getStore().reload();
+					setTimeout(store.jobs.loadPage(1),1500);
+//					grid.job.getStore().reload();
 				}
 			});
 			userGridType();
@@ -3468,6 +3580,7 @@ Ext.onReady(function() {
 	            		id : 'job_add',
 	            		iconCls : 'icon-add',
 	            		handler : function() {
+	            			Ext.getCmp('adept').setValue(userDept);
 	            			addJob.show();
 	            		}
 	            	});
@@ -3538,6 +3651,12 @@ Ext.define('jobRefModel', {
 	},{
 		name : 'job_ref_approve',
 		type : 'string'
+	},{
+		name : 'sent_amount',
+		type : 'int'
+	},{
+		name : 'total_amount',
+		type : 'int'
 	}
 	]
 });
@@ -3641,7 +3760,7 @@ store.publicationJobRef = Ext.create('Ext.data.JsonStore', {
 						msg: 'Job Has Been Update!',
 						buttons: Ext.MessageBox.OK,
 						icon: Ext.MessageBox.INFO,
-						animateTarget: 'isave-syncToday',
+						animateTarget: 'isave-syncPub',
 						fn: function(){
 							store.publicationJobRef.reload();
 							}
@@ -3699,7 +3818,7 @@ store.estudioJobRef = Ext.create('Ext.data.JsonStore', {
 						icon: Ext.MessageBox.INFO,
 						animateTarget: 'isave-syncEstudio',
 						fn: function(){
-							store.publicationJobRef.reload();
+							store.estudioJobRef.reload();
 							}
 					});
             }
@@ -3767,6 +3886,11 @@ store.jobs = Ext.create('Ext.data.JsonStore', {
 		}
 	},
 	listeners: {
+//		beforeload : function(){
+//			Ext.Ajax.request({
+//				url : 'searchJobsParam.htm?first=&sdept='+userDept + getParamValues()
+//			});
+//		},
 		load : function(){
 			setTimeout(function(){
           		Ext.getCmp('grid_total').setText('<b>Total Jobs : '+store.jobs.getTotalCount()+'</b>&nbsp;&nbsp;&nbsp;');

@@ -132,7 +132,7 @@ img {
     color: black; 
 }
 
-.estudio-row .x-grid-cell { 
+.estudio_masking-row .x-grid-cell { 
     background-color: #FDEBFD !important; 
     color: black; 
 }
@@ -142,7 +142,7 @@ img {
     color: black; 
 }
 
-.estudio_masking-row .x-grid-cell { 
+.estudio_otto-row .x-grid-cell { 
     background-color: #DFFEF1 !important; 
     color: black; 
 }

@@ -159,7 +159,6 @@ public class JobsController {
 		}
 		
 //		FileOutputStream fileOut = new FileOutputStream("/Users/gsd/Desktop/GSD-JobTicket.pdf");
-//
 //		fileOut.close();
 //		return response;
 		
@@ -446,13 +445,21 @@ public class JobsController {
 	@RequestMapping(value="/updateJob")
 	public ModelAndView updateJob(HttpServletRequest request, HttpServletResponse response){
 		
-		
 		int job_id = Integer.parseInt(request.getParameter("ejob_id"));
 		String job_name = request.getParameter("ejob_name");
-		String dept = request.getParameter("edept");
 		String job_dtl = request.getParameter("ejob_dtl");
 		String status = request.getParameter("ejob_status");
 		int proj_id = Integer.parseInt(request.getParameter("eproj_id"));
+		UserDetailsApp user = UserLoginDetail.getUser();
+		int userType = user.getUserModel().getUsr_type();
+		String dept = "";
+		if(userType == 0 || userType == 1){
+			dept = request.getParameter("edept");
+		}else{
+			Jobs myJob = new Jobs();
+			myJob = jobsDao.searchJobsByID(job_id);
+			dept = myJob.getDept();
+		}
 		
 		Jobs job = new Jobs();
 		job.setJob_id(job_id);

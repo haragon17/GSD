@@ -145,7 +145,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	
 	public List<JobsReference> searchTodayJobsReference(Map<String, String> data){
 		
-		String sql = "SELECT job_ref_id, job_ref_name, jobs.job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, job_ref_approve, itm_name, job_name, proj_name, cus_name, dept, jobs.proj_id\n"+
+		String sql = "SELECT job_ref_id, job_ref_name, jobs.job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, "
+				+ "job_ref_approve, itm_name, job_name, proj_name, cus_name, dept, jobs.proj_id, sent_amount, (amount-sent_amount) as total_amount\n"+
 				"FROM jobs_reference\n"+
 				"LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"+
 				"LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n"+
@@ -179,7 +180,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 			sql += "AND job_status = '"+data.get("status")+"'\n";
 		}
 		
-		if(data.get("dept") == "Publication"){
+		if(data.get("dept").equals("Publication")){
 			sql += 	"ORDER BY\n"+
 //					"CASE job_ref_status\n"+
 //					"WHEN 'New' 	THEN 1\n"+
@@ -206,9 +207,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					"ELSE 4\n"+
 					"END,"+
 					"CASE\n"+
-					"WHEN job_ref_status = 'New'	THEN 1\n"+
-					"WHEN job_ref_status = 'Hold'	THEN 3\n"+
-					"ELSE 2\n"+
+					"WHEN job_ref_status = 'Hold'	THEN 2\n"+
+					"ELSE 1\n"+
 					"END,"+
 					"jobs_reference.job_out ASC";
 		}
@@ -221,7 +221,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	
 	@Override
 	public JobsReference searchJobsReferenceByID(int id) {
-		String sql = "SELECT job_ref_id, jobs.job_id, job_ref_name, cus_name, cus_code, proj_name, itm_name, job_name, amount, job_in, job_out, job_ref_dtl, job_ref_status, job_ref_approve, dept, jobs_reference.proj_ref_id\n"+
+		String sql = "SELECT job_ref_id, jobs.job_id, job_ref_name, cus_name, cus_code, proj_name, itm_name, job_name, amount, job_in, job_out, job_ref_dtl, "
+				+ "job_ref_status, job_ref_approve, dept, jobs_reference.proj_ref_id, sent_amount, (amount-sent_amount) as total_amount\n"+
 				"FROM jobs_reference\n"+
 				"LEFT JOIN jobs ON jobs.job_id = jobs_reference.job_id\n"+
 				"LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"+
@@ -235,7 +236,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	@Override
 	public List<JobsReference> searchJobsReference(int id, String sort) {
 		
-		String sql = "SELECT job_ref_id, job_ref_name, job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, itm_name\n"
+		String sql = "SELECT job_ref_id, job_ref_name, job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, itm_name, sent_amount, (amount-sent_amount) as total_amount\n"
 				+ "FROM jobs_reference\n"
 				+ "LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"
 				+ "LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n"
@@ -375,7 +376,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	@Override
 	public void createJobReference(JobsReference jobRef) {
 		
-		String sql = "INSERT INTO jobs_reference VALUES (default,?,?,?,?,?,?,?,?,now(),now(),?)";
+		String sql = "INSERT INTO jobs_reference VALUES (default,?,?,?,?,?,?,?,?,now(),now(),?,null,default)";
 		
 		this.getJdbcTemplate().update(sql, new Object[] {
 //				jobRef.getJob_ref_id(),
@@ -831,6 +832,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					+ "job_ref_dtl=?, "
 					+ "job_ref_status=?, "
 					+ "job_ref_approve=?, "
+					+ "sent_amount=?, "
 					+ "update_date=now() "
 					+ "where job_ref_id=?";
 			
@@ -847,7 +849,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					ps.setString(6, jobRef.getJob_ref_dtl());
 					ps.setString(7, jobRef.getJob_ref_status());
 					ps.setString(8, jobRef.getJob_ref_approve());
-					ps.setInt(9, jobRef.getJob_ref_id());
+					ps.setInt(9, jobRef.getSent_amount());
+					ps.setInt(10, jobRef.getJob_ref_id());
 				}
 				
 				@Override
