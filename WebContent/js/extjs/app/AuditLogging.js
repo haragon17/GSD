@@ -9,8 +9,8 @@ Ext.onReady(function() {
 //		bodyPadding : 5,
 		renderTo : document.body,
 		width : 1200,
-		height : 737,
-		forceFit : true,
+		minHeight : 737,
+//		forceFit : true,
 //		autoWidth : true,
 		columnLines : true,
 		style: {
@@ -124,6 +124,7 @@ Ext.onReady(function() {
 	        					myText = myText.replace(/, job_in=/gi, "<br>Date in = ");
 	        					myText = myText.replace(/, job_out=/gi, "<br>Date out = ");
 	        					myText = myText.replace(/, job_ref_dtl=/gi, "<br>Description = ");
+	        					myText = myText.replace(/, job_ref_number=/gi, "<br>Job Number = ");
 	        					myText = myText.replace(/Item List/gi, "Item");
 	        					myText = myText.replace('Created row on ', "");
 	        					myText = myText.replace('Created ', "");

@@ -548,6 +548,11 @@ Ext.onReady(function() {
 					dataIndex : 'proj_desc'
 				},
 				{
+					text : "Project Title",
+					flex : 1.5,
+					dataIndex : 'proj_title'
+				},
+				{
 					text : "Bill to",
 					flex : 0.8,
 					sortable : true,
@@ -658,12 +663,14 @@ Ext.onReady(function() {
 							proj_desc = grid.getStore().getAt(rowIndex).get('proj_desc');
 							cus_name = grid.getStore().getAt(rowIndex).get('cus_name');
 							cus_code = grid.getStore().getAt(rowIndex).get('cus_code');
+							proj_title = grid.getStore().getAt(rowIndex).get('proj_title');
 
 							Ext.getCmp('eproj_name').setValue(proj_name);
 							Ext.getCmp('ecus_id').setValue(cus_id);
 							Ext.getCmp('ecus_name').setValue(cus_name);
 							Ext.getCmp('ecus_code').setValue(cus_code);
 							Ext.getCmp('eproj_desc').setValue(proj_desc);
+							Ext.getCmp('eproj_title').setValue(proj_title);
 							Ext.getCmp('eproj_id').setValue(proj_id);
 							Ext.getCmp('efile_id').setValue(file_id);
 							editProject.show();
@@ -912,6 +919,9 @@ Ext.define('projModel', {
 	}, {
 		name : 'payment',
 		type : 'string'
+	}, {
+		name : 'proj_title',
+		type : 'string'
 	}
 
 	]
@@ -1035,29 +1045,29 @@ editProject = new Ext.create('Ext.window.Window', {
             emptyText: 'Project Name',
             maxLength : 30,
 			maxLengthText : 'Maximum input 30 Character',
-			listeners: {
-          		 'blur': function(e){
-          			var proj_name = Ext.getCmp('eproj_name').getValue();
-          			var proj_id = Ext.getCmp('eproj_id').getValue();
-          			 Ext.Ajax.request({
-          				url : 'chkProjName.htm',
-          				params: {records : proj_name},
-          				success: function(response, opts){
-          					var responseOject = Ext.decode(response.responseText);
-          					if(responseOject.records[0].proj_id != 0){
-          						if(responseOject.records[0].proj_id != proj_id){
-	           						Ext.getCmp('eproj_name').setValue('');
-	           						Ext.getCmp('eproj_name').markInvalid('"'+proj_name+'" has been used');
-          						}
-          					}
-          				},
-          				failure: function(response, opts){
-          					var responseOject = Ext.util.JSON.decode(response.responseText);
-          					Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
-          				}
-          			});
-          		 }
-          	 }
+//			listeners: {
+//          		 'blur': function(e){
+//          			var proj_name = Ext.getCmp('eproj_name').getValue();
+//          			var proj_id = Ext.getCmp('eproj_id').getValue();
+//          			 Ext.Ajax.request({
+//          				url : 'chkProjName.htm',
+//          				params: {records : proj_name},
+//          				success: function(response, opts){
+//          					var responseOject = Ext.decode(response.responseText);
+//          					if(responseOject.records[0].proj_id != 0){
+//          						if(responseOject.records[0].proj_id != proj_id){
+//	           						Ext.getCmp('eproj_name').setValue('');
+//	           						Ext.getCmp('eproj_name').markInvalid('"'+proj_name+'" has been used');
+//          						}
+//          					}
+//          				},
+//          				failure: function(response, opts){
+//          					var responseOject = Ext.util.JSON.decode(response.responseText);
+//          					Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+//          				}
+//          			});
+//          		 }
+//          	 }
         },{
 			xtype : 'combobox',
 			fieldLabel : 'Customer Name <font color="red">*</font> ',
@@ -1178,6 +1188,14 @@ editProject = new Ext.create('Ext.window.Window', {
 				}
 
 			}
+		},{
+			xtype:'textfield',
+            fieldLabel: 'Project Title ',
+            labelWidth: 120,
+            name: 'eproj_title',
+            id: 'eproj_title',
+            msgTarget: 'under',
+            emptyText: 'Project Title'
 		},{
 	    	xtype:'filefield',
 	    	labelWidth: 120,
@@ -1503,26 +1521,26 @@ addProject = new Ext.create('Ext.window.Window', {
                 id: 'cproj_name',
                 msgTarget: 'under',
                 emptyText: 'Project Name',
-                listeners: {
-             		 'blur': function(e){
-             			var proj_name = Ext.getCmp('cproj_name').getValue();
-             			 Ext.Ajax.request({
-             				url : 'chkProjName.htm',
-             				params: {records : proj_name},
-             				success: function(response, opts){
-             					var responseOject = Ext.decode(response.responseText);
-             					if(responseOject.records[0].proj_id != 0){
-   	           						Ext.getCmp('cproj_name').setValue('');
-   	           						Ext.getCmp('cproj_name').markInvalid('"'+proj_name+'" has been used');
-             					}
-             				},
-             				failure: function(response, opts){
-             					var responseOject = Ext.util.JSON.decode(response.responseText);
-             					Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
-             				}
-             			});
-             		 }
-             	 }
+//                listeners: {
+//             		 'blur': function(e){
+//             			var proj_name = Ext.getCmp('cproj_name').getValue();
+//             			 Ext.Ajax.request({
+//             				url : 'chkProjName.htm',
+//             				params: {records : proj_name},
+//             				success: function(response, opts){
+//             					var responseOject = Ext.decode(response.responseText);
+//             					if(responseOject.records[0].proj_id != 0){
+//   	           						Ext.getCmp('cproj_name').setValue('');
+//   	           						Ext.getCmp('cproj_name').markInvalid('"'+proj_name+'" has been used');
+//             					}
+//             				},
+//             				failure: function(response, opts){
+//             					var responseOject = Ext.util.JSON.decode(response.responseText);
+//             					Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+//             				}
+//             			});
+//             		 }
+//             	 }
             },{
 				xtype : 'combobox',
 				fieldLabel : 'Customer Name <font color="red">*</font> ',
@@ -1643,6 +1661,14 @@ addProject = new Ext.create('Ext.window.Window', {
 					}
 
 				}
+			},{
+				xtype:'textfield',
+                fieldLabel: 'Project Title ',
+                labelWidth: 120,
+                name: 'cproj_title',
+                id: 'cproj_title',
+                msgTarget: 'under',
+                emptyText: 'Project Title'
 			},{
     	    	xtype:'filefield',
     	    	labelWidth: 120,

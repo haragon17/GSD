@@ -32,6 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.gsd.dao.JobsDao;
 import com.gsd.model.Jobs;
 import com.gsd.model.JobsReference;
+import com.gsd.report.PrintInvoice_iText;
 import com.gsd.report.PrintJobTicket;
 import com.gsd.report.PrintJobTicket_iText;
 import com.gsd.security.UserDetailsApp;
@@ -80,6 +81,9 @@ public class JobsController {
 	
 	@RequestMapping(value = "/jobs")
 	public ModelAndView viewBilling(HttpServletRequest request, HttpServletResponse response){
+		
+//		String rootDirectory = request.getSession().getServletContext().getRealPath("/");
+//		System.out.println(rootDirectory);
 		
 		HttpSession session = request.getSession();
 		session.setAttribute("cus_id", "");
@@ -144,6 +148,17 @@ public class JobsController {
 		jobj.put("records", jobLs);
 
 		return new ModelAndView("jsonView", jobj);
+	}
+	
+	@RequestMapping(value = "/printInvoice")
+	public void printInvoice(HttpServletRequest request, HttpServletResponse response){
+		
+		try {
+			new PrintInvoice_iText().createPdf(request,response);
+		} catch (IOException | DocumentException e) {
+			logger.error(e.getMessage());
+		}
+		
 	}
 	
 	@RequestMapping(value = "/printJobTicket")
@@ -499,12 +514,14 @@ public class JobsController {
 		String job_out = request.getParameter("ajob_out")+" "+request.getParameter("atime");
 		String job_dtl = request.getParameter("ajob_ref_dtl");
 		String job_ref_status = request.getParameter("ajob_ref_status");
+		String job_ref_number = request.getParameter("ajob_ref_number");
 		
 		List<JobsReference> jobRefLs = new ArrayList<JobsReference>();
 		JobsReference jobRef = new JobsReference();
 		jobRef.setJob_id(job_id);
 		jobRef.setCretd_usr(usr_id);
 		jobRef.setJob_ref_status(job_ref_status);
+		
 		
 		if(!job_in.equals("Date in")){
 			try{
@@ -529,6 +546,12 @@ public class JobsController {
 		jobRef.setJob_in_ts(job_in_ts);
 		jobRef.setJob_out_ts(job_out_ts);
 		
+		if(!job_ref_number.equals("Job Number")){
+			jobRef.setJob_ref_number(job_ref_number);
+		}else{
+			jobRef.setJob_ref_number("");
+		}
+		
 		if(!proj_ref_id.equals("Item Name")){
 			jobRef.setProj_ref_id(Integer.parseInt(proj_ref_id));
 		}else{
@@ -549,6 +572,8 @@ public class JobsController {
 			jobRef.setJob_ref_dtl("");
 		}
 		
+		job_ref_name = job_ref_name.replace("\u2028", "\n");
+		job_ref_name = job_ref_name.replace("\u2029", "\n");
 		String[] name = job_ref_name.split("\n");
 		for(int i=0; i<name.length; i++){
 			if(name[i].length() > 0){
@@ -602,6 +627,7 @@ public class JobsController {
 		String job_out = request.getParameter("ejob_out")+" "+request.getParameter("etime");
 		String job_dtl = request.getParameter("ejob_ref_dtl");
 		String job_ref_status = request.getParameter("ejob_ref_status");
+		String job_ref_number = request.getParameter("ejob_ref_number");
 		
 		JobsReference jobRef = new JobsReference();
 		jobRef.setJob_ref_id(job_ref_id);
@@ -630,6 +656,12 @@ public class JobsController {
 		
 		jobRef.setJob_in_ts(job_in_ts);
 		jobRef.setJob_out_ts(job_out_ts);
+		
+		if(!job_ref_number.equals("Job Number")){
+			jobRef.setJob_ref_number(job_ref_number);
+		}else{
+			jobRef.setJob_ref_number("");
+		}
 		
 		if(!proj_ref_id.equals("Item Name")){
 			jobRef.setProj_ref_id(Integer.parseInt(proj_ref_id));

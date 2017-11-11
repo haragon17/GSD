@@ -88,10 +88,10 @@ public class UserController {
 	public ModelAndView showUser(HttpServletRequest request, HttpServletResponse response){
 		
 		List<User> userLs = null;
-		int type = Integer.parseInt(request.getParameter("type"));
+		String dept = request.getParameter("dept");
 		
 		try{
-			userLs = userDao.showUser(type);
+			userLs = userDao.showUser(dept);
 		}catch (Exception e) {
 			logger.error(e.getMessage());
 		}

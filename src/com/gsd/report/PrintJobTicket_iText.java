@@ -4,6 +4,7 @@ import com.gsd.model.JobsReference;
 import com.itextpdf.awt.PdfGraphics2D;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfTemplate;
@@ -29,8 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public class PrintJobTicket_iText {
 
-	public static final String DEST = "/jview_pdf/GSD-JobTicket.pdf";
-//	public static final String DEST = "/Users/gsd/Desktop/GSD-JobTicket.pdf";
+//	public static final String DEST = "/jview_pdf/GSD-JobTicket.pdf";
+	public static final String DEST = "/Users/gsd/Desktop/GSD-JobTicket.pdf";
 	
 	public void createPdf(HttpServletRequest request,
 			HttpServletResponse response, JobsReference job) throws IOException, DocumentException {
@@ -223,4 +224,5 @@ public class PrintJobTicket_iText {
         outputStream.close();
         
     }
+	
 }

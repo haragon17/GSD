@@ -444,6 +444,7 @@ public class ProjectsController {
 		String currency = request.getParameter("ccurrency");
 		String proj_ref_desc = request.getParameter("cproj_ref_desc");
 		String proj_desc = request.getParameter("cproj_desc");
+		String proj_title = request.getParameter("cproj_title");
 
 		ProjectsReference projRef = new ProjectsReference();
 		Projects proj = new Projects();
@@ -454,6 +455,12 @@ public class ProjectsController {
 		proj.setCus_id(cus_id);
 		proj.setCretd_usr(user.getUserModel().getUsr_id());
 
+		if(!proj_title.equals("Project Title")){
+			proj.setProj_title(proj_title);
+		}else{
+			proj.setProj_title("");
+		}
+		
 		if (!proj_desc.equals("Project Details")) {
 			proj_desc = proj_desc.replace("\u2028", "\n");
 			proj_desc = proj_desc.replace("\u2029", "\n");
@@ -585,7 +592,8 @@ public class ProjectsController {
 		int cus_id = Integer.parseInt(request.getParameter("ecus_id"));
 		String proj_desc = request.getParameter("eproj_desc");
 		int file_id = Integer.parseInt(request.getParameter("efile_id"));
-
+		String proj_title = request.getParameter("eproj_title");
+		
 		Projects proj = new Projects();
 		FileModel fileModel = new FileModel();
 
@@ -593,6 +601,12 @@ public class ProjectsController {
 		proj.setProj_name(proj_name);
 		proj.setCus_id(cus_id);
 
+		if(!proj_title.equals("Project Title")){
+			proj.setProj_title(proj_title);
+		}else{
+			proj.setProj_title("");
+		}
+		
 		if (!proj_desc.equals("Project Details")) {
 			proj_desc = proj_desc.replace("\u2028", "\n");
 			proj_desc = proj_desc.replace("\u2029", "\n");
@@ -603,6 +617,7 @@ public class ProjectsController {
 
 		System.out.println("name = " + proj.getProj_name());
 		System.out.println("cus_id = " + proj.getCus_id());
+		System.out.println("title = " + proj.getProj_title());
 		System.out.println("detail = " + proj.getProj_desc());
 
 		OutputStream outputStream = null;

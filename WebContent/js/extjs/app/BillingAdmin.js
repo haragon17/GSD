@@ -114,15 +114,32 @@ Ext.onReady(function() {
 //						totalAmount = grid.getStore().getAt(rowIndex).get('total_amount');
 						Ext.getCmp('projid').setValue(proj_id);
 						Ext.getCmp('jobid_ref').setValue(job_id);
+						deptRef = "";
 						if(myDept.indexOf("E-Studio") !== -1){
-							Ext.getCmp('ajob_ref_status').bindStore('jobRefStatusEstudio');
-							Ext.getCmp('ejob_ref_status').bindStore('jobRefStatusEstudio');
+							deptRef = "E-Studio";
+//							Ext.getCmp('ajob_ref_status').bindStore('jobRefStatusEstudio');
+//							Ext.getCmp('ejob_ref_status').bindStore('jobRefStatusEstudio');
 //							Ext.getCmp('gjob_ref_status').bindStore(jobRefStatusEstudio);
 						}else{
-							Ext.getCmp('ajob_ref_status').bindStore('jobRefStatusPublication');
-							Ext.getCmp('ejob_ref_status').bindStore('jobRefStatusPublication');
+							deptRef = "Publication";
+//							Ext.getCmp('ajob_ref_status').bindStore('jobRefStatusPublication');
+//							Ext.getCmp('ejob_ref_status').bindStore('jobRefStatusPublication');
 //							Ext.getCmp('gjob_ref_status').bindStore(jobRefStatusPublication);
 						}
+						var ajob_ref = Ext.getCmp('ajob_ref_status');
+						var ejob_ref = Ext.getCmp('ejob_ref_status');
+						
+						ajob_ref.clearValue();
+						ajob_ref.getStore().removeAll();
+						ajob_ref.getStore().load({
+							url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+						});
+						
+						ejob_ref.clearValue();
+						ejob_ref.getStore().removeAll();
+						ejob_ref.getStore().load({
+							url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+						});
 						Ext.Ajax.request({
 							url : 'searchJobsParam.htm?job_id='+job_id,
 							success : function(response, opts) {
@@ -254,13 +271,24 @@ Ext.onReady(function() {
 //						totalAmount = grid.getStore().getAt(rowIndex).get('total_amount');
 						Ext.getCmp('projid').setValue(proj_id);
 						Ext.getCmp('jobid_ref').setValue(job_id);
+						deptRef = "";
 						if(myDept.indexOf("E-Studio") !== -1){
-							Ext.getCmp('ajob_ref_status').bindStore('jobRefStatusEstudio');
-							Ext.getCmp('ejob_ref_status').bindStore('jobRefStatusEstudio');
+							deptRef = "E-Studio";
 						}else{
-							Ext.getCmp('ajob_ref_status').bindStore('jobRefStatusPublication');
-							Ext.getCmp('ejob_ref_status').bindStore('jobRefStatusPublication');
+							deptRef = "Publication";
 						}
+						var ajob_ref = Ext.getCmp('ajob_ref_status');
+						var ejob_ref = Ext.getCmp('ejob_ref_status');
+						ajob_ref.clearValue();
+						ajob_ref.getStore().removeAll();
+						ajob_ref.getStore().load({
+							url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+						});
+						ejob_ref.clearValue();
+						ejob_ref.getStore().removeAll();
+						ejob_ref.getStore().load({
+							url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+						});
 						Ext.Ajax.request({
 							url : 'searchJobsParam.htm?job_id='+job_id,
 							success : function(response, opts) {
@@ -300,6 +328,7 @@ Ext.onReady(function() {
 				Ext.getCmp('aproj_ref_id').getStore().load({
 					url: 'showProjectsReference.htm?id='+Ext.getCmp('projid').getValue()
 				});
+				Ext.getCmp('ajob_ref_status').setValue("New");
 				addJobRef.show();
 			}
 		},{
@@ -455,6 +484,13 @@ Ext.onReady(function() {
 					}
 				},
 				{
+					text : "Job Number",
+					flex : 1,
+					sortable : true,
+					dataIndex : 'job_ref_number',
+					hidden : true
+				},
+				{
 					text : "Job Name",
 					flex : 2.5,
 					sortable : true,
@@ -546,9 +582,20 @@ Ext.onReady(function() {
 						name: 'gjob_ref_status',
 						id: 'gjob_ref_status',
 //						store : jobRefStatusPublication,
-						store : 'jobRefStatusPublication',
-						valueField : 'name',
-						displayField : 'name',
+						store : {
+							fields : ['db_ref_name'],
+							proxy : {
+								type : 'ajax',
+								url : '',
+								reader : {
+									type : 'json',
+									root : 'records',
+								}
+							},
+//							autoLoad : true
+						},
+						valueField : 'db_ref_name',
+						displayField : 'db_ref_name',
 						editable : false
 					}
 				},
@@ -598,6 +645,7 @@ Ext.onReady(function() {
 							job_out = grid.getStore().getAt(rowIndex).get('job_out');
 							proj_id = Ext.getCmp('projid').getValue();
 							job_ref_status = grid.getStore().getAt(rowIndex).get('job_ref_status');
+							job_ref_number = grid.getStore().getAt(rowIndex).get('job_ref_number');
 							
 							Ext.getCmp('eproj_ref_id').getStore().load({
 								url: 'showProjectsReference.htm?id='+proj_id
@@ -612,6 +660,7 @@ Ext.onReady(function() {
 							Ext.getCmp('ejob_out').setValue(job_out);
 							Ext.getCmp('etime').setValue(job_out);
 							Ext.getCmp('ejob_ref_status').setValue(job_ref_status);
+							Ext.getCmp('ejob_ref_number').setValue(job_ref_number);
 							editJobRef.show();
 						}
 					} ]
@@ -654,11 +703,21 @@ Ext.onReady(function() {
 							});
 			        	}else if(e.field == "job_ref_status"){
 //			        		if(myDept == "E-Studio"){
+			        		deptRef = "";
 			        		if(myDept.indexOf("E-Studio") !== -1){
-			        			Ext.getCmp('gjob_ref_status').bindStore('jobRefStatusEstudio');
+//			        			Ext.getCmp('gjob_ref_status').bindStore('jobRefStatusEstudio');
+			        			deptRef = "E-Studio";
 			        		}else if(myDept == "Publication"){
-			        			Ext.getCmp('gjob_ref_status').bindStore('jobRefStatusPublication');
+//			        			Ext.getCmp('gjob_ref_status').bindStore('jobRefStatusPublication');
+			        			deptRef = "Publication";
 			        		}
+			        		var gjob_ref = Ext.getCmp('gjob_ref_status');
+							
+		        			gjob_ref.clearValue();
+		        			gjob_ref.getStore().removeAll();
+		        			gjob_ref.getStore().load({
+								url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+							});
 			        	}
 //						alert(editorDate);
 					},
@@ -950,10 +1009,21 @@ Ext.onReady(function() {
 				dataIndex : 'job_ref_status',
 				editor: {
 					xtype: 'combobox',
-//					store : jobRefStatusPublication,
-					store : 'jobRefStatusPublication',
-					valueField : 'name',
-					displayField : 'name',
+//					store : 'jobRefStatusPublication',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showJobReference.htm?kind=JobStatus&dept=Publication',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
 					editable : false
 				}
 			},
@@ -978,10 +1048,21 @@ Ext.onReady(function() {
 				editor : {
 					xtype : 'combobox',
 					id : 'edit_job_ref_approve_pub',
-//					store : jobRefApprovePublication,
-					store : 'jobRefApprovePublication',
-					value : 'name',
-					displayField : 'name',
+//					store : 'jobRefApprovePublication',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showJobReference.htm?kind=JobApprove&dept=Publication',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
 					editable : false
 				}
 			},
@@ -1327,9 +1408,14 @@ Ext.onReady(function() {
 					}
 					todayFormat = Ext.util.Format.date(today, 'Y-m-d');
 					dateOut = Ext.util.Format.date(value, 'Y-m-d');
+					timeOut = Ext.util.Format.date(value, 'H:i');
 					if(myStatus != "Hold"){
 						if(dateOut <= todayFormat){
-							return '<b><span style="color:red;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+							if(timeOut == "00:00"){
+								return '<b><span style="color:red;">ASAP</span></b>';
+							}else{
+								return '<b><span style="color:red;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+							}
 						}else{
 							return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
 						}
@@ -1341,6 +1427,20 @@ Ext.onReady(function() {
 					xtype: 'timefield',
 					id: 'edit_time_today',
 					format: 'H:i',
+//					tpl: Ext.create('Ext.XTemplate',
+//					        '<tpl for=".">',
+//					        	"<tpl if='field1 == \"00:00\"'>",
+//					        		'ASAP',
+//					            '</tpl>',
+//				            '</tpl>'
+//					    ),
+//					displayTpl: Ext.create('Ext.XTemplate',
+//						    '<tpl for=".">',
+//					        	"<tpl if='field1 == \"00:00\"'>",
+//					        		'ASAP',
+//					            '</tpl>',
+//				            '</tpl>'
+//					    ),
 					listeners: {
 						blur: function () {
 							myTime = Ext.getCmp('edit_time_today').getValue();
@@ -1368,9 +1468,20 @@ Ext.onReady(function() {
 				editor: {
 					xtype: 'combobox',
 //					store : jobRefStatusEstudio,
-					store : 'jobRefStatusEstudio',
-					valueField : 'name',
-					displayField : 'name',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showJobReference.htm?kind=JobStatus&dept=Publication',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
 					editable : false
 				}
 			},
@@ -1387,8 +1498,10 @@ Ext.onReady(function() {
 						return '<b><span style="color:red;">' + val + '</span></b>';
 					}else if(val == "Working" || val == "Checking" || val == "Wait FI"){
 						return '<b><span style="color:#FF8F00;">' + val + '</span></b>';
-					}else if(val.indexOf("Wait") !== -1){
+					}else if(val.indexOf("Wait Check") !== -1){
 						return '<b><span style="color:#0EB400;">' + val + '</span></b>';
+					}else if(val.indexOf("Wait") !== -1){
+						return '<b><span style="color:grey;">' + val + '</span></b>';
 					}else if(val == "Finish Path"){
 						return '<b><span style="color:#B99200;">' + val + '</span></b>';
 					}else{
@@ -1399,9 +1512,20 @@ Ext.onReady(function() {
 					xtype : 'combobox',
 					id : 'edit_job_ref_approve_estudio',
 //					store : jobRefApproveEstudio,
-					store : 'jobRefApproveEstudio',
-					value : 'name',
-					displayField : 'name',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : '',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+//						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
 					editable : false
 				}
 			},
@@ -1487,6 +1611,15 @@ Ext.onReady(function() {
 				        	}
 				        	if(e.field == "sent_amount"){
 				        		Ext.getCmp('esent_amount').setMaxValue(e.record.get('amount'));
+				        	}
+				        	if(e.field == "job_ref_approve"){
+				        		gjob_ref = Ext.getCmp('edit_job_ref_approve_estudio');
+								
+			        			gjob_ref.clearValue();
+			        			gjob_ref.getStore().removeAll();
+			        			gjob_ref.getStore().load({
+									url: 'showJobReference.htm?kind=JobApprove&dept='+e.record.get('dept')
+								});
 				        	}
 						},
 						afteredit: function (editor, e) {
@@ -1757,9 +1890,20 @@ Ext.onReady(function() {
 									margin : '0 0 10 0',
 									msgTarget: 'under',
 //									store : jobStatus,
-									store : 'jobStatus',
-									valueField : 'name',
-									displayField : 'name',
+									store : {
+										fields : ['db_ref_name'],
+										proxy : {
+											type : 'ajax',
+											url : 'showBillingStatus.htm',
+											reader : {
+												type : 'json',
+												root : 'records',
+											}
+										},
+										autoLoad : true
+									},
+									valueField : 'db_ref_name',
+									displayField : 'db_ref_name',
 								},
 								{
 									xtype : 'combobox',
@@ -1772,10 +1916,21 @@ Ext.onReady(function() {
 									emptyText : 'Department',
 									width : 280,
 									magin : '0 0 10 0',
-//									store : department,
-									store : 'deptStore',
-									valueField : 'name',
-									displayField : 'name'
+//									store : 'deptStore',
+									store : {
+										fields : ['db_ref_name'],
+										proxy : {
+											type : 'ajax',
+											url : 'showDepartment.htm',
+											reader : {
+												type : 'json',
+												root : 'records',
+											}
+										},
+										autoLoad : true
+									},
+									valueField : 'db_ref_name',
+									displayField : 'db_ref_name',
 								},
 								{
 									xtype : 'hidden',
@@ -1831,7 +1986,7 @@ Ext.onReady(function() {
 	panels.tabs = Ext.create('Ext.tab.Panel', {
 		renderTo : document.body,
 		deferredRender : false,
-		width: 1200,
+		width: 1500,
 //		height: 548,
 		frame: true,
 		style : {
@@ -2130,10 +2285,21 @@ Ext.onReady(function() {
 					allowBlank: false,
 					editable : false,
 					msgTarget: 'under',
-//					store : department,
-					store : 'deptStore',
-					valueField : 'name',
-					displayField : 'name',
+//					store : 'deptStore',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showDepartment.htm',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
 				},{
 					xtype : 'combobox',
 					fieldLabel : 'Job Status <font color="red">*</font> ',
@@ -2146,9 +2312,20 @@ Ext.onReady(function() {
 					editable : false,
 					msgTarget: 'under',
 //					store : jobStatus,
-					store : 'jobStatus',
-					valueField : 'name',
-					displayField : 'name',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showBillingStatus.htm',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
 					value : 'Processing'
 				},{
 	    	    	xtype: 'textarea',
@@ -2444,10 +2621,21 @@ Ext.onReady(function() {
 					allowBlank: false,
 					editable : false,
 					msgTarget: 'under',
-//					store : department,
-					store : 'deptStore',
-					valueField : 'name',
-					displayField : 'name',
+//					store : 'deptStore',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showDepartment.htm',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
 				},{
 					xtype : 'combobox',
 					fieldLabel : 'Job Status <font color="red">*</font> ',
@@ -2460,9 +2648,20 @@ Ext.onReady(function() {
 					editable : false,
 					msgTarget: 'under',
 //					store : jobStatus,
-					store : 'jobStatus',
-					valueField : 'name',
-					displayField : 'name',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showBillingStatus.htm',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
 					listeners : {
 						select : function() {
 							var v = this.getValue();
@@ -2550,7 +2749,7 @@ Ext.onReady(function() {
 	        						animateTarget: 'ebtn',
 	        					});
 	        				}
-	        		}
+	                 }
 	               	},{
 	                	text: 'Reset',
 	                	width:100,
@@ -2624,10 +2823,30 @@ Ext.onReady(function() {
 					editable : false,
 					msgTarget: 'under',
 //					store : jobRefStatusPublication,
-					store : 'jobRefStatusPublication',
-					valueField : 'name',
-					displayField : 'name',
-					value : 'New'
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showJobReference.htm?kind=JobStatus&dept=Publication',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+//					value : 'New'
+				},
+				{
+					xtype: 'textfield',
+					labelWidth: 120,
+					fieldLabel: 'Job Number ',
+					name: 'ajob_ref_number',
+					id: 'ajob_ref_number',
+					emptyText: 'Job Number',
+					maxLength: 30
 				},
 				{
 					xtype : 'datefield',
@@ -2988,9 +3207,28 @@ Ext.onReady(function() {
 					editable : false,
 					msgTarget: 'under',
 //					store : jobRefStatusPublication,
-					store : 'jobRefStatusPublication',
-					valueField : 'name',
-					displayField : 'name',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showJobReference.htm?kind=JobStatus&dept=Publication',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+				},{
+					xtype: 'textfield',
+					labelWidth: 120,
+					fieldLabel: 'Job Number ',
+					name: 'ejob_ref_number',
+					id: 'ejob_ref_number',
+					emptyText: 'Job Number',
+					maxLength: 30
 				},{
 					xtype: 'combobox',
 					fieldLabel : 'Item Name ',
@@ -3242,6 +3480,9 @@ Ext.define('jobRefModel', {
 	},{
 		name : 'total_amount',
 		type : 'int'
+	},{
+		name : 'job_ref_number',
+		type : 'string'
 	}
 	]
 });

@@ -47,8 +47,14 @@ Ext.onReady(function(){
 						  href: 'projects.htm',
 						  hrefTarget: '_self'
 			          }
+				jmd_menu2 = {
+						text: 'Time Record',
+						href: 'timeRecord.htm',
+						hrefTarget: '_self'
+				}
 			}else{
 				jmd_menu = "";
+				jmd_menu2 = "";
 			}
 		    
 	/**Create a top Panel*/
@@ -88,6 +94,7 @@ Ext.onReady(function(){
         	  href: 'jobs.htm',
 			  hrefTarget: '_self'
           },
+          jmd_menu2,
           {
         	xtype: 'tbfill'  
           },

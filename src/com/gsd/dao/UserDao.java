@@ -27,5 +27,5 @@ public interface UserDao {
 	
 	public int countLastUpdateProject();
 	
-	public List<User> showUser(int type);
+	public List<User> showUser(String dept);
 }

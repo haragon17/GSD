@@ -78,8 +78,10 @@ public class TimeRecordController {
 		
 		if(type == 0 || type == 1){
 			return new ModelAndView("TimeRecordAdmin");
-		}else{
+		}else if(type == 2){
 			return new ModelAndView("TimeRecord");
+		}else{
+			return new ModelAndView("AccessDenied");
 		}
 	}
 	
@@ -151,6 +153,11 @@ public class TimeRecordController {
 		List<TimeRecordReference> trRef = null;
 		String tr_ref_kind = request.getParameter("kind");
 		String tr_ref_dept = request.getParameter("dept");
+		if(tr_ref_kind.equals("Process")){
+			if(tr_ref_dept.contains("E-Studio")){
+				tr_ref_dept = "E-Studio";
+			}
+		}
 		
 		try {
 			trRef = timeRecordDao.showTimeRecordReference(tr_ref_kind, tr_ref_dept);

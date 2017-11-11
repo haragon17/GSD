@@ -1,27 +1,15 @@
 store = {};
 panels = {};
+myDept = "";
 
 Ext.onReady(function() {
 
-	projid = new Ext.form.Hidden({
-		name : 'projid',
-		id : 'projid'
-	});
-	cusid = new Ext.form.Hidden({
-		name : 'cusid',
-		id : 'cusid'
-	});
-	fid = new Ext.form.Hidden({
-		name : 'fid',
-		id : 'fid'
-	});
-	
 	panels.search = Ext.create('Ext.form.Panel', {
 		title : 'Search Criteria',
 		autoWidth : true,
 		id : 'formPanel',
-		width : 750,
-		height : 200,
+		width : 800,
+		height : 250,
 		collapsible : true,
 		renderTo : document.body,
 		style : {
@@ -48,7 +36,7 @@ Ext.onReady(function() {
 			layout : 'column',
 			border : false,
 			items : [ {
-				columnWidth : 0.62,
+				columnWidth : 0.66,
 				border : false,
 				layout : 'anchor',
 				style : {
@@ -60,123 +48,143 @@ Ext.onReady(function() {
 				defaultType : 'textfield',
 				items : [ 
 				    {
-				    fieldLabel : 'Project Name ',
-				    name : 'sproj_name',
-				    id : 'sproj_name',
-				    labelWidth : 110,
-					margin : '0 0 10 0',
-					width : 260,
-					emptyText : 'Project Name'
-				    
-				    }, {
-						xtype : 'combobox',
-						fieldLabel : 'Customer Name ',
-						name : 'scus_name',
-						id: 'scus_name',
+				    	fieldLabel : 'File Name ',
+				    	name : 'str_name',
+				    	id : 'str_name',
+				    	labelWidth : 110,
+						margin : '0 0 10 0',
+						width : 340,
+						emptyText : 'File Name'
+				    },     
+					{
+						xtype: 'combobox',
+						fieldLabel : 'Job Name ',
+						name : 'sjob_ref_id',
+						id : 'sjob_ref_id',
 						queryMode : 'local',
 						labelWidth : 110,
 						margin : '0 0 10 0',
-						width : 260,
-						emptyText : 'Customer Name',
+						width : 340,
+						emptyText : 'Job Name',
 						store : {
-							fields : [ 'cus_id', 'cus_name', 'cus_code' ],
+							fields : [ 'job_ref_id', 'job_ref_name' ],
 							proxy : {
 								type : 'ajax',
-								url : 'showCustomer.htm',
+								url : 'showJobRef.htm?id=0&type=0',
 								reader : {
 									type : 'json',
 									root : 'records',
-									idProperty : 'cus_id'
+									idProperty : 'job_ref_id'
 								}
 							},
 							autoLoad : true,
 							sorters: [{
-						         property: 'cus_name',
+						         property: 'itm_name',
 						         direction: 'ASC'
 						     }]
 						},
-						valueField : 'cus_name',
-						displayField : 'cus_name',
+						valueField : 'job_ref_id',
+						displayField : 'job_ref_name',
 						listeners : {
-
-							select : function() {
-								
-								var v = this.getValue();
-								var record = this.findRecord(this.valueField || this.displayField, v);
-								var myIndex = this.store.indexOf(record);
-								var myValue = this.store.getAt(myIndex).data.cus_code;
-								var myId = this.store.getAt(myIndex).data.cus_id;
-								Ext.getCmp('cusid').setValue(myId);
-								Ext.getCmp('scus_code').setValue(myValue);
-								
-								console.log("cus_code: "+myValue);
-							},
 							blur : function() {
 								var v = this.getValue();
 								var record = this.findRecord(this.valueField || this.displayField, v);
 								if(record == false){
-									Ext.getCmp('cusid').setValue("");
-									Ext.getCmp('scus_name').setValue("");
-									Ext.getCmp('scus_code').setValue("");
+									Ext.getCmp('sjob_ref_id').setValue("");
 								}
 							}
 						}
-					}, {
-						xtype : 'combobox',
-						fieldLabel : 'Customer Code ',
-						name : 'scus_code',
-						id : 'scus_code',
+					},
+					{
+						xtype: 'combobox',
+						fieldLabel : 'Process Type ',
+						name : 'sprocess',
+						id : 'sprocess',
 						queryMode : 'local',
 						labelWidth : 110,
 						margin : '0 0 10 0',
-						width : 260,
-						emptyText : 'Customer Code',
+						width : 340,
+						editable : false,
+						emptyText : 'Process Type',
+//						store : store.process,
 						store : {
-							fields : [ 'cus_id', 'cus_code', 'cus_name' ],
+							fields : ['tr_ref_name'],
 							proxy : {
 								type : 'ajax',
-								url : 'showCustomer.htm',
+								url : '',
 								reader : {
 									type : 'json',
 									root : 'records',
-									idProperty : 'cus_id'
 								}
 							},
-							autoLoad : true,
-							sorters: [{
-						         property: 'cus_code',
-						         direction: 'ASC'
-						     }]
+//							autoLoad : true
 						},
-						valueField : 'cus_code',
-						displayField : 'cus_code',
-						listeners : {
-
-							select : function() {
-								
-								var v = this.getValue();
-								var record = this.findRecord(this.valueField || this.displayField, v);
-								var myIndex = this.store.indexOf(record);
-								var myValue = this.store.getAt(myIndex).data.cus_name;
-								var myId = this.store.getAt(myIndex).data.cus_id;
-								Ext.getCmp('cusid').setValue(myId);
-								Ext.getCmp('scus_name').setValue(myValue);
-								
-								console.log("cus_name: "+myValue);
-							},
-							blur : function() {
-								var v = this.getValue();
-								var record = this.findRecord(this.valueField || this.displayField, v);
-								if(record == false){
-									Ext.getCmp('cusid').setValue("");
-									Ext.getCmp('scus_name').setValue("");
-									Ext.getCmp('scus_code').setValue("");
-								}
-							}
-						}
+						valueField : 'tr_ref_name',
+						displayField : 'tr_ref_name',
+					},
+					{
+						fieldLabel : 'Record Date ',
+						name : 'srecord_date',
+						combineErrors: true,
+						xtype: 'fieldcontainer',
+						labelWidth : 110,
+						margin : '0 0 10 0',
+						width : 350,
+						layout: 'hbox',
+		                defaults: {
+		                    flex: 1,
+		                },
+		                items: [
+		                    {
+		                        xtype     : 'datefield',
+		                        name      : 'record_start',
+		                        id	: 'record_start',
+		                        labelSeparator : '',
+		                        margin: '0 0 0 0',
+		                        msgTarget : 'side',
+		                        width: 50,
+		                        editable: false,
+		                        format: 'Y-m-d',
+		                        maxValue: new Date(),
+		                        emptyText : 'Start',
+		                        listeners: {
+		                        	   "change": function () {
+		                        		   			var startDate = Ext.getCmp('record_start').getRawValue();
+		                        		   			Ext.getCmp('record_finish').setMinValue(startDate);
+		                        	   }
+		                        }
+		                    },{
+		                    	 xtype: 'fieldcontainer',
+		     	                fieldLabel: 'To ',
+		     	                combineErrors: true,
+		     	                msgTarget : 'side',
+		     	                margin: '0 0 0 5',
+		                    	labelSeparator : '',
+		                        Width : 20
+		                    },
+		                    {
+		                        xtype     : 'datefield',
+		                        margin: '0 10 0 -80',	
+		                        name      : 'record_finish',
+		                        id	: 'record_finish',
+		                        labelSeparator : '',
+		                        msgTarget : 'side',
+		                        width: 50,
+		                        editable: false,
+		                        format: 'Y-m-d',
+		                        maxValue: new Date(),
+		                        emptyText : 'Finish',
+		                        listeners: {
+		                        	"change": function () {
+		                        		   	var endDate = Ext.getCmp('record_finish').getRawValue();
+		                           			Ext.getCmp('record_start').setMaxValue(endDate);
+		                        	}
+		                        }
+		                    }
+		                ]
 					} ]
 			}, {
-				columnWidth : 0.36,
+				columnWidth : 0.33,
 				style : {
 					"margin-left" : "-80px",
 					"margin-right" : "10px",
@@ -185,124 +193,317 @@ Ext.onReady(function() {
 				border : false,
 				layout : 'anchor',
 				defaultType : 'textfield',
-				items : [ {
-					xtype: 'combobox',
-					fieldLabel : 'Item Name ',
-					name : 'sitm_id',
-					id : 'sitm_id',
+				items : [ 
+//				{
+//					xtype: 'combobox',
+//					fieldLabel : 'Item Name ',
+//					name : 'sitm_id',
+//					id : 'sitm_id',
+//					queryMode : 'local',
+//					labelWidth : 110,
+//					margin : '0 0 10 0',
+//					width : 280,
+//					emptyText : 'Item Name',
+//					store : {
+//						fields : [ 'itm_id', 'itm_name' ],
+//						proxy : {
+//							type : 'ajax',
+//							url : 'showItem.htm?id=0',
+//							reader : {
+//								type : 'json',
+//								root : 'records',
+//								idProperty : 'itm_id'
+//							}
+//						},
+//						autoLoad : true,
+//						sorters: [{
+//					         property: 'itm_name',
+//					         direction: 'ASC'
+//					     }]
+//					},
+//					valueField : 'itm_id',
+//					displayField : 'itm_name',
+//					listeners : {
+//						blur : function() {
+//							var v = this.getValue();
+//							var record = this.findRecord(this.valueField || this.displayField, v);
+//							if(record == false){
+//								Ext.getCmp('sitm_id').setValue("");
+//							}
+//						}
+//					}
+//				},
+				{
+					xtype : 'combobox',
+					fieldLabel : 'Customer Name ',
+					name : 'scus_name',
+					id: 'scus_name',
 					queryMode : 'local',
-					labelWidth : 100,
+					labelWidth : 110,
 					margin : '0 0 10 0',
-					width : 280,
-					emptyText : 'Item Name',
+					width : 300,
+					emptyText : 'Customer Name',
 					store : {
-						fields : [ 'itm_id', 'itm_name' ],
+						fields : [ 'cus_id', 'cus_name', 'cus_code' ],
 						proxy : {
 							type : 'ajax',
-							url : 'showItem.htm?id=0',
+							url : 'showCustomer.htm',
 							reader : {
 								type : 'json',
 								root : 'records',
-								idProperty : 'itm_id'
+								idProperty : 'cus_id'
 							}
 						},
-						autoLoad : true
+						autoLoad : true,
+						sorters: [{
+					         property: 'cus_name',
+					         direction: 'ASC'
+					     }]
 					},
-					valueField : 'itm_id',
-					displayField : 'itm_name',
+					valueField : 'cus_name',
+					displayField : 'cus_name',
+					listeners : {
+
+						select : function() {
+							
+							var v = this.getValue();
+							var record = this.findRecord(this.valueField || this.displayField, v);
+							var myIndex = this.store.indexOf(record);
+							var myValue = this.store.getAt(myIndex).data.cus_code;
+							var myId = this.store.getAt(myIndex).data.cus_id;
+							Ext.getCmp('scus_id').setValue(myId);
+							Ext.getCmp('scus_code').setValue(myValue);
+							
+//							var item = Ext.getCmp('sitm_id');
+//							item.clearValue();
+//							item.getStore().removeAll();
+							var proj = Ext.getCmp('sproj_id');
+							var job_ref = Ext.getCmp('sjob_ref_id');
+							proj.clearValue();
+							proj.getStore().removeAll();
+							proj.getStore().load({
+								url: 'showProjects.htm?id='+myId
+							});
+							job_ref.clearValue();
+							job_ref.getStore().removeAll();
+							job_ref.getStore().load({
+								url: 'showJobRef.htm?id='+myId+'&type=1'
+							});
+						}
+
+					}
+				}, {
+					xtype : 'combobox',
+					fieldLabel : 'Customer Code ',
+					name : 'scus_code',
+					id : 'scus_code',
+					queryMode : 'local',
+					labelWidth : 110,
+					margin : '0 0 10 0',
+					width : 300,
+					emptyText : 'Customer Code',
+					store : {
+						fields : [ 'cus_id', 'cus_code', 'cus_name' ],
+						proxy : {
+							type : 'ajax',
+							url : 'showCustomer.htm',
+							reader : {
+								type : 'json',
+								root : 'records',
+								idProperty : 'cus_id'
+							}
+						},
+						autoLoad : true,
+						sorters: [{
+					         property: 'cus_code',
+					         direction: 'ASC'
+					     }]
+					},
+					valueField : 'cus_code',
+					displayField : 'cus_code',
+					listeners : {
+
+						select : function() {
+							
+							var v = this.getValue();
+							var record = this.findRecord(this.valueField || this.displayField, v);
+							var myIndex = this.store.indexOf(record);
+							var myValue = this.store.getAt(myIndex).data.cus_name;
+							var myId = this.store.getAt(myIndex).data.cus_id;
+							Ext.getCmp('scus_id').setValue(myId);
+							Ext.getCmp('scus_name').setValue(myValue);
+							
+//							var item = Ext.getCmp('sitm_id');
+//							item.clearValue();
+//							item.getStore().removeAll();
+							var proj = Ext.getCmp('sproj_id');
+							var job_ref = Ext.getCmp('sjob_ref_id');
+							proj.clearValue();
+							proj.getStore().removeAll();
+							proj.getStore().load({
+								url: 'showProjects.htm?id='+myId
+							});
+							job_ref.clearValue();
+							job_ref.getStore().removeAll();
+							job_ref.getStore().load({
+								url: 'showJobRef.htm?id='+myId+'&type=1'
+							});
+						}
+
+					}
+				},{
+					xtype: 'combobox',
+					fieldLabel : 'Project Name ',
+					name : 'sproj_id',
+					id : 'sproj_id',
+					queryMode : 'local',
+					labelWidth : 110,
+					margin : '0 0 10 0',
+					width : 300,
+//					editable : false,
+					emptyText : 'Project Name',
+					store : {
+						fields : [ 'proj_id', 'proj_name' ],
+						proxy : {
+							type : 'ajax',
+							url : 'showProjects.htm?id=0',
+							reader : {
+								type : 'json',
+								root : 'records',
+								idProperty : 'proj_id'
+							}
+						},
+						autoLoad : true,
+						sorters: [{
+					         property: 'proj_name',
+					         direction: 'ASC'
+					     }]
+					},
+					valueField : 'proj_id',
+					displayField : 'proj_name',
+					listeners : {
+
+						select : function() {
+							var item = Ext.getCmp('sitm_id');
+							var proj_id = Ext.getCmp('sproj_id').getValue();
+
+							var job_ref = Ext.getCmp('sjob_ref_id');
+							
+							job_ref.clearValue();
+							job_ref.getStore().removeAll();
+							job_ref.getStore().load({
+								url: 'showJobRef.htm?id='+proj_id+'&type=2'
+							});
+						}
+					}
+				},
+				{
+					xtype: 'combobox',
+					fieldLabel : 'User Name ',
+					name : 'susr_id',
+					id : 'susr_id',
+					queryMode : 'local',
+					labelWidth : 110,
+					margin : '0 0 10 0',
+					width : 300,
+//					editable : false,
+					emptyText : 'User Name',
+					store : {
+						fields : [ 'usr_id', 'usr_name' ],
+						proxy : {
+							type : 'ajax',
+							url : '',
+							reader : {
+								type : 'json',
+								root : 'records',
+								idProperty : 'usr_id'
+							}
+						},
+//						autoLoad : true
+					},
+					valueField : 'usr_id',
+					displayField : 'usr_name',
 					listeners : {
 						blur : function() {
 							var v = this.getValue();
 							var record = this.findRecord(this.valueField || this.displayField, v);
 							if(record == false){
-								Ext.getCmp('sitm_id').setValue("");
+								Ext.getCmp('susr_id').setValue("");
 							}
 						}
 					}
-				}, 
-				,{
-					xtype: 'combobox',
-					fieldLabel : 'Key Acc Mng ',
-					name : 'skey_acc_mng',
-					id : 'skey_acc_mng',
-					queryMode : 'local',
-					labelWidth : 100,
-					margin : '0 0 10 0',
-					width : 280,
-					emptyText : 'Key Acc Mng',
-					store : {
-						fields : [ 'key_acc_id', 'key_acc_name' ],
-						proxy : {
-							type : 'ajax',
-							url : 'showKeyAccMng.htm',
-							reader : {
-								type : 'json',
-								root : 'records',
-								idProperty : 'key_acc_id'
-							}
-						},
-						autoLoad : true
-					},
-					valueField : 'key_acc_id',
-					displayField : 'key_acc_name'
 				},
+//				{
+//					xtype : 'combobox',
+//					fieldLabel : 'Department ',
+//					name : 'sdept',
+//					id : 'sdept',
+//					queryMode : 'local',
+//					labelWidth : 110,
+//					emptyText : 'Department',
+//					editable : false,
+//					width : 300,
+//					margin : '0 0 10 0',
+//					msgTarget: 'under',
+//					store : {
+//						fields : ['db_ref_name'],
+//						proxy : {
+//							type : 'ajax',
+//							url : 'showDepartment.htm',
+//							reader : {
+//								type : 'json',
+//								root : 'records',
+//							}
+//						},
+//						autoLoad : true
+//					},
+//					valueField : 'db_ref_name',
+//					displayField : 'db_ref_name',
+//					listeners : {
+//						select : function() {
+//							var dept = Ext.getCmp('sdept').getValue();
+//							var process = Ext.getCmp('sprocess');
+//							
+//							process.clearValue();
+//							process.getStore().removeAll();
+//							process.getStore().load({
+//								url: 'showTimeRecordReference.htm?kind=Process&dept='+dept
+//							});
+//						}
+//					}
+//				},
+//				{
+//					xtype : 'combobox',
+//					fieldLabel : 'Billing Status ',
+//					name : 'sjob_status',
+//					id : 'sjob_status',
+//					queryMode : 'local',
+//					labelWidth : 110,
+//					editable : false,
+//					emptyText : 'Billing Status',
+//					width : 300,
+//					magin : '0 0 10 0',
+////					store : 'jobStatus',
+//					store : {
+//						fields : ['db_ref_name'],
+//						proxy : {
+//							type : 'ajax',
+//							url : 'showBillingStatus.htm',
+//							reader : {
+//								type : 'json',
+//								root : 'records',
+//							}
+//						},
+//						autoLoad : true
+//					},
+//					valueField : 'db_ref_name',
+//					displayField : 'db_ref_name',
+//				},
 				{
-					fieldLabel : 'Time(minutes)',
-					name : 'stime',
-					combineErrors: true,
-					xtype: 'fieldcontainer',
-					labelWidth : 100,
-					msgTarget : 'above',
-					margin : '0 0 10 0',
-					width : 290,
-					layout: 'hbox',
-	                defaults: {
-	                    flex: 1,
-	                },
-	                items: [
-	                    {
-	                        xtype     : 'numberfield',
-	                        name      : 'time_start',
-	                        id	: 'time_start',
-	                        labelSeparator : '',
-	                        margin: '0 0 0 0',
-	                        msgTarget : 'side',
-	                        minValue : 0,
-	                        width: 50,
-	                        listeners: {
-	                        	   "blur": function () {
-	                        		   			var startDate = Ext.getCmp('time_start').getRawValue();
-	                        		   			Ext.getCmp('time_limit').setMinValue(startDate);
-	                        	   }
-	                        }
-	                    },{
-	                    	 xtype: 'fieldcontainer',
-	     	                fieldLabel: 'To ',
-	     	                combineErrors: true,
-	     	                msgTarget : 'side',
-	     	                margin: '0 0 0 5',
-	                    	labelSeparator : '',
-	                        Width : 20
-	                    },
-	                    {
-	                        xtype     : 'numberfield',
-	                        margin: '0 10 0 -50',	
-	                        name      : 'time_limit',
-	                        id	: 'time_limit',
-	                        labelSeparator : '',
-//	                        msgTarget : 'side',
-	                        minValue : 0,
-	                        width: 50,
-	                        listeners: {
-	                        	"blur": function () {
-	                        		   	var endDate = Ext.getCmp('time_limit').getRawValue();
-	                           			Ext.getCmp('time_start').setMaxValue(endDate);
-	                        	}
-	                        }
-	                    }
-	                ]
-				},
-				]
+					xtype : 'hidden',
+					id : 'scus_id',
+					name : 'scus_id'
+	            }  ]
 			} ]
 		} ],
 
@@ -311,14 +512,12 @@ Ext.onReady(function() {
 			id : 'searchs',
 			handler : function() {
 				var form = this.up('form').getForm();
-
 				if (form.isValid()) {
-
+//					Ext.getCmp('ireport').setDisabled(false);
 					Ext.Ajax.request({
-						url : 'searchProjectsParam.htm?cus_id='+Ext.getCmp('cusid').getValue() + getParamValues(),
+						url : 'searchTimeRecordParam.htm?sdept='+userDept + getParamValues(),
 						success : function(response, opts) {
-							store.projectsRef.reload();
-							store.projects.loadPage(1);
+							store.timeRecord.loadPage(1);
 						}
 					});
 
@@ -330,15 +529,34 @@ Ext.onReady(function() {
 						icon : Ext.MessageBox.ERROR,
 						animateTarget : 'searchs',
 					});
-					console.debug("Projects.js Else conditions");
+					console.debug("TimeRecordAdmin.js - Search else conditions");
 				}
 			}
 		}, {
 			text : 'Reset',
 			handler : function() {
 				this.up('form').getForm().reset();
-				Ext.getCmp('cusid').setValue("");
-				
+				Ext.getCmp('scus_id').setValue("");
+				Ext.getCmp('record_start').setMaxValue(new Date());
+				Ext.getCmp('record_finish').setMinValue('');
+				var proj = Ext.getCmp('sproj_id');
+				var job_ref = Ext.getCmp('sjob_ref_id');
+				var process = Ext.getCmp('sprocess');
+				proj.clearValue();
+				proj.getStore().removeAll();
+				proj.getStore().load({
+					url: 'showProjects.htm?id=0'
+				});
+				job_ref.clearValue();
+				job_ref.getStore().removeAll();
+				job_ref.getStore().load({
+					url: 'showJobRef.htm?id=0&type=0'
+				});
+				process.clearValue();
+				process.getStore().removeAll();
+				process.getStore().load({
+					url: 'showTimeRecordReference.htm?kind=Process&dept=0'
+				});
 			}
 		} ]
 
@@ -346,244 +564,237 @@ Ext.onReady(function() {
 
 	panels.grid = Ext.create('Ext.grid.Panel', {
 		renderTo : document.body,
-		xtype: 'row-expander-grid',
-		title : 'Projects',
-		split : true,
-		forceFit : true,
-		loadMask : true,
-		autoWidth : true,
+		title : 'Time Record',
+//		split : true,
+//		forceFit : true,
+//		loadMask : true,
+//		autoWidth : true,
 		frame : true,
-		store : store.projects,
+		store : store.timeRecord,
+		tools : [ {
+			xtype : 'button',
+			text : 'Report',
+			id : 'ireport',
+			margin : '0 5 0 0',
+//			disabled : true,
+			iconCls : 'icon-print',
+			handler : function() {
+//				alert("Print Report!");
+				var form = Ext.getCmp('formPanel').getForm();
+				form.submit({
+					target : '_blank',
+					url : 'printTimeReport.htm',
+					method : 'POST',
+					reset : true,
+					standardSubmit : true
+				});
+			}
+		} ],
 		style : {
 			"margin-left" : "auto",
 			"margin-right" : "auto",
 			"margin-top" : "15px",
-			"margin-bottom" : "15px"
+			"margin-bottom" : "10px"
 		},
 		width : 1200,
-		height : 500,
+//		height : 495,
+		minHeight: 495,
 		columns : [
 				{
-					text : "Project Name",
-					flex : 1.5,
-					sortable : true,
-					dataIndex : 'proj_name'
-				},
-				{
 					text : "Customer Name",
-					flex : 1.5,
+					flex : 1.2,
 					sortable : true,
-					dataIndex : 'cus_name'
+					dataIndex : 'cus_name',
+					renderer : renderCustomer
 				},
 				{
-					text : "Project Description",
-					flex : 2,
+					text : "Job Name",
+					flex : 1,
 					sortable : true,
-					dataIndex : 'proj_desc'
+					dataIndex : 'job_ref_name'
 				},
 				{
-					text : 'Briefing',
-					flex : 0.5,
-					xtype : 'actioncolumn',
-					align : 'center',
-					id : 'open',
-					items : [{
-						getClass: function(v, meta, rec) {
-							
-							if(rec.get('file_id') != 0){
-								this.items[0].tooltip = 'd1';
-								return 'icon-d1';
-							} else {
-								this.items[0].tooltip = 'd2';
-								
-								return 'icon-d2';
-							}
-							
-						},
-						handler : function(grid, rowIndex, colIndex){
-							file_id = grid.getStore().getAt(rowIndex).get('file_id');
-							if(file_id != 0){
-								window.open('download.htm?file='+file_id,'_blank');
-							}else{
-								Ext.MessageBox.show({
-									title : 'Infomation',
-									msg : 'No Briefing Uploaded !',
-									buttons : Ext.MessageBox.OK,
-									animateTarget : 'open',
-									icon : Ext.MessageBox.INFO
-								});
-							}
-						}
-					}]
+					text : "File Name",
+					flex : 1,
+					sortable : true,
+					dataIndex : 'tr_name'
 				},
+				{
+					text : "Process",
+					flex : 0.8,
+					sortable : true,
+					dataIndex : 'tr_process'
+				},
+//				{
+//					text : "Date",
+//					flex : 0.5,
+//					sortable : true,
+//					dataIndex : 'tr_start',
+//					renderer: Ext.util.Format.dateRenderer('Y-m-d')
+//				},
+				{
+					text : "Start",
+					flex : 0.8,
+					sortable : true,
+					dataIndex : 'tr_start',
+					renderer: Ext.util.Format.dateRenderer('Y-m-d H:i:s')
+				},
+				{
+					text : "Finish",
+					flex : 0.8,
+					sortable : true,
+					dataIndex : 'tr_finish',
+					renderer: Ext.util.Format.dateRenderer('Y-m-d H:i:s')
+				},
+				{
+					text : "Summary",
+					flex : 0.45,
+					dataIndex : 'sum_time'
+				},
+				{
+					text : "Name",
+					flex : 0.35,
+					sortable : true,
+					dataIndex : 'usr_name'
+				}
 				],
 		columnLines : true,
-		plugins: [{
-	        ptype: 'rowexpander',
-	        rowBodyTpl : new Ext.XTemplate(
-	        		'{proj_id:this.myTest}',
-	        		{
-	        			myTest: function(v){
-		            		var myText = "";
-		            		 store.projectsRef.each(function(rec){
-//		            			 alert(rec.data.cus_id);
-		            			 var myEuro = "";
-		            			 var myDesc = "";
-		            			 if(rec.data.proj_ref_desc != ""){
-		            				 myDesc = rec.data.proj_ref_desc;
-		            			 }else{
-		            				 myDesc = "-";
-		            			 }
-		            			if(rec.data.proj_id == v){
-		            				 myText += '<tr><td>Item: <b>'+rec.data.itm_name+'</b></td>'+
-		            				 '<td>Target Time: <b>'+(Math.round(rec.data.time*100)/100)+'</b></td>'+
-		            				 '<td>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td>'+
-		            				 '<td>Description: <b>'+myDesc+'</b></td></tr>';
-		            			}
-		            		})
-		            		if(myText !== ""){
-		            			return "<table cellspacing=8 bgcolor=#F0F0F0 class=\"myTable\">"+myText+"</table>";
-		            		}else{
-		            			return "<b>No Item Assign...</b>";
-		            		}
-		            	}
-	        		}
-	        )
-	    }],
+		listeners: {
+			viewready: function (grid) {
+		        var view = grid.view;
+		        this.toolTip = Ext.create('Ext.tip.ToolTip', {
+		            target: view.el,
+		            delegate: view.cellSelector,
+		            trackMouse: true,
+		            renderTo: Ext.getBody(),
+		            listeners: {
+		                beforeshow: function(tip) {
+		                    var trigger = tip.triggerElement,
+		                        parent = tip.triggerElement.parentElement,
+		                        columnTitle = view.getHeaderByCell(trigger).text,
+		                        columnDataIndex = view.getHeaderByCell(trigger).dataIndex,
+		                        columnText = view.getRecord(parent).get(columnDataIndex).toString();
+		                    if(columnDataIndex == "cus_name"){
+		                    	columnText += "("+view.getRecord(parent).get('proj_name').toString()+")";
+		                    }
+		                    if (columnText){
+		                        tip.update("<b>"+(columnText.replace(/\r\n|\n/gi, "<br>"))+"</b>");
+		                    } else {
+		                        return false;
+		                    }
+		                }
+		            }
+		        });
+	        }
+	    },
 		bbar : Ext.create('Ext.PagingToolbar', {
-			store : store.projects,
+			store : store.timeRecord,
 			displayInfo : true,
-			displayMsg : 'Displaying Project {0} - {1} of {2}',
-			emptyMsg : "No Project to display",
+			displayMsg : 'Displaying Records {0} - {1} of {2}',
+			emptyMsg : "No record to display",
 			plugins : Ext.create('Ext.ux.ProgressBarPager', {})
 		})
 	});
 
-});
+	Ext.Ajax.request({
+		url : 'userModel.htm',
+		success: function(response, opts){
+			var responseOject = Ext.decode(response.responseText);
+			userDept = responseOject.user[0].dept;
+			if(userDept.indexOf("E-Studio") !== -1){
+				myDept = "E-Studio";
+			}else{
+				myDept = userDept;
+			}
+			Ext.getCmp('sprocess').getStore().load({
+				url: 'showTimeRecordReference.htm?kind=Process&dept='+myDept
+			});
+			Ext.getCmp('susr_id').getStore().load({
+				url : 'showUser.htm?dept='+userDept
+			})
+		},
+		failure: function(response, opts){
+			var responseOject = Ext.util.JSON.decode(response.responseText);
+			Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+		}
+	});	
+	
+});	//end onReady
 
-Ext.define('projRefModel', {
+Ext.define('timeRecordModel', {
 	extend : 'Ext.data.Model',
-	fields : [ {
-		name : 'proj_ref_id',
+	fields : [{
+		name : 'tr_id',
 		type : 'int'
 	}, {
-		name : 'proj_id',
+		name : 'job_ref_id',
 		type : 'int'
 	}, {
-		name : 'itm_id',
+		name : 'usr_id',
 		type : 'int'
 	}, {
 		name : 'cus_id',
 		type : 'int'
 	}, {
-		name : 'file_id',
-		type : 'float'
+		name : 'proj_id',
+		type : 'int'
 	}, {
-		name : 'time',
-		type : 'float'
+		name : 'job_id',
+		type : 'int'
 	}, {
-		name : 'price',
-		type : 'float'
+		name : 'tr_start',
+		type : 'date',
+		dateFormat: 'Y-m-d H:i:s'
 	}, {
-		name : 'itm_name',
+		name : 'tr_finish',
+		type : 'date',
+		dateFormat: 'Y-m-d H:i:s'
+	}, {
+		name : 'tr_name',
 		type : 'string'
 	}, {
-		name : 'currency',
+		name : 'tr_process',
+		type : 'string'
+	}, {
+		name : 'tr_name',
+		type : 'string'
+	}, {
+		name : 'usr_name',
 		type : 'string'
 	}, {
 		name : 'cus_name',
 		type : 'string'
-	}, {
-		name : 'cus_code',
-		type : 'string'
-	}, {
-		name : 'proj_ref_desc',
-		type : 'string'
-	}, {
-		name : 'file_name',
-		type : 'string'
-	}, {
-		name : 'actual_time',
-		type : 'int'
-	}
-
-	]
-});
-
-store.projectsRef = Ext.create('Ext.data.JsonStore', {
-	model : 'projRefModel',
-	id : 'projRefStore',
-//	pageSize : 9,
-	autoLoad : true,
-	proxy : {
-		type : 'ajax',
-		url : 'searchProjectsReference.htm',
-		reader : {
-			type : 'json',
-			root : 'records',
-			idProperty : 'proj_ref_id',
-			totalProperty : 'total'
-		}
-	},
-});
-
-Ext.define('projModel', {
-	extend : 'Ext.data.Model',
-	fields : [ {
-		name : 'proj_id',
-		type : 'int'
 	}, {
 		name : 'proj_name',
 		type : 'string'
 	}, {
-		name : 'proj_desc',
+		name : 'job_name',
 		type : 'string'
 	}, {
-		name : 'cus_id',
-		type : 'int'
-	}, {
-		name : 'file_id',
-		type : 'int'
-	}, {
-		name : 'proj_count',
-		type : 'int'
-	}, {
-		name : 'cus_name',
+		name : 'job_ref_name',
 		type : 'string'
 	}, {
-		name : 'cus_code',
+		name : 'sum_time',
 		type : 'string'
-	}
-
-	]
+	}]
 });
 
-store.projects = Ext.create('Ext.data.JsonStore', {
-	model : 'projModel',
-	id : 'projStore',
-	pageSize : 9,
+store.timeRecord = Ext.create('Ext.data.JsonStore', {
+	model : 'timeRecordModel',
+	id : 'timeRecordStore',
+	pageSize : 15,
 //	autoLoad : true,
 	proxy : {
 		type : 'ajax',
-		url : 'searchProjects.htm',
+		url : 'searchTimeRecord.htm',
 		reader : {
 			type : 'json',
 			root : 'records',
-			idProperty : 'proj_id',
+			idProperty : 'tr_id',
 			totalProperty : 'total'
 		}
 	},
-	listeners: {
-		'load' : function(){
-			for(var xyz=0;xyz<store.projects.count();xyz++){
-				if(Ext.fly(panels.grid.plugins[0].view.getNodes()[xyz]).hasCls(panels.grid.plugins[0].rowCollapsedCls) == true){
-					panels.grid.plugins[0].toggleRow(xyz, panels.grid.getStore().getAt(xyz));
-				}
-			}
-		}
-	}
 });
-
 
 function getParamValues() {
 	var url = "";
@@ -613,4 +824,8 @@ function getParamValues() {
 	}
 
 	return encodeURI(url);
+}
+
+function renderCustomer(value, meta, record, rowIndex, colIndex, store) {
+    return record.get('cus_name')+'('+record.get('proj_name')+')';
 }

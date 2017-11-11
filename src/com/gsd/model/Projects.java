@@ -16,6 +16,7 @@ public class Projects {
 	private String bill_to;
 	private String payment;
 	private String file_name;
+	private String proj_title;
 	
 	public int getProj_id() {
 		return proj_id;
@@ -100,6 +101,12 @@ public class Projects {
 	}
 	public void setFile_name(String file_name) {
 		this.file_name = file_name;
+	}
+	public String getProj_title() {
+		return proj_title;
+	}
+	public void setProj_title(String proj_title) {
+		this.proj_title = proj_title;
 	}
 	
 }

@@ -19,7 +19,6 @@ table.myTable th {
  var errMessage = '${msg}';
 </script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/TimeRecordAdmin.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/Store.js"></script>
 <title>Time Record</title>
 </head>
 <body>

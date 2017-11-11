@@ -18,6 +18,7 @@ public class TimeRecord {
 	private String job_name;
 	private String job_ref_name;
 	private String sum_time;
+	private String job_ref_number;
 	
 	public int getTr_id() {
 		return tr_id;
@@ -114,6 +115,12 @@ public class TimeRecord {
 	}
 	public void setSum_time(String sum_time) {
 		this.sum_time = sum_time;
+	}
+	public String getJob_ref_number() {
+		return job_ref_number;
+	}
+	public void setJob_ref_number(String job_ref_number) {
+		this.job_ref_number = job_ref_number;
 	}
 	
 }

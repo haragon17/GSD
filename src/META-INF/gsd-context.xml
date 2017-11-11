@@ -94,5 +94,9 @@
 	<bean id="TimeRecordDao" class="com.gsd.dao.impl.TimeRecordDaoImpl">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+	
+	<bean id="ReferenceDao" class="com.gsd.dao.impl.ReferenceDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
 
 </beans>

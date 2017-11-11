@@ -118,6 +118,7 @@ Ext.create('Ext.data.Store', {
 	        {"name":"Finish Path"},
 	        {"name":"Prepare"},
 	        {"name":"Soft Proof"},
+	        {"name":"IC"},
 	        {"name":"Hold Wait Info"}
 	]
 });

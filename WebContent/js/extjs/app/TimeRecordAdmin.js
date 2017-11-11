@@ -135,7 +135,7 @@ Ext.onReady(function() {
 							fields : [ 'usr_id', 'usr_name' ],
 							proxy : {
 								type : 'ajax',
-								url : 'showUser.htm?type=3',
+								url : 'showUser.htm?dept=',
 								reader : {
 									type : 'json',
 									root : 'records',
@@ -459,9 +459,20 @@ Ext.onReady(function() {
 					width : 300,
 					margin : '0 0 10 0',
 					msgTarget: 'under',
-					store : 'deptStore',
-					valueField : 'name',
-					displayField : 'name',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showDepartment.htm',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
 					listeners : {
 						select : function() {
 							var dept = Ext.getCmp('sdept').getValue();
@@ -486,9 +497,20 @@ Ext.onReady(function() {
 					emptyText : 'Billing Status',
 					width : 300,
 					magin : '0 0 10 0',
-					store : 'jobStatus',
-					valueField : 'name',
-					displayField : 'name'
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showBillingStatus.htm',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
 				},
 				{
 					xtype : 'hidden',
@@ -751,7 +773,7 @@ store.timeRecord = Ext.create('Ext.data.JsonStore', {
 	model : 'timeRecordModel',
 	id : 'timeRecordStore',
 	pageSize : 15,
-	autoLoad : true,
+//	autoLoad : true,
 	proxy : {
 		type : 'ajax',
 		url : 'searchTimeRecord.htm',

@@ -126,7 +126,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	@Override
 	public List<Projects> searchProjects(Map<String, String> data){
 		String sql = "SELECT DISTINCT projects.proj_id, customer.cus_name, projects.proj_name, projects.proj_desc, projects.cus_id, \n" +
-				"customer.cus_code, projects.file_id, customer.bill_to, customer.payment\n" +
+				"customer.cus_code, projects.file_id, customer.bill_to, customer.payment, proj_title\n" +
 				"FROM projects\n" +
 				"LEFT JOIN projects_reference ON projects_reference.proj_id = projects.proj_id\n" +
 				"LEFT JOIN customer ON customer.cus_id = projects.cus_id\n" +
@@ -372,7 +372,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	@Override
 	public void createProjects(Projects proj) {
 		// TODO Auto-generated method stub
-		String sql = "INSERT INTO projects VALUES (?,?,?,?,?,?,now(),now())";
+		String sql = "INSERT INTO projects VALUES (?,?,?,?,?,?,now(),now(),?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[] { 
 				proj.getProj_id(),
@@ -380,7 +380,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				proj.getProj_desc(),
 				proj.getFile_id(),
 				proj.getCus_id(),
-				proj.getCretd_usr()
+				proj.getCretd_usr(),
+				proj.getProj_title()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
@@ -401,7 +402,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				"Projects",
 				user.getUserModel().getUsr_name(),
 				"Created row on Projects name="+proj.getProj_name()+", desc="+proj.getProj_desc()+", file_name="+file_name
-				+", customer="+cus.getCus_code(),
+				+", customer="+cus.getCus_code()+", proj_title="+proj.getProj_title(),
 				proj.getProj_name()
 		});
 	}
@@ -584,6 +585,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				+ "proj_desc=?, "
 				+ "file_id=?, "
 				+ "cus_id=?, "
+				+ "proj_title=?, "
 				+ "update_date=now() "
 				+ "where proj_id=?";
 		
@@ -592,10 +594,26 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				proj.getProj_desc(),
 				proj.getFile_id(),
 				proj.getCus_id(),
+				proj.getProj_title(),
 				proj.getProj_id()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		if(!proj_audit.getProj_title().equals(proj.getProj_title())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				proj.getProj_id(),
+				"Projects",
+				user.getUserModel().getUsr_name(),
+				"Title",
+				proj_audit.getProj_title(),
+				proj.getProj_title(),
+				"Updated",
+				proj.getProj_name()
+			});
+		}
 		
 		if(!cus_audit.getCus_name().equals(cus.getCus_name())){
 			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
