@@ -1472,7 +1472,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showJobReference.htm?kind=JobStatus&dept=Publication',
+							url : 'showJobReference.htm?kind=JobStatus&dept=E-Studio',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -3240,7 +3240,7 @@ Ext.onReady(function() {
 					msgTarget: 'under',
 					emptyText : 'Item Name',
 					store : {
-						fields : [ 'proj_ref_id', 'itm_name' ],
+						fields : [ 'proj_ref_id', 'itm_name', 'proj_ref_desc' ],
 						proxy : {
 							type : 'ajax',
 							url : '',
@@ -3253,7 +3253,25 @@ Ext.onReady(function() {
 						autoLoad : true
 					},
 					valueField : 'proj_ref_id',
-					displayField : 'itm_name'
+					//displayField : 'itm_name'
+					tpl: Ext.create('Ext.XTemplate',
+					        '<tpl for=".">',
+					        	"<tpl if='proj_ref_desc == \"\"'>",
+					        	'<div class="x-boundlist-item">{itm_name}</div>',
+					            '<tpl else>',
+					            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
+					            '</tpl>',
+				            '</tpl>'
+				    ),
+				    displayTpl: Ext.create('Ext.XTemplate',
+				        '<tpl for=".">',
+				        	"<tpl if='proj_ref_desc == \"\"'>",
+				        	'{itm_name}',
+				            '<tpl else>',
+				            '{itm_name} - {proj_ref_desc}',
+				            '</tpl>',
+				        '</tpl>'
+				    ),
 				},
 				{
 					xtype : 'datefield',

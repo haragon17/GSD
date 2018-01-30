@@ -13,7 +13,7 @@ table.myTable th {
   padding: 5px; 
   }
 </style>
-<%@ include file="Menu.jsp" %>
+<%@ include file="MenuAdmin.jsp" %>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script type="text/javascript">
  var errMessage = '${msg}';

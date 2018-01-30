@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public class PrintJobTicket_iText {
 
-//	public static final String DEST = "/jview_pdf/GSD-JobTicket.pdf";
-	public static final String DEST = "/Users/gsd/Desktop/GSD-JobTicket.pdf";
+	public static final String DEST = "/jview_pdf/GSD-JobTicket.pdf";
+//	public static final String DEST = "/Users/gsd/Desktop/GSD-JobTicket.pdf";
 	
 	public void createPdf(HttpServletRequest request,
 			HttpServletResponse response, JobsReference job) throws IOException, DocumentException {

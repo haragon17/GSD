@@ -39,7 +39,9 @@ public class AuditLoggingController {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		int type = user.getUserModel().getUsr_type();
 		
-		if(type == 0){
+		if(type == 0 || type == 1){
+			return new ModelAndView("AuditLoggingAdmin");
+		}else if(type == 2){
 			return new ModelAndView("AuditLogging");
 		}else{
 			return new ModelAndView("AccessDenied");
@@ -52,12 +54,19 @@ public class AuditLoggingController {
 		List<AuditLogging> aud = null;
 		List<AuditLogging> audLs = new ArrayList<AuditLogging>();
 		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		int type = user.getUserModel().getUsr_type();
+		String dept = "";
+		if(type != 1){
+			dept = user.getUserModel().getDept();
+		}
+		
 		int start = Integer.parseInt(request.getParameter("start"));
 		int limit = Integer.parseInt(request.getParameter("limit"));
 		
 		try{
 			
-			aud = auditLoggingDao.showAuditLogging();
+			aud = auditLoggingDao.showAuditLogging(dept);
 			
 			if (limit + start > aud.size()) {
 				limit = aud.size();

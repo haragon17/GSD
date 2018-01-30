@@ -7,6 +7,26 @@ var pid = "";
 var last7day = "";
 Ext.onReady(function(){
 
+	 Ext.apply(Ext.form.field.VTypes, {
+		    ephone: function(val, field) {
+		        var reg= /^([\d\-+, ])/i;
+		        return reg.test(val);
+		    },
+		    ephoneText: 'Must be a number with - or + or ,',
+		    ephoneMask: /^[\d\-+, ]/i
+		});
+		
+		Ext.apply(Ext.form.field.VTypes, {
+			epassword: function(val, field) {
+		        if (field.initialPassField) {
+		            var pwd = Ext.getCmp('npass');
+		            return (val == pwd.getValue());
+		        }
+		        return true;
+		    },
+		    epasswordText: 'Passwords do not match'
+		});
+	
 	Ext.Ajax.request({
 		url : 'userModel.htm',
 		success: function(response, opts){
@@ -36,26 +56,6 @@ Ext.onReady(function(){
 		    	Ext.getCmp('sjob_ref_id').setValue(responseOject.chkTR);
 		    	setTimeout(function() { Ext.get('searchs').dom.click(); }, 800);
 		    }
-		    
-		    Ext.apply(Ext.form.field.VTypes, {
-			    ephone: function(val, field) {
-			        var reg= /^([\d\-+, ])/i;
-			        return reg.test(val);
-			    },
-			    ephoneText: 'Must be a number with - or + or ,',
-			    ephoneMask: /^[\d\-+, ]/i
-			});
-			
-			Ext.apply(Ext.form.field.VTypes, {
-				epassword: function(val, field) {
-			        if (field.initialPassField) {
-			            var pwd = Ext.getCmp('npass');
-			            return (val == pwd.getValue());
-			        }
-			        return true;
-			    },
-			    epasswordText: 'Passwords do not match'
-			});
 		    
 		    if(usr_type == 0){
 		    	admin_menu = {
@@ -167,7 +167,11 @@ Ext.onReady(function(){
 //	        	}
 	      },
 	      admin_menu,
-	      admin_menu2,
+	      {
+	  			text: 'History State', 
+	  			href: 'auditLogging.htm',
+	  			hrefTarget: '_self'
+	      },
           {
         	xtype: 'tbfill'  
           },

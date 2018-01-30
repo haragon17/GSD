@@ -14,7 +14,7 @@ public class TimeRecordDaoImpl extends JdbcDaoSupport implements TimeRecordDao {
 
 	@Override
 	public List<TimeRecord> searchTimeRecord(Map<String, String> data) {
-		String sql = "SELECT tr_id, tr_name, usr_name, tr.job_ref_id, cus_name, proj_name, job_name, job_ref_name, tr_name, tr_process, tr_start, tr_finish, (tr_finish - tr_start) AS sum_time, job_ref_number\n"+
+		String sql = "SELECT tr_id, tr_name, usr_name, tr.job_ref_id, cus_name, cus_code, proj_name, job_name, job_ref_name, tr_name, tr_process, tr_start, tr_finish, (tr_finish - tr_start) AS sum_time, job_ref_number\n"+
 					"FROM time_record tr \n"+
 					"LEFT JOIN jobs_reference job_ref ON job_ref.job_ref_id = tr.job_ref_id\n"+
 					"LEFT JOIN jobs ON jobs.job_id = job_ref.job_id\n"+

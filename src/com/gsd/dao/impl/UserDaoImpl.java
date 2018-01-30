@@ -145,7 +145,7 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 	@Override
 	public void changePassword(int id, String pass) {
 
-		String sql = "update users set password = ? where usr_id = ?";
+		String sql = "update users set password = ?, update_date = now() where usr_id = ?";
 		
 		getJdbcTemplate().update(sql, new Object[] { pass, id });
 	}

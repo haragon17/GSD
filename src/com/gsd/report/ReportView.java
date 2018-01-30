@@ -72,6 +72,7 @@ public class ReportView extends AbstractJExcelView{
 	
         int row = 4;
         String chkDate = "";
+        Map<String, Integer> map_name = new HashMap<String, Integer>();
         for(int i = 0;i<list.size();i++){
         	String job_in = "";
         	try{
@@ -87,25 +88,23 @@ public class ReportView extends AbstractJExcelView{
         		chkDate = job_in;
         		row++;
         	}
+        	
         	int col = map.get(list.get(i).getProj_ref_id());
         	String amount = "";
         	if(list.get(i).getAmount() == 0){
         		amount = "***NO AMOUNT***";
         	}
         	Number num = new Number(3, 0, 9.99);
-        	ws.addCell(new Label(0,row,job_in,date));
-//        	ws.addCell(new Label(0,row,list.get(i).getJob_in()+"",date));
-        	ws.addCell(new Label(1,row,list.get(i).getJob_ref_name()+amount,job_name));
-        	ws.addCell(new Number(col,row,list.get(i).getAmount(),ws.getWritableCell(col, 4).getCellFormat()));
-//        	ws.addCell(new Label(1,row,list.get(i).getWrk_name()+"",name));
-//        	ws.addCell(new Label(2,row,(list.get(i).getCate1()==null? "" : list.get(i).getCate1()+""),cate1));
-//        	ws.addCell(new Label(3,row,(list.get(i).getCate2()==null? "" : list.get(i).getCate2()+""),cate2));
-//        	ws.addCell(new Label(4,row,(list.get(i).getCate3()==null? "" : list.get(i).getCate3()+"")+"",cate3));
-//        	ws.addCell(new Label(5,row,list.get(i).getUsr_name()+"",createBy));
-//        	ws.addCell(new Label(6,row,list.get(i).getCretd_date()+"",createDate));
-//        	ws.addCell(new Label(7,row,list.get(i).getUpdate_date()+"",updateDate));
         	
-        	row++;
+        	if(map_name.get(list.get(i).getJob_ref_name()) == null){
+	        	ws.addCell(new Label(0,row,job_in,date));
+	        	ws.addCell(new Label(1,row,list.get(i).getJob_ref_name()+amount,job_name));
+	        	ws.addCell(new Number(col,row,list.get(i).getAmount(),ws.getWritableCell(col, 4).getCellFormat()));
+	        	map_name.put(list.get(i).getJob_ref_name(), row);
+	        	row++;
+        	}else{
+        		ws.addCell(new Number(col,map_name.get(list.get(i).getJob_ref_name()),list.get(i).getAmount(),ws.getWritableCell(col, 4).getCellFormat()));
+        	}
         	
         }
 	

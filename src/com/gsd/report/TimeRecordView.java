@@ -83,7 +83,11 @@ public class TimeRecordView extends AbstractJExcelView {
         	ws.setRowView(row, 350);
         	ws.addCell(new Label(1,row,dateFormat.format(startDate)+"",date));
         	ws.addCell(new Label(2,row,list.get(i).getJob_ref_number(),job_number));
-        	ws.addCell(new Label(3,row,list.get(i).getCus_name()+"("+list.get(i).getProj_name()+")",cus));
+        	if(list.get(i).getCus_code().equals("MMPK")){
+        		ws.addCell(new Label(3,row,list.get(i).getProj_name(),cus));
+        	}else{
+        		ws.addCell(new Label(3,row,list.get(i).getCus_name()+"("+list.get(i).getProj_name()+")",cus));
+        	}
         	ws.addCell(new Label(4,row,list.get(i).getJob_ref_name()+"",job));
         	ws.addCell(new Label(5,row,list.get(i).getTr_name()+"",file));
         	ws.addCell(new Label(6,row,dateFormat1.format(startDate)+"",start));

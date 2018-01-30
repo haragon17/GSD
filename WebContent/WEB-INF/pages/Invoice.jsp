@@ -13,13 +13,13 @@ table.myTable th {
   padding: 5px; 
   }
 </style>
-<%@ include file="Menu.jsp" %>
+<%@ include file="MenuAdmin.jsp" %>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script type="text/javascript">
  var errMessage = '${msg}';
 </script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/AuditLogging.js"></script>
-<title>History State</title>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/Invoice.js"></script>
+<title>Jobs</title>
 </head>
 <body>
 </body>

@@ -6,6 +6,26 @@ var pphone = "";
 var pid = "";
 Ext.onReady(function(){
 
+	Ext.apply(Ext.form.field.VTypes, {
+	    ephone: function(val, field) {
+	        var reg= /^[0-9,-]/i;
+	        return reg.test(val);
+	    },
+	    ephoneText: 'Must be a number with -',
+	    ephoneMask: /^[0-9,-]/i
+	});
+	
+	Ext.apply(Ext.form.field.VTypes, {
+		epassword: function(val, field) {
+	        if (field.initialPassField) {
+	            var pwd = Ext.getCmp('npass');
+	            return (val == pwd.getValue());
+	        }
+	        return true;
+	    },
+	    epasswordText: 'Passwords do not match'
+	});
+	
 	Ext.Ajax.request({
 		url : 'userModel.htm',
 		success: function(response, opts){
@@ -19,28 +39,6 @@ Ext.onReady(function(){
 		    pid = responseOject.user[0].usr_id;
 		    usr_type = responseOject.user[0].usr_type;
 		    
-		    
-    
-		    Ext.apply(Ext.form.field.VTypes, {
-			    ephone: function(val, field) {
-			        var reg= /^[0-9,-]/i;
-			        return reg.test(val);
-			    },
-			    ephoneText: 'Must be a number with -',
-			    ephoneMask: /^[0-9,-]/i
-			});
-			
-			Ext.apply(Ext.form.field.VTypes, {
-				epassword: function(val, field) {
-			        if (field.initialPassField) {
-			            var pwd = Ext.getCmp('npass');
-			            return (val == pwd.getValue());
-			        }
-			        return true;
-			    },
-			    epasswordText: 'Passwords do not match'
-			});
-			
 			if(usr_type == 2){
 				jmd_menu = {
 						  text: 'Projects',
@@ -52,9 +50,15 @@ Ext.onReady(function(){
 						href: 'timeRecord.htm',
 						hrefTarget: '_self'
 				}
+				jmd_menu3 = {
+		  			text: 'History State', 
+		  			href: 'auditLogging.htm',
+		  			hrefTarget: '_self'
+		        }
 			}else{
 				jmd_menu = "";
 				jmd_menu2 = "";
+				jmd_menu3 = "";
 			}
 		    
 	/**Create a top Panel*/
@@ -95,6 +99,7 @@ Ext.onReady(function(){
 			  hrefTarget: '_self'
           },
           jmd_menu2,
+          jmd_menu3,
           {
         	xtype: 'tbfill'  
           },
@@ -199,7 +204,7 @@ edit = new Ext.create('Ext.window.Window', {
                  	 emptyText: 'Phone Number', 
                  	 labelWidth : 145,
                  	 msgTarget: 'side',
-                 	 vtype: 'phone',
+                 	 vtype: 'ephone',
                  	maxLength: 20,
            		maxLengthText: 'Maximum input 20 Character',
                 },
@@ -341,7 +346,7 @@ changePass = new Ext.create('Ext.window.Window', {
 	            	labelWidth: 125,
 	                width: 300,
 	            	msgTarget: 'under',
-	               	vtype: 'password',
+	               	vtype: 'epassword',
 	                initialPassField: 'pass'
 	            	},
 	            ],

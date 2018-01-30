@@ -14,6 +14,7 @@ public class TimeRecord {
 	private int job_id;
 	private String usr_name;
 	private String cus_name;
+	private String cus_code;
 	private String proj_name;
 	private String job_name;
 	private String job_ref_name;
@@ -91,6 +92,12 @@ public class TimeRecord {
 	}
 	public void setCus_name(String cus_name) {
 		this.cus_name = cus_name;
+	}
+	public String getCus_code() {
+		return cus_code;
+	}
+	public void setCus_code(String cus_code) {
+		this.cus_code = cus_code;
 	}
 	public String getProj_name() {
 		return proj_name;

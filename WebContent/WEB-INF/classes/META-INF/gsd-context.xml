@@ -99,4 +99,8 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
+	<bean id="InvoiceDao" class="com.gsd.dao.impl.InvoiceDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
 </beans>
