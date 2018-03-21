@@ -435,10 +435,17 @@ Ext.onReady(function() {
 		            				 myDesc = "-";
 		            			 }
 		            			if(rec.data.proj_id == v){
-		            				 myText += '<tr><td>Item: <b>'+rec.data.itm_name+'</b></td>'+
+		            				var topix_id = "";
+		            				if(rec.data.topix_article_id == "" || rec.data.topix_article_id == null){
+		            					topix_id = "-";
+		            				}else{
+		            					topix_id = rec.data.topix_article_id;
+		            				}
+		            				 myText += '<tr><td bgcolor=#F0F0F0>Topix ID: <b>'+topix_id+'</b></td>'+ 
+			            			 '<td bgcolor=#F0F0F0>Item: <b>'+rec.data.itm_name+'</b></td>'+
 		            				 '<td>Target Time: <b>'+(Math.round(rec.data.time*100)/100)+'</b></td>'+
-		            				 '<td>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td>'+
-		            				 '<td>Description: <b>'+myDesc+'</b></td></tr>';
+		            				 '<td>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td></tr>';
+//		            				 '<td>Description: <b>'+myDesc+'</b></td></tr>';
 		            			}
 		            		})
 		            		if(myText !== ""){
@@ -505,6 +512,9 @@ Ext.define('projRefModel', {
 	}, {
 		name : 'actual_time',
 		type : 'int'
+	}, {
+		name : 'topix_article_id',
+		type : 'string'
 	}
 
 	]

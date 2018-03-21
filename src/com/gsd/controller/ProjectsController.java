@@ -299,7 +299,7 @@ public class ProjectsController {
 	}
 	
 	@RequestMapping(value = "/showProjectsReference")
-	public ModelAndView showProject(@RequestParam("id") int id, HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView showProjectReference(@RequestParam("id") int id, HttpServletRequest request, HttpServletResponse response) {
 
 		List<ProjectsReference> projRef = null;
 
@@ -445,6 +445,7 @@ public class ProjectsController {
 		String proj_ref_desc = request.getParameter("cproj_ref_desc");
 		String proj_desc = request.getParameter("cproj_desc");
 		String proj_title = request.getParameter("cproj_title");
+		String topix_article_id = request.getParameter("ctopix_article_id");
 
 		ProjectsReference projRef = new ProjectsReference();
 		Projects proj = new Projects();
@@ -560,6 +561,11 @@ public class ProjectsController {
 			} else {
 				projRef.setProj_ref_desc("");
 			}
+			if (!topix_article_id.equals("Article ID(Topix)")) {
+				projRef.setTopix_article_id(topix_article_id);
+			} else {
+				projRef.setTopix_article_id("");
+			}
 
 			projRef.setCretd_usr(user.getUserModel().getUsr_id());
 			
@@ -571,6 +577,7 @@ public class ProjectsController {
 			System.out.println("price = " + projRef.getPrice());
 			System.out.println("currency = " + projRef.getCurrency());
 			System.out.println("item detail = " + projRef.getProj_ref_desc());
+			System.out.println("topix article id = " + projRef.getTopix_article_id());
 			}
 			
 //			Map<String, Object> model = new HashMap<String, Object>();
@@ -747,6 +754,7 @@ public class ProjectsController {
 		String price = request.getParameter("aprice");
 		String currency = request.getParameter("acurrency");
 		String proj_ref_desc = request.getParameter("aproj_ref_desc");
+		String topix_article_id = request.getParameter("atopix_article_id");
 		
 		ProjectsReference projRef = new ProjectsReference();
 		projRef.setProj_ref_id(projectsDao.getLastProjectRefId());
@@ -780,6 +788,11 @@ public class ProjectsController {
 		} else {
 			projRef.setProj_ref_desc("");
 		}
+		if (!topix_article_id.equals("Article ID(Topix)")) {
+			projRef.setTopix_article_id(topix_article_id);
+		} else {
+			projRef.setTopix_article_id("");
+		}
 		
 		projectsDao.createProjectsReference(projRef);
 		
@@ -798,6 +811,7 @@ public class ProjectsController {
 		String price = request.getParameter("eprice");
 		String currency = request.getParameter("ecurrency");
 		String proj_ref_desc = request.getParameter("eproj_ref_desc");
+		String topix_article_id = request.getParameter("etopix_article_id");
 		
 		ProjectsReference projRef = new ProjectsReference();
 		projRef.setProj_ref_id(proj_ref_id);
@@ -829,6 +843,11 @@ public class ProjectsController {
 			projRef.setProj_ref_desc(proj_ref_desc);
 		} else {
 			projRef.setProj_ref_desc("");
+		}
+		if (!topix_article_id.equals("Article ID(Topix)")) {
+			projRef.setTopix_article_id(topix_article_id);
+		} else {
+			projRef.setTopix_article_id("");
 		}
 		
 		projectsDao.updateProjectsReference(projRef);

@@ -40,7 +40,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			sql += "AND customer.cus_email like '%"+data.get("cus_email")+"%'\n";
 		}
 		
-		sql += "ORDER BY cus_name";
+		sql += "ORDER BY lower(cus_name)";
 //		System.out.println(sql);
 		
 		List<Customer> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Customer>(Customer.class));
@@ -68,7 +68,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 				+ "bill_to=?, "
 				+ "payment=?, "
 				+ "transfer_dtl=?, "
-				+ "regist_date=? "
+				+ "regist_date=?, "
+				+ "topix_cus_id=? "
 				+ "where cus_id=?";
 		
 		this.getJdbcTemplate().update(sql, new Object[]{
@@ -83,10 +84,26 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			cus.getPayment(),
 			cus.getTransfer_dtl(),
 			cus.getRegist_date_ts(),
+			cus.getTopix_cus_id(),
 			cus.getCus_id()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		if(cus_audit.getTopix_cus_id() != cus.getTopix_cus_id()){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+					getLastAuditId(),
+					cus.getTopix_cus_id(),
+					"Customer",
+					user.getUserModel().getUsr_name(),
+					"Customer ID(Topix)",
+					cus_audit.getTopix_cus_id(),
+					cus.getTopix_cus_id(),
+					"Updated",
+					cus.getCus_name()
+			});
+		}
 		
 		if(cus.getRegist_date_ts() != null){
 			if(!cus.getRegist_date_ts().toString().contains(((cus_audit.getRegist_date() == null) ? "no" : cus_audit.getRegist_date()))){
@@ -292,7 +309,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 	@Override
 	public void createCustomer(Customer cus) {
 		
-		String sql = "INSERT INTO customer VALUES (?,?,?,?,?,?,?,now(),now(),?,?,?,?,?,?)";
+		String sql = "INSERT INTO customer VALUES (?,?,?,?,?,?,?,now(),now(),?,?,?,?,?,?,?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[]{
 			cus.getCus_id(),
@@ -307,7 +324,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			cus.getBill_to(),
 			cus.getPayment(),
 			cus.getTransfer_dtl(),
-			cus.getRegist_date_ts()
+			cus.getRegist_date_ts(),
+			cus.getTopix_cus_id()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
@@ -324,7 +342,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 				"Created row on Customer name="+cus.getCus_name()+", code="+cus.getCus_code()+", key_account="+key_acc.getKey_acc_name()
 				+", address="+cus.getAddress()+", contact_person="+cus.getContact_person()+", e-mail="+cus.getCus_email()
 				+", phone="+cus.getCus_phone()+", bill_to="+cus.getBill_to()+", payment="+cus.getPayment()+", transfer_dtl="+cus.getTransfer_dtl()
-				+", regist_date="+((cus.getRegist_date_ts()==null) ? "" : cus.getRegist_date_ts().toString()),
+				+", regist_date="+((cus.getRegist_date_ts()==null) ? "" : cus.getRegist_date_ts().toString())+", topix_cus_id="+cus.getTopix_cus_id(),
 				cus.getCus_name()
 		});
 		

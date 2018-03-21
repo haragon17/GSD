@@ -44,7 +44,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	public List<ProjectsReference> showProjectsReference(int proj_id) {
 		
 		String sql = "SELECT projects_reference.proj_ref_id, \n" + 
-				"item.itm_name, proj_ref_desc \n" +
+				"item.itm_name, proj_ref_desc, price, currency \n" +
 				"FROM projects_reference, item\n" +
 				"WHERE projects_reference.itm_id = item.itm_id " +
 				"AND projects_reference.proj_id = "+ proj_id +"\n" +
@@ -213,7 +213,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		
 		String sql = "SELECT projects_reference.proj_ref_id, projects_reference.proj_id, projects.proj_name, \n" +
 				"projects_reference.itm_id, item.itm_name, projects_reference.\"time\", projects_reference.actual_time, \n" +
-				"projects_reference.price, projects_reference.currency, projects_reference.proj_ref_desc\n" +
+				"projects_reference.price, projects_reference.currency, projects_reference.proj_ref_desc, projects_reference.topix_article_id\n" +
 				"FROM projects_reference\n" +
 				"LEFT JOIN projects ON projects.proj_id = projects_reference.proj_id\n" +
 				"LEFT JOIN item ON item.itm_id = projects_reference.itm_id\n" +
@@ -334,7 +334,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	@Override
 	public void createProjectsReference(ProjectsReference proj) {
 		// TODO Auto-generated method stub
-		String sql = "INSERT INTO projects_reference VALUES (?,?,?,?,?,?,now(),now(),?,?,?)";
+		String sql = "INSERT INTO projects_reference VALUES (?,?,?,?,?,?,now(),now(),?,?,?,?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[] { 
 				proj.getProj_ref_id(),
@@ -345,7 +345,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				proj.getCretd_usr(),
 				proj.getCurrency(),
 				proj.getProj_ref_desc(),
-				proj.getActual_time()
+				proj.getActual_time(),
+				proj.getTopix_article_id()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
@@ -364,7 +365,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				"Projects Reference:"+proj2.getProj_id(),
 				user.getUserModel().getUsr_name(),
 				"Created Item name="+itm.getItm_name()+" on Project name="+proj2.getProj_name()+", customer="+cus.getCus_name()
-				+", target_time="+proj.getTime()+", actual_time="+proj.getActual_time()+", price="+proj.getPrice()+", currency="+proj.getCurrency()+", desc="+proj.getProj_ref_desc(),
+				+", target_time="+proj.getTime()+", actual_time="+proj.getActual_time()+", price="+proj.getPrice()+", currency="+proj.getCurrency()+", desc="+proj.getProj_ref_desc()+", topix_article_id="+proj.getTopix_article_id(),
 				proj2.getProj_name()+" : "+itm.getItm_name()
 		});
 	}
@@ -464,7 +465,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				+ "update_date=now(), "
 				+ "currency=?, "
 				+ "proj_ref_desc=?, "
-				+ "actual_time=?"
+				+ "actual_time=?, "
+				+ "topix_article_id=? "
 				+ "where proj_ref_id=?";
 		
 		this.getJdbcTemplate().update(sql, new Object[] { 
@@ -474,10 +476,26 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				proj.getCurrency(),
 				proj.getProj_ref_desc(),
 				proj.getActual_time(),
+				proj.getTopix_article_id(),
 				proj.getProj_ref_id()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		if(!proj_audit.getTopix_article_id().equals(proj.getTopix_article_id())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+					getLastAuditId(),
+					proj.getProj_ref_id(),
+					"Projects Reference:"+proj_audit.getProj_id(),
+					user.getUserModel().getUsr_name(),
+					"Article ID(Topix)",
+					proj_audit.getTopix_article_id(),
+					proj.getTopix_article_id(),
+					"Updated",
+					projects.getProj_name()+" : "+itm.getItm_name()
+			});
+		}
 		
 		if(!proj_audit.getProj_ref_desc().equals(proj.getProj_ref_desc())){
 			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";

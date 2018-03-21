@@ -101,7 +101,7 @@ public class CustomerController {
 	}
 	
 	@RequestMapping(value = "/searchCustomer")
-	public ModelAndView searchMember(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ModelAndView searchCustomer(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		HttpSession session = request.getSession();
 		List<Customer> cus = null;
@@ -182,6 +182,7 @@ public class CustomerController {
 		String payment = request.getParameter("apayment");
 		String transfer_dtl = request.getParameter("atransfer_dtl");
 		String regist_date = request.getParameter("aregist_date");
+		int topix_cus_id = Integer.parseInt(request.getParameter("atopix_cus_id"));
 		Timestamp regist_date_ts = null;
 		
 		Customer cus = new Customer();
@@ -190,6 +191,7 @@ public class CustomerController {
 		cus.setCus_code(cus_code);
 		cus.setKey_acc_id(key_acc_id);
 		cus.setCretd_usr(user.getUserModel().getUsr_id());
+		cus.setTopix_cus_id(topix_cus_id);
 		
 		if(!regist_date.equals("Register Date")){
 			try{
@@ -269,6 +271,7 @@ public class CustomerController {
 			String payment = request.getParameter("epayment");
 			String transfer_dtl = request.getParameter("etransfer_dtl");
 			String regist_date = request.getParameter("eregist_date");
+			int topix_cus_id = Integer.parseInt(request.getParameter("etopix_cus_id"));
 			Timestamp regist_date_ts = null;
 			
 			Customer cus = new Customer();
@@ -276,6 +279,7 @@ public class CustomerController {
 			cus.setCus_name(cus_name);
 			cus.setCus_code(cus_code);
 			cus.setKey_acc_id(key_acc_id);
+			cus.setTopix_cus_id(topix_cus_id);
 			
 			if(!regist_date.equals("Register Date")){
 				try{

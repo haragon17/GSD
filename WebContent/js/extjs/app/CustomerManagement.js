@@ -269,6 +269,12 @@ Ext.onReady(function() {
 					dataIndex : 'cus_code'
 				},
 				{
+					text : "ID (Topix)",
+					flex : 0.4,
+					sortable : true,
+					dataIndex : 'topix_cus_id'
+				},
+				{
 					text : "E-mail",
 					flex : 1.2,
 					sortable : true,
@@ -320,6 +326,7 @@ Ext.onReady(function() {
 							payment = grid.getStore().getAt(rowIndex).get('payment');
 							transfer_dtl = grid.getStore().getAt(rowIndex).get('transfer_dtl');
 							regist_date = grid.getStore().getAt(rowIndex).get('regist_date');
+							topix_cus_id = grid.getStore().getAt(rowIndex).get('topix_cus_id');
 							
 							Ext.getCmp('ecus_name').setValue(cus_name);
 							Ext.getCmp('ecus_code').setValue(cus_code);
@@ -333,6 +340,7 @@ Ext.onReady(function() {
 							Ext.getCmp('epayment').setValue(payment);
 							Ext.getCmp('etransfer_dtl').setValue(transfer_dtl);
 							Ext.getCmp('eregist_date').setValue(regist_date);
+							Ext.getCmp('etopix_cus_id').setValue(topix_cus_id);
 							editCustomer.show();
 						}
 					} ]
@@ -506,6 +514,9 @@ Ext.define('cusModel', {
 //		type : 'string'
 		type : 'date',
 		dateFormat: 'Y-m-d H:i:s'
+	}, {
+		name : 'topix_cus_id',
+		type : 'int'
 	}
 
 	]
@@ -590,15 +601,15 @@ editCustomer = new Ext.create('Ext.window.Window', {
 				maxLengthText : 'Maximum input 50 Character',
 			}, {
 				allowBlank : false,
-				fieldLabel : 'Customer Code <font color="red">*</font>  ',
+				fieldLabel : 'Customer Code <font color="red">*</font> ',
 				name : 'ecus_code',
 				id : 'ecus_code',
 				emptyText : 'Customer Code',
 				labelWidth : 145,
 				msgTarget : 'under',
 				vtype : 'alphanum',
-				maxLength : 5,
-				maxLengthText : 'Maximum input 5 Character',
+				maxLength : 10,
+				maxLengthText : 'Maximum input 10 Character',
 				listeners: {
 	           		 'blur': function(e){
 	           			 var cc = Ext.getCmp('ecus_code').getValue();
@@ -738,6 +749,17 @@ editCustomer = new Ext.create('Ext.window.Window', {
 				editable: false,
 				format: 'Y-m-d',
 			}, {
+				xtype: 'numberfield',
+				allowBlank: false,
+				fieldLabel: 'Customer ID(Topix) <font color="red">*</font> ',
+				name: 'etopix_cus_id',
+				id : 'etopix_cus_id',
+				labelWidth : 145,
+				minValue : 0,
+				emptyText : 'Customer ID(Topix)',
+				hideTrigger: true,
+				msgTarget : 'under',
+			}, {
 				xtype : 'hidden',
 				id : 'ecus_id',
 				name : 'ecus_id'
@@ -850,15 +872,15 @@ addCustomer = new Ext.create('Ext.window.Window', {
 				maxLengthText : 'Maximum input 50 Character',
 			}, {
 				allowBlank : false,
-				fieldLabel : 'Customer Code <font color="red">*</font>  ',
+				fieldLabel : 'Customer Code <font color="red">*</font> ',
 				name : 'acus_code',
 				id : 'acus_code',
 				emptyText : 'Customer Code',
 				labelWidth : 145,
 				msgTarget : 'under',
 				vtype : 'alphanum',
-				maxLength : 5,
-				maxLengthText : 'Maximum input 5 Character',
+				maxLength : 10,
+				maxLengthText : 'Maximum input 10 Character',
 				listeners: {
 	           		 'blur': function(e){
 	           			 var cc = Ext.getCmp('acus_code').getValue();
@@ -994,6 +1016,18 @@ addCustomer = new Ext.create('Ext.window.Window', {
 				emptyText : 'Register Date',
 				editable: false,
 				format: 'Y-m-d',
+			}, {
+				xtype: 'numberfield',
+				allowBlank: false,
+				fieldLabel: 'Customer ID(Topix) <font color="red">*</font> ',
+				name: 'atopix_cus_id',
+				id : 'atopix_cus_id',
+				labelWidth : 145,
+				minValue : 0,
+				value : 0,
+				emptyText : 'Customer ID(Topix)',
+				hideTrigger: true,
+				msgTarget : 'under',
 			} ]
 		} ],
 	} ],

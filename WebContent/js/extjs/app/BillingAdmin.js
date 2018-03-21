@@ -120,12 +120,14 @@ Ext.onReady(function() {
 //							Ext.getCmp('ajob_ref_status').bindStore('jobRefStatusEstudio');
 //							Ext.getCmp('ejob_ref_status').bindStore('jobRefStatusEstudio');
 //							Ext.getCmp('gjob_ref_status').bindStore(jobRefStatusEstudio);
-						}else{
-							deptRef = "Publication";
-//							Ext.getCmp('ajob_ref_status').bindStore('jobRefStatusPublication');
+						}else if(myDept == "Publication"){
+//		        			Ext.getCmp('ajob_ref_status').bindStore('jobRefStatusPublication');
 //							Ext.getCmp('ejob_ref_status').bindStore('jobRefStatusPublication');
 //							Ext.getCmp('gjob_ref_status').bindStore(jobRefStatusPublication);
-						}
+		        			deptRef = "Publication";
+		        		}else{
+		        			deptRef = "E-Studio";
+		        		}
 						var ajob_ref = Ext.getCmp('ajob_ref_status');
 						var ejob_ref = Ext.getCmp('ejob_ref_status');
 						
@@ -274,9 +276,11 @@ Ext.onReady(function() {
 						deptRef = "";
 						if(myDept.indexOf("E-Studio") !== -1){
 							deptRef = "E-Studio";
-						}else{
-							deptRef = "Publication";
-						}
+						}else if(myDept == "Publication"){
+		        			deptRef = "Publication";
+		        		}else{
+		        			deptRef = "E-Studio";
+		        		}
 						var ajob_ref = Ext.getCmp('ajob_ref_status');
 						var ejob_ref = Ext.getCmp('ejob_ref_status');
 						ajob_ref.clearValue();
@@ -526,24 +530,25 @@ Ext.onReady(function() {
 						     }]
 						},
 						valueField : 'itm_name',
-					    tpl: Ext.create('Ext.XTemplate',
-					        '<tpl for=".">',
-					        	"<tpl if='proj_ref_desc == \"\"'>",
-					        	'<div class="x-boundlist-item">{itm_name}</div>',
-					            '<tpl else>',
-					            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
-					            '</tpl>',
-				            '</tpl>'
-					    ),
-					    displayTpl: Ext.create('Ext.XTemplate',
-					        '<tpl for=".">',
-					        	"<tpl if='proj_ref_desc == \"\"'>",
-					        	'{itm_name}',
-					            '<tpl else>',
-					            '{itm_name} - {proj_ref_desc}',
-					            '</tpl>',
-					        '</tpl>'
-					    ),
+						displayField : 'itm_name',
+//					    tpl: Ext.create('Ext.XTemplate',
+//					        '<tpl for=".">',
+//					        	"<tpl if='proj_ref_desc == \"\"'>",
+//					        	'<div class="x-boundlist-item">{itm_name}</div>',
+//					            '<tpl else>',
+//					            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
+//					            '</tpl>',
+//				            '</tpl>'
+//					    ),
+//					    displayTpl: Ext.create('Ext.XTemplate',
+//					        '<tpl for=".">',
+//					        	"<tpl if='proj_ref_desc == \"\"'>",
+//					        	'{itm_name}',
+//					            '<tpl else>',
+//					            '{itm_name} - {proj_ref_desc}',
+//					            '</tpl>',
+//					        '</tpl>'
+//					    ),
 					    listeners: {
 					    	select : function(){
 					    		var v = this.getValue();
@@ -710,6 +715,8 @@ Ext.onReady(function() {
 			        		}else if(myDept == "Publication"){
 //			        			Ext.getCmp('gjob_ref_status').bindStore('jobRefStatusPublication');
 			        			deptRef = "Publication";
+			        		}else{
+			        			deptRef = "E-Studio";
 			        		}
 			        		var gjob_ref = Ext.getCmp('gjob_ref_status');
 							
@@ -946,24 +953,25 @@ Ext.onReady(function() {
 					     }]
 					},
 					valueField : 'itm_name',
-				    tpl: Ext.create('Ext.XTemplate',
-				        '<tpl for=".">',
-				        	"<tpl if='proj_ref_desc == \"\"'>",
-				        	'<div class="x-boundlist-item">{itm_name}</div>',
-				            '<tpl else>',
-				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
-				            '</tpl>',
-			            '</tpl>'
-				    ),
-				    displayTpl: Ext.create('Ext.XTemplate',
-				        '<tpl for=".">',
-				        	"<tpl if='proj_ref_desc == \"\"'>",
-				        	'{itm_name}',
-				            '<tpl else>',
-				            '{itm_name} - {proj_ref_desc}',
-				            '</tpl>',
-				        '</tpl>'
-				    ),
+					displayField : 'itm_name',
+//				    tpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'<div class="x-boundlist-item">{itm_name}</div>',
+//				            '<tpl else>',
+//				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
+//				            '</tpl>',
+//			            '</tpl>'
+//				    ),
+//				    displayTpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'{itm_name}',
+//				            '<tpl else>',
+//				            '{itm_name} - {proj_ref_desc}',
+//				            '</tpl>',
+//				        '</tpl>'
+//				    ),
 				    listeners: {
 				    	select : function(){
 				    		var v = this.getValue();
@@ -1064,6 +1072,14 @@ Ext.onReady(function() {
 					valueField : 'db_ref_name',
 					displayField : 'db_ref_name',
 					editable : false
+				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
 				}
 			},
 		    {
@@ -1278,24 +1294,25 @@ Ext.onReady(function() {
 					     }]
 					},
 					valueField : 'itm_name',
-				    tpl: Ext.create('Ext.XTemplate',
-				        '<tpl for=".">',
-				        	"<tpl if='proj_ref_desc == \"\"'>",
-				        	'<div class="x-boundlist-item">{itm_name}</div>',
-				            '<tpl else>',
-				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
-				            '</tpl>',
-			            '</tpl>'
-				    ),
-				    displayTpl: Ext.create('Ext.XTemplate',
-				        '<tpl for=".">',
-				        	"<tpl if='proj_ref_desc == \"\"'>",
-				        	'{itm_name}',
-				            '<tpl else>',
-				            '{itm_name} - {proj_ref_desc}',
-				            '</tpl>',
-				        '</tpl>'
-				    ),
+					displayField : 'itm_name',
+//				    tpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'<div class="x-boundlist-item">{itm_name}</div>',
+//				            '<tpl else>',
+//				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
+//				            '</tpl>',
+//			            '</tpl>'
+//				    ),
+//				    displayTpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'{itm_name}',
+//				            '<tpl else>',
+//				            '{itm_name} - {proj_ref_desc}',
+//				            '</tpl>',
+//				        '</tpl>'
+//				    ),
 				    listeners: {
 				    	select : function(){
 				    		var v = this.getValue();
@@ -1566,6 +1583,27 @@ Ext.onReady(function() {
 		        		return 'estudio_masking-row';
 		        	}
 		        },
+		        plugins: {
+		            ptype: 'gridviewdragdrop',
+		            dragText: 'Drag and drop to reorganize',
+//		            listeners : {
+//		            	drop : function(){alert("drop!")}
+//		            }
+		        },
+		        listeners : {
+		        	drop : function (node, data, overModel, dropPosition, eOpts) {
+//		        		alert("Drop!");
+//		        		console.log(node);
+//		        		console.log(data);
+//		        		console.log(overModel);
+//		        		console.log(dropPosition);
+//		        		console.log(eOpts);
+		        		console.log(grid.estudio.store.indexOf(data.records[0]));
+		        		var selectedRecord = grid.estudio.getSelectionModel().getSelection()[0];
+		        		var row = grid.estudio.store.indexOf(selectedRecord);
+		        		console.log(row);
+		        	}
+		        }
 		    },
 			listeners : {
 				viewready: function (grid) {
@@ -1593,7 +1631,7 @@ Ext.onReady(function() {
 			                }
 			            }
 			        });
-		        }
+		        },
 		    },
 		    plugins: 
 			    [{ 
@@ -3459,7 +3497,7 @@ Ext.define('jobRefModel', {
 		type : 'int'
 	},{
 		name : 'amount',
-		type : 'int'
+		type : 'float'
 	},{
 		name : 'job_in',
 		type : 'date',

@@ -16,6 +16,7 @@ public class ProjectsReference {
 	private String cus_name;
 	private String cus_code;
 	private float actual_time;
+	private String topix_article_id;
 	
 	public int getProj_ref_id() {
 		return proj_ref_id;
@@ -100,6 +101,12 @@ public class ProjectsReference {
 	}
 	public void setActual_time(float actual_time) {
 		this.actual_time = actual_time;
+	}
+	public String getTopix_article_id() {
+		return topix_article_id;
+	}
+	public void setTopix_article_id(String topix_article_id) {
+		this.topix_article_id = topix_article_id;
 	}
 	
 }

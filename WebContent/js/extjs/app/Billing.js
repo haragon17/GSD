@@ -459,24 +459,25 @@ Ext.onReady(function() {
 						     }]
 						},
 						valueField : 'itm_name',
-					    tpl: Ext.create('Ext.XTemplate',
-					        '<tpl for=".">',
-					        	"<tpl if='proj_ref_desc == \"\"'>",
-					        	'<div class="x-boundlist-item">{itm_name}</div>',
-					            '<tpl else>',
-					            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
-					            '</tpl>',
-				            '</tpl>'
-					    ),
-					    displayTpl: Ext.create('Ext.XTemplate',
-					        '<tpl for=".">',
-					        	"<tpl if='proj_ref_desc == \"\"'>",
-					        	'{itm_name}',
-					            '<tpl else>',
-					            '{itm_name} - {proj_ref_desc}',
-					            '</tpl>',
-					        '</tpl>'
-					    ),
+						displayField : 'itm_name',
+//					    tpl: Ext.create('Ext.XTemplate',
+//					        '<tpl for=".">',
+//					        	"<tpl if='proj_ref_desc == \"\"'>",
+//					        	'<div class="x-boundlist-item">{itm_name}</div>',
+//					            '<tpl else>',
+//					            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
+//					            '</tpl>',
+//				            '</tpl>'
+//					    ),
+//					    displayTpl: Ext.create('Ext.XTemplate',
+//					        '<tpl for=".">',
+//					        	"<tpl if='proj_ref_desc == \"\"'>",
+//					        	'{itm_name}',
+//					            '<tpl else>',
+//					            '{itm_name} - {proj_ref_desc}',
+//					            '</tpl>',
+//					        '</tpl>'
+//					    ),
 					    listeners: {
 					    	select : function(){
 					    		var v = this.getValue();
@@ -853,24 +854,25 @@ Ext.onReady(function() {
 					     }]
 					},
 					valueField : 'itm_name',
-				    tpl: Ext.create('Ext.XTemplate',
-				        '<tpl for=".">',
-				        	"<tpl if='proj_ref_desc == \"\"'>",
-				        	'<div class="x-boundlist-item">{itm_name}</div>',
-				            '<tpl else>',
-				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
-				            '</tpl>',
-			            '</tpl>'
-				    ),
-				    displayTpl: Ext.create('Ext.XTemplate',
-				        '<tpl for=".">',
-				        	"<tpl if='proj_ref_desc == \"\"'>",
-				        	'{itm_name}',
-				            '<tpl else>',
-				            '{itm_name} - {proj_ref_desc}',
-				            '</tpl>',
-				        '</tpl>'
-				    ),
+					displayField : 'itm_name',
+//				    tpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'<div class="x-boundlist-item">{itm_name}</div>',
+//				            '<tpl else>',
+//				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
+//				            '</tpl>',
+//			            '</tpl>'
+//				    ),
+//				    displayTpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'{itm_name}',
+//				            '<tpl else>',
+//				            '{itm_name} - {proj_ref_desc}',
+//				            '</tpl>',
+//				        '</tpl>'
+//				    ),
 				    listeners: {
 				    	select : function(){
 				    		var v = this.getValue();
@@ -970,6 +972,14 @@ Ext.onReady(function() {
 					valueField : 'db_ref_name',
 					displayField : 'db_ref_name',
 					editable : false
+				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
 				}
 			},
 		    {
@@ -1159,24 +1169,25 @@ Ext.onReady(function() {
 					     }]
 					},
 					valueField : 'itm_name',
-				    tpl: Ext.create('Ext.XTemplate',
-				        '<tpl for=".">',
-				        	"<tpl if='proj_ref_desc == \"\"'>",
-				        	'<div class="x-boundlist-item">{itm_name}</div>',
-				            '<tpl else>',
-				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
-				            '</tpl>',
-			            '</tpl>'
-				    ),
-				    displayTpl: Ext.create('Ext.XTemplate',
-				        '<tpl for=".">',
-				        	"<tpl if='proj_ref_desc == \"\"'>",
-				        	'{itm_name}',
-				            '<tpl else>',
-				            '{itm_name} - {proj_ref_desc}',
-				            '</tpl>',
-				        '</tpl>'
-				    ),
+					displayField : 'itm_name',
+//				    tpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'<div class="x-boundlist-item">{itm_name}</div>',
+//				            '<tpl else>',
+//				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
+//				            '</tpl>',
+//			            '</tpl>'
+//				    ),
+//				    displayTpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'{itm_name}',
+//				            '<tpl else>',
+//				            '{itm_name} - {proj_ref_desc}',
+//				            '</tpl>',
+//				        '</tpl>'
+//				    ),
 				    listeners: {
 				    	select : function(){
 				    		var v = this.getValue();
@@ -1715,6 +1726,11 @@ Ext.onReady(function() {
 					displayField : 'db_ref_name',
 					editable : false
 				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_dtl',
 			},
 		    {
 				text : "Name",
@@ -2944,29 +2960,29 @@ Ext.onReady(function() {
 					     }]
 					},
 					valueField : 'proj_ref_id',
-//					displayField : 'itm_name'
+					displayField : 'itm_name'
 					// Template for the dropdown menu.
 				    // Note the use of "x-boundlist-item" class,
 				    // this is required to make the items selectable.
-				    tpl: Ext.create('Ext.XTemplate',
-				        '<tpl for=".">',
-				        	"<tpl if='proj_ref_desc == \"\"'>",
-				        	'<div class="x-boundlist-item">{itm_name}</div>',
-				            '<tpl else>',
-				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
-				            '</tpl>',
-			            '</tpl>'
-				    ),
-				    // template for the content inside text field
-				    displayTpl: Ext.create('Ext.XTemplate',
-				        '<tpl for=".">',
-				        	"<tpl if='proj_ref_desc == \"\"'>",
-				        	'{itm_name}',
-				            '<tpl else>',
-				            '{itm_name} - {proj_ref_desc}',
-				            '</tpl>',
-				        '</tpl>'
-				    )
+//				    tpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'<div class="x-boundlist-item">{itm_name}</div>',
+//				            '<tpl else>',
+//				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
+//				            '</tpl>',
+//			            '</tpl>'
+//				    ),
+//				    // template for the content inside text field
+//				    displayTpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'{itm_name}',
+//				            '<tpl else>',
+//				            '{itm_name} - {proj_ref_desc}',
+//				            '</tpl>',
+//				        '</tpl>'
+//				    )
 				},
 				{
 	    	    	xtype:'numberfield',
@@ -3458,6 +3474,20 @@ Ext.onReady(function() {
 				    	items: grid.estudioType3
 				    }]
 				var userStore = grid.estudioType3.getStore();
+			}
+		}else{
+			deptRef = "E-Studio";
+			if(userType == 2){
+				var userGrid = [{
+			    	id: 'projTabs',
+			    	title: 'Projects',
+			    	items: grid.job
+			    },{
+			    	id: 'jobTabs',
+			    	disabled: true,
+			    	title: 'Jobs',
+			    	items: grid.jobRef
+			    }]
 			}
 		}
 		

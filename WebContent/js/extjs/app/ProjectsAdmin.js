@@ -773,6 +773,7 @@ Ext.onReady(function() {
 		            			if(rec.data.proj_id == v){
 		            				var actual_time = "";
 		            				var target_time = "";
+		            				var topix_id = "";
 //		            				alert(rec.data.proj_id);
 //		            				alert(rec.data.actual_time);
 		            				
@@ -788,7 +789,13 @@ Ext.onReady(function() {
 		            				}else{
 		            					target_time = '<td bgcolor=#F0F0F0>Target Time: <b>'+(Math.round(rec.data.time*100)/100)+'</b></td>';
 		            				}
-		            				 myText += '<tr><td bgcolor=#F0F0F0>Item: <b>'+rec.data.itm_name+'</b></td>'+
+		            				if(rec.data.topix_article_id == "" || rec.data.topix_article_id == null){
+		            					topix_id = "-";
+		            				}else{
+		            					topix_id = rec.data.topix_article_id;
+		            				}
+		            				myText += '<tr><td bgcolor=#F0F0F0>Topix ID: <b>'+topix_id+'</b></td>'+ 
+		            				'<td bgcolor=#F0F0F0>Item: <b>'+rec.data.itm_name+'</b></td>'+
 //		            				 '<td bgcolor=#F0F0F0>Target Time: <b>'+rec.data.time+'</b></td>'+
 		            				 target_time+
 //		            				 '<td bgcolor=#F0F0F0>Actual Time: <b>'+rec.data.actual_time+'</b></td>'+
@@ -864,6 +871,9 @@ Ext.define('projRefModel', {
 		type : 'string'
 	}, {
 		name : 'file_name',
+		type : 'string'
+	}, {
+		name : 'topix_article_id',
 		type : 'string'
 	}
 
@@ -1412,6 +1422,12 @@ addItem = new Ext.create('Ext.window.Window', {
     	    	emptyText: 'Item Details',
     	    	maxLength : 100,
 				maxLengthText : 'Maximum input 100 Character',
+    	    },{
+    	    	labelWidth: 120,
+    	    	fieldLabel: 'Article ID(Topix) ',
+    	    	name: 'atopix_article_id',
+    	    	id: 'atopix_article_id',
+    	    	emptyText: 'Article ID(Topix)'
     	    }]
             },{
 				xtype : 'hidden',
@@ -1441,7 +1457,7 @@ addItem = new Ext.create('Ext.window.Window', {
           						fn: function(){
           							addItem.hide();
           							store.projectsRef.reload();
-          							store.projects.reload();
+          							setTimeout(function(){store.projects.reload()},500);
           							}
           					});
                             },
@@ -1813,6 +1829,12 @@ addProject = new Ext.create('Ext.window.Window', {
     	    	emptyText: 'Item Details',
     	    	maxLength : 100,
 				maxLengthText : 'Maximum input 100 Character',
+    	    },{
+    	    	labelWidth: 120,
+    	    	fieldLabel: 'Article ID(Topix) ',
+    	    	name: 'ctopix_article_id',
+    	    	id: 'ctopix_article_id',
+    	    	emptyText: 'Article ID(Topix)'
     	    }]
             },{
 				xtype : 'hidden',
@@ -2016,6 +2038,12 @@ editItem = new Ext.create('Ext.window.Window', {
     	    	emptyText: 'Item Details',
     	    	maxLength : 100,
 				maxLengthText : 'Maximum input 100 Character'
+    	    },{
+    	    	labelWidth: 120,
+    	    	fieldLabel: 'Article ID(Topix) ',
+    	    	name: 'etopix_article_id',
+    	    	id: 'etopix_article_id',
+    	    	emptyText: 'Article ID(Topix)'
     	    }]
             },{
 				xtype : 'hidden',
@@ -2096,6 +2124,7 @@ function editItemFunction(v){
 	Ext.getCmp('ecurrency').setValue(myData.data.currency);
 	Ext.getCmp('eproj_ref_desc').setValue(myData.data.proj_ref_desc);
 	Ext.getCmp('eproj_ref_id').setValue(myData.data.proj_ref_id);
+	Ext.getCmp('etopix_article_id').setValue(myData.data.topix_article_id);
 	editItem.show();
 }
 
@@ -2115,11 +2144,11 @@ function deleteItem(proj_ref_id){
 					},
 					success : function(response, opts) {
 						store.projectsRef.reload();
-						store.projects.reload();
+						setTimeout(function(){store.projects.reload()},500);
 					},
 					failure : function(response, opts) {
 						store.projectsRef.reload();
-						store.projects.reload();
+						setTimeout(function(){store.projects.reload()},500);
 						var responseOject = Ext.util.JSON
 								.decode(response.responseText);
 						Ext.Msg.alert(responseOject.messageHeader,

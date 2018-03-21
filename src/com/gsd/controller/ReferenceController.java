@@ -29,6 +29,26 @@ public class ReferenceController {
 		this.referenceDao = (ReferenceDao) this.context.getBean("ReferenceDao");
 	}
 	
+	@RequestMapping(value = "/showDBReference")
+	public ModelAndView showDBReference(HttpServletRequest request, HttpServletResponse response) {
+
+		List<Reference> dbRef = null;
+		String db_ref_kind = request.getParameter("kind");
+		String db_ref_dept = request.getParameter("dept");
+		
+		try{
+			dbRef = referenceDao.showDBReference(db_ref_kind, db_ref_dept);
+		} catch(Exception e){
+			logger.error(e.getMessage());
+		}
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", dbRef);
+		jobj.put("total", dbRef.size());
+		
+		return new ModelAndView("jsonView", jobj);
+	}
+	
 	@RequestMapping(value = "/showDepartment")
 	public ModelAndView showDepartmentReference(HttpServletRequest request, HttpServletResponse response) {
 		

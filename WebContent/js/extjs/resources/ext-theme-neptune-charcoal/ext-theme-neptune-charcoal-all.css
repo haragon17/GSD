@@ -6,6 +6,11 @@ img {
 	border: 0
 }
 
+.boldtext
+{
+    font-weight: bold !important;
+} 
+
 .x-livesearch-match {
 	font-weight: bold; background-color: yellow; 
 }
@@ -1025,7 +1030,8 @@ table.x-form-checkboxgroup {
 }
 
 .x-monthpicker-buttons {
-	position: absolute;
+	/* position: absolute; */
+	position: relative;
 	bottom: 0;
 	width: 100%
 }

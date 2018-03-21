@@ -273,6 +273,7 @@ var department = Ext.create('Ext.data.Store', {
 			{"name":"E-Studio_MM"},
 			{"name":"E-Studio_Masking"},
 			{"name":"Catalog"},
+			{"name":"PP"},
 			{"name":"Manager"}
 	]
 });
@@ -391,6 +392,20 @@ editMember = new Ext.create('Ext.window.Window', {
 	    				store : department,
 	    				valueField : 'name',
 	    				displayField : 'name',
+//	    				store : {
+//							fields : ['db_ref_name'],
+//							proxy : {
+//								type : 'ajax',
+//								url : 'showDepartment.htm',
+//								reader : {
+//									type : 'json',
+//									root : 'records',
+//								}
+//							},
+//							autoLoad : true
+//						},
+//						valueField : 'db_ref_name',
+//						displayField : 'db_ref_name',
 	                },
 	                {
 	                	xtype: 'hidden',
@@ -620,6 +635,20 @@ addMember = new Ext.create('Ext.window.Window', {
 			store : department,
 			valueField : 'name',
 			displayField : 'name',
+//			store : {
+//				fields : ['db_ref_name'],
+//				proxy : {
+//					type : 'ajax',
+//					url : 'showDepartment.htm',
+//					reader : {
+//						type : 'json',
+//						root : 'records',
+//					}
+//				},
+//				autoLoad : true
+//			},
+//			valueField : 'db_ref_name',
+//			displayField : 'db_ref_name',
      },
      {
     	 xtype: 'radiogroup',
