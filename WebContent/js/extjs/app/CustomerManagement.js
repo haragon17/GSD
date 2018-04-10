@@ -299,10 +299,10 @@ Ext.onReady(function() {
 					dataIndex : 'bill_to'
 				},
 				{
-					text : "Payment",
+					text : "Terms",
 					flex : 0.4,
 					sortable : true,
-					dataIndex : 'payment'
+					dataIndex : 'billing_terms'
 				},
 				{
 					text : 'Edit',
@@ -323,10 +323,11 @@ Ext.onReady(function() {
 							cus_email = grid.getStore().getAt(rowIndex).get('cus_email');
 							cus_phone = grid.getStore().getAt(rowIndex).get('cus_phone');
 							bill_to = grid.getStore().getAt(rowIndex).get('bill_to');
-							payment = grid.getStore().getAt(rowIndex).get('payment');
+							billing_terms = grid.getStore().getAt(rowIndex).get('billing_terms');
 							transfer_dtl = grid.getStore().getAt(rowIndex).get('transfer_dtl');
 							regist_date = grid.getStore().getAt(rowIndex).get('regist_date');
 							topix_cus_id = grid.getStore().getAt(rowIndex).get('topix_cus_id');
+							payment_terms = grid.getStore().getAt(rowIndex).get('payment_terms');
 							
 							Ext.getCmp('ecus_name').setValue(cus_name);
 							Ext.getCmp('ecus_code').setValue(cus_code);
@@ -337,10 +338,11 @@ Ext.onReady(function() {
 							Ext.getCmp('ecus_id').setValue(cus_id);
 							Ext.getCmp('ecus_phone').setValue(cus_phone);
 							Ext.getCmp('ebill_to').setValue(bill_to);
-							Ext.getCmp('epayment').setValue(payment);
+							Ext.getCmp('ebilling_terms').setValue(billing_terms);
 							Ext.getCmp('etransfer_dtl').setValue(transfer_dtl);
 							Ext.getCmp('eregist_date').setValue(regist_date);
 							Ext.getCmp('etopix_cus_id').setValue(topix_cus_id);
+							Ext.getCmp('epayment_terms').setValue(payment_terms);
 							editCustomer.show();
 						}
 					} ]
@@ -413,6 +415,7 @@ Ext.onReady(function() {
 	        		'<p><b>Adress:</b> {address:this.chkEmpty}</p>',
 	        		'<p><b>Phone :</b> {cus_phone:this.chkEmpty}</p>',
 	        		'<p><b>Transfer Detail:</b> <br>{transfer_dtl:this.chkTransfer}</p>',
+	        		'<p><b>Payment Terms :</b> {payment_terms} days net</p>',
 	        		{
 	        			chkEmpty: function(v){
 	        				if(v == "" || v == null){
@@ -504,7 +507,7 @@ Ext.define('cusModel', {
 		name : 'bill_to',
 		type : 'string'
 	}, {
-		name : 'payment',
+		name : 'billing_terms',
 		type : 'string'
 	}, {
 		name : 'transfer_dtl',
@@ -516,6 +519,9 @@ Ext.define('cusModel', {
 		dateFormat: 'Y-m-d H:i:s'
 	}, {
 		name : 'topix_cus_id',
+		type : 'int'
+	}, {
+		name : 'payment_terms',
 		type : 'int'
 	}
 
@@ -552,7 +558,7 @@ var billingTo = Ext.create('Ext.data.Store', {
 	]
 });
 
-var paymentTerms = Ext.create('Ext.data.Store', {
+var billingTerms = Ext.create('Ext.data.Store', {
 	fields: ['name'],
 	data : [
 	        {"name":"Monthly"},
@@ -719,14 +725,25 @@ editCustomer = new Ext.create('Ext.window.Window', {
 			},{
 				xtype : 'combobox',
 				labelWidth : 145,
-				fieldLabel : 'Payment Terms',
-				name : 'epayment',
-				id : 'epayment',
-				emptyText : 'Payment Terms',
+				fieldLabel : 'Billing Terms',
+				name : 'ebilling_terms',
+				id : 'ebilling_terms',
+				emptyText : 'Billing Terms',
 				editable : false,
-				store : paymentTerms,
+				store : billingTerms,
 				valueField : 'name',
 				displayField : 'name'
+			}, {
+				xtype: 'numberfield',
+				allowBlank: false,
+				fieldLabel: 'Payment Terms <font color="red">*</font> ',
+				name: 'epayment_terms',
+				id : 'epayment_terms',
+				labelWidth : 145,
+				minValue : 0,
+				value : 0,
+//				hideTrigger: true,
+				msgTarget : 'under',
 			}, {
 				xtype : 'textareafield',
 				allowBlank : true,
@@ -987,14 +1004,25 @@ addCustomer = new Ext.create('Ext.window.Window', {
 			},{
 				xtype : 'combobox',
 				labelWidth : 145,
-				fieldLabel : 'Payment Terms',
-				name : 'apayment',
-				id : 'apayment',
-				emptyText : 'Payment Terms',
+				fieldLabel : 'Billing Terms',
+				name : 'abilling_terms',
+				id : 'abilling_terms',
+				emptyText : 'Billing Terms',
 				editable : false,
-				store : paymentTerms,
+				store : billingTerms,
 				valueField : 'name',
 				displayField : 'name'
+			}, {
+				xtype: 'numberfield',
+				allowBlank: false,
+				fieldLabel: 'Payment Terms <font color="red">*</font> ',
+				name: 'apayment_terms',
+				id : 'apayment_terms',
+				labelWidth : 145,
+				minValue : 0,
+				value : 0,
+//				hideTrigger: true,
+				msgTarget : 'under',
 			}, {
 				xtype : 'textareafield',
 				allowBlank : true,

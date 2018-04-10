@@ -150,17 +150,6 @@ public class JobsController {
 		return new ModelAndView("jsonView", jobj);
 	}
 	
-	@RequestMapping(value = "/printInvoice")
-	public void printInvoice(HttpServletRequest request, HttpServletResponse response){
-		
-		try {
-			new PrintInvoice_iText().createPdf(request,response);
-		} catch (IOException | DocumentException e) {
-			logger.error(e.getMessage());
-		}
-		
-	}
-	
 	@RequestMapping(value = "/printJobTicket")
 	public void printJobTicket(HttpServletRequest request, HttpServletResponse response) throws IOException{
 	

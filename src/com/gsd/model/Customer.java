@@ -17,11 +17,12 @@ public class Customer {
 	private String cus_email;
 	private String cus_phone;
 	private String bill_to;
-	private String payment;
+	private String billing_terms;
 	private String transfer_dtl;
 	private String regist_date;
 	private Timestamp regist_date_ts;
 	private int topix_cus_id;
+	private int payment_terms;
 	
 	public int getCus_id() {
 		return cus_id;
@@ -101,11 +102,11 @@ public class Customer {
 	public void setBill_to(String bill_to) {
 		this.bill_to = bill_to;
 	}
-	public String getPayment() {
-		return payment;
+	public String getBilling_terms() {
+		return billing_terms;
 	}
-	public void setPayment(String payment) {
-		this.payment = payment;
+	public void setBilling_terms(String billing_terms) {
+		this.billing_terms = billing_terms;
 	}
 	public String getTransfer_dtl() {
 		return transfer_dtl;
@@ -130,6 +131,12 @@ public class Customer {
 	}
 	public void setTopix_cus_id(int topix_cus_id) {
 		this.topix_cus_id = topix_cus_id;
+	}
+	public int getPayment_terms() {
+		return payment_terms;
+	}
+	public void setPayment_terms(int payment_terms) {
+		this.payment_terms = payment_terms;
 	}
 	
 }

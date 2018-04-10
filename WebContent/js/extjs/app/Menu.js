@@ -92,12 +92,12 @@ Ext.onReady(function(){
 //			  href: 'projects.htm',
 //			  hrefTarget: '_self'
 //          },
-		  jmd_menu,
           {
         	  text: 'Jobs',
         	  href: 'jobs.htm',
 			  hrefTarget: '_self'
           },
+          jmd_menu,
           jmd_menu2,
           jmd_menu3,
           {

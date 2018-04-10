@@ -1,5 +1,6 @@
 package com.gsd.dao.impl;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -27,7 +28,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 	@Override
 	public List<Invoice> searchInvoice(Map<String, String> data) {
 		
-		String sql = "SELECT inv_id, inv_number, inv_name, inv.inv_company_id, inv_proj_no, inv_bill_date, inv_delivery_date, inv_payment_term, inv_vat, inv_bill_type, inv.cus_id, inv.cretd_usr, inv_comp.inv_company_name, inv_comp.inv_company_code, cus.cus_name, cus.cus_code, users.usr_name\n"+
+		String sql = "SELECT inv_id, inv_number, inv_name, inv.inv_company_id, inv_proj_no, inv_bill_date, inv_delivery_date, inv_payment_terms, inv_vat, inv_bill_type, inv.cus_id, inv.cretd_usr, inv_comp.inv_company_name, inv_comp.inv_company_code, cus.cus_name, cus.cus_code, users.usr_name\n"+
 				"FROM invoice inv\n"+
 				"LEFT JOIN invoice_company inv_comp ON inv_comp.inv_company_id = inv.inv_company_id\n"+
 				"LEFT JOIN customer cus ON cus.cus_id = inv.cus_id\n"+
@@ -40,8 +41,9 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 	
 	public List<InvoiceReference> searchInvoiceReference(int id){
 		
-		String sql = "SELECT inv_ref.*, proj_ref.proj_id, (inv_ref_price*inv_ref_qty) as total_amount FROM invoice_reference inv_ref "
+		String sql = "SELECT inv_ref.*, proj_ref.proj_id, proj_ref.topix_article_id, proj.proj_name, cast((inv_ref_price*inv_ref_qty) as numeric(9,2)) as total_amount FROM invoice_reference inv_ref "
 				+ "LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = inv_ref.proj_ref_id "
+				+ "LEFT JOIN projects proj ON proj.proj_id = proj_ref.proj_id "
 				+ "WHERE inv_id="+id
 				+ " ORDER BY order_by ASC";
 		
@@ -59,11 +61,11 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 	}
 
 	@Override
-	public void addInvoice(Invoice inv) {
+	public int addInvoice(Invoice inv) {
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yy");
 		String delivery_year = sdf.format(inv.getInv_delivery_date_sql());
-		InvoiceCompany inv_company = getInvoiceCompanyFromId(inv.getInv_company_id());
+		InvoiceCompany inv_company = getInvoiceCompanyById(inv.getInv_company_id());
 		String inv_number = inv_company.getInv_company_code()+delivery_year;
 		String last_inv_number = "";
 		try{
@@ -80,6 +82,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				String myChar = inv_number_count.substring(x,x+1);
 				if(!myChar.equals("0")){
 					myLast = inv_number_count.substring(x);
+					break;
 				}
 			}
 			int praseNumber = Integer.parseInt(myLast)+1;
@@ -92,15 +95,16 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		}
 		System.out.println("Invoice Number : "+inv_number);
 		
-		String sql = "INSERT INTO invoice VALUES (default,?,?,?,?,now(),?,?,?,?,?,?,now(),now())";
+		String sql = "INSERT INTO invoice VALUES (default,?,?,?,?,?,?,?,?,?,?,0,?,now(),now())";
 		
 		this.getJdbcTemplate().update(sql, new Object[] {
 			inv_number,
 			inv.getInv_name(),
 			inv.getInv_company_id(),
 			inv.getInv_proj_no(),
+			inv.getInv_bill_date_sql(),
 			inv.getInv_delivery_date_sql(),
-			inv.getInv_payment_term(),
+			inv.getInv_payment_terms(),
 			inv.getInv_vat(),
 			inv.getInv_bill_type(),
 			inv.getCus_id(),
@@ -121,15 +125,17 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				"Invoice",
 				user.getUserModel().getUsr_name(),
 				"Created Invoice name="+inv.getInv_name()+" on Company name="+inv_company.getInv_company_name()+", customer="+inv_audit.getCus_name()
-				+", inv_proj_no="+inv.getInv_proj_no()+", inv_delivery_date="+delivery_date+", inv_payment_term="+inv.getInv_payment_term()
+				+", inv_proj_no="+inv.getInv_proj_no()+", inv_delivery_date="+delivery_date+", inv_payment_terms="+inv.getInv_payment_terms()
 				+", inv_vat="+inv.getInv_vat()+", inv_bill_type="+inv.getInv_bill_type(),
 				inv.getInv_name()
 		});
 		
+		return inv_audit.getInv_id();
+		
 	}
 	
 	@Override
-	public void addInvoiceReference(InvoiceReference inv_ref) {
+	public void addInvoiceReference(InvoiceReference inv_ref, Map<String, Float> map) {
 		
 		String order_by_sql = "SELECT count(inv_ref_id) FROM invoice_reference WHERE inv_id="+inv_ref.getInv_id();
 		int order_by = this.getJdbcTemplate().queryForInt(order_by_sql)+1;
@@ -148,9 +154,30 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				order_by
 		});
 		
-		UserDetailsApp user = UserLoginDetail.getUser();
 		Invoice inv = getInvoiceById(inv_ref.getInv_id());
-		int inv_ref_id = getLastInvoiceReferenceId(inv_ref.getInv_id());
+		List<InvoiceReference> inv_refLs = searchInvoiceReference(inv_ref.getInv_id());
+		BigDecimal total_price = BigDecimal.ZERO;
+		for(int i=0; i<inv_refLs.size(); i++){
+			BigDecimal price = inv_refLs.get(i).getInv_ref_price().multiply(inv_refLs.get(i).getInv_ref_qty());
+			float vat = (inv.getInv_vat().floatValue() / 100)+1;
+			price = price.multiply(new BigDecimal(vat));
+			total_price = total_price.add(price);
+		}
+		String currency = inv_refLs.get(0).getInv_ref_currency();
+		if(currency.equals("EUR")){
+			System.out.println(String.format("%.2f", total_price)+" EUR");
+		}else{
+			float convert_eur = map.get("EUR") / map.get(currency);
+			float total_eur = total_price.floatValue() * convert_eur;
+			System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
+			total_price = new BigDecimal(total_eur);
+		}
+		
+		String sql_total = "UPDATE invoice SET inv_total_price_eur="+String.format("%.2f", total_price)+" WHERE inv_id="+inv_ref.getInv_id();
+		this.getJdbcTemplate().update(sql_total);
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		int inv_ref_id = getLastInvoiceReferenceIdByInvoiceId(inv_ref.getInv_id());
 		
 		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
@@ -165,15 +192,16 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 	}
 	
 	@Override
-	public void updateInvoice(Invoice inv) {
+	public void updateInvoice(Invoice inv, Map<String, Float> map) {
 		
 		Invoice inv_audit = getInvoiceById(inv.getInv_id());
 		
 		String sql = "UPDATE invoice SET "
 				+ "inv_name=?, "
 				+ "inv_proj_no=?, "
+				+ "inv_bill_date=?, "
 				+ "inv_delivery_date=?, "
-				+ "inv_payment_term=?, "
+				+ "inv_payment_terms=?, "
 				+ "inv_vat=?, "
 				+ "inv_bill_type=?, "
 				+ "cus_id=?, "
@@ -183,8 +211,9 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		this.getJdbcTemplate().update(sql, new Object[] {
 			inv.getInv_name(),
 			inv.getInv_proj_no(),
+			inv.getInv_bill_date_sql(),
 			inv.getInv_delivery_date_sql(),
-			inv.getInv_payment_term(),
+			inv.getInv_payment_terms(),
 			inv.getInv_vat(),
 			inv.getInv_bill_type(),
 			inv.getCus_id(),
@@ -255,6 +284,22 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				"Updated",
 				inv_new.getInv_name()
 			});
+			
+			String del_item = "DELETE FROM invoice_reference WHERE inv_id="+inv_new.getInv_id();
+			this.getJdbcTemplate().update(del_item);
+			
+			String audit_del = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+			this.getJdbcTemplate().update(audit_del, new Object[]{
+					getLastAuditId(),
+					inv_new.getInv_id(),
+					"Invoice",
+					user.getUserModel().getUsr_name(),
+					"Delete all Items from Invoice name="+inv_new.getInv_name(),
+					inv.getInv_name()
+			});
+			
+			String sql_total = "UPDATE invoice SET inv_total_price_eur=0.00 WHERE inv_id="+inv.getInv_id();
+			this.getJdbcTemplate().update(sql_total);
 		}
 		
 		if(!inv_audit.getInv_bill_type().equals(inv_new.getInv_bill_type())){
@@ -272,7 +317,29 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 			});
 		}
 		
-		if(inv_audit.getInv_vat() != inv_new.getInv_vat()){
+		if(inv_audit.getInv_vat().compareTo(inv_new.getInv_vat()) != 0){
+			
+			List<InvoiceReference> inv_refLs = searchInvoiceReference(inv.getInv_id());
+			BigDecimal total_price = BigDecimal.ZERO;
+			for(int i=0; i<inv_refLs.size(); i++){
+				BigDecimal price = inv_refLs.get(i).getInv_ref_price().multiply(inv_refLs.get(i).getInv_ref_qty());
+				float vat = (inv.getInv_vat().floatValue() / 100)+1;
+				price = price.multiply(new BigDecimal(vat));
+				total_price = total_price.add(price);
+			}
+			String currency = inv_refLs.get(0).getInv_ref_currency();
+			if(currency.equals("EUR")){
+				System.out.println(String.format("%.2f", total_price)+" EUR");
+			}else{
+				float convert_eur = map.get("EUR") / map.get(currency);
+				float total_eur = total_price.floatValue() * convert_eur;
+				System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
+				total_price = new BigDecimal(total_eur);
+			}
+			
+			String sql_total = "UPDATE invoice SET inv_total_price_eur="+String.format("%.2f", total_price)+" WHERE inv_id="+inv.getInv_id();
+			this.getJdbcTemplate().update(sql_total);
+			
 			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
 				getLastAuditId(),
@@ -287,7 +354,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 			});
 		}
 		
-		if(inv_audit.getInv_payment_term() != inv_new.getInv_payment_term()){
+		if(inv_audit.getInv_payment_terms() != inv_new.getInv_payment_terms()){
 			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
 				getLastAuditId(),
@@ -295,8 +362,8 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				"Invoice",
 				user.getUserModel().getUsr_name(),
 				"Payment Term",
-				inv_audit.getInv_payment_term(),
-				inv_new.getInv_payment_term(),
+				inv_audit.getInv_payment_terms(),
+				inv_new.getInv_payment_terms(),
 				"Updated",
 				inv_new.getInv_name()
 			});
@@ -334,7 +401,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 	}
 
 	@Override
-	public void updateInvoicereference(InvoiceReference inv_ref) {
+	public void updateInvoicereference(InvoiceReference inv_ref, Map<String, Float> map) {
 		
 		InvoiceReference inv_ref_audit = getInvoiceReferenceById(inv_ref.getInv_ref_id());
 		
@@ -358,6 +425,28 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				inv_ref.getInv_ref_id()
 		});
 		
+		Invoice inv = getInvoiceById(inv_ref.getInv_id());
+		List<InvoiceReference> inv_refLs = searchInvoiceReference(inv_ref.getInv_id());
+		BigDecimal total_price = BigDecimal.ZERO;
+		for(int i=0; i<inv_refLs.size(); i++){
+			BigDecimal price = inv_refLs.get(i).getInv_ref_price().multiply(inv_refLs.get(i).getInv_ref_qty());
+			float vat = (inv.getInv_vat().floatValue() / 100)+1;
+			price = price.multiply(new BigDecimal(vat));
+			total_price = total_price.add(price);
+		}
+		String currency = inv_refLs.get(0).getInv_ref_currency();
+		if(currency.equals("EUR")){
+			System.out.println(String.format("%.2f", total_price)+" EUR");
+		}else{
+			float convert_eur = map.get("EUR") / map.get(currency);
+			float total_eur = total_price.floatValue() * convert_eur;
+			System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
+			total_price = new BigDecimal(total_eur);
+		}
+		
+		String sql_total = "UPDATE invoice SET inv_total_price_eur="+String.format("%.2f", total_price)+" WHERE inv_id="+inv_ref.getInv_id();
+		this.getJdbcTemplate().update(sql_total);
+		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		InvoiceReference invRef_new = getInvoiceReferenceById(inv_ref.getInv_ref_id());
 		
@@ -376,7 +465,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 			});
 		}
 		
-		if(inv_ref_audit.getInv_ref_qty() != invRef_new.getInv_ref_qty()){
+		if(inv_ref_audit.getInv_ref_qty().compareTo(invRef_new.getInv_ref_qty()) != 0){
 			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
 				getLastAuditId(),
@@ -391,7 +480,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 			});
 		}
 		
-		if(inv_ref_audit.getInv_ref_price() != invRef_new.getInv_ref_price()){
+		if(inv_ref_audit.getInv_ref_price().compareTo(invRef_new.getInv_ref_price()) != 0){
 			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
 				getLastAuditId(),
@@ -424,7 +513,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 	}
 	
 	@Override
-	public void updateInvoiceReferenceBatch(List<InvoiceReference> invRefLs) {
+	public void updateInvoiceReferenceBatch(List<InvoiceReference> invRefLs, Map<String, Float> map) {
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		List<InvoiceReference> invRefLs_audit = new ArrayList<InvoiceReference>();
@@ -454,8 +543,8 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 					InvoiceReference invRef = invRefLs.get(i);
 					ps.setInt(1, invRef.getProj_ref_id());
 					ps.setString(2, invRef.getInv_itm_name());
-					ps.setFloat(3, invRef.getInv_ref_price());
-					ps.setFloat(4, invRef.getInv_ref_qty());
+					ps.setBigDecimal(3, invRef.getInv_ref_price());
+					ps.setBigDecimal(4, invRef.getInv_ref_qty());
 					ps.setString(5, invRef.getInv_ref_currency());
 					ps.setString(6, invRef.getInv_ref_desc());
 					ps.setInt(7, invRef.getOrder_by());
@@ -470,6 +559,31 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 			});
 			
 			for(int y=0; y<invRefLs.size(); y++){
+				
+				//Update invoice total price in EUR
+				Invoice inv = getInvoiceById(invRefLs.get(y).getInv_id());
+				List<InvoiceReference> inv_refLs = searchInvoiceReference(invRefLs.get(y).getInv_id());
+				BigDecimal total_price = BigDecimal.ZERO;
+				for(int i=0; i<inv_refLs.size(); i++){
+					BigDecimal price = inv_refLs.get(i).getInv_ref_price().multiply(inv_refLs.get(i).getInv_ref_qty());
+					float vat = (inv.getInv_vat().floatValue() / 100)+1;
+					price = price.multiply(new BigDecimal(vat));
+					total_price = total_price.add(price);
+				}
+				String currency = inv_refLs.get(0).getInv_ref_currency();
+				if(currency.equals("EUR")){
+					System.out.println(String.format("%.2f", total_price)+" EUR");
+				}else{
+					float convert_eur = map.get("EUR") / map.get(currency);
+					float total_eur = total_price.floatValue() * convert_eur;
+					System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
+					total_price = new BigDecimal(total_eur);
+				}
+				
+				String sql_total = "UPDATE invoice SET inv_total_price_eur="+String.format("%.2f", total_price)+" WHERE inv_id="+invRefLs.get(y).getInv_id();
+				this.getJdbcTemplate().update(sql_total);
+				//End update
+				
 				InvoiceReference invRef_new = getInvoiceReferenceById(invRefLs.get(y).getInv_ref_id());
 				
 				if(!invRefLs_audit.get(y).getInv_ref_desc().equals(invRef_new.getInv_ref_desc())){
@@ -487,7 +601,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 					});
 				}
 				
-				if(invRefLs_audit.get(y).getInv_ref_qty() != invRef_new.getInv_ref_qty()){
+				if(invRefLs_audit.get(y).getInv_ref_qty().compareTo(invRef_new.getInv_ref_qty()) != 0){
 					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
 						getLastAuditId(),
@@ -502,7 +616,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 					});
 				}
 				
-				if(invRefLs_audit.get(y).getInv_ref_price() != invRef_new.getInv_ref_price()){
+				if(invRefLs_audit.get(y).getInv_ref_price().compareTo(invRef_new.getInv_ref_price()) != 0){
 					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
 						getLastAuditId(),
@@ -551,7 +665,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 	
 	public Invoice getInvoiceById(int id){
 		
-		String sql = "SELECT invoice.*, cus.cus_name, cus.cus_code, inv_comp.inv_company_name, inv_comp.inv_company_code FROM invoice "
+		String sql = "SELECT invoice.*, cus.cus_name, cus.cus_code, cus.address, cus.topix_cus_id, inv_comp.inv_company_name, inv_comp.inv_company_code FROM invoice "
 				+ "LEFT JOIN customer cus ON cus.cus_id = invoice.cus_id "
 				+ "LEFT JOIN invoice_company inv_comp ON inv_comp.inv_company_id = invoice.inv_company_id "
 				+ "WHERE inv_id="+id;
@@ -581,7 +695,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		return inv.getInv_number();
 	}
 	
-	public InvoiceCompany getInvoiceCompanyFromId(int inv_company_id){
+	public InvoiceCompany getInvoiceCompanyById(int inv_company_id){
 		
 		String sql = "SELECT * FROM invoice_company WHERE inv_company_id = "+inv_company_id;
 		
@@ -589,8 +703,22 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		
 		return inv_company;
 	}
+	
+	@Override
+	public List<InvoiceReference> getJobItemList(int job_id) {
+		
+		String sql = "SELECT jobs_reference.proj_ref_id, itm_name as inv_itm_name, sum(amount) as inv_ref_qty, price as inv_ref_price, currency as inv_ref_currency\n"+
+				"FROM jobs_reference\n"+
+				"LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"+
+				"LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n"+
+				"WHERE job_id="+job_id+"\n"+
+				"GROUP BY jobs_reference.proj_ref_id, inv_itm_name, price, currency";
+		
+		List<InvoiceReference> inv_ref = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<InvoiceReference>(InvoiceReference.class));
+		return inv_ref;
+	}
 
-	public int getLastInvoiceReferenceId(int inv_id) {
+	public int getLastInvoiceReferenceIdByInvoiceId(int inv_id) {
 		
 		String sql = "SELECT max(inv_ref_id) from invoice_reference WHERE inv_id="+inv_id;
 		

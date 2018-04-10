@@ -30,7 +30,7 @@
         <intercept-url pattern="/*" access="isAuthenticated()" />
         <logout logout-success-url="/login/"/>
         <form-login login-page="/login/"
-                    default-target-url="/projects.htm"
+                    default-target-url="/jobs.htm"
                     authentication-failure-url="/login?access=fail"
                     always-use-default-target="false" />
         

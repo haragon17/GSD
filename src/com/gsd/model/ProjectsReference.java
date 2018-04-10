@@ -1,12 +1,15 @@
 package com.gsd.model;
 
+import java.math.BigDecimal;
+
 public class ProjectsReference {
 
 	private int proj_ref_id;
 	private int proj_id;
 	private int itm_id;
 	private float time;
-	private float price;
+	private BigDecimal price;
+	private String price_str;
 	private int cretd_usr;
 	private String cretd_date;
 	private String update_date;
@@ -42,11 +45,17 @@ public class ProjectsReference {
 	public void setTime(float time) {
 		this.time = time;
 	}
-	public float getPrice() {
+	public BigDecimal getPrice() {
 		return price;
 	}
-	public void setPrice(float price) {
+	public void setPrice(BigDecimal price) {
 		this.price = price;
+	}
+	public String getPrice_str() {
+		return price_str;
+	}
+	public void setPrice_str(String price_str) {
+		this.price_str = price_str;
 	}
 	public int getCretd_usr() {
 		return cretd_usr;

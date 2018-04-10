@@ -74,7 +74,14 @@ var	loginForm = Ext.create('Ext.form.Panel', {
             fieldLabel: 'User Name',
             name: 'j_username',
             id: 'j_username',
-            emptyText: 'UserName'
+            emptyText: 'UserName',
+            listeners: {
+        		  specialkey: function(field, e){
+        			  if (e.getKey() == e.ENTER) {
+        				  login.click();
+        			  }
+        		  }
+            },
         },
         {
             allowBlank: false,
@@ -89,7 +96,7 @@ var	loginForm = Ext.create('Ext.form.Panel', {
       				  login.click();
       			  }
       		  }
-          },
+            },
         },
         {
             xtype:'checkbox',

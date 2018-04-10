@@ -139,7 +139,7 @@ Ext.onReady(function() {
 	        					myText = myText.replace(/, job_ref_number=/gi, "<br>Job Number = ");
 	        					myText = myText.replace(/, inv_proj_no=/gi, "<br>Project Number = ");
 	        					myText = myText.replace(/, inv_delivery_date=/gi, "<br>Delivery Date= ");
-	        					myText = myText.replace(/, inv_payment_term=/gi, "<br>Payment Term= ");
+	        					myText = myText.replace(/, inv_payment_terms=/gi, "<br>Payment Terms= ");
 	        					myText = myText.replace(/, inv_vat=/gi, "<br>Vat(%)= ");
 	        					myText = myText.replace(/, inv_bill_type=/gi, "<br>Billing Type= ");
 	        					myText = myText.replace(/, topix_cus_id=/gi, "<br>Customer ID(Topix) = ");

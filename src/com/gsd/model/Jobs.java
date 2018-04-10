@@ -28,11 +28,8 @@ public class Jobs {
 	private int itm_id;
 	private int total_amount;
 	private int remain_job;
-	private String PP;
-	private String PK;
-	private String BKK;
-	private String CM;
-	private String KK;
+	private int remain_item;
+	private int payment_terms;
 	
 	public int getJob_id() {
 		return job_id;
@@ -178,35 +175,17 @@ public class Jobs {
 	public void setRemain_job(int remain_job) {
 		this.remain_job = remain_job;
 	}
-	public String getPP() {
-		return PP;
+	public int getRemain_item() {
+		return remain_item;
 	}
-	public void setPP(String pP) {
-		PP = pP;
+	public void setRemain_item(int remain_item) {
+		this.remain_item = remain_item;
 	}
-	public String getPK() {
-		return PK;
+	public int getPayment_terms() {
+		return payment_terms;
 	}
-	public void setPK(String pK) {
-		PK = pK;
-	}
-	public String getBKK() {
-		return BKK;
-	}
-	public void setBKK(String bKK) {
-		BKK = bKK;
-	}
-	public String getCM() {
-		return CM;
-	}
-	public void setCM(String cM) {
-		CM = cM;
-	}
-	public String getKK() {
-		return KK;
-	}
-	public void setKK(String kK) {
-		KK = kK;
+	public void setPayment_terms(int payment_terms) {
+		this.payment_terms = payment_terms;
 	}
 	
 }

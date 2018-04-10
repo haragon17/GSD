@@ -23,14 +23,16 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 
 	@Override
 	public List<Jobs> searchJobs(Map<String, String> data) {
-		String sql = "SELECT jobs.job_id, job_name, jobs.proj_id, proj_name, cus_name, cus_code, cus.cus_id, job_dtl, job_status, dept,\n"
+		String sql = "SELECT jobs.job_id, job_name, jobs.proj_id, proj_name, cus_name, cus_code, cus.cus_id, payment_terms, job_dtl, job_status, dept,\n"
 				+ "CASE WHEN y.remain_job IS NULL THEN 0 ELSE y.remain_job END,\n"
-				+ "CASE WHEN x.total_amount IS NULL THEN 0 ELSE x.total_amount END\n"
+				+ "CASE WHEN x.total_amount IS NULL THEN 0 ELSE x.total_amount END,\n"
+				+ "CASE WHEN z.remain_item IS NULL THEN 0 ELSE z.remain_item END\n"
 				+ "FROM jobs\n"
 				+ "LEFT JOIN projects proj ON proj.proj_id = jobs.proj_id\n"
 				+ "LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"
 				+ "LEFT JOIN (select job_id, sum(amount) as total_amount from jobs_reference group by job_id) x on x.job_id = jobs.job_id\n"
-				+ "LEFT JOIN (select job_id, count(*) as remain_job from jobs_reference where job_ref_status != 'Sent' group by job_id) y on y.job_id = jobs.job_id\n"
+				+ "LEFT JOIN (select job_id, count(*) as remain_job from jobs_reference where job_ref_status != 'Sent' and job_ref_status != 'Checked' group by job_id) y on y.job_id = jobs.job_id\n"
+				+ "LEFT JOIN (select job_id, count(*) as remain_item from jobs_reference where proj_ref_id = 0 group by job_id) z on z.job_id = jobs.job_id\n"
 				+ "WHERE jobs.job_id != 0\n";
 		if(data.get("first")==null || data.get("first").isEmpty()){
 		}else{
@@ -153,7 +155,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				"LEFT JOIN jobs on jobs.job_id = jobs_reference.job_id\n"+
 				"LEFT JOIN projects proj on proj.proj_id = jobs.proj_id\n"+
 				"LEFT JOIN customer cus on cus.cus_id = proj.cus_id\n"+
-				"WHERE job_ref_status <> 'Sent'\n";
+				"WHERE job_ref_status <> 'Sent' AND job_ref_status <> 'Checked'\n";
 //				"AND date (job_out) <= (CASE\n"+
 //				"WHEN extract(dow from current_date) = 6 THEN (current_date+2)\n"+
 //				"WHEN extract(dow from current_date) = 7 THEN (current_date+1)\n"+
@@ -253,7 +255,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				+ "WHEN 'Final' 	THEN 6\n"
 				+ "WHEN 'Hold' 	THEN 7\n"
 				+ "WHEN 'Sent' 	THEN 8\n"
-				+ "ELSE 9\n"
+				+ "WHEN 'Checked' 	THEN 9\n"
+				+ "ELSE 10\n"
 				+ "END,jobs_reference.job_in DESC ,job_ref_id DESC";
 		}else{
 			sql+= " ORDER BY jobs_reference.job_in ASC ,job_ref_id ASC";

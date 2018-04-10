@@ -1,7 +1,12 @@
 store = {};
 panel = {};
 grid = {};
+editPosition = 0;
+inv_year = "";
 Ext.onReady(function() {
+	
+	Ext.util.Format.thousandSeparator = ',';
+	Ext.util.Format.decimalSeparator = '.';
 	
 	Ext.define('Ext.form.field.Month', {
         extend: 'Ext.form.field.Date',
@@ -52,8 +57,35 @@ Ext.onReady(function() {
         onOKClick: function () {
             var me = this;
             if (me.selectMonth) {
-                me.setValue(me.selectMonth);
-                me.fireEvent('select', me, me.selectMonth);
+            	if(me.selectMonth.getFullYear() == inv_year){
+	                me.setValue(me.selectMonth);
+	                me.fireEvent('select', me, me.selectMonth);
+	                try{
+	    	            var delivery_date = Ext.getCmp('einv_delivery_date').getValue();
+	    				var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0);
+	    				var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1);
+//	    				var val_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), new Date().getDay());
+	    				Ext.getCmp('einv_bill_date').setValue('');
+	    				Ext.getCmp('einv_bill_date').setMinValue(min_date);
+	    				Ext.getCmp('einv_bill_date').setMaxValue(max_date);
+	                }catch(err){
+	    				var delivery_date = Ext.getCmp('ainv_delivery_date').getValue();
+	    				var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0);
+	    				var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1);
+//	    				var val_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), new Date().getDay());
+	    				Ext.getCmp('ainv_bill_date').setValue('');
+	    				Ext.getCmp('ainv_bill_date').setMinValue(min_date);
+	    				Ext.getCmp('ainv_bill_date').setMaxValue(max_date);
+	                }
+            	}else{
+            		Ext.MessageBox.show({
+            			title : 'Error',
+            			msg : 'Please select only year \''+inv_year+'\' !',
+            			buttons : Ext.MessageBox.OK,
+//            			animateTarget : 'del',
+            			icon : Ext.MessageBox.ERROR
+            		});
+            	}
             }
             me.collapse();
         },
@@ -86,9 +118,9 @@ Ext.onReady(function() {
 	
 	
 	panel.invoiceHeader = Ext.create('Ext.form.Panel', {
-		title : 'Invoice Header ',
+		title : 'Invoice Information ',
 		width : 850,
-		height : 240,
+		height : 270,
 		layout : 'column',
 		style : {
 			"margin-left" : "auto",
@@ -112,21 +144,28 @@ Ext.onReady(function() {
 				cus_id = Ext.getCmp('dcus_id').getValue();
 				cus_name = Ext.getCmp('dcus_name').getValue();
 				cus_code = Ext.getCmp('dcus_code').getValue();
-				inv_payment_term = Ext.getCmp('dinv_payment_term').getValue();
+				inv_payment_terms = Ext.getCmp('dinv_payment_terms').getValue();
 				inv_vat = Ext.getCmp('dinv_vat').getValue();
 				inv_bill_type = Ext.getCmp('dinv_bill_type').getValue();
+				inv_bill_date = new Date(Ext.getCmp('dinv_bill_date').getValue());
 				
-				console.log(inv_delivery_date);
+				min_year = new Date(inv_delivery_date.getFullYear(), 0, 1);
+				max_year = new Date(inv_delivery_date.getFullYear()+1, 0, 0);
+				inv_year = inv_delivery_date.getFullYear();
+				editPosition = 1;
 				
 				Ext.getCmp('einv_id').setValue(inv_id);
 				Ext.getCmp('einv_name').setValue(inv_name);
 				Ext.getCmp('einv_proj_no').setValue(inv_proj_no);
 				Ext.getCmp('einv_delivery_date').setValue(inv_delivery_date);
-				Ext.getCmp('einv_company_id').setValue(inv_company_id);
+//				Ext.getCmp('einv_delivery_date').setMinValue(min_year);
+//				Ext.getCmp('einv_delivery_date').setMaxValue(max_year);
+				Ext.getCmp('einv_bill_date').setValue(inv_bill_date);
+//				Ext.getCmp('einv_company_id').setValue(Number(inv_company_id));
 				Ext.getCmp('ecus_id').setValue(cus_id);
 				Ext.getCmp('ecus_name').setValue(cus_name);
 				Ext.getCmp('ecus_code').setValue(cus_code);
-				Ext.getCmp('einv_payment_term').setValue(inv_payment_term);
+				Ext.getCmp('einv_payment_terms').setValue(inv_payment_terms);
 				Ext.getCmp('einv_vat').setValue(inv_vat);
 				Ext.getCmp('einv_bill_type').setValue(inv_bill_type);
 				editInvoice.show();
@@ -171,10 +210,19 @@ Ext.onReady(function() {
 					width : 320,
 					renderer: Ext.util.Format.dateRenderer('m/y'),
 					fieldStyle : 'font-size:14px;font-weight:bold;'
+				},{ 
+					fieldLabel : 'Bill Date ',
+					name : 'dinv_bill_date',
+					id : 'dinv_bill_date',
+					labelWidth : 110,
+					margin : '0 0 10 0',
+					width : 320,
+					renderer: Ext.util.Format.dateRenderer('d/m/y'),
+					fieldStyle : 'font-size:14px;font-weight:bold;'
 				},{
-					fieldLabel : 'Billing Type ',
-					name : 'dinv_bill_type',
-					id : 'dinv_bill_type',
+					fieldLabel : 'Payment Terms ',
+					name : 'dinv_payment_terms',
+					id : 'dinv_payment_terms',
 					labelWidth : 110,
 					margin : '0 0 10 0',
 					width : 320,
@@ -193,6 +241,14 @@ Ext.onReady(function() {
 				defaultType : 'displayfield',
 				items : [
 				    {
+				    	fieldLabel : 'Invoice Number ',
+						name : 'dinv_number',
+						id: 'dinv_number',
+						labelWidth : 110,
+						margin : '0 0 10 0',
+						width : 350,
+						fieldStyle : 'font-size:14px;font-weight:bold;'
+				    },{
 				    	fieldLabel : 'Company Name ',
 						name : 'dinv_company_name',
 						id: 'dinv_company_name',
@@ -209,9 +265,9 @@ Ext.onReady(function() {
 						width : 350,
 						fieldStyle : 'font-size:14px;font-weight:bold;'
 					},{
-						fieldLabel : 'Payment Term ',
-						name : 'dinv_payment_term',
-						id : 'dinv_payment_term',
+						fieldLabel : 'Billing Type ',
+						name : 'dinv_bill_type',
+						id : 'dinv_bill_type',
 						labelWidth : 110,
 						margin : '0 0 10 0',
 						width : 350,
@@ -248,18 +304,10 @@ Ext.onReady(function() {
 			id : 'printInvoiceButton',
 			iconCls: 'icon-print',
 			handler: function(){
-				
-			}
-		},
-//		{
-//			text : 'Edit Invoice',
-//			id : 'editInvoiceHeaderButton',
-//			iconCls : 'table-edit',
-//			handler : function() {
-//				addInvoiceHeader.show();
-//			}
-//		}
-		]
+					inv_id = Ext.getCmp('dinv_id').getValue();
+					window.open('printInvoice.htm?inv_id='+inv_id, '_blank');
+				}
+		}]
 	});
 
 	
@@ -355,6 +403,13 @@ Ext.onReady(function() {
 	    	items: panel.detail
 	    }],
 	    listeners: {
+	    	'tabchange': function (tabPanel, tab) {
+	    		if(tab.id == 'invoiceTabs'){
+	    			store.invoice.reload();
+	    		}else if(tab.id == 'detailTabs'){
+	    			store.invoiceRef.reload();
+	    		}
+	    	},
 	    	'afterrender': function(){
             	grid.invoice.down('toolbar').add('->',{
             		xtype : 'button',
@@ -362,6 +417,7 @@ Ext.onReady(function() {
             		id : 'inv_add',
             		iconCls : 'icon-add',
             		handler : function() {
+            			Ext.getCmp('ainv_portal').setValue(1);
             			addInvoice.show();
             		}
             	});
@@ -375,7 +431,7 @@ Ext.onReady(function() {
 	});
 	
 	addInvoice = new Ext.create('Ext.window.Window', {
-		title: 'Add Invoice',
+		title: 'Create Invoice',
 		width: 450,
 		animateTarget: 'inv_add',
 		resizable: false,
@@ -400,21 +456,6 @@ Ext.onReady(function() {
 	                anchor: '100%'
 	            },
 	            items: [{
-	            	fieldLabel: 'Subject <font color="red">*</font> ',
-	            	name: 'ainv_name',
-	            	id: 'ainv_name',
-	            	allowBlank: false,
-	            	labelWidth: 120,
-	            	msgTarget: 'under',
-	            	emptyText: 'Subject'
-	            },{
-	            	fieldLabel: 'Project No. ',
-	            	name: 'ainv_proj_no',
-	            	id: 'ainv_proj_no',
-	            	labelWidth: 120,
-	            	msgTarget: 'under',
-	            	emptyText: 'Project Number'
-	            },{
 	            	xtype: 'combobox',
 	            	fieldLabel: 'Company <font color="red">*</font> ',
 	            	name: 'ainv_company_id',
@@ -445,12 +486,37 @@ Ext.onReady(function() {
 	            	valueField: 'inv_company_id',
 	            	displayField: 'inv_company_name'
 	            },{
+	            	fieldLabel: 'Subject <font color="red">*</font> ',
+	            	name: 'ainv_name',
+	            	id: 'ainv_name',
+	            	allowBlank: false,
+	            	labelWidth: 120,
+	            	msgTarget: 'under',
+	            	emptyText: 'Subject'
+	            },{
+	            	fieldLabel: 'Project No. ',
+	            	name: 'ainv_proj_no',
+	            	id: 'ainv_proj_no',
+	            	labelWidth: 120,
+	            	msgTarget: 'under',
+	            	emptyText: 'Project Number'
+	            },{
 	            	xtype: 'monthfield',
 	            	fieldLabel : 'Delivery Date <font color="red">*</font> ',
 					name : 'ainv_delivery_date',
 					id : 'ainv_delivery_date',
 					labelWidth : 120,
 					format: 'm/y',
+					value: new Date(),
+					allowBlank: false,
+					editable: false
+	            },{
+	            	xtype: 'datefield',
+	            	fieldLabel : 'Billing Date <font color="red">*</font> ',
+					name : 'ainv_bill_date',
+					id : 'ainv_bill_date',
+					labelWidth : 120,
+					format: 'd/m/y',
 					value: new Date(),
 					allowBlank: false,
 					editable: false
@@ -465,7 +531,7 @@ Ext.onReady(function() {
 					labelWidth : 120,
 					emptyText : 'Customer Name',
 					store : {
-						fields : [ 'cus_id', 'cus_name', 'cus_code' ],
+						fields : [ 'cus_id', 'cus_name', 'cus_code', 'payment_terms' ],
 						proxy : {
 							type : 'ajax',
 							url : 'showCustomer.htm',
@@ -491,8 +557,10 @@ Ext.onReady(function() {
 							var myIndex = this.store.indexOf(record);
 							var myValue = this.store.getAt(myIndex).data.cus_code;
 							var myId = this.store.getAt(myIndex).data.cus_id;
+							var myPayment = this.store.getAt(myIndex).data.payment_terms;
 							Ext.getCmp('acus_id').setValue(myId);
 							Ext.getCmp('acus_code').setValue(myValue);
+							Ext.getCmp('ainv_payment_terms').setValue(myPayment);
 							
 							console.log("cus_code: "+myValue);
 						},
@@ -503,8 +571,10 @@ Ext.onReady(function() {
 								var myIndex = this.store.indexOf(record);
 								var myValue = this.store.getAt(myIndex).data.cus_code;
 								var myId = this.store.getAt(myIndex).data.cus_id;
+								var myPayment = this.store.getAt(myIndex).data.payment_terms;
 								Ext.getCmp('acus_id').setValue(myId);
 								Ext.getCmp('acus_code').setValue(myValue);
+								Ext.getCmp('ainv_payment_terms').setValue(myPayment);
 							}else{
 								Ext.getCmp('acus_id').setValue("");
 								Ext.getCmp('acus_name').setValue("");
@@ -524,7 +594,7 @@ Ext.onReady(function() {
 					msgTarget: 'under',
 					emptyText : 'Customer Code',
 					store : {
-						fields : [ 'cus_id', 'cus_code', 'cus_name' ],
+						fields : [ 'cus_id', 'cus_code', 'cus_name', 'payment_terms' ],
 						proxy : {
 							type : 'ajax',
 							url : 'showCustomer.htm',
@@ -551,8 +621,10 @@ Ext.onReady(function() {
 							var myIndex = this.store.indexOf(record);
 							var myValue = this.store.getAt(myIndex).data.cus_name;
 							var myId = this.store.getAt(myIndex).data.cus_id;
+							var myPayment = this.store.getAt(myIndex).data.payment_terms;
 							Ext.getCmp('acus_id').setValue(myId);
 							Ext.getCmp('acus_name').setValue(myValue);
+							Ext.getCmp('ainv_payment_terms').setValue(myPayment);
 							
 							console.log("cus_name: "+myValue);
 						},
@@ -563,8 +635,10 @@ Ext.onReady(function() {
 								var myIndex = this.store.indexOf(record);
 								var myValue = this.store.getAt(myIndex).data.cus_name;
 								var myId = this.store.getAt(myIndex).data.cus_id;
+								var myPayment = this.store.getAt(myIndex).data.payment_terms;
 								Ext.getCmp('acus_id').setValue(myId);
 								Ext.getCmp('acus_name').setValue(myValue);
+								Ext.getCmp('ainv_payment_terms').setValue(myPayment);
 							}else{
 								Ext.getCmp('acus_id').setValue("");
 								Ext.getCmp('acus_code').setValue("");
@@ -575,9 +649,9 @@ Ext.onReady(function() {
 					}
 				},{
 					xtype : 'numberfield',
-					fieldLabel : 'Payment Term <font color="red">*</font> ',
-					name : 'ainv_payment_term',
-					id : 'ainv_payment_term',
+					fieldLabel : 'Payment Terms <font color="red">*</font> ',
+					name : 'ainv_payment_terms',
+					id : 'ainv_payment_terms',
 					labelWidth : 120,
 					value : 0,
 					minValue : 0,
@@ -620,10 +694,14 @@ Ext.onReady(function() {
 				xtype: 'hidden',
 				id: 'acus_id',
 				name: 'acus_id'
+			},{
+				xtype: 'hidden',
+				id: 'ainv_portal',
+				name: 'ainv_portal'
 			}]
 		}],
 		buttons: [{
-			text: 'Add',
+			text: 'Create',
 			width: 100,
 			id: 'addInvoiceButton',
 			handler: function(){
@@ -631,13 +709,13 @@ Ext.onReady(function() {
 				if (form.isValid()){
    				 form.submit({
    				 url: 'addInvoice.htm',
-   				 waitTitle: 'Adding Invoice',
+   				 waitTitle: 'Creating Invoice',
    				 waitMsg: 'Please wait...',
    				 standardSubmit: false,
                     success: function(form, action) {
                    	 Ext.MessageBox.show({
      						title: 'Information',
-     						msg: "Inovoice Has Been Add!",
+     						msg: "Inovoice Has Been Created!",
      						buttons: Ext.MessageBox.OK,
      						icon: Ext.MessageBox.INFO,
      						animateTarget: 'ajob_btn',
@@ -727,45 +805,39 @@ Ext.onReady(function() {
 	            	msgTarget: 'under',
 	            	emptyText: 'Project Number'
 	            },{
-	            	xtype: 'combobox',
-	            	fieldLabel: 'Company <font color="red">*</font> ',
-	            	name: 'einv_company_id',
-	            	id: 'einv_company_id',
-	            	allowBlank: false,
-	            	queryMode: 'local',
-	            	msgTarget: 'under',
-	            	labelWidth: 120,
-	            	editable: false,
-	            	emptyText: 'Company',
-	            	store: {
-	            		fields: ['inv_company_id','inv_company_name'],
-	            		proxy: {
-	            			type: 'ajax',
-	            			url: 'showInvoiceCompany.htm',
-	            			reader: {
-	            				type: 'json',
-	            				root: 'records',
-	            				idProperty: 'inv_company_id'
-	            			}
-	            		},
-	            		autoLoad: true,
-	            		sorters: [{
-	            			property: 'inv_company_id',
-	            			direction: 'ASC'
-	            		}]
-	            	},
-	            	valueField: 'inv_company_id',
-	            	displayField: 'inv_company_name'
-	            },{
 	            	xtype: 'monthfield',
 	            	fieldLabel : 'Delivery Date <font color="red">*</font> ',
 					name : 'einv_delivery_date',
 					id : 'einv_delivery_date',
 					labelWidth : 120,
 					format: 'm/y',
-					value: new Date(),
 					allowBlank: false,
-					editable: false
+					editable: false,
+					listener: {
+						"select": function(){
+							console.log("change devilery date!!");
+							var delivery_date = Ext.getCmp('einv_delivery_date').getValue();
+							var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0).toString();
+							var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1).toString();
+							Ext.getCmp('einv_bill_date').setValue('');
+							Ext.getCmp('einv_bill_date').setMinValue(min_date);
+							Ext.getCmp('einv_bill_date').setMaxValue(max_date);
+							console.log("change devilery date!!");
+						}
+					}
+	            },{
+	            	xtype: 'datefield',
+	            	fieldLabel : 'Billing Date <font color="red">*</font> ',
+					name : 'einv_bill_date',
+					id : 'einv_bill_date',
+					labelWidth : 120,
+					format: 'd/m/y',
+					allowBlank: false,
+					editable: false,
+					onExpand: function(){
+		                var value = this.up('form').down('datefield[name=einv_bill_date]').getValue();
+		                this.picker.setValue(Ext.isDate(value) ? value : new Date());
+		            }
 	            },{
 					xtype : 'combobox',
 					fieldLabel : 'Customer Name <font color="red">*</font> ',
@@ -777,7 +849,7 @@ Ext.onReady(function() {
 					labelWidth : 120,
 					emptyText : 'Customer Name',
 					store : {
-						fields : [ 'cus_id', 'cus_name', 'cus_code' ],
+						fields : [ 'cus_id', 'cus_name', 'cus_code', 'payment_terms' ],
 						proxy : {
 							type : 'ajax',
 							url : 'showCustomer.htm',
@@ -799,32 +871,26 @@ Ext.onReady(function() {
 
 						select : function() {
 							
+							Ext.MessageBox.show({
+	     						title: 'Warning',
+	     						msg: 'All item will be deleted if you change customer!',
+	     						buttons: Ext.MessageBox.OK,
+	     						icon: Ext.MessageBox.WARNING,
+	     						animateTarget: 'ecus_name'
+							});
+							
 							var v = this.getValue();
 							var record = this.findRecord(this.valueField || this.displayField, v);
 							var myIndex = this.store.indexOf(record);
 							var myValue = this.store.getAt(myIndex).data.cus_code;
 							var myId = this.store.getAt(myIndex).data.cus_id;
+							var myPayment = this.store.getAt(myIndex).data.payment_terms;
 							Ext.getCmp('ecus_id').setValue(myId);
 							Ext.getCmp('ecus_code').setValue(myValue);
+							Ext.getCmp('epayment_terms').setValue(myPayment);
 							
 							console.log("cus_code: "+myValue);
-						},
-						blur : function() {
-							var v = this.getValue();
-							var record = this.findRecord(this.valueField || this.displayField, v);
-							if(record !== false){
-								var myIndex = this.store.indexOf(record);
-								var myValue = this.store.getAt(myIndex).data.cus_code;
-								var myId = this.store.getAt(myIndex).data.cus_id;
-								Ext.getCmp('ecus_id').setValue(myId);
-								Ext.getCmp('ecus_code').setValue(myValue);
-							}else{
-								Ext.getCmp('ecus_id').setValue("");
-								Ext.getCmp('ecus_name').setValue("");
-								Ext.getCmp('ecus_code').setValue("");
-							}
 						}
-
 					}
 				}, {
 					xtype : 'combobox',
@@ -837,7 +903,7 @@ Ext.onReady(function() {
 					msgTarget: 'under',
 					emptyText : 'Customer Code',
 					store : {
-						fields : [ 'cus_id', 'cus_code', 'cus_name' ],
+						fields : [ 'cus_id', 'cus_code', 'cus_name', 'payment_terms' ],
 						proxy : {
 							type : 'ajax',
 							url : 'showCustomer.htm',
@@ -859,38 +925,32 @@ Ext.onReady(function() {
 
 						select : function() {
 							
+							Ext.MessageBox.show({
+	     						title: 'Warning',
+	     						msg: 'All item will be deleted if you change customer!',
+	     						buttons: Ext.MessageBox.OK,
+	     						icon: Ext.MessageBox.WARNING,
+	     						animateTarget: 'ecus_code'
+							});
+							
 							var v = this.getValue();
 							var record = this.findRecord(this.valueField || this.displayField, v);
 							var myIndex = this.store.indexOf(record);
 							var myValue = this.store.getAt(myIndex).data.cus_name;
 							var myId = this.store.getAt(myIndex).data.cus_id;
+							var myPayment = this.store.getAt(myIndex).data.payment_terms;
 							Ext.getCmp('ecus_id').setValue(myId);
 							Ext.getCmp('ecus_name').setValue(myValue);
+							Ext.getCmp('epayment_terms').setValue(myPayment);
 							
 							console.log("cus_name: "+myValue);
-						},
-						blur : function() {
-							var v = this.getValue();
-							var record = this.findRecord(this.valueField || this.displayField, v);
-							if(record !== false){
-								var myIndex = this.store.indexOf(record);
-								var myValue = this.store.getAt(myIndex).data.cus_name;
-								var myId = this.store.getAt(myIndex).data.cus_id;
-								Ext.getCmp('ecus_id').setValue(myId);
-								Ext.getCmp('ecus_name').setValue(myValue);
-							}else{
-								Ext.getCmp('ecus_id').setValue("");
-								Ext.getCmp('ecus_code').setValue("");
-								Ext.getCmp('ecus_name').setValue("");
-							}
 						}
-
 					}
 				},{
 					xtype : 'numberfield',
-					fieldLabel : 'Payment Term <font color="red">*</font> ',
-					name : 'einv_payment_term',
-					id : 'einv_payment_term',
+					fieldLabel : 'Payment Terms <font color="red">*</font> ',
+					name : 'einv_payment_terms',
+					id : 'einv_payment_terms',
 					labelWidth : 120,
 					value : 0,
 					minValue : 0,
@@ -944,27 +1004,62 @@ Ext.onReady(function() {
 			id: 'updateInvoiceButton',
 			handler: function(){
 				var form = Ext.getCmp('editInvoiceForm').getForm();
-           	 if(form.isValid()){
+				Ext.Ajax.request({
+					url : 'searchInvoiceParam.htm?inv_id='+Ext.getCmp('einv_id').getValue()+'&AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
+					'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
+					'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&USD='+store.exchangeRates.getAt(0).data.USD,
+					success : function(response, opts) {}
+				});
+				if(form.isValid()){
    				 form.submit({
    				 url: 'updateInvoice.htm',
-   				 waitTitle: 'Updating Job',
+   				 waitTitle: 'Updating Invoice',
    				 waitMsg: 'Please wait...',
    				 standardSubmit: false,
                     success: function(form, action) {
                    	 Ext.MessageBox.show({
      						title: 'Information',
-     						msg: 'Job Has Been Update!',
+     						msg: 'Invoice Has Been Update!',
      						buttons: Ext.MessageBox.OK,
      						icon: Ext.MessageBox.INFO,
      						animateTarget: 'updateInvoiceButton',
      						fn: function(){
-     							editInvoice.hide();
-     							store.invoice.reload();
-     							Ext.getCmp('detailTabs').setDisabled(true);
-								Ext.getCmp('detailTabs').setTitle("Detail");
-     							Ext.getCmp('filterSearchField').setValue("");
-      		                	store.invoice.clearFilter();
+     							if(editPosition == 0){
+	     							editInvoice.hide();
+	     							store.invoice.reload();
+	     							Ext.getCmp('detailTabs').setDisabled(true);
+									Ext.getCmp('detailTabs').setTitle("Detail");
+	     							Ext.getCmp('filterSearchField').setValue("");
+	      		                	store.invoice.clearFilter();
+     							}else if(editPosition == 1){
+     								editForm = Ext.getCmp('editInvoiceForm').getForm();
+     								inv_name = editForm.getValues().einv_name;
+     								inv_proj_no = editForm.getValues().einv_proj_no;
+     								inv_delivery_date = Ext.getCmp('einv_delivery_date').getValue();
+     								cus_id = Ext.getCmp('ecus_id').getValue();
+     								cus_name = editForm.getValues().ecus_name;
+     								cus_code = editForm.getValues().ecus_code;
+     								inv_payment_terms = Ext.getCmp('einv_payment_terms').getValue();
+     								inv_vat = Ext.getCmp('einv_vat').getValue();
+     								inv_bill_type = editForm.getValues().einv_bill_type;
+     								inv_bill_date = Ext.getCmp('einv_bill_date').getValue();
+     								
+     								Ext.getCmp('dinv_name').setValue(inv_name);
+     								Ext.getCmp('dinv_proj_no').setValue(inv_proj_no);
+     								Ext.getCmp('dinv_delivery_date').setValue(inv_delivery_date);
+     								Ext.getCmp('dcus_id').setValue(cus_id);
+     								Ext.getCmp('dcus_name').setValue(cus_name);
+     								Ext.getCmp('dcus_code').setValue(cus_code);
+     								Ext.getCmp('dinv_payment_terms').setValue(inv_payment_terms + " days net");
+     								Ext.getCmp('dinv_vat').setValue(inv_vat);
+     								Ext.getCmp('dinv_bill_type').setValue(inv_bill_type);
+     								Ext.getCmp('dinv_bill_date').setValue(inv_bill_date);
+     								editInvoice.hide();
+     								store.invoice.reload();
+     								store.invoiceRef.reload();
+     								Ext.getCmp('detailTabs').setTitle(inv_name);
      							}
+     						}
      					});
                        },
                        failure : function(form, action) {
@@ -1022,17 +1117,17 @@ Ext.define('invoiceModel', {
 	},{
 		name: 'inv_bill_date',
 		type: 'date',
-		dateFormat: 'Y-m-d H:i:s'
+		dateFormat: 'Y-m-d'
 	},{
 		name: 'inv_delivery_date',
 		type: 'date',
 		dateFormat: 'Y-m-d'
 	},{
-		name: 'inv_payment_term',
+		name: 'inv_payment_terms',
 		type: 'int'
 	},{
 		name: 'inv_vat',
-		type: 'float'
+		type: 'double'
 	},{
 		name: 'inv_bill_type',
 		type: 'string'
@@ -1044,11 +1139,11 @@ Ext.define('invoiceModel', {
 		type: 'int'
 	},{
 		name: 'cretd_date',
-		type: 'date',
+		type: 'datetime',
 		dateFormat: 'Y-m-d H:i:s'
 	},{
 		name: 'update_date',
-		type: 'date',
+		type: 'datetime',
 		dateFormat: 'Y-m-d H:i:s'
 	},{
 		name: 'inv_company_name',
@@ -1138,6 +1233,9 @@ Ext.define('invoiceRefModel', {
 	},{
 		name: 'proj_id',
 		type: 'int'
+	},{
+		name: 'proj_name',
+		type: 'string'
 	}]
 });
 
@@ -1184,6 +1282,47 @@ store.invoiceRef = Ext.create('Ext.data.JsonStore', {
 	}
 });
 
+Ext.Ajax.useDefaultXhrHeader = false;
+
+Ext.define('exModel', {
+	extend : 'Ext.data.Model',
+	fields : [ {
+		name : 'USD',
+		type : 'float'
+	}, {
+		name : 'EUR',
+		type : 'float'
+	}, {
+		name : 'THB',
+		type : 'float'
+	}, {
+		name : 'AUD',
+		type : 'float'
+	}, {
+		name : 'GBP',
+		type : 'float'
+	}, {
+		name : 'CHF',
+		type : 'float'
+	}
+
+	]
+});
+
+store.exchangeRates = Ext.create('Ext.data.JsonStore', {
+	model: 'exModel',
+	id : 'exStore',
+	autoLoad : true,
+	proxy : {
+		type : 'ajax',
+		url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c',
+		reader : {
+			type : 'json',
+			root : 'rates',
+		}
+	}
+});
+
 grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 	store: store.invoice,
 	id: 'invoiceGrid',
@@ -1207,24 +1346,26 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				cus_id = grid.getStore().getAt(rowIndex).get('cus_id');
 				cus_name = grid.getStore().getAt(rowIndex).get('cus_name');
 				cus_code = grid.getStore().getAt(rowIndex).get('cus_code');
-				inv_payment_term = grid.getStore().getAt(rowIndex).get('inv_payment_term');
+				inv_payment_terms = grid.getStore().getAt(rowIndex).get('inv_payment_terms');
 				inv_vat = grid.getStore().getAt(rowIndex).get('inv_vat');
 				inv_bill_type = grid.getStore().getAt(rowIndex).get('inv_bill_type');
-				
-				console.log(inv_delivery_date);
+				inv_bill_date = grid.getStore().getAt(rowIndex).get('inv_bill_date');
+				inv_number = grid.getStore().getAt(rowIndex).get('inv_number');
 				
 				Ext.getCmp('dinv_id').setValue(inv_id);
 				Ext.getCmp('dinv_name').setValue(inv_name);
 				Ext.getCmp('dinv_proj_no').setValue(inv_proj_no);
 				Ext.getCmp('dinv_delivery_date').setValue(inv_delivery_date);
+				Ext.getCmp('dinv_bill_date').setValue(inv_bill_date);
 				Ext.getCmp('dinv_company_id').setValue(inv_company_id);
 				Ext.getCmp('dinv_company_name').setValue(inv_company_name);
 				Ext.getCmp('dcus_id').setValue(cus_id);
 				Ext.getCmp('dcus_name').setValue(cus_name);
 				Ext.getCmp('dcus_code').setValue(cus_code);
-				Ext.getCmp('dinv_payment_term').setValue(inv_payment_term);
+				Ext.getCmp('dinv_payment_terms').setValue(inv_payment_terms + ' days net');
 				Ext.getCmp('dinv_vat').setValue(inv_vat);
 				Ext.getCmp('dinv_bill_type').setValue(inv_bill_type);
+				Ext.getCmp('dinv_number').setValue(inv_number);
 				
 				var aproj_id = Ext.getCmp('aproj_id');
 				aproj_id.clearValue();
@@ -1245,8 +1386,11 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 //					url: 'searchInvoiceReference.htm?id='+inv_id
 //				});
 				
+				
 				Ext.Ajax.request({
-					url : 'searchInvoiceParam.htm?inv_id='+inv_id,
+					url : 'searchInvoiceParam.htm?inv_id='+inv_id+'&AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
+					'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
+					'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&USD='+store.exchangeRates.getAt(0).data.USD,
 					success : function(response, opts) {
 						store.invoiceRef.loadPage(1);
 						Ext.getCmp('detailTabs').setDisabled(false);
@@ -1296,20 +1440,29 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				cus_id = grid.getStore().getAt(rowIndex).get('cus_id');
 				cus_name = grid.getStore().getAt(rowIndex).get('cus_name');
 				cus_code = grid.getStore().getAt(rowIndex).get('cus_code');
-				inv_payment_term = grid.getStore().getAt(rowIndex).get('inv_payment_term');
+				inv_payment_terms = grid.getStore().getAt(rowIndex).get('inv_payment_terms');
 				inv_vat = grid.getStore().getAt(rowIndex).get('inv_vat');
 				inv_bill_type = grid.getStore().getAt(rowIndex).get('inv_bill_type');
+				inv_bill_date = grid.getStore().getAt(rowIndex).get('inv_bill_date');
 				
+				min_year = new Date(inv_delivery_date.getFullYear(), 0, 1);
+				max_year = new Date(inv_delivery_date.getFullYear()+1, 0, 0);
+				inv_year = inv_delivery_date.getFullYear();
+				
+				editPosition = 0;
 				
 				Ext.getCmp('einv_id').setValue(inv_id);
 				Ext.getCmp('einv_name').setValue(inv_name);
 				Ext.getCmp('einv_proj_no').setValue(inv_proj_no);
 				Ext.getCmp('einv_delivery_date').setValue(inv_delivery_date);
-				Ext.getCmp('einv_company_id').setValue(inv_company_id);
+//				Ext.getCmp('einv_delivery_date').setMinValue(min_year);
+//				Ext.getCmp('einv_delivery_date').setMaxValue(max_year);
+				Ext.getCmp('einv_bill_date').setValue(inv_bill_date);
+//				Ext.getCmp('einv_company_id').setValue(inv_company_id);
 				Ext.getCmp('ecus_id').setValue(cus_id);
 				Ext.getCmp('ecus_name').setValue(cus_name);
 				Ext.getCmp('ecus_code').setValue(cus_code);
-				Ext.getCmp('einv_payment_term').setValue(inv_payment_term);
+				Ext.getCmp('einv_payment_terms').setValue(inv_payment_terms);
 				Ext.getCmp('einv_vat').setValue(inv_vat);
 				Ext.getCmp('einv_bill_type').setValue(inv_bill_type);
 				editInvoice.show();
@@ -1348,24 +1501,26 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 			cus_id = dv.getStore().getAt(index).get('cus_id');
 			cus_name = dv.getStore().getAt(index).get('cus_name');
 			cus_code = dv.getStore().getAt(index).get('cus_code');
-			inv_payment_term = dv.getStore().getAt(index).get('inv_payment_term');
+			inv_payment_terms = dv.getStore().getAt(index).get('inv_payment_terms');
 			inv_vat = dv.getStore().getAt(index).get('inv_vat');
 			inv_bill_type = dv.getStore().getAt(index).get('inv_bill_type');
-			
-			console.log(inv_delivery_date);
+			inv_bill_date = dv.getStore().getAt(index).get('inv_bill_date');
+			inv_number = dv.getStore().getAt(index).get('inv_number');
 			
 			Ext.getCmp('dinv_id').setValue(inv_id);
 			Ext.getCmp('dinv_name').setValue(inv_name);
 			Ext.getCmp('dinv_proj_no').setValue(inv_proj_no);
 			Ext.getCmp('dinv_delivery_date').setValue(inv_delivery_date);
+			Ext.getCmp('dinv_bill_date').setValue(inv_bill_date);
 			Ext.getCmp('dinv_company_id').setValue(inv_company_id);
 			Ext.getCmp('dinv_company_name').setValue(inv_company_name);
 			Ext.getCmp('dcus_id').setValue(cus_id);
 			Ext.getCmp('dcus_name').setValue(cus_name);
 			Ext.getCmp('dcus_code').setValue(cus_code);
-			Ext.getCmp('dinv_payment_term').setValue(inv_payment_term);
+			Ext.getCmp('dinv_payment_terms').setValue(inv_payment_terms);
 			Ext.getCmp('dinv_vat').setValue(inv_vat);
 			Ext.getCmp('dinv_bill_type').setValue(inv_bill_type);
+			Ext.getCmp('dinv_number').setValue(inv_number);
 			
 			var aproj_id = Ext.getCmp('aproj_id');
 			aproj_id.clearValue();
@@ -1398,31 +1553,9 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 	id: 'detailGrid',
 	title: 'Invoice Item',
 	store : store.invoiceRef,
-	height: 390,
+	height: 360,
 	columnLines: true,
-	tools: [ {
-		xtype : 'button',
-		text : 'Add Item',
-		id : 'addInvoiceItemButton',
-		iconCls : 'icon-add',
-		handler : function() {
-			var inv_id = Ext.getCmp('dinv_id').getValue();
-			Ext.getCmp('ainv_id').setValue(inv_id);
-			addInvoiceItem.show();
-		}
-//	}
-//	,{xtype: 'tbspacer', width: 5},
-//	{
-//		xtype: 'button',
-//		text: 'Save All',
-//		id: 'invRefSync',
-//		iconCls: 'icon-save',
-//		handler: function(){
-//			store.invoiceRef.sync();
-//		}
-	} ],
-	tbar: [
-//	       {
+//	tools: [ {
 //		xtype : 'button',
 //		text : 'Add Item',
 //		id : 'addInvoiceItemButton',
@@ -1432,7 +1565,19 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 //			Ext.getCmp('ainv_id').setValue(inv_id);
 //			addInvoiceItem.show();
 //		}
-//	},
+//	} ],
+	tbar: [
+	       {
+		xtype : 'button',
+		text : 'Add Item',
+		id : 'addInvoiceItemButton',
+		iconCls : 'icon-add',
+		handler : function() {
+			var inv_id = Ext.getCmp('dinv_id').getValue();
+			Ext.getCmp('ainv_id').setValue(inv_id);
+			addInvoiceItem.show();
+		}
+	},
 	'->',
 	{
 		xtype: 'button',
@@ -1443,8 +1588,19 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 			store.invoiceRef.sync();
 		}
 	}],
-	columns: [{
-			xtype: 'rownumberer'
+	columns: [
+//	    {
+//			xtype: 'rownumberer'
+		{
+			hideable : false,
+			flex : 0.3,
+			dataIndex: 'order_by',
+			editor: {
+				xtype: 'numberfield',
+				id: 'gorder_by',
+		    	name: 'gorder_by',
+		    	hideTrigger: true,
+			}
 		},{
 			text : "Item Name",
 			flex : 2.5,
@@ -1512,7 +1668,7 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 			hideable : false
 		},
 		{
-	    	text : "Description",
+	    	text : "Remark",
 	    	flex : 3,
 	    	sortable : true,
 	    	dataIndex : 'inv_ref_desc',
@@ -1530,9 +1686,11 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 		{
 			text : "Qty",
 			flex : 0.6,
-			align : 'center',
+			align : 'right',
 			sortable : true,
 			dataIndex : 'inv_ref_qty',
+//			renderer: roundDecimal,
+			renderer: Ext.util.Format.numberRenderer('0,000.##'),
 			editor: {
 				xtype:'numberfield',
 				minValue : 0,
@@ -1542,25 +1700,17 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 		{
 			text : "Rate",
 			flex : 0.8,
-			align : 'center',
+			align : 'right',
 			dataIndex : 'inv_ref_price',
+			renderer: roundDecimal
 		},
 	    {
 	    	text : "Amount",
 			flex : 0.8,
-			align : 'center',
+			align : 'right',
 			sortable : true,
-			dataIndex : 'total_amount'
-	    },
-	    {
-	    	hideable : false,
-//	    	hidden: true,
-	    	dataIndex: 'order_by',
-	    	editor: {
-	    		xtype: 'numberfield',
-	    		id: 'gorder_by',
-		    	name: 'gorder_by'
-	    	}
+			dataIndex : 'total_amount',
+			renderer: roundDecimal
 	    },
 	    {
 	    	text : 'Edit',
@@ -1587,7 +1737,7 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 						url: 'showProjectsReference.htm?id='+proj_id
 					});
 					
-					Ext.getCmp('einv_id').setValue(inv_id);
+					Ext.getCmp('einv_id_ref').setValue(inv_id);
 					Ext.getCmp('einv_ref_id').setValue(inv_ref_id);
 					Ext.getCmp('eproj_id').setValue(proj_id);
 					Ext.getCmp('eproj_ref_id').setValue(proj_ref_id);
@@ -1633,12 +1783,12 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 	        listeners : {
 	        	drop : function (node, data, overModel, dropPosition, eOpts) {
 //	        		alert(data.records);
-	        		console.log(grid.invoiceDetail.store.indexOf(data.records[0]));
+//	        		console.log(grid.invoiceDetail.store.indexOf(data.records[0]));
 	        		var selectedRecord = grid.invoiceDetail.getSelectionModel().getSelection()[0];
 	        		var row = grid.invoiceDetail.store.indexOf(selectedRecord);
 	        		console.log(data.records[0].get('order_by')+" To "+(row+1));
-	        		data.records[0].set('order_by', row+1);
-	        		grid.invoiceDetail.columns[0].doSort();
+//	        		data.records[0].set('order_by', row+1);
+//	        		grid.invoiceDetail.columns[0].doSort();
 	        	}
 	        }
 	    },
@@ -2135,8 +2285,8 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 					id: 'einv_itm_name'
 				},{
 					xtype: 'hidden',
-					name: 'einv_id',
-					id: 'einv_id'
+					name: 'einv_id_ref',
+					id: 'einv_id_ref'
 				},{
 					xtype: 'hidden',
 					name: 'einv_ref_id',
@@ -2145,7 +2295,7 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 		}]
 	}],
 	buttons:[{
-		text: 'Add',
+		text: 'Update',
 		width: 100,
 		id: 'updateInvoiceItemBtn',
 		handler: function(){
@@ -2269,6 +2419,40 @@ function confirmChkRef(btn) {
 	}
 }
 
+function getParamValues() {
+	var url = "";
+	var param = "";
+	var prefix = "&";
+	var queryStr = "";
+	var i = 1;
+	var count = 0;
+
+	for (param in panels.search.getValues()) {
+
+		count += panels.search.getValues()[param].length;
+
+		if (i == 1) {
+			queryStr += param + "=" + panels.search.getValues()[param];
+		} else {
+			queryStr += "&" + param + "=" + panels.search.getValues()[param];
+		}
+
+		i++;
+	}
+
+	if (count == 0) {
+		url = "";
+	} else {
+		url = prefix + queryStr;
+	}
+
+	return encodeURI(url);
+}
+
+function roundDecimal(value, meta, record, rowIndex, colIndex, store) {
+    return Ext.util.Format.number(value, '0,000.##')+' '+record.get('inv_ref_currency');
+//	return Math.round(value * 100) / 100;
+}
 
 function customerCombine(value, meta, record, rowIndex, colIndex, store) {
     return record.get('cus_name')+' ('+record.get('cus_code')+')';

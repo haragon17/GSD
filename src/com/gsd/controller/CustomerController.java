@@ -176,14 +176,21 @@ public class CustomerController {
 		String address = request.getParameter("aaddress");
 		String contact_person = request.getParameter("acontact_person");
 		String cus_phone = request.getParameter("acus_phone");
-		int key_acc_id = Integer.parseInt(request.getParameter("akey_acc_mng"));
 		String cus_email = request.getParameter("acus_email");
 		String bill_to = request.getParameter("abill_to");
-		String payment = request.getParameter("apayment");
+		String billing_terms = request.getParameter("abilling_terms");
 		String transfer_dtl = request.getParameter("atransfer_dtl");
 		String regist_date = request.getParameter("aregist_date");
 		int topix_cus_id = Integer.parseInt(request.getParameter("atopix_cus_id"));
+		int payment_terms = Integer.parseInt(request.getParameter("apayment_terms"));
 		Timestamp regist_date_ts = null;
+		int key_acc_id = 0;
+		
+		try{
+			key_acc_id = Integer.parseInt(request.getParameter("akey_acc_mng"));
+		}catch(Exception e){
+			
+		}
 		
 		Customer cus = new Customer();
 		cus.setCus_id(customerDao.getLastCustomerId());
@@ -192,6 +199,7 @@ public class CustomerController {
 		cus.setKey_acc_id(key_acc_id);
 		cus.setCretd_usr(user.getUserModel().getUsr_id());
 		cus.setTopix_cus_id(topix_cus_id);
+		cus.setPayment_terms(payment_terms);
 		
 		if(!regist_date.equals("Register Date")){
 			try{
@@ -235,10 +243,10 @@ public class CustomerController {
 		}else{
 			cus.setBill_to("");
 		}
-		if(!payment.equals("Payment Terms")){
-			cus.setPayment(payment);
+		if(!billing_terms.equals("Billing Terms")){
+			cus.setBilling_terms(billing_terms);
 		}else{
-			cus.setPayment("");
+			cus.setBilling_terms("");
 		}
 		if(!transfer_dtl.equals("Transfer Detail")){
 			transfer_dtl = transfer_dtl.replace("\u2028", "\n");
@@ -268,10 +276,11 @@ public class CustomerController {
 			int key_acc_id = Integer.parseInt(request.getParameter("ekey_acc_mng"));
 			String cus_email = request.getParameter("ecus_email");
 			String bill_to = request.getParameter("ebill_to");
-			String payment = request.getParameter("epayment");
+			String billing_terms = request.getParameter("ebilling_terms");
 			String transfer_dtl = request.getParameter("etransfer_dtl");
 			String regist_date = request.getParameter("eregist_date");
 			int topix_cus_id = Integer.parseInt(request.getParameter("etopix_cus_id"));
+			int payment_terms = Integer.parseInt(request.getParameter("epayment_terms"));
 			Timestamp regist_date_ts = null;
 			
 			Customer cus = new Customer();
@@ -280,6 +289,7 @@ public class CustomerController {
 			cus.setCus_code(cus_code);
 			cus.setKey_acc_id(key_acc_id);
 			cus.setTopix_cus_id(topix_cus_id);
+			cus.setPayment_terms(payment_terms);
 			
 			if(!regist_date.equals("Register Date")){
 				try{
@@ -321,10 +331,10 @@ public class CustomerController {
 			}else{
 				cus.setBill_to("");
 			}
-			if(!payment.equals("Payment Terms")){
-				cus.setPayment(payment);
+			if(!billing_terms.equals("Billing Terms")){
+				cus.setBilling_terms(billing_terms);
 			}else{
-				cus.setPayment("");
+				cus.setBilling_terms("");
 			}
 			if(!transfer_dtl.equals("Transfer Detail")){
 				transfer_dtl = transfer_dtl.replace("\u2028", "\n");

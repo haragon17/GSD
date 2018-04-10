@@ -101,42 +101,21 @@ Ext.onReady(function(){
     	renderTo: 'menu2',
     	margin: '-1 0 0 0',
         tbar:[
-//          {text: 'Workings',
-//        	handler : function(){
-//    		window.location = 'workings.htm';
-//          	}
-//          },
-//          {text: 'Report',
-//          	handler : function(){
-//      		window.location = 'report.htm';
-//            	}
-//            },
-//          {text: 'Member Management',
-//          	handler : function(){
-//      		window.location = 'memberManagement.htm';
-//                }
-//          },
-//          {text: 'Category Management',
-//        	handler : function(){
-//    		window.location = 'categoryManagement.htm';
-//          		}
-//          },
-		  {
-			  text: 'Projects',
-			  href: 'projects.htm',
-			  hrefTarget: '_self'
-//        	handler : function(){
-//    		window.location = 'projects.htm';
-//          		}
-          },
           {
         	  text: 'Jobs',
         	  href: 'jobs.htm',
 			  hrefTarget: '_self'
-//          	handler : function(){
-//      		window.location = 'jobs.htm';
-//            		}
           },
+          {
+			  text: 'Projects',
+			  href: 'projects.htm',
+			  hrefTarget: '_self'
+          },
+          {
+	    	  text: 'Invoice',
+	    	  href: 'invoice.htm',
+			  hrefTarget: '_self'
+	      },
           {
 	    	  text: 'Time Record',
 	    	  href: 'timeRecord.htm',

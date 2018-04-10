@@ -44,7 +44,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	public List<ProjectsReference> showProjectsReference(int proj_id) {
 		
 		String sql = "SELECT projects_reference.proj_ref_id, \n" + 
-				"item.itm_name, proj_ref_desc, price, currency \n" +
+				"item.itm_name, proj_ref_desc, price, currency, trim(to_char(price, '99999999999999999D99')) as price_str \n" +
 				"FROM projects_reference, item\n" +
 				"WHERE projects_reference.itm_id = item.itm_id " +
 				"AND projects_reference.proj_id = "+ proj_id +"\n" +
@@ -126,7 +126,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	@Override
 	public List<Projects> searchProjects(Map<String, String> data){
 		String sql = "SELECT DISTINCT projects.proj_id, customer.cus_name, projects.proj_name, projects.proj_desc, projects.cus_id, \n" +
-				"customer.cus_code, projects.file_id, customer.bill_to, customer.payment, proj_title\n" +
+				"customer.cus_code, projects.file_id, customer.bill_to, customer.billing_terms, proj_title\n" +
 				"FROM projects\n" +
 				"LEFT JOIN projects_reference ON projects_reference.proj_id = projects.proj_id\n" +
 				"LEFT JOIN customer ON customer.cus_id = projects.cus_id\n" +
@@ -527,7 +527,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 			});
 		}
 		
-		if(proj_audit.getPrice() != proj.getPrice()){
+		if(proj_audit.getPrice().compareTo(proj.getPrice()) != 0){
 			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),

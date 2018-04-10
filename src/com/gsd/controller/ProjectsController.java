@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -99,7 +100,8 @@ public class ProjectsController {
 		if(type == 0 || type == 1){
 			return new ModelAndView("ProjectsAdmin");
 		}else if(type == 3){
-			return new ModelAndView("redirect:jobs.htm");
+//			return new ModelAndView("redirect:jobs.htm");
+			return new ModelAndView("AccessDenied");
 		}else{
 			return new ModelAndView("Projects");
 		}
@@ -545,9 +547,9 @@ public class ProjectsController {
 				projRef.setActual_time(0);
 			}
 			if (!price.equals("Project Price")) {
-				projRef.setPrice(Float.parseFloat(price));
+				projRef.setPrice(new BigDecimal(price));
 			} else {
-				projRef.setPrice(0);
+				projRef.setPrice(new BigDecimal(0));
 			}
 			if (!currency.equals("Price Currency")) {
 				projRef.setCurrency(currency);
@@ -772,9 +774,9 @@ public class ProjectsController {
 			projRef.setActual_time(0);
 		}
 		if (!price.equals("Project Price")) {
-			projRef.setPrice(Float.parseFloat(price));
+			projRef.setPrice(new BigDecimal(price));
 		} else {
-			projRef.setPrice(0);
+			projRef.setPrice(new BigDecimal(0));
 		}
 		if (!currency.equals("Price Currency")) {
 			projRef.setCurrency(currency);
@@ -828,9 +830,9 @@ public class ProjectsController {
 			projRef.setActual_time(0);
 		}
 		if (!price.equals("Project Price")) {
-			projRef.setPrice(Float.parseFloat(price));
+			projRef.setPrice(new BigDecimal(price));
 		} else {
-			projRef.setPrice(0);
+			projRef.setPrice(new BigDecimal(0));
 		}
 		if (!currency.equals("Price Currency")) {
 			projRef.setCurrency(currency);

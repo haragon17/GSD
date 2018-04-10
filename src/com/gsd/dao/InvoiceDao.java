@@ -15,19 +15,25 @@ public interface InvoiceDao {
 	
 	public List<InvoiceCompany> showInvoiceCompany();
 	
-	public void addInvoice(Invoice inv);
+	public int addInvoice(Invoice inv);
 	
-	public void addInvoiceReference(InvoiceReference inv_ref);
+	public void addInvoiceReference(InvoiceReference inv_ref, Map<String, Float> map);
 	
-	public void updateInvoice(Invoice inv);
+	public void updateInvoice(Invoice inv, Map<String, Float> map);
 	
-	public void updateInvoicereference(InvoiceReference inv_ref);
+	public void updateInvoicereference(InvoiceReference inv_ref, Map<String, Float> map);
 	
-	public void updateInvoiceReferenceBatch(List<InvoiceReference> invRefLs);
+	public void updateInvoiceReferenceBatch(List<InvoiceReference> invRefLs, Map<String, Float> map);
 	
 	public void deleteInvoice(int id);
 	
 	public void deleteInvoiceReference(int id);
+	
+	public Invoice getInvoiceById(int id);
+	
+	public InvoiceCompany getInvoiceCompanyById(int inv_company_id);
+	
+	public List<InvoiceReference> getJobItemList(int job_id);
 	
 	public List<InvoiceReference> getListDataFromRequest(Object data);
 }

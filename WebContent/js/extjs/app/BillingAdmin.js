@@ -6,6 +6,7 @@ myStackItem = [];
 myRadarItem = [];
 editorDate = "";
 myDept = "";
+notLoaded = true;
 
 Ext.override(Ext.chart.axis.Radial, {
     processView: function() {
@@ -31,6 +32,73 @@ Ext.override(Ext.chart.axis.Radial, {
 });
 
 Ext.onReady(function() {
+	
+	Ext.define('Ext.form.field.Month', {
+        extend: 'Ext.form.field.Date',
+        alias: 'widget.monthfield',
+        requires: ['Ext.picker.Month'],
+        alternateClassName: ['Ext.form.MonthField', 'Ext.form.Month'],
+        selectMonth: null,
+        createPicker: function () {
+            var me = this,
+                format = Ext.String.format;
+            return Ext.create('Ext.picker.Month', {
+                pickerField: me,
+                ownerCt: me.ownerCt,
+                renderTo: document.body,
+                floating: true,
+                hidden: true,
+                focusOnShow: true,
+                minDate: me.minValue,
+                maxDate: me.maxValue,
+                disabledDatesRE: me.disabledDatesRE,
+                disabledDatesText: me.disabledDatesText,
+                disabledDays: me.disabledDays,
+                disabledDaysText: me.disabledDaysText,
+                format: me.format,
+                showToday: me.showToday,
+                startDay: me.startDay,
+                minText: format(me.minText, me.formatDate(me.minValue)),
+                maxText: format(me.maxText, me.formatDate(me.maxValue)),
+                listeners: {
+                    select: { scope: me, fn: me.onSelect },
+                    monthdblclick: { scope: me, fn: me.onOKClick },
+                    yeardblclick: { scope: me, fn: me.onOKClick },
+                    OkClick: { scope: me, fn: me.onOKClick },
+                    CancelClick: { scope: me, fn: me.onCancelClick }
+                },
+                keyNavConfig: {
+                    esc: function () {
+                        me.collapse();
+                    }
+                }
+            });
+        },
+        onCancelClick: function () {
+            var me = this;
+            me.selectMonth = null;
+            me.collapse();
+        },
+        onOKClick: function () {
+            var me = this;
+            if (me.selectMonth) {
+                me.setValue(me.selectMonth);
+                me.fireEvent('select', me, me.selectMonth);
+            }
+            me.collapse();
+            
+			var delivery_date = Ext.getCmp('ainv_delivery_date').getValue();
+			var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0);
+			var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1);
+			Ext.getCmp('ainv_bill_date').setValue('');
+			Ext.getCmp('ainv_bill_date').setMinValue(min_date);
+			Ext.getCmp('ainv_bill_date').setMaxValue(max_date);
+        },
+        onSelect: function (m, d) {
+            var me = this;
+            me.selectMonth = new Date((d[0] + 1) + '/1/' + d[1]);
+        }
+    });
 	
 	map.document = new Ext.util.KeyMap(document,{
 	    key: [117], // press F6
@@ -354,52 +422,102 @@ Ext.onReady(function() {
 			}
 		},"->",{
 			xtype : 'button',
-			text : 'Billed',
-			id : 'ibilled',
+			text : 'Invoice',
+			id : 'invoice-button',
 			iconCls : 'icon-billed',
 			handler : function() {
 				var record = store.jobs.findRecord('job_id',Ext.getCmp('jobid_ref').getValue());
 				var myIndex = store.jobs.indexOf(record);
-				var myValue = store.jobs.getAt(myIndex).data.remain_job;
-				if(myValue != 0){
+				var remain_job = store.jobs.getAt(myIndex).data.remain_job;
+				var remain_item = store.jobs.getAt(myIndex).data.remain_item;
+				var inv_cus_name = store.jobs.getAt(myIndex).data.cus_name;
+				var inv_cus_code = store.jobs.getAt(myIndex).data.cus_code;
+				var inv_cus_id = store.jobs.getAt(myIndex).data.cus_id;
+				var job_name = store.jobs.getAt(myIndex).data.job_name;
+				var payment_terms = store.jobs.getAt(myIndex).data.payment_terms;
+				
+				if(notLoaded){
+					store.exchangeRates.load();
+				}
+				
+				if(remain_job != 0){
 					Ext.MessageBox.show({
 							title: 'Information',
 							msg: "Still Have Jobs Remaining!",
 							buttons: Ext.MessageBox.OK,
 							icon: Ext.MessageBox.ERROR,
-							animateTarget: 'ibilled'
+							animateTarget: 'invoice-button'
 						});
-				}else{
-					Ext.Ajax.request({
-						url : 'billedProjects.htm?id=' + Ext.getCmp('jobid_ref').getValue(),
-						success : function(response, opts) {
-							var responseObject = Ext.decode(response.responseText);
-							projStatus = responseObject.jobs[0].job_status;
-							if(projStatus == "Billed"){
-								Ext.MessageBox.show({
-		     						title: 'Information',
-		     						msg: "Job's Project Has Been Billed!",
-		     						buttons: Ext.MessageBox.OK,
-		     						icon: Ext.MessageBox.INFO,
-		     						animateTarget: 'ibilled',
-		     						fn: function(){
-		     							panels.tabs.setActiveTab('projTabs');
-		     							Ext.getCmp('jobTabs').setDisabled(true);
-		     							Ext.getCmp('jobTabs').setTitle("Jobs");
-		     							store.jobs.loadPage(1);
-		     							store.publicationJobRef.reload();
-		     							store.jobsToday.reload();
-		     						}
-		     					});
-							}else{
-								
-							}
-						},
-						failure: function(response, opts){
-							var responseOject = Ext.util.JSON.decode(response.responseText);
-							Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
-						}
+				}else if(remain_item != 0){
+					Ext.MessageBox.show({
+						title: 'Information',
+						msg: "Please Assign All Item!",
+						buttons: Ext.MessageBox.OK,
+						icon: Ext.MessageBox.ERROR,
+						animateTarget: 'invoice-button'
 					});
+				}else{
+					Ext.Msg.show({
+		                title : 'Invoice',
+		                msg : 'How do you want to invoice? ',
+		                width : 270,
+		                closable : true,
+		                buttons : Ext.Msg.YESNO,
+		                animateTarget: 'invoice-button',
+		                icon : Ext.Msg.QUESTION,
+		                buttonText : 
+		                {
+		                    yes : 'Create New',
+		                    no : 'Add To Existing',
+//		                    cancel : 'Cancel'
+		                },
+		                multiline : false,
+		                fn : function(buttonValue, inputText, showConfig){
+//		                    Ext.Msg.alert('Status', buttonValue);
+		                	if(buttonValue == "yes"){
+		                		Ext.getCmp('ainv_cus_name').setValue(inv_cus_name);
+		                		Ext.getCmp('ainv_cus_code').setValue(inv_cus_code);
+		                		Ext.getCmp('acus_id').setValue(inv_cus_id);
+		                		Ext.getCmp('ainv_job_id').setValue(Ext.getCmp('jobid_ref').getValue());
+		                		Ext.getCmp('ainv_portal').setValue(2);
+		                		Ext.getCmp('ainv_job_name').setValue(job_name);
+		                		Ext.getCmp('ainv_payment_terms').setValue(payment_terms);
+		                		addInvoice.show();
+		                	}else if(buttonValue == "no"){
+		                		Ext.Msg.alert('Information', 'Hang on, This feature will come soon! ;)')
+		                	}
+		                }
+		            });
+//					Ext.Ajax.request({
+//						url : 'billedProjects.htm?id=' + Ext.getCmp('jobid_ref').getValue(),
+//						success : function(response, opts) {
+//							var responseObject = Ext.decode(response.responseText);
+//							projStatus = responseObject.jobs[0].job_status;
+//							if(projStatus == "Billed"){
+//								Ext.MessageBox.show({
+//		     						title: 'Information',
+//		     						msg: "Job's Project Has Been Billed!",
+//		     						buttons: Ext.MessageBox.OK,
+//		     						icon: Ext.MessageBox.INFO,
+//		     						animateTarget: 'invoice-button',
+//		     						fn: function(){
+//		     							panels.tabs.setActiveTab('projTabs');
+//		     							Ext.getCmp('jobTabs').setDisabled(true);
+//		     							Ext.getCmp('jobTabs').setTitle("Jobs");
+//		     							store.jobs.loadPage(1);
+//		     							store.publicationJobRef.reload();
+//		     							store.jobsToday.reload();
+//		     						}
+//		     					});
+//							}else{
+//								
+//							}
+//						},
+//						failure: function(response, opts){
+//							var responseOject = Ext.util.JSON.decode(response.responseText);
+//							Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+//						}
+//					});
 				}
 			}
 		},{
@@ -3473,8 +3591,246 @@ Ext.onReady(function() {
 	               	}
 	});
 	
-	setInterval(function(){store.publicationJobRef.reload()},150000);
-	setInterval(function(){store.estudioJobRef.reload()},150000);
+	addInvoice = new Ext.create('Ext.window.Window', {
+		title: 'Create Invoice',
+		width: 450,
+		animateTarget: 'invoice-button',
+		resizable: false,
+		closeAction: 'hide',
+		items: [{
+			xtype: 'form',
+			id: 'addInvoiceForm',
+			items: [{
+				xtype: 'fieldset',
+				title: 'Invoice Information',
+				defaultType: 'textfield',
+				layout: 'anchor',
+				padding: 10,
+				width: 400,
+				style: {
+	                "margin-left": "auto",
+	                "margin-right": "auto",
+	                "margin-top": "10px",
+	                "margin-bottom": "10px"
+	            },
+	            defaults: {
+	                anchor: '100%'
+	            },
+	            items: [{
+	            	xtype: 'combobox',
+	            	fieldLabel: 'Company <font color="red">*</font> ',
+	            	name: 'ainv_company_id',
+	            	id: 'ainv_company_id',
+	            	allowBlank: false,
+	            	queryMode: 'local',
+	            	msgTarget: 'under',
+	            	labelWidth: 120,
+	            	editable: false,
+	            	emptyText: 'Company',
+	            	store: {
+	            		fields: ['inv_company_id','inv_company_name'],
+	            		proxy: {
+	            			type: 'ajax',
+	            			url: 'showInvoiceCompany.htm',
+	            			reader: {
+	            				type: 'json',
+	            				root: 'records',
+	            				idProperty: 'inv_company_id'
+	            			}
+	            		},
+	            		autoLoad: true,
+	            		sorters: [{
+	            			property: 'inv_company_id',
+	            			direction: 'ASC'
+	            		}]
+	            	},
+	            	valueField: 'inv_company_id',
+	            	displayField: 'inv_company_name'
+	            },{
+	            	fieldLabel: 'Subject <font color="red">*</font> ',
+	            	name: 'ainv_name',
+	            	id: 'ainv_name',
+	            	allowBlank: false,
+	            	labelWidth: 120,
+	            	msgTarget: 'under',
+	            	emptyText: 'Subject'
+	            },{
+	            	fieldLabel: 'Project No. ',
+	            	name: 'ainv_proj_no',
+	            	id: 'ainv_proj_no',
+	            	labelWidth: 120,
+	            	msgTarget: 'under',
+	            	emptyText: 'Project Number'
+	            },{
+	            	xtype: 'monthfield',
+	            	fieldLabel : 'Delivery Date <font color="red">*</font> ',
+					name : 'ainv_delivery_date',
+					id : 'ainv_delivery_date',
+					labelWidth : 120,
+					format: 'm/y',
+					value: new Date(),
+					allowBlank: false,
+					editable: false
+	            },{
+	            	xtype: 'datefield',
+	            	fieldLabel : 'Billing Date <font color="red">*</font> ',
+					name : 'ainv_bill_date',
+					id : 'ainv_bill_date',
+					labelWidth : 120,
+					format: 'd/m/y',
+					value: new Date(),
+					allowBlank: false,
+					editable: false
+	            },{
+	            	xtype : 'displayfield',
+	            	fieldLabel : 'Customer Name ',
+	            	id: 'ainv_cus_name',
+	            	name: 'ainv_cus_name',
+	            	labelWidth : 120,
+	            	fieldStyle : 'font-size:12px;font-weight:bold;'
+	            },{
+	            	xtype : 'displayfield',
+	            	fieldLabel : 'Customer Code ',
+	            	id: 'ainv_cus_code',
+	            	name: 'ainv_cus_code',
+	            	labelWidth : 120,
+	            	fieldStyle : 'font-size:12px;font-weight:bold;'
+	            },{
+					xtype : 'numberfield',
+					fieldLabel : 'Payment Terms <font color="red">*</font> ',
+					name : 'ainv_payment_terms',
+					id : 'ainv_payment_terms',
+					labelWidth : 120,
+					value : 0,
+					minValue : 0,
+					msgTarget: 'under',
+					allowBlank: false
+				},{
+					xtype : 'numberfield',
+					fieldLabel : 'Vat(%) <font color="red">*</font> ',
+					name : 'ainv_vat',
+					id : 'ainv_vat',
+					labelWidth : 120,
+					value : 0,
+					minValue : 0,
+					msgTarget: 'under',
+					allowBlank: false
+				},{
+					xtype: 'combobox',
+					fieldLabel: 'Billing Type <font color="red">*</font> ',
+					name: 'ainv_bill_type',
+					id: 'ainv_bill_type',
+					labelWidth: 120,
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showDBReference.htm?kind=BillingType&dept=-',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+					editable : false,
+					value : 'Direct'
+				}]
+			},{
+				xtype: 'hidden',
+				id: 'acus_id',
+				name: 'acus_id'
+			},{
+				xtype: 'hidden',
+				id: 'ainv_portal',
+				name: 'ainv_portal'
+			},{
+				xtype: 'hidden',
+				id: 'ainv_job_id',
+				name: 'ainv_job_id'
+			},{
+				xtype: 'hidden',
+				id: 'ainv_job_name',
+				name: 'ainv_job_name'
+			}]
+		}],
+		buttons: [{
+			text: 'Create',
+			width: 100,
+			id: 'addInvoiceButton',
+			handler: function(){
+				var form = Ext.getCmp('addInvoiceForm').getForm();
+				Ext.Ajax.request({
+					url : 'searchInvoiceParam.htm?AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
+					'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
+					'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&USD='+store.exchangeRates.getAt(0).data.USD,
+					success : function(response, opts) {}
+				});
+				if (form.isValid()){
+   				 form.submit({
+   				 url: 'addInvoice.htm',
+   				 waitTitle: 'Creating Invoice',
+   				 waitMsg: 'Please wait...',
+   				 standardSubmit: false,
+                    success: function(form, action) {
+                   	 Ext.MessageBox.show({
+     						title: 'Information',
+     						msg: "Inovoice Has Been Created!",
+     						buttons: Ext.MessageBox.OK,
+     						icon: Ext.MessageBox.INFO,
+     						animateTarget: 'ajob_btn',
+     						fn: function(){
+     							addInvoice.hide();
+     							panels.tabs.setActiveTab('projTabs');
+     							Ext.getCmp('jobTabs').setDisabled(true);
+     							Ext.getCmp('jobTabs').setTitle("Jobs");
+     							store.jobs.loadPage(1);
+     							store.publicationJobRef.reload();
+     							store.jobsToday.reload();
+     						}
+     					});
+                       },
+                       failure : function(form, action) {
+//							Ext.Msg.alert('Failed',
+//									action.result ? action.result.message
+//											: 'No response');
+                       	Ext.MessageBox.show({
+			                    title: 'REMOTE EXCEPTION',
+			                    msg: operation.getError(),
+			                    icon: Ext.MessageBox.ERROR,
+			                    buttons: Ext.Msg.OK,
+			                    fn: function(){location.reload()}
+			                });
+						}
+         			});
+           	 }else {
+   					Ext.MessageBox.show({
+   						title: 'Failed',
+   						msg: ' Please Insert All Required Field',
+   						buttons: Ext.MessageBox.OK,
+   						icon: Ext.MessageBox.ERROR,
+   						animateTarget: 'abtn',
+   					});
+   				}
+			}
+		},{
+			text: 'Reset',
+			width: 100,
+			handler: function(){
+				Ext.getCmp('addInvoiceForm').getForm().reset();
+			}
+		}],
+		listeners: {
+			'beforehide': function() {
+				Ext.getCmp('addInvoiceForm').getForm().reset();
+			}
+		}
+	})
+	
+	setInterval(function(){store.publicationJobRef.reload()},240000);
+	setInterval(function(){store.estudioJobRef.reload()},240000);
 	
 }); //end onReady
 
@@ -3591,7 +3947,8 @@ store.jobsRef = Ext.create('Ext.data.JsonStore', {
 						icon: Ext.MessageBox.INFO,
 						animateTarget: 'isave-sync',
 						fn: function(){
-							store.jobsRef.reload();
+							store.jobs.reload();
+//							store.jobsRef.reload();
 							}
 					});
             }
@@ -3759,6 +4116,12 @@ Ext.define('jobModel', {
 	}, {
 		name : 'remain_job',
 		type : 'int'       
+	}, {
+		name : 'remain_item',
+		type : 'int'       
+	}, {
+		name : 'payment_terms',
+		type : 'int'       
 	}
 	]
 });
@@ -3811,6 +4174,52 @@ store.jobsToday = Ext.create('Ext.data.JsonStore', {
 			root : 'records',
 			idProperty : 'job_id',
 			totalProperty : 'total'
+		}
+	}
+});
+
+Ext.Ajax.useDefaultXhrHeader = false;
+
+Ext.define('exModel', {
+	extend : 'Ext.data.Model',
+	fields : [ {
+		name : 'USD',
+		type : 'float'
+	}, {
+		name : 'EUR',
+		type : 'float'
+	}, {
+		name : 'THB',
+		type : 'float'
+	}, {
+		name : 'AUD',
+		type : 'float'
+	}, {
+		name : 'GBP',
+		type : 'float'
+	}, {
+		name : 'CHF',
+		type : 'float'
+	}
+
+	]
+});
+
+store.exchangeRates = Ext.create('Ext.data.JsonStore', {
+	model: 'exModel',
+	id : 'exStore',
+	autoLoad : false,
+	proxy : {
+		type : 'ajax',
+		url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c',
+		reader : {
+			type : 'json',
+			root : 'rates',
+		}
+	},
+	listeners: {
+		load : function(){
+			notLoaded = false;
 		}
 	}
 });

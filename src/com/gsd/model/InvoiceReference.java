@@ -1,22 +1,26 @@
 package com.gsd.model;
 
+import java.math.BigDecimal;
+
 public class InvoiceReference {
 
 	private int inv_ref_id;
 	private int inv_id;
 	private int proj_ref_id;
 	private String inv_itm_name;
-	private float inv_ref_price;
-	private float inv_ref_qty;
+	private BigDecimal inv_ref_price;
+	private BigDecimal inv_ref_qty;
 	private String inv_ref_currency;
 	private String inv_ref_desc;
 	private int cretd_usr;
 	private int order_by;
 	private String cretd_date;
 	private String update_date;
-	private float total_amount;
+	private BigDecimal total_amount;
 	private String inv_name;
 	private int proj_id;
+	private String proj_name;
+	private String topix_article_id;
 	
 	public int getInv_ref_id() {
 		return inv_ref_id;
@@ -42,16 +46,16 @@ public class InvoiceReference {
 	public void setInv_itm_name(String inv_itm_name) {
 		this.inv_itm_name = inv_itm_name;
 	}
-	public float getInv_ref_price() {
+	public BigDecimal getInv_ref_price() {
 		return inv_ref_price;
 	}
-	public void setInv_ref_price(float inv_ref_price) {
+	public void setInv_ref_price(BigDecimal inv_ref_price) {
 		this.inv_ref_price = inv_ref_price;
 	}
-	public float getInv_ref_qty() {
+	public BigDecimal getInv_ref_qty() {
 		return inv_ref_qty;
 	}
-	public void setInv_ref_qty(float inv_ref_qty) {
+	public void setInv_ref_qty(BigDecimal inv_ref_qty) {
 		this.inv_ref_qty = inv_ref_qty;
 	}
 	public String getInv_ref_currency() {
@@ -90,10 +94,10 @@ public class InvoiceReference {
 	public void setUpdate_date(String update_date) {
 		this.update_date = update_date;
 	}
-	public float getTotal_amount() {
+	public BigDecimal getTotal_amount() {
 		return total_amount;
 	}
-	public void setTotal_amount(float total_amount) {
+	public void setTotal_amount(BigDecimal total_amount) {
 		this.total_amount = total_amount;
 	}
 	public String getInv_name() {
@@ -107,6 +111,18 @@ public class InvoiceReference {
 	}
 	public void setProj_id(int proj_id) {
 		this.proj_id = proj_id;
+	}
+	public String getProj_name() {
+		return proj_name;
+	}
+	public void setProj_name(String proj_name) {
+		this.proj_name = proj_name;
+	}
+	public String getTopix_article_id() {
+		return topix_article_id;
+	}
+	public void setTopix_article_id(String topix_article_id) {
+		this.topix_article_id = topix_article_id;
 	}
 	
 }

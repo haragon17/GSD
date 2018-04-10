@@ -297,55 +297,64 @@ Ext.onReady(function() {
 				})
 			}
 		},"->",{
-			xtype : 'button',
-			text : 'Billed',
-			id : 'ibilled',
-			iconCls : 'icon-billed',
-			handler : function() {
-				var record = store.jobs.findRecord('job_id',Ext.getCmp('jobid_ref').getValue());
-				var myIndex = store.jobs.indexOf(record);
-				var myValue = store.jobs.getAt(myIndex).data.remain_job;
-				if(myValue != 0){
-					Ext.MessageBox.show({
-							title: 'Information',
-							msg: "Still Have Jobs Remaining!",
-							buttons: Ext.MessageBox.OK,
-							icon: Ext.MessageBox.ERROR,
-							animateTarget: 'ibilled'
-						});
-				}else{
-					Ext.Ajax.request({
-						url : 'billedProjects.htm?id=' + Ext.getCmp('jobid_ref').getValue(),
-						success : function(response, opts) {
-							var responseObject = Ext.decode(response.responseText);
-							projStatus = responseObject.jobs[0].job_status;
-							if(projStatus == "Billed"){
-								Ext.MessageBox.show({
-		     						title: 'Information',
-		     						msg: "Job's Project Has Been Billed!",
-		     						buttons: Ext.MessageBox.OK,
-		     						icon: Ext.MessageBox.INFO,
-		     						animateTarget: 'ibilled',
-		     						fn: function(){
-		     							panels.tabs.setActiveTab('projTabs');
-		     							Ext.getCmp('jobTabs').setDisabled(true);
-		     							Ext.getCmp('jobTabs').setTitle("Jobs");
-		     							store.jobs.loadPage(1);
-		     							store.publicationJobRef.reload();
-		     						}
-		     					});
-							}else{
-								
-							}
-						},
-						failure: function(response, opts){
-							var responseOject = Ext.util.JSON.decode(response.responseText);
-							Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
-						}
-					});
-				}
-			}
-		},{
+//			xtype : 'button',
+//			text : 'Billed',
+//			id : 'ibilled',
+//			iconCls : 'icon-billed',
+//			handler : function() {
+//				var record = store.jobs.findRecord('job_id',Ext.getCmp('jobid_ref').getValue());
+//				var myIndex = store.jobs.indexOf(record);
+//				var remain_job = store.jobs.getAt(myIndex).data.remain_job;
+//				var remain_item = store.jobs.getAt(myIndex).data.remain_item;
+//				if(remain_job != 0){
+//					Ext.MessageBox.show({
+//							title: 'Information',
+//							msg: "Still Have Jobs Remaining!",
+//							buttons: Ext.MessageBox.OK,
+//							icon: Ext.MessageBox.ERROR,
+//							animateTarget: 'ibilled'
+//						});
+//				}else if(remain_item != 0){
+//					Ext.MessageBox.show({
+//						title: 'Information',
+//						msg: "Please Assign All Item!",
+//						buttons: Ext.MessageBox.OK,
+//						icon: Ext.MessageBox.ERROR,
+//						animateTarget: 'ibilled'
+//					});
+//				}else{
+//					Ext.Ajax.request({
+//						url : 'billedProjects.htm?id=' + Ext.getCmp('jobid_ref').getValue(),
+//						success : function(response, opts) {
+//							var responseObject = Ext.decode(response.responseText);
+//							projStatus = responseObject.jobs[0].job_status;
+//							if(projStatus == "Billed"){
+//								Ext.MessageBox.show({
+//		     						title: 'Information',
+//		     						msg: "Job's Project Has Been Billed!",
+//		     						buttons: Ext.MessageBox.OK,
+//		     						icon: Ext.MessageBox.INFO,
+//		     						animateTarget: 'ibilled',
+//		     						fn: function(){
+//		     							panels.tabs.setActiveTab('projTabs');
+//		     							Ext.getCmp('jobTabs').setDisabled(true);
+//		     							Ext.getCmp('jobTabs').setTitle("Jobs");
+//		     							store.jobs.loadPage(1);
+//		     							store.publicationJobRef.reload();
+//		     						}
+//		     					});
+//							}else{
+//								
+//							}
+//						},
+//						failure: function(response, opts){
+//							var responseOject = Ext.util.JSON.decode(response.responseText);
+//							Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+//						}
+//					});
+//				}
+//			}
+//		},{
 			xtype: 'tbtext',
 			id: 'gridRef_tbar',
 	        text: 'Loading ...'
@@ -3842,8 +3851,8 @@ Ext.onReady(function() {
 		});
 	}
 	
-	setInterval(function(){store.publicationJobRef.reload()},150000);
-	setInterval(function(){store.estudioJobRef.reload()},150000);
+	setInterval(function(){store.publicationJobRef.reload()},240000);
+	setInterval(function(){store.estudioJobRef.reload()},240000);
 	
 }); //end onReady
 
@@ -3959,7 +3968,7 @@ store.jobsRef = Ext.create('Ext.data.JsonStore', {
 						icon: Ext.MessageBox.INFO,
 						animateTarget: 'isave-sync',
 						fn: function(){
-							store.jobsRef.reload();
+							store.jobs.reload();
 							}
 					});
             }
@@ -4115,6 +4124,9 @@ Ext.define('jobModel', {
 		type : 'int'
 	}, {
 		name : 'remain_job',
+		type : 'int'
+	}, {
+		name : 'remain_item',
 		type : 'int'
 	}
 	]

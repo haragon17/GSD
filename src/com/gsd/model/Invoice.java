@@ -1,5 +1,6 @@
 package com.gsd.model;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 
@@ -12,10 +13,10 @@ public class Invoice {
 	private String inv_proj_no;
 	private String inv_bill_date;
 	private String inv_delivery_date;
-	private Timestamp inv_bill_date_ts;
+	private Date setInv_bill_date_sql;
 	private Date inv_delivery_date_sql;
-	private int inv_payment_term;
-	private float inv_vat;
+	private int inv_payment_terms;
+	private BigDecimal inv_vat;
 	private String inv_bill_type;
 	private int cus_id;
 	private int cretd_usr;
@@ -26,6 +27,9 @@ public class Invoice {
 	private String cus_name;
 	private String cus_code;
 	private String usr_name;
+	private int topix_cus_id;
+	private String address;
+	private BigDecimal inv_total_price_eur;
 	
 	public int getInv_id() {
 		return inv_id;
@@ -69,11 +73,11 @@ public class Invoice {
 	public void setInv_delivery_date(String inv_delivery_date) {
 		this.inv_delivery_date = inv_delivery_date;
 	}
-	public Timestamp getInv_bill_date_ts() {
-		return inv_bill_date_ts;
+	public Date getInv_bill_date_sql() {
+		return setInv_bill_date_sql;
 	}
-	public void setInv_bill_date_ts(Timestamp inv_bill_date_ts) {
-		this.inv_bill_date_ts = inv_bill_date_ts;
+	public void setInv_bill_date_sql(Date inv_bill_date_ts) {
+		this.setInv_bill_date_sql = inv_bill_date_ts;
 	}
 	public Date getInv_delivery_date_sql() {
 		return inv_delivery_date_sql;
@@ -81,16 +85,16 @@ public class Invoice {
 	public void setInv_delivery_date_sql(Date inv_delivery_date_sql) {
 		this.inv_delivery_date_sql = inv_delivery_date_sql;
 	}
-	public int getInv_payment_term() {
-		return inv_payment_term;
+	public int getInv_payment_terms() {
+		return inv_payment_terms;
 	}
-	public void setInv_payment_term(int inv_payment_term) {
-		this.inv_payment_term = inv_payment_term;
+	public void setInv_payment_terms(int inv_payment_terms) {
+		this.inv_payment_terms = inv_payment_terms;
 	}
-	public float getInv_vat() {
+	public BigDecimal getInv_vat() {
 		return inv_vat;
 	}
-	public void setInv_vat(float inv_vat) {
+	public void setInv_vat(BigDecimal inv_vat) {
 		this.inv_vat = inv_vat;
 	}
 	public String getInv_bill_type() {
@@ -152,6 +156,24 @@ public class Invoice {
 	}
 	public void setUsr_name(String usr_name) {
 		this.usr_name = usr_name;
+	}
+	public int getTopix_cus_id() {
+		return topix_cus_id;
+	}
+	public void setTopix_cus_id(int topix_cus_id) {
+		this.topix_cus_id = topix_cus_id;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public BigDecimal getInv_total_price_eur() {
+		return inv_total_price_eur;
+	}
+	public void setInv_total_price_eur(BigDecimal inv_total_price_eur) {
+		this.inv_total_price_eur = inv_total_price_eur;
 	}
 	
 }
