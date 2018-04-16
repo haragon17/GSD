@@ -15,6 +15,8 @@ public interface InvoiceDao {
 	
 	public List<InvoiceCompany> showInvoiceCompany();
 	
+	public List<Invoice> showInvoiceCustomer(int cus_id, String month, String year);
+	
 	public int addInvoice(Invoice inv);
 	
 	public void addInvoiceReference(InvoiceReference inv_ref, Map<String, Float> map);

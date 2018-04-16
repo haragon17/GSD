@@ -93,6 +93,17 @@ Ext.onReady(function() {
 			Ext.getCmp('ainv_bill_date').setValue('');
 			Ext.getCmp('ainv_bill_date').setMinValue(min_date);
 			Ext.getCmp('ainv_bill_date').setMaxValue(max_date);
+            
+        	var delivery_date2 = Ext.getCmp('aeinv_delivery_date').getValue();
+        	var cus_id = Ext.getCmp('cusid').getValue();
+        	month = delivery_date2.getMonth()+1;
+    		year = delivery_date2.getFullYear();
+    		aejob_inv_id = Ext.getCmp('aejob_inv_id');
+    		aejob_inv_id.clearValue();
+    		aejob_inv_id.getStore().removeAll();
+    		aejob_inv_id.getStore().load({
+				url: 'showInvoiceCustomer.htm?cus_id='+cus_id+'&month='+month+'&year='+year
+			});
         },
         onSelect: function (m, d) {
             var me = this;
@@ -179,7 +190,9 @@ Ext.onReady(function() {
 						job_id = grid.getStore().getAt(rowIndex).get('job_id');
 						proj_id = grid.getStore().getAt(rowIndex).get('proj_id');
 						myDept = grid.getStore().getAt(rowIndex).get('dept');
+						cus_id = grid.getStore().getAt(rowIndex).get('cus_id');
 //						totalAmount = grid.getStore().getAt(rowIndex).get('total_amount');
+						Ext.getCmp('cusid').setValue(cus_id);
 						Ext.getCmp('projid').setValue(proj_id);
 						Ext.getCmp('jobid_ref').setValue(job_id);
 						deptRef = "";
@@ -202,13 +215,13 @@ Ext.onReady(function() {
 						ajob_ref.clearValue();
 						ajob_ref.getStore().removeAll();
 						ajob_ref.getStore().load({
-							url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+							url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
 						});
 						
 						ejob_ref.clearValue();
 						ejob_ref.getStore().removeAll();
 						ejob_ref.getStore().load({
-							url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+							url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
 						});
 						Ext.Ajax.request({
 							url : 'searchJobsParam.htm?job_id='+job_id,
@@ -338,7 +351,9 @@ Ext.onReady(function() {
 						job_id = dv.getStore().getAt(index).get('job_id');
 						proj_id = dv.getStore().getAt(index).get('proj_id');
 						myDept = dv.getStore().getAt(index).get('dept');
+						cus_id = dv.getStore().getAt(index).get('cus_id');
 //						totalAmount = grid.getStore().getAt(rowIndex).get('total_amount');
+						Ext.getCmp('cusid').setValue(cus_id);
 						Ext.getCmp('projid').setValue(proj_id);
 						Ext.getCmp('jobid_ref').setValue(job_id);
 						deptRef = "";
@@ -354,12 +369,12 @@ Ext.onReady(function() {
 						ajob_ref.clearValue();
 						ajob_ref.getStore().removeAll();
 						ajob_ref.getStore().load({
-							url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+							url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
 						});
 						ejob_ref.clearValue();
 						ejob_ref.getStore().removeAll();
 						ejob_ref.getStore().load({
-							url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+							url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
 						});
 						Ext.Ajax.request({
 							url : 'searchJobsParam.htm?job_id='+job_id,
@@ -484,7 +499,20 @@ Ext.onReady(function() {
 		                		Ext.getCmp('ainv_payment_terms').setValue(payment_terms);
 		                		addInvoice.show();
 		                	}else if(buttonValue == "no"){
-		                		Ext.Msg.alert('Information', 'Hang on, This feature will come soon! ;)')
+//		                		Ext.Msg.alert('Information', 'Hang on, This feature will come soon! ;)')
+//		                		cus_id = Ext.getCmp('cusid').getValue();
+		                		Ext.getCmp('aeinv_job_name').setValue(job_name);
+		                		Ext.getCmp('aejob_id').setValue(Ext.getCmp('jobid_ref').getValue());
+		                		today = new Date();
+		                		month = today.getMonth()+1;
+		                		year = today.getFullYear();
+		                		aejob_inv_id = Ext.getCmp('aejob_inv_id');
+		                		aejob_inv_id.clearValue();
+		                		aejob_inv_id.getStore().removeAll();
+		                		aejob_inv_id.getStore().load({
+									url: 'showInvoiceCustomer.htm?cus_id='+inv_cus_id+'&month='+month+'&year='+year
+								});
+		                		addToExistInvoice.show();
 		                	}
 		                }
 		            });
@@ -841,7 +869,7 @@ Ext.onReady(function() {
 		        			gjob_ref.clearValue();
 		        			gjob_ref.getStore().removeAll();
 		        			gjob_ref.getStore().load({
-								url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+								url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
 							});
 			        	}
 //						alert(editorDate);
@@ -1140,7 +1168,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showJobReference.htm?kind=JobStatus&dept=Publication',
+							url : 'showJobReference.htm?kind=JobRefStatus&dept=Publication',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -1179,7 +1207,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showJobReference.htm?kind=JobApprove&dept=Publication',
+							url : 'showJobReference.htm?kind=JobRefApprove&dept=Publication',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -1607,7 +1635,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showJobReference.htm?kind=JobStatus&dept=E-Studio',
+							url : 'showJobReference.htm?kind=JobRefStatus&dept=E-Studio',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -1774,7 +1802,7 @@ Ext.onReady(function() {
 			        			gjob_ref.clearValue();
 			        			gjob_ref.getStore().removeAll();
 			        			gjob_ref.getStore().load({
-									url: 'showJobReference.htm?kind=JobApprove&dept='+e.record.get('dept')
+									url: 'showJobReference.htm?kind=JobRefApprove&dept='+e.record.get('dept')
 								});
 				        	}
 						},
@@ -2050,7 +2078,7 @@ Ext.onReady(function() {
 										fields : ['db_ref_name'],
 										proxy : {
 											type : 'ajax',
-											url : 'showBillingStatus.htm',
+											url : 'showJobStatus.htm',
 											reader : {
 												type : 'json',
 												root : 'records',
@@ -2472,7 +2500,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showBillingStatus.htm',
+							url : 'showJobStatus.htm',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -2808,7 +2836,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showBillingStatus.htm',
+							url : 'showJobStatus.htm',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -2983,7 +3011,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showJobReference.htm?kind=JobStatus&dept=Publication',
+							url : 'showJobReference.htm?kind=JobRefStatus&dept=Publication',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -3367,7 +3395,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showJobReference.htm?kind=JobStatus&dept=Publication',
+							url : 'showJobReference.htm?kind=JobRefStatus&dept=Publication',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -3787,8 +3815,6 @@ Ext.onReady(function() {
      							Ext.getCmp('jobTabs').setDisabled(true);
      							Ext.getCmp('jobTabs').setTitle("Jobs");
      							store.jobs.loadPage(1);
-     							store.publicationJobRef.reload();
-     							store.jobsToday.reload();
      						}
      					});
                        },
@@ -3828,6 +3854,146 @@ Ext.onReady(function() {
 			}
 		}
 	})
+	
+	addToExistInvoice = new Ext.create('Ext.window.Window', {
+		title: 'Add To Exist Invoice',
+		width: 450,
+		animateTarget: 'invoice-button',
+		resizable: false,
+		closeAction: 'hide',
+		items: [{
+			xtype: 'form',
+			id: 'addExistInvoiceForm',
+			items: [{
+				xtype: 'fieldset',
+				title: 'Job List Information',
+				defaultType: 'textfield',
+				layout: 'anchor',
+				padding: 10,
+				width: 400,
+				style: {
+	                "margin-left": "auto",
+	                "margin-right": "auto",
+	                "margin-top": "10px",
+	                "margin-bottom": "10px"
+	            },
+	            defaults: {
+	                anchor: '100%'
+	            },
+	            items: [{
+		            	xtype: 'monthfield',
+		            	fieldLabel : 'Delivery Date <font color="red">*</font> ',
+						name : 'aeinv_delivery_date',
+						id : 'aeinv_delivery_date',
+						labelWidth : 120,
+						format: 'm/y',
+						value: new Date(),
+						allowBlank: false,
+						editable: false
+		            },{
+		            	xtype: 'combobox',
+		            	fieldLabel : 'Invoice Name <font color="red">*</font> ',
+		            	name : 'aejob_inv_id',
+		            	id : 'aejob_inv_id',
+		            	allowBlank: false,
+		            	queryMode: 'local',
+		            	msgTarget: 'under',
+		            	labelWidth: 120,
+		            	editable: false,
+		            	emptyText: 'Job Name',
+		            	store: {
+		            		fields: ['inv_id', 'inv_name'],
+		            		proxy: {
+		            			type: 'ajax',
+		            			url: '',
+		            			reader: {
+		            				type: 'json',
+		            				root: 'records',
+		            				idProperty: 'inv_id'
+		            			}
+		            		},
+		            		sorters: [{
+		            			property: 'job_name',
+		            			direction: 'ASC'
+		            		}]
+		            	},
+		            	valueField: 'inv_id',
+		            	displayField: 'inv_name'
+	            }]
+			},{
+				xtype: 'hidden',
+				id: 'aejob_id',
+				name: 'aejob_id'
+			},{
+				xtype: 'hidden',
+				id: 'aeinv_job_name',
+				name: 'aeinv_job_name'
+			}]
+		}],
+		buttons:[{
+			text: 'Add',
+			width: 100,
+			id: 'addExistInvoiceBtn',
+			handler: function(){
+				var form = Ext.getCmp('addExistInvoiceForm').getForm();
+				if (form.isValid()){
+					 form.submit({
+					 url: 'addInvoiceReferenceFromJobs.htm',
+					 waitTitle: 'Adding Invoice Item',
+					 waitMsg: 'Please wait...',
+					 standardSubmit: false,
+	                success: function(form, action) {
+	               	 Ext.MessageBox.show({
+	 						title: 'Information',
+	 						msg: "Inovoice's Item Has Been Add!",
+	 						buttons: Ext.MessageBox.OK,
+	 						icon: Ext.MessageBox.INFO,
+	 						animateTarget: 'addExistInvoiceBtn',
+	 						fn: function(){
+	 							addToExistInvoice.hide();
+	 							panels.tabs.setActiveTab('projTabs');
+     							Ext.getCmp('jobTabs').setDisabled(true);
+     							Ext.getCmp('jobTabs').setTitle("Jobs");
+     							store.jobs.loadPage(1);
+	 						}
+	 					});
+	                   },
+	                   failure : function(form, action) {
+//							Ext.Msg.alert('Failed',
+//									action.result ? action.result.message
+//											: 'No response');
+	                   	Ext.MessageBox.show({
+			                    title: 'REMOTE EXCEPTION',
+			                    msg: operation.getError(),
+			                    icon: Ext.MessageBox.ERROR,
+			                    buttons: Ext.Msg.OK,
+			                    fn: function(){location.reload()}
+			                });
+						}
+	     			});
+	       	 }else {
+						Ext.MessageBox.show({
+							title: 'Failed',
+							msg: ' Please Select Invoice!',
+							buttons: Ext.MessageBox.OK,
+							icon: Ext.MessageBox.ERROR,
+							animateTarget: 'addExistInvoiceBtn',
+						});
+					}
+			}
+		},{
+			text: 'Cancel',
+			width: 100,
+			handler: function(){
+				Ext.getCmp('addToExistInvoice').hide();
+			}
+		}],
+		listeners: {
+			'beforehide': function(){
+				Ext.getCmp('addExistInvoiceForm').getForm().reset();
+			}
+		}
+	});
 	
 	setInterval(function(){store.publicationJobRef.reload()},240000);
 	setInterval(function(){store.estudioJobRef.reload()},240000);

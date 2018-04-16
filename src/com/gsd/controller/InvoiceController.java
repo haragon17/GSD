@@ -125,6 +125,23 @@ public class InvoiceController {
 		return new ModelAndView("jsonView", jobj);
 	}
 	
+	@RequestMapping(value = "/showInvoiceCustomer")
+	public ModelAndView showInvoiceCustomer(HttpServletRequest request, HttpServletResponse response) {
+		
+		List<Invoice> invLs = null;
+		int cus_id = Integer.parseInt(request.getParameter("cus_id"));
+		String month = request.getParameter("month");
+		String year = request.getParameter("year");
+		
+		invLs = invoiceDao.showInvoiceCustomer(cus_id, month, year);
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", invLs);
+		jobj.put("total", invLs.size());
+		
+		return new ModelAndView("jsonView", jobj);
+	}
+	
 	@RequestMapping(value = "/addInvoice")
 	public ModelAndView addInvoice (HttpServletRequest request, HttpServletResponse response) {
 		
@@ -240,6 +257,27 @@ public class InvoiceController {
 		map = getCurrencyRate(request, response);
 		
 		invoiceDao.addInvoiceReference(inv_ref,map);
+		
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("success", true);
+		return new ModelAndView("jsonView", model);
+	}
+	
+	@RequestMapping(value = "/addInvoiceReferenceFromJobs")
+	public ModelAndView addInvoiceReferenceFromJobs(HttpServletRequest request, HttpServletResponse response) {
+	
+		Map<String, Float> map = new HashMap<String, Float>();
+		map = getCurrencyRate(request, response);
+		int job_id = Integer.parseInt(request.getParameter("aejob_id"));
+		int inv_id = Integer.parseInt(request.getParameter("aejob_inv_id"));
+		String job_name = request.getParameter("aeinv_job_name");
+		List<InvoiceReference> inv_refLs = invoiceDao.getJobItemList(job_id);
+		for(int i=0; i<inv_refLs.size(); i++){
+			inv_refLs.get(i).setInv_id(inv_id);
+			inv_refLs.get(i).setInv_ref_desc(job_name);
+			invoiceDao.addInvoiceReference(inv_refLs.get(i), map);
+		}
+		jobsDao.billedJobProjects(job_id);
 		
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("success", true);

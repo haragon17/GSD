@@ -30,9 +30,9 @@ public class ReferenceDaoImpl extends JdbcDaoSupport implements ReferenceDao {
 	}
 
 	@Override
-	public List<Reference> showBillingStatus() {
+	public List<Reference> showJobStatus() {
 		
-		String sql = "SELECT db_ref_name from db_reference WHERE db_ref_kind = 'Billing Status' ORDER BY order_by ASC";
+		String sql = "SELECT db_ref_name from db_reference WHERE db_ref_kind = 'JobStatus' ORDER BY order_by ASC";
 		
 		List<Reference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Reference>(Reference.class));
 		return result;

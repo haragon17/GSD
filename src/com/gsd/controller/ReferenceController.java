@@ -67,13 +67,13 @@ public class ReferenceController {
 		return new ModelAndView("jsonView", jobj);
 	}
 	
-	@RequestMapping(value = "/showBillingStatus")
-	public ModelAndView showBillingStatus(HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/showJobStatus")
+	public ModelAndView showJobStatus(HttpServletRequest request, HttpServletResponse response) {
 		
 		List<Reference> refLs = null;
 		
 		try{
-			refLs = referenceDao.showBillingStatus();
+			refLs = referenceDao.showJobStatus();
 		} catch (Exception e){
 			logger.error(e.getMessage());
 		}

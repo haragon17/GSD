@@ -328,6 +328,7 @@ Ext.onReady(function() {
 							regist_date = grid.getStore().getAt(rowIndex).get('regist_date');
 							topix_cus_id = grid.getStore().getAt(rowIndex).get('topix_cus_id');
 							payment_terms = grid.getStore().getAt(rowIndex).get('payment_terms');
+							cus_fax = grid.getStore().getAt(rowIndex).get('cus_fax');
 							
 							Ext.getCmp('ecus_name').setValue(cus_name);
 							Ext.getCmp('ecus_code').setValue(cus_code);
@@ -337,6 +338,7 @@ Ext.onReady(function() {
 							Ext.getCmp('ekey_acc_mng').setValue(key_acc_id);
 							Ext.getCmp('ecus_id').setValue(cus_id);
 							Ext.getCmp('ecus_phone').setValue(cus_phone);
+							Ext.getCmp('ecus_fax').setValue(cus_fax);
 							Ext.getCmp('ebill_to').setValue(bill_to);
 							Ext.getCmp('ebilling_terms').setValue(billing_terms);
 							Ext.getCmp('etransfer_dtl').setValue(transfer_dtl);
@@ -414,6 +416,7 @@ Ext.onReady(function() {
 	        		'<p><b>Register date:</b> {regist_date:this.formatDate}</p>',
 	        		'<p><b>Adress:</b> {address:this.chkEmpty}</p>',
 	        		'<p><b>Phone :</b> {cus_phone:this.chkEmpty}</p>',
+	        		'<p><b>Fax :</b> {cus_fax:this.chkEmpty}</p>',
 	        		'<p><b>Transfer Detail:</b> <br>{transfer_dtl:this.chkTransfer}</p>',
 	        		'<p><b>Payment Terms :</b> {payment_terms} days net</p>',
 	        		{
@@ -523,6 +526,9 @@ Ext.define('cusModel', {
 	}, {
 		name : 'payment_terms',
 		type : 'int'
+	}, {
+		name : 'cus_fax',
+		type : 'string'
 	}
 
 	]
@@ -669,6 +675,17 @@ editCustomer = new Ext.create('Ext.window.Window', {
 				name : 'ecus_phone',
 				id : 'ecus_phone',
 				emptyText : 'Phone Number',
+				labelWidth : 145,
+				msgTarget : 'under',
+				vtype: 'ephone',
+				maxLength : 50,
+				maxLengthText : 'Maximum input 50 Character',
+			}, {
+				allowBlank : true,
+				fieldLabel : 'Fax Number ',
+				name : 'ecus_fax',
+				id : 'ecus_fax',
+				emptyText : 'Fax Number',
 				labelWidth : 145,
 				msgTarget : 'under',
 				vtype: 'ephone',
@@ -948,6 +965,17 @@ addCustomer = new Ext.create('Ext.window.Window', {
 				name : 'acus_phone',
 				id : 'acus_phone',
 				emptyText : 'Phone Number',
+				labelWidth : 145,
+				msgTarget : 'under',
+				vtype: 'ephone',
+				maxLength : 50,
+				maxLengthText : 'Maximum input 50 Character',
+			}, {
+				allowBlank : true,
+				fieldLabel : 'Fax Number ',
+				name : 'acus_fax',
+				id : 'acus_fax',
+				emptyText : 'Fax Number',
 				labelWidth : 145,
 				msgTarget : 'under',
 				vtype: 'ephone',

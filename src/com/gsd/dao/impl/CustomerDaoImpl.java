@@ -70,7 +70,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 				+ "transfer_dtl=?, "
 				+ "regist_date=?, "
 				+ "topix_cus_id=?, "
-				+ "payment_terms=? "
+				+ "payment_terms=?, "
+				+ "cus_fax=? "
 				+ "where cus_id=?";
 		
 		this.getJdbcTemplate().update(sql, new Object[]{
@@ -87,6 +88,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			cus.getRegist_date_ts(),
 			cus.getTopix_cus_id(),
 			cus.getPayment_terms(),
+			cus.getCus_fax(),
 			cus.getCus_id()
 		});
 		
@@ -194,6 +196,21 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 					"Phone",
 					cus_audit.getCus_phone(),
 					cus.getCus_phone(),
+					"Updated",
+					cus.getCus_name()
+			});
+		}
+		
+		if(!cus_audit.getCus_fax().equals(cus.getCus_fax())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+					getLastAuditId(),
+					cus.getCus_id(),
+					"Customer",
+					user.getUserModel().getUsr_name(),
+					"Fax",
+					cus_audit.getCus_fax(),
+					cus.getCus_fax(),
 					"Updated",
 					cus.getCus_name()
 			});
@@ -311,7 +328,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 	@Override
 	public void createCustomer(Customer cus) {
 		
-		String sql = "INSERT INTO customer VALUES (?,?,?,?,?,?,?,now(),now(),?,?,?,?,?,?,?,?)";
+		String sql = "INSERT INTO customer VALUES (?,?,?,?,?,?,?,now(),now(),?,?,?,?,?,?,?,?,?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[]{
 			cus.getCus_id(),
@@ -328,7 +345,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			cus.getTransfer_dtl(),
 			cus.getRegist_date_ts(),
 			cus.getTopix_cus_id(),
-			cus.getPayment_terms()
+			cus.getPayment_terms(),
+			cus.getCus_fax()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
@@ -344,7 +362,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 				user.getUserModel().getUsr_name(),
 				"Created row on Customer name="+cus.getCus_name()+", code="+cus.getCus_code()+", key_account="+key_acc.getKey_acc_name()
 				+", address="+cus.getAddress()+", contact_person="+cus.getContact_person()+", e-mail="+cus.getCus_email()
-				+", phone="+cus.getCus_phone()+", bill_to="+cus.getBill_to()+", payment="+cus.getBilling_terms()+", transfer_dtl="+cus.getTransfer_dtl()
+				+", phone="+cus.getCus_phone()+", fax="+cus.getCus_fax()+", bill_to="+cus.getBill_to()+", payment="+cus.getBilling_terms()+", transfer_dtl="+cus.getTransfer_dtl()
 				+", regist_date="+((cus.getRegist_date_ts()==null) ? "" : cus.getRegist_date_ts().toString())+", topix_cus_id="+cus.getTopix_cus_id(),
 				cus.getCus_name()
 		});

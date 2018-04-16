@@ -23,6 +23,7 @@ public class Customer {
 	private Timestamp regist_date_ts;
 	private int topix_cus_id;
 	private int payment_terms;
+	private String cus_fax;
 	
 	public int getCus_id() {
 		return cus_id;
@@ -137,6 +138,12 @@ public class Customer {
 	}
 	public void setPayment_terms(int payment_terms) {
 		this.payment_terms = payment_terms;
+	}
+	public String getCus_fax() {
+		return cus_fax;
+	}
+	public void setCus_fax(String cus_fax) {
+		this.cus_fax = cus_fax;
 	}
 	
 }

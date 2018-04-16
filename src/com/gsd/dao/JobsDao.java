@@ -34,6 +34,8 @@ public interface JobsDao {
 	
 	public List<JobsReference> searchJobsReference(int id, String sort);
 	
+	public List<Jobs> searchJobForInvoice(int cus_id);
+	
 	public JobsReference searchJobsReferenceByID(int id);
 	
 	public JobsReference searchJobReferenceByName(String name);

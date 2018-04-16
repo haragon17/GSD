@@ -59,7 +59,16 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		List<InvoiceCompany> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<InvoiceCompany>(InvoiceCompany.class));
 		return result;
 	}
-
+	
+	@Override
+	public List<Invoice> showInvoiceCustomer(int cus_id, String month, String year) {
+		
+		String sql = "SELECT inv_id,inv_name FROM invoice WHERE EXTRACT(MONTH FROM inv_delivery_date) = '"+month+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND cus_id = "+cus_id;
+		
+		List<Invoice> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Invoice>(Invoice.class));
+		return result;
+	}
+	
 	@Override
 	public int addInvoice(Invoice inv) {
 		

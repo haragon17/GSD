@@ -176,6 +176,7 @@ public class CustomerController {
 		String address = request.getParameter("aaddress");
 		String contact_person = request.getParameter("acontact_person");
 		String cus_phone = request.getParameter("acus_phone");
+		String cus_fax = request.getParameter("acus_fax");
 		String cus_email = request.getParameter("acus_email");
 		String bill_to = request.getParameter("abill_to");
 		String billing_terms = request.getParameter("abilling_terms");
@@ -238,6 +239,11 @@ public class CustomerController {
 		}else{
 			cus.setCus_phone("");
 		}
+		if(!cus_fax.equals("Fax Number")){
+			cus.setCus_fax(cus_fax);
+		}else{
+			cus.setCus_fax("");
+		}
 		if(!bill_to.equals("Billing To")){
 			cus.setBill_to(bill_to);
 		}else{
@@ -272,6 +278,7 @@ public class CustomerController {
 			String cus_code = request.getParameter("ecus_code");
 			String address = request.getParameter("eaddress");
 			String cus_phone = request.getParameter("ecus_phone");
+			String cus_fax = request.getParameter("ecus_fax");
 			String contact_person = request.getParameter("econtact_person");
 			int key_acc_id = Integer.parseInt(request.getParameter("ekey_acc_mng"));
 			String cus_email = request.getParameter("ecus_email");
@@ -325,6 +332,11 @@ public class CustomerController {
 				cus.setCus_phone(cus_phone);
 			}else{
 				cus.setCus_phone("");
+			}
+			if(!cus_fax.equals("Fax Number")){
+				cus.setCus_fax(cus_fax);
+			}else{
+				cus.setCus_fax("");
 			}
 			if(!bill_to.equals("Billing To")){
 				cus.setBill_to(bill_to);

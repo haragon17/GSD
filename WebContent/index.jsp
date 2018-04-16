@@ -1,3 +1,3 @@
 <script language="javascript">
-window.location.href ="projects.htm";
+window.location.href ="jobs.htm";
 </script>

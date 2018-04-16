@@ -559,10 +559,10 @@ Ext.onReady(function() {
 					dataIndex : 'bill_to'
 				},
 				{
-					text : "Payment",
+					text : "Terms",
 					flex : 0.5,
 					sortable : true,
-					dataIndex : 'payment'
+					dataIndex : 'billing_terms'
 				},
 //				{
 //					text : "Price",
@@ -927,7 +927,7 @@ Ext.define('projModel', {
 		name : 'bill_to',
 		type : 'string'
 	}, {
-		name : 'payment',
+		name : 'billing_terms',
 		type : 'string'
 	}, {
 		name : 'proj_title',

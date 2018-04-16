@@ -14,7 +14,7 @@ public class Projects {
 	private String cus_name;
 	private String cus_code;
 	private String bill_to;
-	private String payment;
+	private String billing_terms;
 	private String file_name;
 	private String proj_title;
 	
@@ -90,11 +90,11 @@ public class Projects {
 	public void setBill_to(String bill_to) {
 		this.bill_to = bill_to;
 	}
-	public String getPayment() {
-		return payment;
+	public String getBilling_terms() {
+		return billing_terms;
 	}
-	public void setPayment(String payment) {
-		this.payment = payment;
+	public void setBilling_terms(String billing_terms) {
+		this.billing_terms = billing_terms;
 	}
 	public String getFile_name() {
 		return file_name;

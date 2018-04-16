@@ -1573,9 +1573,41 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 		id : 'addInvoiceItemButton',
 		iconCls : 'icon-add',
 		handler : function() {
-			var inv_id = Ext.getCmp('dinv_id').getValue();
-			Ext.getCmp('ainv_id').setValue(inv_id);
-			addInvoiceItem.show();
+			Ext.Msg.show({
+                title : 'Invoice',
+                msg : 'How do you want to add? ',
+                width : 270,
+                closable : true,
+                buttons : Ext.Msg.YESNO,
+                animateTarget: 'addInvoiceItemButton',
+                icon : Ext.Msg.QUESTION,
+                buttonText : 
+                {
+                    yes : 'Add New',
+                    no : 'Select From Jobs',
+//                    cancel : 'Cancel'
+                },
+                multiline : false,
+                fn : function(buttonValue, inputText, showConfig){
+                	if(buttonValue == "yes"){
+                		var inv_id = Ext.getCmp('dinv_id').getValue();
+            			Ext.getCmp('ainv_id').setValue(inv_id);
+            			addInvoiceItem.show();
+                	}else if(buttonValue == "no"){
+                		var cus_id = Ext.getCmp('dcus_id').getValue();
+                		var inv_id = Ext.getCmp('dinv_id').getValue();
+                		var ajob_name = Ext.getCmp('aeinv_job_name');
+                		ajob_name.clearValue();
+                		ajob_name.getStore().removeAll();
+                		ajob_name.getStore().load({
+							url: 'showJobForInvoice.htm?cus_id='+cus_id
+						});
+                		Ext.getCmp('aejob_inv_id').setValue(inv_id);
+                		addInvoiceItemFromJobs.show();
+                	}
+                }
+            });
+			
 		}
 	},
 	'->',
@@ -2352,6 +2384,142 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 	listeners: {
 		'beforehide': function(){
 			Ext.getCmp('editInvoiceItemForm').getForm().reset();
+		}
+	}
+});
+
+addInvoiceItemFromJobs = new Ext.create('Ext.window.Window', {
+	title: 'Select From Jobs',
+	width: 450,
+	animateTarget: 'addInvoiceItemButton',
+	resizable: false,
+	closeAction: 'hide',
+	items: [{
+		xtype: 'form',
+		id: 'addInvoiceItemFromJobsForm',
+		items: [{
+			xtype: 'fieldset',
+			title: 'Job List Information',
+			defaultType: 'textfield',
+			layout: 'anchor',
+			padding: 10,
+			width: 400,
+			style: {
+                "margin-left": "auto",
+                "margin-right": "auto",
+                "margin-top": "10px",
+                "margin-bottom": "10px"
+            },
+            defaults: {
+                anchor: '100%'
+            },
+            items: [{
+            	xtype: 'combobox',
+            	fieldLabel: 'Job Name <font color="red">*</font>',
+            	name: 'aeinv_job_name',
+            	id: 'aeinv_job_name',
+            	allowBlank: false,
+            	queryMode: 'local',
+            	msgTarget: 'under',
+            	labelWidth: 120,
+            	editable: false,
+            	emptyText: 'Job Name',
+            	store: {
+            		fields: ['job_id', 'job_name'],
+            		proxy: {
+            			type: 'ajax',
+            			url: '',
+            			reader: {
+            				type: 'json',
+            				root: 'records',
+            				idProperty: 'job_id'
+            			}
+            		},
+            		sorters: [{
+            			property: 'job_name',
+            			direction: 'ASC'
+            		}]
+            	},
+            	valueField: 'job_name',
+            	displayField: 'job_name',
+            	listeners: {
+            		select: function(){
+            			var v = this.getValue();
+            			var record = this.findRecord(this.valueField || this.displayField, v);
+            			var myIndex = this.store.indexOf(record);
+						var job_id = this.store.getAt(myIndex).data.job_id;
+						Ext.getCmp('ajob_id').setValue(job_id);
+            		}
+            	}
+            }]
+		},{
+			xtype: 'hidden',
+			id: 'aejob_inv_id',
+			name: 'aejob_inv_id'
+		},{
+			xtype: 'hidden',
+			id: 'aejob_id',
+			name: 'aejob_id'
+		}]
+	}],
+	buttons:[{
+		text: 'Add',
+		width: 100,
+		id: 'addFromJobBtn',
+		handler: function(){
+			var form = Ext.getCmp('addInvoiceItemFromJobsForm').getForm();
+			if (form.isValid()){
+				 form.submit({
+				 url: 'addInvoiceReferenceFromJobs.htm',
+				 waitTitle: 'Adding Invoice Item',
+				 waitMsg: 'Please wait...',
+				 standardSubmit: false,
+                success: function(form, action) {
+               	 Ext.MessageBox.show({
+ 						title: 'Information',
+ 						msg: "Inovoice's Item Has Been Add!",
+ 						buttons: Ext.MessageBox.OK,
+ 						icon: Ext.MessageBox.INFO,
+ 						animateTarget: 'addInvoiceItemButton',
+ 						fn: function(){
+ 							addInvoiceItemFromJobs.hide();
+ 							store.invoiceRef.reload();
+ 						}
+ 					});
+                   },
+                   failure : function(form, action) {
+//						Ext.Msg.alert('Failed',
+//								action.result ? action.result.message
+//										: 'No response');
+                   	Ext.MessageBox.show({
+		                    title: 'REMOTE EXCEPTION',
+		                    msg: operation.getError(),
+		                    icon: Ext.MessageBox.ERROR,
+		                    buttons: Ext.Msg.OK,
+		                    fn: function(){location.reload()}
+		                });
+					}
+     			});
+       	 }else {
+					Ext.MessageBox.show({
+						title: 'Failed',
+						msg: ' Please Select Job!',
+						buttons: Ext.MessageBox.OK,
+						icon: Ext.MessageBox.ERROR,
+						animateTarget: 'addInvoiceItemButton',
+					});
+				}
+		}
+	},{
+		text: 'Cancel',
+		width: 100,
+		handler: function(){
+			Ext.getCmp('addInvoiceItemFromJobs').hide();
+		}
+	}],
+	listeners: {
+		'beforehide': function(){
+			Ext.getCmp('addInvoiceItemFromJobsForm').getForm().reset();
 		}
 	}
 });

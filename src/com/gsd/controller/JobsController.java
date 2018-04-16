@@ -131,6 +131,21 @@ public class JobsController {
 		return new ModelAndView("jsonView", jobj);
 	}
 	
+	@RequestMapping(value = "/showJobForInvoice")
+	public ModelAndView showJobForInvoice(HttpServletRequest request, HttpServletResponse response) {
+
+		List<Jobs> jobLs = null;
+		int cus_id = Integer.parseInt(request.getParameter("cus_id"));
+		
+		jobLs = jobsDao.searchJobForInvoice(cus_id);
+		
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", jobLs);
+		jobj.put("total", jobLs.size());
+
+		return new ModelAndView("jsonView", jobj);
+	}
+	
 	@RequestMapping(value = "/chkJobName")
 	public ModelAndView chkJobName(@RequestParam("records") String name, HttpServletRequest request,
 			HttpServletResponse response){

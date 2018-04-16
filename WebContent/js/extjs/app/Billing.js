@@ -640,7 +640,7 @@ Ext.onReady(function() {
 		        			gjob_ref.clearValue();
 		        			gjob_ref.getStore().removeAll();
 		        			gjob_ref.getStore().load({
-								url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+								url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
 							});
 			        	}
 					},
@@ -932,7 +932,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showJobReference.htm?kind=JobStatus&dept=Publication',
+							url : 'showJobReference.htm?kind=JobRefStatus&dept=Publication',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -970,7 +970,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showJobReference.htm?kind=JobApprove&dept=Publication',
+							url : 'showJobReference.htm?kind=JobRefApprove&dept=Publication',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -1360,7 +1360,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showJobReference.htm?kind=JobStatus&dept=E-Studio',
+							url : 'showJobReference.htm?kind=JobRefStatus&dept=E-Studio',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -1506,7 +1506,7 @@ Ext.onReady(function() {
 			        			gjob_ref.clearValue();
 			        			gjob_ref.getStore().removeAll();
 			        			gjob_ref.getStore().load({
-									url: 'showJobReference.htm?kind=JobApprove&dept='+e.record.get('dept')
+									url: 'showJobReference.htm?kind=JobRefApprove&dept='+e.record.get('dept')
 								});
 				        	}
 				        	if(e.field == "sent_amount"){
@@ -1723,7 +1723,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showJobReference.htm?kind=JobApprove&dept=Publication',
+							url : 'showJobReference.htm?kind=JobRefApprove&dept=Publication',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -2126,7 +2126,7 @@ Ext.onReady(function() {
 				        		gjob_ref.clearValue();
 				        		gjob_ref.getStore().removeAll();
 				        		gjob_ref.getStore().load({
-									url: 'showJobReference.htm?kind=JobApprove&dept='+e.record.get('dept')
+									url: 'showJobReference.htm?kind=JobRefApprove&dept='+e.record.get('dept')
 								});
 				        	}
 						},
@@ -2367,7 +2367,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showBillingStatus.htm',
+							url : 'showJobStatus.htm',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -2677,7 +2677,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showBillingStatus.htm',
+							url : 'showJobStatus.htm',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -3506,13 +3506,13 @@ Ext.onReady(function() {
 		ajob_ref.clearValue();
 		ajob_ref.getStore().removeAll();
 		ajob_ref.getStore().load({
-			url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+			url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
 		});
 		
 		ejob_ref.clearValue();
 		ejob_ref.getStore().removeAll();
 		ejob_ref.getStore().load({
-			url: 'showJobReference.htm?kind=JobStatus&dept='+deptRef
+			url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
 		});
 		
 		if(userType == 2){
@@ -3745,7 +3745,7 @@ Ext.onReady(function() {
 												fields : ['db_ref_name'],
 												proxy : {
 													type : 'ajax',
-													url : 'showBillingStatus.htm',
+													url : 'showJobStatus.htm',
 													reader : {
 														type : 'json',
 														root : 'records',

@@ -1424,4 +1424,16 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		return result;
 	}
 
+	@Override
+	public List<Jobs> searchJobForInvoice(int cus_id) {
+		
+		String sql = "SELECT jobs.*, CASE WHEN z.remain_item IS NULL THEN 0 ELSE z.remain_item END FROM jobs \n"+
+				"LEFT JOIN projects on projects.proj_id = jobs.proj_id\n"+
+				"LEFT JOIN (select job_id, count(*) as remain_item from jobs_reference where proj_ref_id = 0 group by job_id) z on z.job_id = jobs.job_id\n"+
+				"WHERE (job_status = 'Checked' OR job_status = 'Sent') AND z.remain_item IS NULL AND cus_id = "+cus_id;
+		
+		List<Jobs> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Jobs>(Jobs.class));
+		return result;
+	}
+
 }

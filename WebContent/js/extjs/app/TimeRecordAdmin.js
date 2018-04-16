@@ -501,7 +501,7 @@ Ext.onReady(function() {
 						fields : ['db_ref_name'],
 						proxy : {
 							type : 'ajax',
-							url : 'showBillingStatus.htm',
+							url : 'showJobStatus.htm',
 							reader : {
 								type : 'json',
 								root : 'records',
