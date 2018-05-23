@@ -44,7 +44,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	public List<ProjectsReference> showProjectsReference(int proj_id) {
 		
 		String sql = "SELECT projects_reference.proj_ref_id, \n" + 
-				"item.itm_name, proj_ref_desc, price, currency, trim(to_char(price, '99999999999999999D99')) as price_str \n" +
+				"item.itm_name, proj_ref_desc, topix_article_id, price, currency, trim(to_char(price, '99999999999999999D99')) as price_str \n" +
 				"FROM projects_reference, item\n" +
 				"WHERE projects_reference.itm_id = item.itm_id " +
 				"AND projects_reference.proj_id = "+ proj_id +"\n" +

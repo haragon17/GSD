@@ -18,7 +18,7 @@ table.myTable th {
 <script type="text/javascript">
  var errMessage = '${msg}';
 </script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/AuditLogging.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/extjs/app/AuditLoggingAdmin.js"></script>
 <title>History State</title>
 </head>
 <body>

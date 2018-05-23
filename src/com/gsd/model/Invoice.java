@@ -27,9 +27,25 @@ public class Invoice {
 	private String cus_name;
 	private String cus_code;
 	private String usr_name;
-	private int topix_cus_id;
+	private String topix_cus_id;
 	private String address;
 	private BigDecimal inv_total_price_eur;
+	private BigDecimal jan;
+	private BigDecimal feb;
+	private BigDecimal mar;
+	private BigDecimal apr;
+	private BigDecimal may;
+	private BigDecimal jun;
+	private BigDecimal jul;
+	private BigDecimal aug;
+	private BigDecimal sep;
+	private BigDecimal oct;
+	private BigDecimal nov;
+	private BigDecimal dec;
+	private int inv_tpx_id;
+	private BigDecimal total_inv_price;
+	private String inv_ref_currency;
+	private int count_tpx;
 	
 	public int getInv_id() {
 		return inv_id;
@@ -157,10 +173,10 @@ public class Invoice {
 	public void setUsr_name(String usr_name) {
 		this.usr_name = usr_name;
 	}
-	public int getTopix_cus_id() {
+	public String getTopix_cus_id() {
 		return topix_cus_id;
 	}
-	public void setTopix_cus_id(int topix_cus_id) {
+	public void setTopix_cus_id(String topix_cus_id) {
 		this.topix_cus_id = topix_cus_id;
 	}
 	public String getAddress() {
@@ -174,6 +190,108 @@ public class Invoice {
 	}
 	public void setInv_total_price_eur(BigDecimal inv_total_price_eur) {
 		this.inv_total_price_eur = inv_total_price_eur;
+	}
+	public Date getSetInv_bill_date_sql() {
+		return setInv_bill_date_sql;
+	}
+	public void setSetInv_bill_date_sql(Date setInv_bill_date_sql) {
+		this.setInv_bill_date_sql = setInv_bill_date_sql;
+	}
+	public BigDecimal getJan() {
+		return jan;
+	}
+	public void setJan(BigDecimal jan) {
+		this.jan = jan;
+	}
+	public BigDecimal getFeb() {
+		return feb;
+	}
+	public void setFeb(BigDecimal feb) {
+		this.feb = feb;
+	}
+	public BigDecimal getMar() {
+		return mar;
+	}
+	public void setMar(BigDecimal mar) {
+		this.mar = mar;
+	}
+	public BigDecimal getApr() {
+		return apr;
+	}
+	public void setApr(BigDecimal apr) {
+		this.apr = apr;
+	}
+	public BigDecimal getMay() {
+		return may;
+	}
+	public void setMay(BigDecimal may) {
+		this.may = may;
+	}
+	public BigDecimal getJun() {
+		return jun;
+	}
+	public void setJun(BigDecimal jun) {
+		this.jun = jun;
+	}
+	public BigDecimal getJul() {
+		return jul;
+	}
+	public void setJul(BigDecimal jul) {
+		this.jul = jul;
+	}
+	public BigDecimal getAug() {
+		return aug;
+	}
+	public void setAug(BigDecimal aug) {
+		this.aug = aug;
+	}
+	public BigDecimal getSep() {
+		return sep;
+	}
+	public void setSep(BigDecimal sep) {
+		this.sep = sep;
+	}
+	public BigDecimal getOct() {
+		return oct;
+	}
+	public void setOct(BigDecimal oct) {
+		this.oct = oct;
+	}
+	public BigDecimal getNov() {
+		return nov;
+	}
+	public void setNov(BigDecimal nov) {
+		this.nov = nov;
+	}
+	public BigDecimal getDec() {
+		return dec;
+	}
+	public void setDec(BigDecimal dec) {
+		this.dec = dec;
+	}
+	public int getInv_tpx_id() {
+		return inv_tpx_id;
+	}
+	public void setInv_tpx_id(int inv_tpx_id) {
+		this.inv_tpx_id = inv_tpx_id;
+	}
+	public BigDecimal getTotal_inv_price() {
+		return total_inv_price;
+	}
+	public void setTotal_inv_price(BigDecimal total_inv_price) {
+		this.total_inv_price = total_inv_price;
+	}
+	public String getInv_ref_currency() {
+		return inv_ref_currency;
+	}
+	public void setInv_ref_currency(String inv_ref_currency) {
+		this.inv_ref_currency = inv_ref_currency;
+	}
+	public int getCount_tpx() {
+		return count_tpx;
+	}
+	public void setCount_tpx(int count_tpx) {
+		this.count_tpx = count_tpx;
 	}
 	
 }

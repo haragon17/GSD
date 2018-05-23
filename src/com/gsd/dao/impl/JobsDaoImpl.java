@@ -1038,7 +1038,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 			}
 			
 		}catch(Exception e){
-			logger.error(e.getMessage());
+			logger.error(e.toString());
 		}
 		
 	}

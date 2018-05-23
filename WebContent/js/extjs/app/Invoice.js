@@ -57,35 +57,37 @@ Ext.onReady(function() {
         onOKClick: function () {
             var me = this;
             if (me.selectMonth) {
-            	if(me.selectMonth.getFullYear() == inv_year){
-	                me.setValue(me.selectMonth);
-	                me.fireEvent('select', me, me.selectMonth);
-	                try{
-	    	            var delivery_date = Ext.getCmp('einv_delivery_date').getValue();
-	    				var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0);
-	    				var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1);
-//	    				var val_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), new Date().getDay());
-	    				Ext.getCmp('einv_bill_date').setValue('');
-	    				Ext.getCmp('einv_bill_date').setMinValue(min_date);
-	    				Ext.getCmp('einv_bill_date').setMaxValue(max_date);
-	                }catch(err){
-	    				var delivery_date = Ext.getCmp('ainv_delivery_date').getValue();
-	    				var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0);
-	    				var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1);
-//	    				var val_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), new Date().getDay());
-	    				Ext.getCmp('ainv_bill_date').setValue('');
-	    				Ext.getCmp('ainv_bill_date').setMinValue(min_date);
-	    				Ext.getCmp('ainv_bill_date').setMaxValue(max_date);
-	                }
-            	}else{
-            		Ext.MessageBox.show({
-            			title : 'Error',
-            			msg : 'Please select only year \''+inv_year+'\' !',
-            			buttons : Ext.MessageBox.OK,
-//            			animateTarget : 'del',
-            			icon : Ext.MessageBox.ERROR
-            		});
+            	if(Ext.getCmp('einv_delivery_date').getValue() != null && Ext.getCmp('ainv_delivery_date').getValue() != null){
+	            	if(me.selectMonth.getFullYear() == inv_year){
+		                try{
+		    	            var delivery_date = Ext.getCmp('einv_delivery_date').getValue();
+		    				var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0);
+		    				var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1);
+//	    					var val_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), new Date().getDay());
+		    				Ext.getCmp('einv_bill_date').setValue('');
+		    				Ext.getCmp('einv_bill_date').setMinValue(min_date);
+		    				Ext.getCmp('einv_bill_date').setMaxValue(max_date);
+		                }catch(err){
+		    				var delivery_date = Ext.getCmp('ainv_delivery_date').getValue();
+		    				var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0);
+		    				var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1);
+//	    					var val_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), new Date().getDay());
+		    				Ext.getCmp('ainv_bill_date').setValue('');
+		    				Ext.getCmp('ainv_bill_date').setMinValue(min_date);
+		    				Ext.getCmp('ainv_bill_date').setMaxValue(max_date);
+		                }
+	            	}else{
+	            		Ext.MessageBox.show({
+	            			title : 'Error',
+	            			msg : 'Please select only year \''+inv_year+'\' !',
+	            			buttons : Ext.MessageBox.OK,
+//            				animateTarget : 'del',
+	            			icon : Ext.MessageBox.ERROR
+	            		});
+	            	}
             	}
+            	me.setValue(me.selectMonth);
+                me.fireEvent('select', me, me.selectMonth);
             }
             me.collapse();
         },
@@ -95,9 +97,74 @@ Ext.onReady(function() {
         }
     });  
 	
+//	Ext.define('Ext.form.field.Month', {
+//        extend: 'Ext.form.field.Date',
+//        alias: 'widget.searchmonthfield',
+//        requires: ['Ext.picker.Month'],
+//        alternateClassName: ['Ext.form.MonthField', 'Ext.form.Month'],
+//        selectMonth: null,
+//        createPicker: function () {
+//            var me = this,
+//                format = Ext.String.format;
+//            return Ext.create('Ext.picker.Month', {
+//                pickerField: me,
+//                ownerCt: me.ownerCt,
+//                renderTo: document.body,
+//                floating: true,
+//                hidden: true,
+//                focusOnShow: true,
+//                minDate: me.minValue,
+//                maxDate: me.maxValue,
+//                disabledDatesRE: me.disabledDatesRE,
+//                disabledDatesText: me.disabledDatesText,
+//                disabledDays: me.disabledDays,
+//                disabledDaysText: me.disabledDaysText,
+//                format: me.format,
+//                showToday: me.showToday,
+//                startDay: me.startDay,
+//                minText: format(me.minText, me.formatDate(me.minValue)),
+//                maxText: format(me.maxText, me.formatDate(me.maxValue)),
+//                listeners: {
+//                    select: { scope: me, fn: me.onSelect },
+//                    monthdblclick: { scope: me, fn: me.onOKClick },
+//                    yeardblclick: { scope: me, fn: me.onOKClick },
+//                    OkClick: { scope: me, fn: me.onOKClick },
+//                    CancelClick: { scope: me, fn: me.onCancelClick }
+//                },
+//                keyNavConfig: {
+//                    esc: function () {
+//                        me.collapse();
+//                    }
+//                }
+//            });
+//        },
+//        onCancelClick: function () {
+//            var me = this;
+//            me.selectMonth = null;
+//            me.collapse();
+//        },
+//        onOKClick: function () {
+//            var me = this;
+//            if (me.selectMonth) {
+//            	me.setValue(me.selectMonth);
+//                me.fireEvent('select', me, me.selectMonth);
+//                
+//            }
+//            me.collapse();
+//        },
+//        onSelect: function (m, d) {
+//            var me = this;
+//            me.selectMonth = new Date((d[0] + 1) + '/1/' + d[1]);
+//        }
+//    });  
+	
 	invid = new Ext.form.Hidden({
 		name : 'invid',
 		id : 'invid'
+	});
+	invid_del = new Ext.form.Hidden({
+		name : 'invid_del',
+		id : 'invid_del'
 	});
 	invrefid = new Ext.form.Hidden({
 		name : 'invrefid',
@@ -121,6 +188,7 @@ Ext.onReady(function() {
 		title : 'Invoice Information ',
 		width : 850,
 		height : 270,
+		autoScroll:true,
 		layout : 'column',
 		style : {
 			"margin-left" : "auto",
@@ -146,7 +214,7 @@ Ext.onReady(function() {
 				cus_code = Ext.getCmp('dcus_code').getValue();
 				inv_payment_terms = Ext.getCmp('dinv_payment_terms').getValue();
 				inv_vat = Ext.getCmp('dinv_vat').getValue();
-				inv_bill_type = Ext.getCmp('dinv_bill_type').getValue();
+//				inv_bill_type = Ext.getCmp('dinv_bill_type').getValue();
 				inv_bill_date = new Date(Ext.getCmp('dinv_bill_date').getValue());
 				
 				min_year = new Date(inv_delivery_date.getFullYear(), 0, 1);
@@ -167,7 +235,7 @@ Ext.onReady(function() {
 				Ext.getCmp('ecus_code').setValue(cus_code);
 				Ext.getCmp('einv_payment_terms').setValue(inv_payment_terms);
 				Ext.getCmp('einv_vat').setValue(inv_vat);
-				Ext.getCmp('einv_bill_type').setValue(inv_bill_type);
+//				Ext.getCmp('einv_bill_type').setValue(inv_bill_type);
 				editInvoice.show();
 			}
 		} ],
@@ -175,9 +243,9 @@ Ext.onReady(function() {
 			layout : 'column',
 			border : false,
 			items : [ {
-				columnWidth : 0.5,
+				columnWidth : 0.7,
 				style : {
-					"margin-left" : "60px",
+					"margin-left" : "30px",
 					"margin-right" : "10px",
 					"margin-top" : "10px",
 				},
@@ -191,49 +259,49 @@ Ext.onReady(function() {
 					id : 'dinv_name',
 					labelWidth : 110,
 					margin : '0 0 10 0',
-					width : 320,
-					fieldStyle : 'font-size:14px;font-weight:bold;'
+					width : 400,
+					fieldStyle : 'font-size:13px;font-weight:bold;'
 				}, {
 					fieldLabel : 'Project No ',
 					name : 'dinv_proj_no',
 					id : 'dinv_proj_no',
 					labelWidth : 110,
 					margin : '0 0 10 0',
-					width : 320,
-					fieldStyle : 'font-size:14px;font-weight:bold;'
+					width : 400,
+					fieldStyle : 'font-size:13px;font-weight:bold;'
 				},{ 
 					fieldLabel : 'Delivery Date ',
 					name : 'dinv_delivery_date',
 					id : 'dinv_delivery_date',
 					labelWidth : 110,
 					margin : '0 0 10 0',
-					width : 320,
+					width : 400,
 					renderer: Ext.util.Format.dateRenderer('m/y'),
-					fieldStyle : 'font-size:14px;font-weight:bold;'
+					fieldStyle : 'font-size:13px;font-weight:bold;'
 				},{ 
 					fieldLabel : 'Bill Date ',
 					name : 'dinv_bill_date',
 					id : 'dinv_bill_date',
 					labelWidth : 110,
 					margin : '0 0 10 0',
-					width : 320,
+					width : 400,
 					renderer: Ext.util.Format.dateRenderer('d/m/y'),
-					fieldStyle : 'font-size:14px;font-weight:bold;'
+					fieldStyle : 'font-size:13px;font-weight:bold;'
 				},{
 					fieldLabel : 'Payment Terms ',
 					name : 'dinv_payment_terms',
 					id : 'dinv_payment_terms',
 					labelWidth : 110,
 					margin : '0 0 10 0',
-					width : 320,
-					fieldStyle : 'font-size:14px;font-weight:bold;'
+					width : 400,
+					fieldStyle : 'font-size:13px;font-weight:bold;'
 				}]
 			},{
-				columnWidth : 0.5,
+				columnWidth : 0.3,
 				border : false,
 				layout : 'anchor',
 				style : {
-					"margin-left" : "60px",
+					"margin-left" : "30px",
 					"margin-right" : "auto",
 					"margin-top" : "10px",
 					"margin-bottom" : "10px"
@@ -246,40 +314,40 @@ Ext.onReady(function() {
 						id: 'dinv_number',
 						labelWidth : 110,
 						margin : '0 0 10 0',
-						width : 350,
-						fieldStyle : 'font-size:14px;font-weight:bold;'
+						width : 320,
+						fieldStyle : 'font-size:13px;font-weight:bold;'
 				    },{
 				    	fieldLabel : 'Company Name ',
 						name : 'dinv_company_name',
 						id: 'dinv_company_name',
 						labelWidth : 110,
 						margin : '0 0 10 0',
-						width : 350,
-						fieldStyle : 'font-size:14px;font-weight:bold;'
+						width : 320,
+						fieldStyle : 'font-size:13px;font-weight:bold;'
 				    },{
 						fieldLabel : 'Customer Name ',
 						name : 'dcus_name',
 						id: 'dcus_name',
 						labelWidth : 110,
 						margin : '0 0 10 0',
-						width : 350,
-						fieldStyle : 'font-size:14px;font-weight:bold;'
+						width : 320,
+						fieldStyle : 'font-size:13px;font-weight:bold;'
 					},{
 						fieldLabel : 'Billing Type ',
 						name : 'dinv_bill_type',
 						id : 'dinv_bill_type',
 						labelWidth : 110,
 						margin : '0 0 10 0',
-						width : 350,
-						fieldStyle : 'font-size:14px;font-weight:bold;'
+						width : 320,
+						fieldStyle : 'font-size:13px;font-weight:bold;'
 					},{
 						fieldLabel : 'Vat(%) ',
 						name : 'dinv_vat',
 						id : 'dinv_vat',
 						labelWidth : 110,
 						margin : '0 0 10 0',
-						width : 350,
-						fieldStyle : 'font-size:14px;font-weight:bold;'
+						width : 320,
+						fieldStyle : 'font-size:13px;font-weight:bold;'
 					}]
 			},{
 				xtype: 'hidden',
@@ -300,6 +368,145 @@ Ext.onReady(function() {
 			}  ]
 		} ],
 		buttons: [{
+			text: 'Send to Angebote',
+			disabled: true,
+			id: 'angeboteButton',
+			iconCls: 'icon-db',
+			handler: function(){
+				inv_id = Ext.getCmp('dinv_id').getValue();
+				var record = store.invoice.findRecord('inv_id',inv_id);
+				var myIndex = store.invoice.indexOf(record);
+				var count_tpx = store.invoice.getAt(myIndex).data.count_tpx;
+				var topix_cus_id = store.invoice.getAt(myIndex).data.topix_cus_id;
+				console.log(topix_cus_id);
+				if(topix_cus_id == '' || topix_cus_id == '0'){
+					Ext.MessageBox.show({
+						title: 'Information',
+						msg: "Please Assign Topix Customer ID!",
+						width: 300,
+						buttons: Ext.MessageBox.OK,
+						icon: Ext.MessageBox.ERROR,
+						animateTarget: 'angeboteButton'
+					});
+				}else if(count_tpx != 0){
+					Ext.MessageBox.show({
+						title: 'Information',
+						msg: "Please Assign All Item Topix ID!",
+						width: 300,
+						buttons: Ext.MessageBox.OK,
+						icon: Ext.MessageBox.ERROR,
+						animateTarget: 'angeboteButton'
+					});
+				}else{
+					Ext.MessageBox.show({
+						title : 'Confirm',
+						msg : 'Are you sure you want to send to Angebote?',
+						buttons : Ext.MessageBox.YESNO,
+						animateTarget : 'angeboteButton',
+						icon : Ext.MessageBox.QUESTION,
+						width: 350,
+						fn: function(btn){
+							if(btn == "yes"){
+								var box1 = Ext.MessageBox.show({
+					                  title: 'Sending info to Topix',
+					                  msg: 'Please wait...',
+					                  wait: true,
+					                  animateTarget: 'angeboteButton',
+					              });
+								var inv_id = Ext.getCmp('dinv_id').getValue();
+								Ext.Ajax.request({
+			           				url : 'topixSoap.htm',
+			           				params: {id : inv_id},
+			           				success: function(response, opts){
+			           					box1.hide();
+			           					var responseOject = Ext.decode(response.responseText);
+			           					var err_nr = responseOject.records[0].tpx_res_nr;
+			           					var err_text = responseOject.records[0].tpx_res_msg;
+			           					if(err_nr == '0'){
+			           						Ext.getCmp('angeboteButton').setDisabled(true);
+			           						Ext.getCmp('directButton').setDisabled(true);
+			           						Ext.getCmp('printInvoiceButton').setDisabled(false);
+			           						var inv_number = responseOject.records[0].tpx_inv_number;
+			           						Ext.getCmp('dinv_bill_type').setValue("Angebote");
+			           						Ext.getCmp('dinv_number').setValue(inv_number);
+			           						Ext.MessageBox.show({
+			           							title: 'Information',
+			           							msg: "Invoice has been sent to Angebote: "+inv_number,
+			           							width: 350,
+			           							buttons: Ext.MessageBox.OK,
+			           							icon: Ext.MessageBox.INFO,
+			           							animateTarget: 'angeboteButton'
+			           						});
+			           					}else{
+			           						var err_msg = "Angebote Error("+err_nr+"): "+err_text;
+			           						Ext.getCmp('dinv_bill_type').setValue(err_msg);
+			           						Ext.MessageBox.show({
+			           							title: 'Information',
+			           							msg: err_msg,
+			           							width: 350,
+			           							buttons: Ext.MessageBox.OK,
+			           							icon: Ext.MessageBox.ERROR,
+			           							animateTarget: 'angeboteButton'
+			           						});
+			           					}
+			           				},
+			           				failure: function(response, opts){
+			           					box1.hide();
+			           					var responseOject = Ext.util.JSON.decode(response.responseText);
+			           					Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+			           				}
+			           			});
+							}
+						}
+					});
+				}
+			}
+		},{
+			text: 'Send Direct',
+			id: 'directButton',
+			disabled: true,
+			iconCls: 'icon-mail',
+			handler: function(){
+				Ext.MessageBox.show({
+					title : 'Confirm',
+					msg : 'Are you sure you want to send Direct?',
+					buttons : Ext.MessageBox.YESNO,
+					animateTarget : 'directButton',
+					icon : Ext.MessageBox.QUESTION,
+					width: 350,
+					fn: function(btn){
+						if(btn == "yes"){
+							var inv_id = Ext.getCmp('dinv_id').getValue();
+							Ext.Ajax.request({
+								url : 'updateInvoiceStatus.htm',
+			       				params: {inv_bill_type : "Direct", inv_id : inv_id},
+			       				success: function(response, opts){
+			       					Ext.getCmp('angeboteButton').setDisabled(true);
+	           						Ext.getCmp('directButton').setDisabled(true);
+	           						Ext.getCmp('printInvoiceButton').setDisabled(false);
+			       					var responseOject = Ext.decode(response.responseText);
+			       					var inv_number = responseOject.records[0].inv_number;
+			       					Ext.getCmp('dinv_bill_type').setValue("Direct");
+			   						Ext.getCmp('dinv_number').setValue(inv_number);
+			   						Ext.MessageBox.show({
+			   							title: 'Information',
+			   							msg: "Invoice has been assign to: "+inv_number,
+			   							width: 350,
+			   							buttons: Ext.MessageBox.OK,
+			   							icon: Ext.MessageBox.INFO,
+			   							animateTarget: 'directButton'
+			   						});
+			       				},
+			       				failure: function(response, opts){
+			       					var responseOject = Ext.util.JSON.decode(response.responseText);
+			       					Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+			       				}
+							});
+						}
+					}
+				});
+			}
+		},'->',{
 			text: 'Print Invoice',
 			id : 'printInvoiceButton',
 			iconCls: 'icon-print',
@@ -377,6 +584,292 @@ Ext.onReady(function() {
 			hideBorders : false,
 			padding : '10 10 10 10'
 		},
+		items : [ {
+			layout : 'column',
+			border : false,
+			items : [ {
+				columnWidth : 0.66,
+				style : {
+					"margin-left" : "50px",
+					"margin-right" : "10px",
+					"margin-top" : "10px",
+				},
+				border : false,
+				layout : 'anchor',
+				defaultType : 'textfield',
+				items : [ {
+					    fieldLabel : 'Project No. ',
+					    name : 'sinv_proj_no',
+					    id : 'sinv_proj_no',
+					    labelWidth : 100,
+						margin : '0 0 10 0',
+						width : 340,
+						emptyText : 'Project No.'
+					},{
+		            	xtype: 'combobox',
+		            	fieldLabel: 'Company ',
+		            	name: 'sinv_company_id',
+		            	id: 'sinv_company_id',
+		            	queryMode: 'local',
+		            	msgTarget: 'under',
+		            	labelWidth: 100,
+		            	width : 340,
+		            	editable: false,
+		            	emptyText: 'Company',
+		            	store: {
+		            		fields: ['inv_company_id','inv_company_name'],
+		            		proxy: {
+		            			type: 'ajax',
+		            			url: 'showInvoiceCompany.htm',
+		            			reader: {
+		            				type: 'json',
+		            				root: 'records',
+		            				idProperty: 'inv_company_id'
+		            			}
+		            		},
+		            		autoLoad: true,
+		            		sorters: [{
+		            			property: 'inv_company_id',
+		            			direction: 'ASC'
+		            		}]
+		            	},
+		            	valueField: 'inv_company_id',
+		            	displayField: 'inv_company_name'
+		            },{
+						fieldLabel : 'Delivery Date',
+						name : 'supdate_date',
+						combineErrors: true,
+						xtype: 'fieldcontainer',
+						labelWidth : 100,
+						margin : '0 0 10 0',
+						width : 350,
+						layout: 'hbox',
+		                defaults: {
+		                    flex: 1,
+		                },
+		                items: [
+		                    {
+//		                        xtype     : 'datefield',
+		                    	xtype     : 'monthfield',
+		                        name      : 'delivery_start',
+		                        id	: 'delivery_start',
+		                        labelSeparator : '',
+		                        margin: '0 0 0 0',
+		                        msgTarget : 'side',
+		                        width: 50,
+		                        editable: false,
+		                        format: 'm/y',
+//		                        maxValue: new Date(),
+//		                        listeners: {
+//		                        	   "change": function () {
+//		                        		   			var startDate = Ext.getCmp('delivery_start').getRawValue();
+//		                        		   			Ext.getCmp('delivery_limit').setMinValue(startDate);
+//		                        	   }
+//		                        }
+		                    },{
+		                    	 xtype: 'fieldcontainer',
+		     	                fieldLabel: 'To ',
+		     	                combineErrors: true,
+		     	                msgTarget : 'side',
+		     	                margin: '0 0 0 5',
+		                    	labelSeparator : '',
+		                        Width : 20
+		                    },
+		                    {
+//		                        xtype     : 'datefield',
+		                    	xtype     : 'monthfield',
+		                        margin: '0 10 0 -80',	
+		                        name      : 'delivery_limit',
+		                        id	: 'delivery_limit',
+		                        labelSeparator : '',
+		                        msgTarget : 'side',
+		                        editable: false,
+		                        format: 'm/y',
+		                        width: 50,
+//		                        maxValue: new Date(),
+//		                        listeners: {
+//		                        	"change": function () {
+//		                        		   	var endDate = Ext.getCmp('delivery_limit').getRawValue();
+//		                           			Ext.getCmp('delivery_start').setMaxValue(endDate);
+//		                        	}
+//		                        }
+		                    }
+		                ]
+					}
+				]
+			},{
+				columnWidth : 0.33,
+				border : false,
+				layout : 'anchor',
+				style : {
+					"margin-left" : "-80px",
+					"margin-right" : "10px",
+					"margin-top" : "10px",
+					"margin-bottom" : "10px"
+				},
+				defaultType : 'textfield',
+				items : [ 
+						{
+							xtype : 'combobox',
+							fieldLabel : 'Customer Name ',
+							name : 'scus_name',
+							id: 'scus_name',
+							queryMode : 'local',
+							labelWidth : 110,
+							margin : '0 0 10 0',
+							width : 280,
+							emptyText : 'Customer Name',
+							store : {
+								fields : [ 'cus_id', 'cus_name', 'cus_code' ],
+								proxy : {
+									type : 'ajax',
+									url : 'showCustomer.htm',
+									reader : {
+										type : 'json',
+										root : 'records',
+										idProperty : 'cus_id'
+									}
+								},
+								autoLoad : true,
+								sorters: [{
+							         property: 'cus_name',
+							         direction: 'ASC'
+							     }]
+							},
+							valueField : 'cus_name',
+							displayField : 'cus_name',
+							listeners : {
+						
+								select : function() {
+									
+									var v = this.getValue();
+									var record = this.findRecord(this.valueField || this.displayField, v);
+									var myIndex = this.store.indexOf(record);
+									var myValue = this.store.getAt(myIndex).data.cus_code;
+									var myId = this.store.getAt(myIndex).data.cus_id;
+									Ext.getCmp('scus_id').setValue(myId);
+									Ext.getCmp('scus_code').setValue(myValue);
+									
+									console.log("cus_code: "+myValue);
+								},
+								blur : function() {
+									var v = this.getValue();
+									var record = this.findRecord(this.valueField || this.displayField, v);
+									if(record == false){
+										Ext.getCmp('scus_id').setValue("");
+										Ext.getCmp('scus_name').setValue("");
+										Ext.getCmp('scus_code').setValue("");
+									}
+								}
+							}
+						}, {
+							xtype : 'combobox',
+							fieldLabel : 'Customer Code ',
+							name : 'scus_code',
+							id : 'scus_code',
+							queryMode : 'local',
+							labelWidth : 110,
+							margin : '0 0 10 0',
+							width : 280,
+							emptyText : 'Customer Code',
+							store : {
+								fields : [ 'cus_id', 'cus_code', 'cus_name' ],
+								proxy : {
+									type : 'ajax',
+									url : 'showCustomer.htm',
+									reader : {
+										type : 'json',
+										root : 'records',
+										idProperty : 'cus_id'
+									}
+								},
+								autoLoad : true,
+								sorters: [{
+							         property: 'cus_code',
+							         direction: 'ASC'
+							     }]
+							},
+							valueField : 'cus_code',
+							displayField : 'cus_code',
+							listeners : {
+						
+								select : function() {
+									
+									var v = this.getValue();
+									var record = this.findRecord(this.valueField || this.displayField, v);
+									var myIndex = this.store.indexOf(record);
+									var myValue = this.store.getAt(myIndex).data.cus_name;
+									var myId = this.store.getAt(myIndex).data.cus_id;
+									Ext.getCmp('scus_id').setValue(myId);
+									Ext.getCmp('scus_name').setValue(myValue);
+									
+									console.log("cus_name: "+myValue);
+								},
+								blur : function() {
+									var v = this.getValue();
+									var record = this.findRecord(this.valueField || this.displayField, v);
+									if(record == false){
+										Ext.getCmp('scus_id').setValue("");
+										Ext.getCmp('scus_name').setValue("");
+										Ext.getCmp('scus_code').setValue("");
+									}
+								}
+						
+							}
+						},{
+							xtype: 'combobox',
+							fieldLabel: 'Billing Type ',
+							name: 'sinv_bill_type',
+							id: 'sinv_bill_type',
+							labelWidth: 110,
+							width : 280,
+							store : {
+								fields : ['db_ref_name'],
+								proxy : {
+									type : 'ajax',
+									url : 'showDBReference.htm?kind=BillingType&dept=-',
+									reader : {
+										type : 'json',
+										root : 'records',
+									}
+								},
+								autoLoad : true
+							},
+							valueField : 'db_ref_name',
+							displayField : 'db_ref_name',
+							editable : false,
+							emptyText : 'Billing Type'
+						}]
+			},{
+				xtype: 'hidden',
+				id : 'scus_id',
+				name : 'scus_id'
+			}  ]
+		} ],
+		buttons: [{
+			text: 'Search',
+			id: 'searchBtn',
+			handler: function(){
+				var form = this.up('form').getForm();
+				if(form.isValid()){
+					Ext.Ajax.request({
+						url : 'searchInvoiceParam.htm' + getParamValues(),
+						success : function(response, opts) {
+							store.invoice.reload();
+							panel.tabs.setActiveTab('invoiceTabs');
+							Ext.getCmp('detailTabs').setDisabled(true);
+							Ext.getCmp('detailTabs').setTitle("Detail");
+ 							Ext.getCmp('filterSearchField').setValue("");
+						}
+					});
+				}
+			}
+		},{
+			text : 'Reset',
+			handler : function() {
+				this.up('form').getForm().reset();
+			}
+		}]
 	});
 	
 	panel.tabs = Ext.create('Ext.tab.Panel', {
@@ -385,6 +878,15 @@ Ext.onReady(function() {
 		width: 1300,
 		height: 700,
 		frame: true,
+//		tools : [ {
+//			xtype : 'button',
+//			text : 'Report',
+//			id : 'invoiceReport',
+//			iconCls : 'icon-excel',
+//			handler : function() {
+//				window.open('printInvoiceReport.htm', '_blank');
+//			}
+//		}],
 		style : {
 			"margin-left" : "auto",
 			"margin-right" : "auto",
@@ -407,25 +909,73 @@ Ext.onReady(function() {
 	    		if(tab.id == 'invoiceTabs'){
 	    			store.invoice.reload();
 	    		}else if(tab.id == 'detailTabs'){
+	    			store.invoice.reload();
 	    			store.invoiceRef.reload();
 	    		}
 	    	},
-	    	'afterrender': function(){
-            	grid.invoice.down('toolbar').add('->',{
-            		xtype : 'button',
-            		text : "Add Invoice",
-            		id : 'inv_add',
-            		iconCls : 'icon-add',
-            		handler : function() {
-            			Ext.getCmp('ainv_portal').setValue(1);
-            			addInvoice.show();
-            		}
-            	});
+	    	'afterrender': function(panel){
             	grid.invoice.down('statusbar').add('->',{
               		xtype : 'tbtext',
              		 id : 'inv_total',
-              		text : '<b>Total Invoices : '+store.invoice.getTotalCount()+' <b>&nbsp;&nbsp;&nbsp;'
+              		text : '<b>Total Invoices : '+store.invoice.count()+' <b>&nbsp;&nbsp;&nbsp;'
             	});
+            	Ext.Ajax.request({
+            		url : 'userModel.htm',
+            		success: function(response, opts){
+            			var responseObject = Ext.decode(response.responseText);
+            			usr_id = responseObject.user[0].usr_id;
+            			usr_dept = responseObject.user[0].dept;
+            			
+            			if(usr_dept == 'Billing'){
+            				grid.invoice.down('toolbar').add('->',{
+                                xtype: 'button',
+                                id: 'inv_report_btn',
+                                text: 'Report',
+                                margin : '0 5 0 0',
+                                iconCls : 'icon-excel',
+                    			handler : function() {
+                    				window.open('printInvoiceReport.htm', '_blank');
+                    			}
+                            },{
+                        		xtype : 'button',
+                        		text : "Add Invoice",
+                        		id : 'inv_add',
+                        		iconCls : 'icon-add',
+                        		handler : function() {
+                        			Ext.getCmp('ainv_portal').setValue(1);
+                        			addInvoice.show();
+                        		}
+                        	});
+            			}else{
+            				grid.invoice.down('toolbar').add('->',{
+                        		xtype : 'button',
+                        		text : "Add Invoice",
+                        		id : 'inv_add',
+                        		iconCls : 'icon-add',
+                        		handler : function() {
+                        			Ext.getCmp('ainv_portal').setValue(1);
+                        			addInvoice.show();
+                        		}
+                        	});
+            			}
+            		}
+            	});
+//            	var bar = panel.tabBar;
+//                bar.insert(2,[
+//                    {
+//                        xtype: 'component',
+//                        flex: 1
+//                    },
+//                    {
+//                        xtype: 'button',
+//                        text: 'Report',
+//                        margin : '0 5 0 0',
+//                        iconCls : 'icon-excel',
+//            			handler : function() {
+//            				window.open('printInvoiceReport.htm', '_blank');
+//            			}
+//                    }                
+//                ]);
             }
 	    }
 	});
@@ -667,28 +1217,28 @@ Ext.onReady(function() {
 					minValue : 0,
 					msgTarget: 'under',
 					allowBlank: false
-				},{
-					xtype: 'combobox',
-					fieldLabel: 'Billing Type <font color="red">*</font> ',
-					name: 'ainv_bill_type',
-					id: 'ainv_bill_type',
-					labelWidth: 120,
-					store : {
-						fields : ['db_ref_name'],
-						proxy : {
-							type : 'ajax',
-							url : 'showDBReference.htm?kind=BillingType&dept=-',
-							reader : {
-								type : 'json',
-								root : 'records',
-							}
-						},
-						autoLoad : true
-					},
-					valueField : 'db_ref_name',
-					displayField : 'db_ref_name',
-					editable : false,
-					value : 'Direct'
+//				},{
+//					xtype: 'combobox',
+//					fieldLabel: 'Billing Type <font color="red">*</font> ',
+//					name: 'ainv_bill_type',
+//					id: 'ainv_bill_type',
+//					labelWidth: 120,
+//					store : {
+//						fields : ['db_ref_name'],
+//						proxy : {
+//							type : 'ajax',
+//							url : 'showDBReference.htm?kind=BillingType&dept=-',
+//							reader : {
+//								type : 'json',
+//								root : 'records',
+//							}
+//						},
+//						autoLoad : true
+//					},
+//					valueField : 'db_ref_name',
+//					displayField : 'db_ref_name',
+//					editable : false,
+//					value : 'Direct'
 				}]
 			},{
 				xtype: 'hidden',
@@ -966,27 +1516,27 @@ Ext.onReady(function() {
 					minValue : 0,
 					msgTarget: 'under',
 					allowBlank: false
-				},{
-					xtype: 'combobox',
-					fieldLabel: 'Billing Type <font color="red">*</font> ',
-					name: 'einv_bill_type',
-					id: 'einv_bill_type',
-					labelWidth: 120,
-					store : {
-						fields : ['db_ref_name'],
-						proxy : {
-							type : 'ajax',
-							url : 'showDBReference.htm?kind=BillingType&dept=-',
-							reader : {
-								type : 'json',
-								root : 'records',
-							}
-						},
-						autoLoad : true
-					},
-					valueField : 'db_ref_name',
-					displayField : 'db_ref_name',
-					editable : false,
+//				},{
+//					xtype: 'combobox',
+//					fieldLabel: 'Billing Type <font color="red">*</font> ',
+//					name: 'einv_bill_type',
+//					id: 'einv_bill_type',
+//					labelWidth: 120,
+//					store : {
+//						fields : ['db_ref_name'],
+//						proxy : {
+//							type : 'ajax',
+//							url : 'showDBReference.htm?kind=BillingType&dept=-',
+//							reader : {
+//								type : 'json',
+//								root : 'records',
+//							}
+//						},
+//						autoLoad : true
+//					},
+//					valueField : 'db_ref_name',
+//					displayField : 'db_ref_name',
+//					editable : false,
 				}]
 			},{
 				xtype: 'hidden',
@@ -1005,82 +1555,99 @@ Ext.onReady(function() {
 			handler: function(){
 				var form = Ext.getCmp('editInvoiceForm').getForm();
 				Ext.Ajax.request({
-					url : 'searchInvoiceParam.htm?inv_id='+Ext.getCmp('einv_id').getValue()+'&AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
-					'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
-					'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&USD='+store.exchangeRates.getAt(0).data.USD,
-					success : function(response, opts) {}
+					url : 'searchInvoiceParam.htm?inv_id='+Ext.getCmp('einv_id').getValue(),
+					success : function(response, opts) {
+						if(form.isValid()){
+			   				 form.submit({
+			   				 url: 'updateInvoice.htm',
+			   				 waitTitle: 'Updating Invoice',
+			   				 waitMsg: 'Please wait...',
+			   				 standardSubmit: false,
+			                    success: function(form, action) {
+			                   	 Ext.MessageBox.show({
+			     						title: 'Information',
+			     						msg: 'Invoice Has Been Update!',
+			     						buttons: Ext.MessageBox.OK,
+			     						icon: Ext.MessageBox.INFO,
+			     						animateTarget: 'updateInvoiceButton',
+			     						fn: function(){
+			     							if(editPosition == 0){
+				     							editInvoice.hide();
+				     							store.invoice.reload();
+				     							Ext.getCmp('detailTabs').setDisabled(true);
+												Ext.getCmp('detailTabs').setTitle("Detail");
+				     							Ext.getCmp('filterSearchField').setValue("");
+				      		                	store.invoice.clearFilter();
+			     							}else if(editPosition == 1){
+			     								editForm = Ext.getCmp('editInvoiceForm').getForm();
+			     								inv_name = editForm.getValues().einv_name;
+			     								inv_proj_no = editForm.getValues().einv_proj_no;
+			     								inv_delivery_date = Ext.getCmp('einv_delivery_date').getValue();
+			     								cus_id = Ext.getCmp('ecus_id').getValue();
+			     								cus_name = editForm.getValues().ecus_name;
+			     								cus_code = editForm.getValues().ecus_code;
+			     								inv_payment_terms = Ext.getCmp('einv_payment_terms').getValue();
+			     								inv_vat = Ext.getCmp('einv_vat').getValue();
+//			     								inv_bill_type = editForm.getValues().einv_bill_type;
+			     								inv_bill_date = Ext.getCmp('einv_bill_date').getValue();
+			     								
+			     								if(cus_id != Ext.getCmp('dcus_id').getValue()){
+			     									console.log("Change Customer!");
+//			     									store.invoiceRef.removeAll();
+			     									var aproj_id = Ext.getCmp('aproj_id');
+			     									aproj_id.clearValue();
+			     									aproj_id.getStore().removeAll();
+			     									aproj_id.getStore().load({
+			     										url: 'showProjects.htm?id='+cus_id
+			     									});
+			     									
+			     									var eproj_id = Ext.getCmp('eproj_id');
+			     									eproj_id.clearValue();
+			     									eproj_id.getStore().removeAll();
+			     									eproj_id.getStore().load({
+			     										url: 'showProjects.htm?id='+cus_id
+			     									});
+			     								}
+			     								
+			     								Ext.getCmp('dinv_name').setValue(inv_name);
+			     								Ext.getCmp('dinv_proj_no').setValue(inv_proj_no);
+			     								Ext.getCmp('dinv_delivery_date').setValue(inv_delivery_date);
+			     								Ext.getCmp('dcus_id').setValue(cus_id);
+			     								Ext.getCmp('dcus_name').setValue(cus_name);
+			     								Ext.getCmp('dcus_code').setValue(cus_code);
+			     								Ext.getCmp('dinv_payment_terms').setValue(inv_payment_terms + " days net");
+			     								Ext.getCmp('dinv_vat').setValue(inv_vat);
+//			     								Ext.getCmp('dinv_bill_type').setValue(inv_bill_type);
+			     								Ext.getCmp('dinv_bill_date').setValue(inv_bill_date);
+			     								editInvoice.hide();
+			     								store.invoice.reload();
+			     								store.invoiceRef.reload();
+			     								Ext.getCmp('detailTabs').setTitle(inv_name);
+			     							}
+			     						}
+			     					});
+			                       },
+			                       failure : function(form, action) {
+			                       	Ext.MessageBox.show({
+						                    title: 'REMOTE EXCEPTION',
+						                    msg: operation.getError(),
+						                    icon: Ext.MessageBox.ERROR,
+						                    buttons: Ext.Msg.OK,
+						                    fn: function(){location.reload()}
+						                });
+									}
+			         			});
+			           	 }else {
+			   					Ext.MessageBox.show({
+			   						title: 'Failed',
+			   						msg: ' Please Insert All Required Field',
+			   						buttons: Ext.MessageBox.OK,
+			   						icon: Ext.MessageBox.ERROR,
+			   						animateTarget: 'ebtn',
+			   					});
+			   				}
+					}
 				});
-				if(form.isValid()){
-   				 form.submit({
-   				 url: 'updateInvoice.htm',
-   				 waitTitle: 'Updating Invoice',
-   				 waitMsg: 'Please wait...',
-   				 standardSubmit: false,
-                    success: function(form, action) {
-                   	 Ext.MessageBox.show({
-     						title: 'Information',
-     						msg: 'Invoice Has Been Update!',
-     						buttons: Ext.MessageBox.OK,
-     						icon: Ext.MessageBox.INFO,
-     						animateTarget: 'updateInvoiceButton',
-     						fn: function(){
-     							if(editPosition == 0){
-	     							editInvoice.hide();
-	     							store.invoice.reload();
-	     							Ext.getCmp('detailTabs').setDisabled(true);
-									Ext.getCmp('detailTabs').setTitle("Detail");
-	     							Ext.getCmp('filterSearchField').setValue("");
-	      		                	store.invoice.clearFilter();
-     							}else if(editPosition == 1){
-     								editForm = Ext.getCmp('editInvoiceForm').getForm();
-     								inv_name = editForm.getValues().einv_name;
-     								inv_proj_no = editForm.getValues().einv_proj_no;
-     								inv_delivery_date = Ext.getCmp('einv_delivery_date').getValue();
-     								cus_id = Ext.getCmp('ecus_id').getValue();
-     								cus_name = editForm.getValues().ecus_name;
-     								cus_code = editForm.getValues().ecus_code;
-     								inv_payment_terms = Ext.getCmp('einv_payment_terms').getValue();
-     								inv_vat = Ext.getCmp('einv_vat').getValue();
-     								inv_bill_type = editForm.getValues().einv_bill_type;
-     								inv_bill_date = Ext.getCmp('einv_bill_date').getValue();
-     								
-     								Ext.getCmp('dinv_name').setValue(inv_name);
-     								Ext.getCmp('dinv_proj_no').setValue(inv_proj_no);
-     								Ext.getCmp('dinv_delivery_date').setValue(inv_delivery_date);
-     								Ext.getCmp('dcus_id').setValue(cus_id);
-     								Ext.getCmp('dcus_name').setValue(cus_name);
-     								Ext.getCmp('dcus_code').setValue(cus_code);
-     								Ext.getCmp('dinv_payment_terms').setValue(inv_payment_terms + " days net");
-     								Ext.getCmp('dinv_vat').setValue(inv_vat);
-     								Ext.getCmp('dinv_bill_type').setValue(inv_bill_type);
-     								Ext.getCmp('dinv_bill_date').setValue(inv_bill_date);
-     								editInvoice.hide();
-     								store.invoice.reload();
-     								store.invoiceRef.reload();
-     								Ext.getCmp('detailTabs').setTitle(inv_name);
-     							}
-     						}
-     					});
-                       },
-                       failure : function(form, action) {
-                       	Ext.MessageBox.show({
-			                    title: 'REMOTE EXCEPTION',
-			                    msg: operation.getError(),
-			                    icon: Ext.MessageBox.ERROR,
-			                    buttons: Ext.Msg.OK,
-			                    fn: function(){location.reload()}
-			                });
-						}
-         			});
-           	 }else {
-   					Ext.MessageBox.show({
-   						title: 'Failed',
-   						msg: ' Please Insert All Required Field',
-   						buttons: Ext.MessageBox.OK,
-   						icon: Ext.MessageBox.ERROR,
-   						animateTarget: 'ebtn',
-   					});
-   				}
 			}
 		},{
 			text: 'Reset',
@@ -1160,6 +1727,18 @@ Ext.define('invoiceModel', {
 	},{
 		name: 'usr_name',
 		type: 'string'
+	},{
+		name: 'total_inv_price',
+		type: 'double'
+	},{
+		name: 'inv_ref_currency',
+		type: 'string'
+	},{
+		name: 'count_tpx',
+		type: 'int'
+	},{
+		name: 'topix_cus_id',
+		type: 'string'
 	}]
 });
 
@@ -1178,11 +1757,28 @@ store.invoice = Ext.create('Ext.data.JsonStore', {
 			totalProperty : 'total'
 		}
 	},
+	sorters: [{
+        property: 'inv_id',
+        direction: 'DESC'
+    }],
 	listeners: {
 		load: function(){
 			setTimeout(function(){
-          		Ext.getCmp('inv_total').setText('<b>Total Invoices : '+store.invoice.getTotalCount()+'</b>&nbsp;&nbsp;&nbsp;');
+          		Ext.getCmp('inv_total').setText('<b>Total Invoices : '+store.invoice.count()+'</b>&nbsp;&nbsp;&nbsp;');
           	},500);
+			try {
+				var record = store.invoice.findRecord('inv_id',Ext.getCmp('dinv_id').getValue());
+				var myIndex = store.invoice.indexOf(record);
+				var total_price = store.invoice.getAt(myIndex).data.total_inv_price;
+				var currency = store.invoice.getAt(myIndex).data.inv_ref_currency;
+				var sum_price = Ext.util.Format.number(total_price, '0,000.##');
+				store.invoiceRef.reload();
+				setTimeout(function(){
+	          		Ext.getCmp('invRef_tbar').setText('<b>Total Price : '+sum_price+' '+currency+'</b>');
+	          	},500);
+			} catch (err){
+				console.log(err.message);
+			}
 		}
 	}
 });
@@ -1229,12 +1825,15 @@ Ext.define('invoiceRefModel', {
 		dateFormat: 'Y-m-d H:i:s'
 	},{
 		name: 'total_amount',
-		type: 'float'
+		type: 'double'
 	},{
 		name: 'proj_id',
 		type: 'int'
 	},{
 		name: 'proj_name',
+		type: 'string'
+	},{
+		name: 'topix_article_id',
 		type: 'string'
 	}]
 });
@@ -1274,11 +1873,28 @@ store.invoiceRef = Ext.create('Ext.data.JsonStore', {
 						animateTarget: 'invRefSync',
 						fn: function(){
 							store.invoiceRef.reload();
+							store.invoice.reload();
 							}
 					});
             }
             
-        }
+        },
+        load: function(proxy, operation){
+        	var inv_status = Ext.getCmp('dinv_bill_type').getValue();
+        	if(store.invoiceRef.count() == 0){
+        		Ext.getCmp('angeboteButton').setDisabled(true);
+	        	Ext.getCmp('directButton').setDisabled(true);
+        		Ext.getCmp('printInvoiceButton').setDisabled(true);
+        	}else if(inv_status !== "Direct" && inv_status !== "Angebote" && store.invoiceRef.count() !== 0){
+	        	Ext.getCmp('angeboteButton').setDisabled(false);
+	        	Ext.getCmp('directButton').setDisabled(false);
+	        	Ext.getCmp('printInvoiceButton').setDisabled(true);
+			}else{
+				Ext.getCmp('angeboteButton').setDisabled(true);
+				Ext.getCmp('directButton').setDisabled(true);
+				Ext.getCmp('printInvoiceButton').setDisabled(false);
+			}
+    	}
 	}
 });
 
@@ -1320,12 +1936,24 @@ store.exchangeRates = Ext.create('Ext.data.JsonStore', {
 			type : 'json',
 			root : 'rates',
 		}
+	},
+	listeners: {
+		load : function(){
+			Ext.Ajax.request({
+				url : 'invoiceCurrencyParam.htm?AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
+				'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
+				'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&USD='+store.exchangeRates.getAt(0).data.USD,
+				success : function(response, opts) {}
+			});
+		}
 	}
 });
 
 grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 	store: store.invoice,
 	id: 'invoiceGrid',
+	columnLines: true,
+    stripeRows: true,
 	indexes: ['inv_number','inv_name','cus_name'],
 	height: 652,
 	columns: [{
@@ -1352,6 +1980,7 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				inv_bill_date = grid.getStore().getAt(rowIndex).get('inv_bill_date');
 				inv_number = grid.getStore().getAt(rowIndex).get('inv_number');
 				
+				Ext.getCmp('invid').setValue(inv_id);
 				Ext.getCmp('dinv_id').setValue(inv_id);
 				Ext.getCmp('dinv_name').setValue(inv_name);
 				Ext.getCmp('dinv_proj_no').setValue(inv_proj_no);
@@ -1381,23 +2010,22 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 					url: 'showProjects.htm?id='+cus_id
 				});
 				
-//				store.invoiceRef.removeAll();
-//				store.invoiceRef.load({
-//					url: 'searchInvoiceReference.htm?id='+inv_id
+//				Ext.apply(store.invoiceRef.getProxy().api,{read: 'searchInvoiceReference.htm?inv_id='+inv_id});
+				Ext.apply(store.invoiceRef.getProxy().extraParams,{'inv_id': inv_id});
+				store.invoiceRef.loadPage(1);
+				Ext.getCmp('detailTabs').setDisabled(false);
+				Ext.getCmp('detailTabs').setTitle(inv_name);
+				panel.tabs.setActiveTab('detailTabs');
+				
+//				Ext.Ajax.request({
+//					url : 'searchInvoiceParam.htm?inv_id='+inv_id,
+//					success : function(response, opts) {
+//						store.invoiceRef.loadPage(1);
+//						Ext.getCmp('detailTabs').setDisabled(false);
+//						Ext.getCmp('detailTabs').setTitle(inv_name);
+//						panel.tabs.setActiveTab('detailTabs');
+//					}
 //				});
-				
-				
-				Ext.Ajax.request({
-					url : 'searchInvoiceParam.htm?inv_id='+inv_id+'&AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
-					'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
-					'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&USD='+store.exchangeRates.getAt(0).data.USD,
-					success : function(response, opts) {
-						store.invoiceRef.loadPage(1);
-						Ext.getCmp('detailTabs').setDisabled(false);
-						Ext.getCmp('detailTabs').setTitle(inv_name);
-						panel.tabs.setActiveTab('detailTabs');
-					}
-				});
 				
 			}
 		}]
@@ -1424,6 +2052,13 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 		dataIndex: 'cus_code',
 		align : 'center',
 	},{
+		text: 'Total Price',
+		flex: 0.4,
+		sortable: true,
+		dataIndex: 'total_inv_price',
+		align : 'right',
+		renderer: roundDecimal
+	},{
     	text : 'Edit',
 		xtype : 'actioncolumn',
 		flex : 0.5,
@@ -1442,7 +2077,7 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				cus_code = grid.getStore().getAt(rowIndex).get('cus_code');
 				inv_payment_terms = grid.getStore().getAt(rowIndex).get('inv_payment_terms');
 				inv_vat = grid.getStore().getAt(rowIndex).get('inv_vat');
-				inv_bill_type = grid.getStore().getAt(rowIndex).get('inv_bill_type');
+//				inv_bill_type = grid.getStore().getAt(rowIndex).get('inv_bill_type');
 				inv_bill_date = grid.getStore().getAt(rowIndex).get('inv_bill_date');
 				
 				min_year = new Date(inv_delivery_date.getFullYear(), 0, 1);
@@ -1464,31 +2099,31 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				Ext.getCmp('ecus_code').setValue(cus_code);
 				Ext.getCmp('einv_payment_terms').setValue(inv_payment_terms);
 				Ext.getCmp('einv_vat').setValue(inv_vat);
-				Ext.getCmp('einv_bill_type').setValue(inv_bill_type);
+//				Ext.getCmp('einv_bill_type').setValue(inv_bill_type);
 				editInvoice.show();
 			}
 		}]
-	},{
-		text : 'Delete',
-		xtype : 'actioncolumn',
-		flex : 0.5,
-		align : 'center',
-		id : 'inv_del',
-		items : [ {
-			iconCls : 'icon-delete',
-			handler : function(grid, rowIndex, colIndex) {
-				inv_id = grid.getStore().getAt(rowIndex).get('inv_id');
-				Ext.getCmp('invid').setValue(inv_id);
-				Ext.MessageBox.show({
-					title : 'Confirm',
-					msg : 'Are you sure you want to delete this?',
-					buttons : Ext.MessageBox.YESNO,
-					animateTarget : 'inv_del',
-					fn : confirmChk,
-					icon : Ext.MessageBox.QUESTION
-				});
-			}
-		}]
+//	},{
+//		text : 'Delete',
+//		xtype : 'actioncolumn',
+//		flex : 0.5,
+//		align : 'center',
+//		id : 'inv_del',
+//		items : [ {
+//			iconCls : 'icon-delete',
+//			handler : function(grid, rowIndex, colIndex) {
+//				inv_id = grid.getStore().getAt(rowIndex).get('inv_id');
+//				Ext.getCmp('invid_del').setValue(inv_id);
+//				Ext.MessageBox.show({
+//					title : 'Confirm',
+//					msg : 'Are you sure you want to delete this?',
+//					buttons : Ext.MessageBox.YESNO,
+//					animateTarget : 'inv_del',
+//					fn : confirmChk,
+//					icon : Ext.MessageBox.QUESTION
+//				});
+//			}
+//		}]
 	}],
 	listeners : {
 	    itemdblclick: function(dv, record, item, index, e) {
@@ -1507,6 +2142,7 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 			inv_bill_date = dv.getStore().getAt(index).get('inv_bill_date');
 			inv_number = dv.getStore().getAt(index).get('inv_number');
 			
+			Ext.getCmp('invid').setValue(inv_id);
 			Ext.getCmp('dinv_id').setValue(inv_id);
 			Ext.getCmp('dinv_name').setValue(inv_name);
 			Ext.getCmp('dinv_proj_no').setValue(inv_proj_no);
@@ -1536,15 +2172,21 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				url: 'showProjects.htm?id='+cus_id
 			});
 			
-			Ext.Ajax.request({
-				url : 'searchInvoiceParam.htm?inv_id='+inv_id,
-				success : function(response, opts) {
-					store.invoiceRef.loadPage(1);
-					Ext.getCmp('detailTabs').setDisabled(false);
-					Ext.getCmp('detailTabs').setTitle(inv_name);
-					panel.tabs.setActiveTab('detailTabs');
-				}
-			});
+			Ext.apply(store.invoiceRef.getProxy().extraParams,{'inv_id': inv_id});
+			store.invoiceRef.loadPage(1);
+			Ext.getCmp('detailTabs').setDisabled(false);
+			Ext.getCmp('detailTabs').setTitle(inv_name);
+			panel.tabs.setActiveTab('detailTabs');
+			
+//			Ext.Ajax.request({
+//				url : 'searchInvoiceParam.htm?inv_id='+inv_id,
+//				success : function(response, opts) {
+//					store.invoiceRef.loadPage(1);
+//					Ext.getCmp('detailTabs').setDisabled(false);
+//					Ext.getCmp('detailTabs').setTitle(inv_name);
+//					panel.tabs.setActiveTab('detailTabs');
+//				}
+//			});
 	    }
 	}
 });
@@ -1610,7 +2252,11 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 			
 		}
 	},
-	'->',
+	'->',{
+		xtype: 'tbtext',
+		id: 'invRef_tbar',
+        text: 'Loading ...'
+	},{xtype: 'tbspacer', width: 5},
 	{
 		xtype: 'button',
 		text: 'Save All',
@@ -1633,6 +2279,11 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 		    	name: 'gorder_by',
 		    	hideTrigger: true,
 			}
+		},{
+			text : "Topix ID",
+			flex : 0.6,
+			dataIndex: 'topix_article_id',
+			align : 'right'
 		},{
 			text : "Item Name",
 			flex : 2.5,
@@ -1918,7 +2569,7 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 addInvoiceItem = new Ext.create('Ext.window.Window', {
 	title: 'Add Item',
 	animateTarget: 'addInvoiceItemButton',
-	width: 450,
+	width: 600,
 	minHeight: 250,
 	layout: 'fit',
 	closeAction: 'hide',
@@ -1994,7 +2645,7 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 					msgTarget: 'under',
 					emptyText : 'Item Name',
 					store : {
-						fields : [ 'proj_ref_id', 'itm_name', 'proj_ref_desc', 'price', 'currency' ],
+						fields : [ 'proj_ref_id', 'itm_name', 'proj_ref_desc', 'price', 'currency', 'topix_article_id' ],
 						proxy : {
 							type : 'ajax',
 							url : '',
@@ -2020,7 +2671,7 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 				        	"<tpl if='price == \"\"'>",
 				        	'<div class="x-boundlist-item">{itm_name}</div>',
 				            '<tpl else>',
-				            '<div class="x-boundlist-item">{itm_name} - {price} {currency}</div>',
+				            '<div class="x-boundlist-item">{topix_article_id} : {itm_name} - {price} {currency}</div>',
 				            '</tpl>',
 			            '</tpl>'
 				    ),
@@ -2030,7 +2681,7 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 				        	"<tpl if='price == \"\"'>",
 				        	'{itm_name}',
 				            '<tpl else>',
-				            '{itm_name} - {price} {currency}',
+				            '{topix_article_id} : {itm_name} - {price} {currency}',
 				            '</tpl>',
 				        '</tpl>'
 				    ),
@@ -2108,8 +2759,8 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
  						animateTarget: 'addInvoiceItemBtn',
  						fn: function(){
  							addInvoiceItem.hide();
+ 							store.invoice.reload();
  							store.invoiceRef.reload();
- 		                	store.invoiceRef.clearFilter();
  						}
  					});
                    },
@@ -2347,6 +2998,7 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
  						animateTarget: 'updateInvoiceItemBtn',
  						fn: function(){
  							editInvoiceItem.hide();
+ 							store.invoice.reload();
  							store.invoiceRef.reload();
  						}
  					});
@@ -2390,7 +3042,7 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 
 addInvoiceItemFromJobs = new Ext.create('Ext.window.Window', {
 	title: 'Select From Jobs',
-	width: 450,
+	width: 600,
 	animateTarget: 'addInvoiceItemButton',
 	resizable: false,
 	closeAction: 'hide',
@@ -2403,7 +3055,7 @@ addInvoiceItemFromJobs = new Ext.create('Ext.window.Window', {
 			defaultType: 'textfield',
 			layout: 'anchor',
 			padding: 10,
-			width: 400,
+			width: 550,
 			style: {
                 "margin-left": "auto",
                 "margin-right": "auto",
@@ -2448,7 +3100,7 @@ addInvoiceItemFromJobs = new Ext.create('Ext.window.Window', {
             			var record = this.findRecord(this.valueField || this.displayField, v);
             			var myIndex = this.store.indexOf(record);
 						var job_id = this.store.getAt(myIndex).data.job_id;
-						Ext.getCmp('ajob_id').setValue(job_id);
+						Ext.getCmp('aejob_id').setValue(job_id);
             		}
             	}
             }]
@@ -2514,7 +3166,7 @@ addInvoiceItemFromJobs = new Ext.create('Ext.window.Window', {
 		text: 'Cancel',
 		width: 100,
 		handler: function(){
-			Ext.getCmp('addInvoiceItemFromJobs').hide();
+			addInvoiceItemFromJobs.hide();
 		}
 	}],
 	listeners: {
@@ -2529,7 +3181,7 @@ function confirmChk(btn) {
 		Ext.Ajax.request({
 					url : 'deleteInvoice.htm',
 					params : {
-						id : Ext.getCmp('invid').getValue(),
+						id : Ext.getCmp('invid_del').getValue(),
 					},
 					success : function(response, opts) {
 						Ext.MessageBox.show({
@@ -2543,6 +3195,7 @@ function confirmChk(btn) {
 								Ext.getCmp('detailTabs').setTitle("Detail");
 								Ext.getCmp('filterSearchField').setValue("");
       		                	store.invoice.clearFilter();
+      		                	Ext.getCmp('invid_del').setValue("");
 							},
 							icon : Ext.MessageBox.INFO
 						});
@@ -2590,19 +3243,19 @@ function confirmChkRef(btn) {
 function getParamValues() {
 	var url = "";
 	var param = "";
-	var prefix = "&";
+	var prefix = "?";
 	var queryStr = "";
 	var i = 1;
 	var count = 0;
 
-	for (param in panels.search.getValues()) {
+	for (param in panel.search.getValues()) {
 
-		count += panels.search.getValues()[param].length;
+		count += panel.search.getValues()[param].length;
 
 		if (i == 1) {
-			queryStr += param + "=" + panels.search.getValues()[param];
+			queryStr += param + "=" + panel.search.getValues()[param];
 		} else {
-			queryStr += "&" + param + "=" + panels.search.getValues()[param];
+			queryStr += "&" + param + "=" + panel.search.getValues()[param];
 		}
 
 		i++;

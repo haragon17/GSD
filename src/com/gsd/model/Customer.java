@@ -21,7 +21,7 @@ public class Customer {
 	private String transfer_dtl;
 	private String regist_date;
 	private Timestamp regist_date_ts;
-	private int topix_cus_id;
+	private String topix_cus_id;
 	private int payment_terms;
 	private String cus_fax;
 	
@@ -127,10 +127,10 @@ public class Customer {
 	public void setRegist_date_ts(Timestamp regist_date_ts) {
 		this.regist_date_ts = regist_date_ts;
 	}
-	public int getTopix_cus_id() {
+	public String getTopix_cus_id() {
 		return topix_cus_id;
 	}
-	public void setTopix_cus_id(int topix_cus_id) {
+	public void setTopix_cus_id(String topix_cus_id) {
 		this.topix_cus_id = topix_cus_id;
 	}
 	public int getPayment_terms() {

@@ -1,8 +1,12 @@
 package com.gsd.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +15,16 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPConnection;
+import javax.xml.soap.SOAPConnectionFactory;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.soap.SOAPPart;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -24,6 +38,9 @@ import com.gsd.dao.JobsDao;
 import com.gsd.model.Invoice;
 import com.gsd.model.InvoiceCompany;
 import com.gsd.model.InvoiceReference;
+import com.gsd.model.Topix;
+import com.gsd.model.TopixConfig;
+import com.gsd.model.TopixReference;
 import com.gsd.report.PrintInvoice_iText;
 import com.gsd.security.UserDetailsApp;
 import com.gsd.security.UserLoginDetail;
@@ -49,6 +66,16 @@ public class InvoiceController {
 	
 	@RequestMapping(value = "/invoice")
 	public ModelAndView viewInvoicePage(HttpServletRequest request, HttpServletResponse response){
+		
+		HttpSession session = request.getSession();
+//		session.setAttribute("inv_id", "");
+		session.setAttribute("inv_proj_no", "");
+		session.setAttribute("inv_company_id", "");
+		session.setAttribute("delivery_start", "");
+		session.setAttribute("delivery_limit", "");
+		session.setAttribute("inv_cus_id", "");
+		session.setAttribute("inv_bill_type", "");
+		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		int type = user.getUserModel().getUsr_type();
 		if (type == 0 || type == 1) {
@@ -62,16 +89,32 @@ public class InvoiceController {
 	public ModelAndView searchInvoice(HttpServletRequest request, HttpServletResponse response){
 
 		HttpSession session = request.getSession();
-		session.setAttribute("inv_id", "");
-		session.setAttribute("AUD", "");
-		session.setAttribute("CHF", "");
-		session.setAttribute("GBP", "");
-		session.setAttribute("THB", "");
-		session.setAttribute("EUR", "");
-		session.setAttribute("USD", "");
-		
 		List<Invoice> inv = null;
 		Map<String, String> map = new HashMap<String, String>();
+		map.put("inv_proj_no", (String)session.getAttribute("inv_proj_no"));
+		map.put("inv_company_id", (String)session.getAttribute("inv_company_id"));
+		map.put("delivery_start", (String)session.getAttribute("delivery_start"));
+		map.put("delivery_limit", (String)session.getAttribute("delivery_limit"));
+		map.put("inv_cus_id", (String)session.getAttribute("inv_cus_id"));
+		map.put("inv_bill_type", (String)session.getAttribute("inv_bill_type"));
+		
+		if(map.get("delivery_start")!=null && !map.get("delivery_start").isEmpty()){
+			String delivery_start = map.get("delivery_start");
+			String[] parts = delivery_start.split("/");
+			String month = parts[0];
+			String year = parts[1];
+			String myDate = "20"+year+"-"+month+"-01";
+			map.put("delivery_start", myDate);
+		}
+		
+		if(map.get("delivery_limit")!=null && !map.get("delivery_limit").isEmpty()){
+			String delivery_limit = map.get("delivery_limit");
+			String[] parts = delivery_limit.split("/");
+			String month = parts[0];
+			String year = parts[1];
+			String myDate = "20"+year+"-"+month+"-01";
+			map.put("delivery_limit", myDate);
+		}
 		
 		inv = invoiceDao.searchInvoice(map);
 		
@@ -85,11 +128,13 @@ public class InvoiceController {
 	@RequestMapping(value = "/searchInvoiceReference")
 	public ModelAndView searchInvoiceReference(HttpServletRequest request, HttpServletResponse response){
 
-		List<InvoiceReference> inv_ref = null;
-		HttpSession session = request.getSession();
-		int id = Integer.parseInt((String) session.getAttribute("inv_id"));
+//		HttpSession session = request.getSession();
+//		int id = Integer.parseInt((String) session.getAttribute("inv_id"));
 		
-		inv_ref = invoiceDao.searchInvoiceReference(id);
+		List<InvoiceReference> inv_ref = null;
+		int inv_id = Integer.parseInt(request.getParameter("inv_id"));
+		
+		inv_ref = invoiceDao.searchInvoiceReference(inv_id);
 		
 		JSONObject jobj = new JSONObject();
 		jobj.put("records", inv_ref);
@@ -102,7 +147,19 @@ public class InvoiceController {
 	public void searchInvoiceParam(HttpServletRequest request, HttpServletResponse response){
 		
 		HttpSession session = request.getSession();
-		session.setAttribute("inv_id", request.getParameter("inv_id"));
+//		session.setAttribute("inv_id", request.getParameter("inv_id"));
+		session.setAttribute("inv_proj_no", request.getParameter("sinv_proj_no"));
+		session.setAttribute("inv_company_id", request.getParameter("sinv_company_id"));
+		session.setAttribute("delivery_start", request.getParameter("delivery_start"));
+		session.setAttribute("delivery_limit", request.getParameter("delivery_limit"));
+		session.setAttribute("inv_cus_id", request.getParameter("scus_id"));
+		session.setAttribute("inv_bill_type", request.getParameter("sinv_bill_type"));
+		
+	}
+	
+	@RequestMapping(value = "/invoiceCurrencyParam")
+	public void invoiceCurrencyParam(HttpServletRequest request, HttpServletResponse response){
+		HttpSession session = request.getSession();
 		session.setAttribute("AUD", request.getParameter("AUD"));
 		session.setAttribute("CHF", request.getParameter("CHF"));
 		session.setAttribute("GBP", request.getParameter("GBP"));
@@ -156,12 +213,12 @@ public class InvoiceController {
 		String inv_delivery_date = request.getParameter("ainv_delivery_date");
 		int inv_payment_terms = Integer.parseInt(request.getParameter("ainv_payment_terms"));
 		BigDecimal inv_vat = new BigDecimal(request.getParameter("ainv_vat"));
-		String inv_bill_type = request.getParameter("ainv_bill_type");
+//		String inv_bill_type = request.getParameter("ainv_bill_type");
 		int cus_id = Integer.parseInt(request.getParameter("acus_id"));
 		String inv_bill_date = request.getParameter("ainv_bill_date");
 		int inv_portal = Integer.parseInt(request.getParameter("ainv_portal"));
 		
-		System.out.println("delivery date = "+inv_delivery_date);
+//		System.out.println("delivery date = "+inv_delivery_date);
 		
 		Invoice inv = new Invoice();
 		inv.setInv_name(inv_name);
@@ -170,7 +227,7 @@ public class InvoiceController {
 		inv.setInv_vat(inv_vat);
 		inv.setCus_id(cus_id);
 		inv.setCretd_usr(usr_id);
-		inv.setInv_bill_type(inv_bill_type);
+		inv.setInv_bill_type("");
 		
 		try{
 			SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yy");
@@ -190,7 +247,7 @@ public class InvoiceController {
 		
 		inv.setInv_delivery_date_sql(inv_delivery_date_sql);
 		inv.setInv_bill_date_sql(inv_bill_date_sql);
-		System.out.println(inv_delivery_date_sql.toString());
+//		System.out.println(inv_delivery_date_sql.toString());
 		
 		if(!inv_proj_no.equals("Project Number")){
 			inv.setInv_proj_no(inv_proj_no);
@@ -284,6 +341,68 @@ public class InvoiceController {
 		return new ModelAndView("jsonView", model);
 	}
 	
+	@RequestMapping(value = "/updateInvoiceStatus")
+	public ModelAndView updateInvoiceStatus(HttpServletRequest request, HttpServletResponse response){
+	
+		String inv_bill_type = request.getParameter("inv_bill_type");
+		int inv_id = Integer.parseInt(request.getParameter("inv_id"));
+		
+//		invoiceDao.updateInvoiceStatus(inv_id, inv_bill_type);
+		
+		Invoice inv = invoiceDao.getInvoiceById(inv_id);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date parsed_delivery_date = null;
+		try {
+			parsed_delivery_date = dateFormat.parse(inv.getInv_delivery_date());
+			
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String delivery_year = sdf.format(parsed_delivery_date);
+		InvoiceCompany inv_company = invoiceDao.getInvoiceCompanyById(inv.getInv_company_id());
+		String inv_number = inv_company.getInv_company_code()+delivery_year;
+		String last_inv_number = "";
+		try{
+			last_inv_number = invoiceDao.getLastInvoiceNumber(inv.getInv_company_id(),delivery_year);
+		}catch(Exception e){
+			System.out.println("First job of "+inv_company.getInv_company_name());
+		}
+		if(last_inv_number == ""){
+			inv_number += "00001";
+		}else{
+			String inv_number_count = last_inv_number.substring(last_inv_number.length()-5);
+			String myLast = "";
+			for(int x=0; x<inv_number_count.length(); x++){
+				String myChar = inv_number_count.substring(x,x+1);
+				if(!myChar.equals("0")){
+					myLast = inv_number_count.substring(x);
+					break;
+				}
+			}
+			int praseNumber = Integer.parseInt(myLast)+1;
+			String new_inv_number = Integer.toString(praseNumber);
+			int charCount = 5-new_inv_number.length();
+			for(int i=0; i<charCount; i++){
+				inv_number += "0";
+			}
+			inv_number += new_inv_number;
+		}
+		System.out.println("Invoice Number : "+inv_number);
+		inv.setInv_number(inv_number);
+		
+		invoiceDao.updateInvoiceStatus(inv_id, inv_bill_type, inv_number);
+		
+		List<Invoice> invLs = new ArrayList<Invoice>();
+		invLs.add(inv);
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", invLs);
+
+		return new ModelAndView("jsonView", jobj);
+	}
+	
 	@RequestMapping(value = "/updateInvoice")
 	public ModelAndView updateInvoice(HttpServletRequest request, HttpServletResponse response){
 		
@@ -293,7 +412,7 @@ public class InvoiceController {
 		String inv_delivery_date = request.getParameter("einv_delivery_date");
 		int inv_payment_terms = Integer.parseInt(request.getParameter("einv_payment_terms"));
 		BigDecimal inv_vat = new BigDecimal(request.getParameter("einv_vat"));
-		String inv_bill_type = request.getParameter("einv_bill_type");
+//		String inv_bill_type = request.getParameter("einv_bill_type");
 		int cus_id = Integer.parseInt(request.getParameter("ecus_id"));
 		String inv_bill_date = request.getParameter("einv_bill_date");
 		
@@ -306,7 +425,7 @@ public class InvoiceController {
 		inv.setInv_payment_terms(inv_payment_terms);
 		inv.setInv_vat(inv_vat);
 		inv.setCus_id(cus_id);
-		inv.setInv_bill_type(inv_bill_type);
+//		inv.setInv_bill_type(inv_bill_type);
 		
 		java.sql.Date inv_delivery_date_sql = null;
 		java.sql.Date inv_bill_date_sql = null;
@@ -428,6 +547,234 @@ public class InvoiceController {
 		}
 		
 	}
+	
+	@RequestMapping(value = "/printInvoiceReport")
+	public ModelAndView printInvoiceSummary(HttpServletRequest request, HttpServletResponse response) {
+	
+		Calendar now = Calendar.getInstance();
+		int year = now.get(Calendar.YEAR);
+		String yearInString = String.valueOf(year);
+		
+		List<Invoice> gsd = invoiceDao.showInvoiceReport(yearInString, 1);
+		List<Invoice> jv = invoiceDao.showInvoiceReport(yearInString, 2);
+		List<Invoice> fgs = invoiceDao.showInvoiceReport(yearInString, 3);
+		List<Invoice> mm = invoiceDao.showInvoiceReport(yearInString, 4);
+		List<Invoice> gsdp = invoiceDao.showInvoiceReport(yearInString, 5);
+		List<Invoice> gps = invoiceDao.showInvoiceReport(yearInString, 6);
+		List<Invoice> tta = invoiceDao.showInvoiceReport(yearInString, 7);
+		List<Invoice> stu = invoiceDao.showInvoiceReport(yearInString, 8);
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("gsd", gsd);
+		map.put("jv", jv);
+		map.put("fgs", fgs);
+		map.put("mm", mm);
+		map.put("gsdp", gsdp);
+		map.put("gps", gps);
+		map.put("tta", tta);
+		map.put("stu", stu);
+		
+		return new ModelAndView("invoice-print", map);
+	}
+	
+	@RequestMapping(value = "/topixSoap")
+	public ModelAndView topixSoapConnection(HttpServletRequest request, HttpServletResponse response){
+		
+		// Test Server = 0 && Main Server = 1
+		TopixConfig tpx_cfg = invoiceDao.getTopixConfig();
+		
+		int inv_id = Integer.parseInt(request.getParameter("id"));
+		Invoice inv = invoiceDao.getInvoiceById(inv_id);
+		List<InvoiceReference> inv_refLs = invoiceDao.searchInvoiceReference(inv_id);
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		java.sql.Date tpx_date_ts = null;
+		try {
+			Date parse_tpx_date = dateFormat.parse(inv.getInv_bill_date());
+			tpx_date_ts = new java.sql.Date(parse_tpx_date.getTime());
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			logger.error(e1.getMessage());
+		}
+		Topix tpx = new Topix();
+		tpx.setInv_id(inv.getInv_id());
+		tpx.setTpx_cfg_id(tpx_cfg.getTpx_cfg_id());
+		tpx.setTpx_name(inv.getInv_name());
+		tpx.setTpx_cus_id(inv.getTopix_cus_id());
+//		tpx.setTpx_res_nr("");
+//		tpx.setTpx_res_msg("");
+//		tpx.setTpx_inv_number("");
+		tpx.setTpx_date(inv.getInv_bill_date());
+		tpx.setInv_delivery_date(inv.getInv_delivery_date());
+		tpx.setTpx_date_sql(tpx_date_ts);
+		
+		try {
+	        SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
+	        SOAPConnection soapConnection = soapConnectionFactory.createConnection();
+	
+	        // Send SOAP Message to SOAP Server
+//	      	String url = "http://192.168.16.125:9090/4DSOAP";
+	        String url = tpx_cfg.getTpx_cfg_ip();
+	        SOAPMessage soapResponse = soapConnection.call(createSOAPRequest(tpx_cfg, tpx, inv_refLs), url);
+	
+	        // print SOAP Response
+	        System.out.println("\nResponse SOAP Message:");
+	        soapResponse.writeTo(System.out);
+	        String err_num = soapResponse.getSOAPBody().getElementsByTagName("ERRORNUM").item(0).getFirstChild().getTextContent();
+	        String err_text = soapResponse.getSOAPBody().getElementsByTagName("ERRORTEXT").item(0).getFirstChild().getTextContent();
+	        
+	        err_num = replaceLine(err_num);
+	        err_num = err_num.trim();
+	        err_text = replaceLine(err_text);
+	        String inv_number = "";
+	        try{
+	        inv_number = soapResponse.getSOAPBody().getElementsByTagName("AUFTR_NR_AUSGABE").item(0).getFirstChild().getTextContent();
+	        inv_number = replaceLine(inv_number);
+	        inv_number = inv_number.trim();
+	        } catch (Exception e) {
+	        	inv_number = "";
+	        }
+	        System.out.println("\n----------------");
+	        System.out.println(err_num);
+	        System.out.println(err_text);
+	        System.out.println(inv_number);
+	        System.out.println("----------------");
+	        
+	        tpx.setTpx_res_nr(err_num);
+	        tpx.setTpx_res_msg(err_text);
+	        tpx.setTpx_inv_number(inv_number);
+	        
+	        if(err_num.equals("0")){
+	        
+	        int tpx_id = invoiceDao.addTopix(tpx);
+
+			for(int i=0; i<inv_refLs.size(); i++){
+				TopixReference tpx_ref = new TopixReference();
+				tpx_ref.setTpx_id(tpx_id);
+				tpx_ref.setTpx_article_id(inv_refLs.get(i).getTopix_article_id());
+				tpx_ref.setTpx_ref_qty(inv_refLs.get(i).getInv_ref_qty());
+				invoiceDao.addTopixReference(tpx_ref);
+			}
+			
+	        }else{
+	        	String status = "Angebote Error("+err_num+"): "+err_text;
+	        	invoiceDao.updateInvoiceStatus(inv_id, status, inv_number);
+	        	invoiceDao.updateTopixAuditLogging(tpx);
+	        }
+	        
+			soapConnection.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			tpx.setTpx_res_nr("404");
+			tpx.setTpx_res_msg("No Response From Topix Server");
+			tpx.setTpx_inv_number("Please try again later");
+			invoiceDao.updateTopixAuditLogging(tpx);
+		}
+		
+		tpx.setTpx_date_sql(null);
+		List<Topix> tpxLs = new ArrayList<Topix>();
+		tpxLs.add(tpx);
+		JSONObject jobj = new JSONObject();
+		jobj.put("records", tpxLs);
+
+		return new ModelAndView("jsonView", jobj);
+		
+	}
+	
+	public String replaceLine(String s){
+		s = s.replace("\u2028", "");
+        s = s.replace("\u2029", "");
+        s = s.replace("\n", "");
+		return s;
+	}
+	
+	private static SOAPMessage createSOAPRequest(TopixConfig tpx_cfg, Topix tpx, List<InvoiceReference> inv_refLs) throws Exception {
+
+        MessageFactory messageFactory = MessageFactory.newInstance();
+        SOAPMessage soapMessage = messageFactory.createMessage();
+        SOAPPart soapPart = soapMessage.getSOAPPart();
+
+        soapMessage.setProperty(SOAPMessage.WRITE_XML_DECLARATION, "true");
+        soapMessage.setProperty(SOAPMessage.CHARACTER_SET_ENCODING, "UTF-8");
+        SOAPEnvelope envelope = soapPart.getEnvelope();
+        envelope.removeNamespaceDeclaration(envelope.getPrefix());
+//        envelope.addNamespaceDeclaration("soap","http://schemas.xmlsoap.org/soap/envelope/");
+        envelope.setPrefix("soapenv");              
+        envelope.addNamespaceDeclaration("xsi","http://www.w3.org/2001/XMLSchema-instance");
+        envelope.addNamespaceDeclaration("xsd","http://www.w3.org/2001/XMLSchema"); 
+        envelope.addNamespaceDeclaration("soapenv","http://schemas.xmlsoap.org/soap/envelope/");
+        envelope.addNamespaceDeclaration("def","http://www.4d.com/namespace/default");
+        envelope.addNamespaceDeclaration("soapenc","http://schemas.xmlsoap.org/soap/encoding/");
+        SOAPHeader header=soapMessage.getSOAPHeader();                      
+        header.setPrefix("soapenv");       
+        SOAPBody soapBody = envelope.getBody();
+        soapBody.setPrefix("soapenv");
+        SOAPElement root = soapBody.addChildElement("def:SOAP_SetAuftrag");
+        root.setAttribute("soapenv:encodingStyle", "http://schemas.xmlsoap.org/soap/encoding/");
+        SOAPElement mandant = root.addChildElement("MANDANT");
+        mandant.setAttribute("xsi:type", "xsd:string");
+//        mandant.setValue("nos01");
+        mandant.setValue(tpx_cfg.getTpx_cfg_man());
+        SOAPElement benutzername = root.addChildElement("BENUTZERNAME");
+        benutzername.setAttribute("xsi:type", "xsd:string");
+//        benutzername.setValue("Administrator");
+        benutzername.setValue(tpx_cfg.getTpx_cfg_usr());
+        SOAPElement kennwort = root.addChildElement("KENNWORT");
+        kennwort.setAttribute("xsi:type", "xsd:string");
+//        kennwort.setValue("nosAdmin");
+        kennwort.setValue(tpx_cfg.getTpx_cfg_pw());
+        SOAPElement auftr_art = root.addChildElement("AUFTR_ART");
+        auftr_art.setAttribute("xsi:type", "xsd:string");
+//        auftr_art.setValue("A");
+        auftr_art.setValue(tpx_cfg.getTpx_cfg_art());
+        SOAPElement auftr_datum = root.addChildElement("AUFTR_DATUM");
+        auftr_datum.setAttribute("xsi:type", "xsd:date");
+//        auftr_datum.setValue("2018-03-13");
+        auftr_datum.setValue(tpx.getTpx_date());
+        SOAPElement auftr_liefertermin = root.addChildElement("AUFTR_LIEFERTERMIN");
+        auftr_liefertermin.setAttribute("xsi:type", "xsd:date");
+//        String month = tpx.getTpx_date().substring(0, 7);
+        auftr_liefertermin.setValue(tpx.getInv_delivery_date());
+        SOAPElement auftr_text = root.addChildElement("AUFTR_TEXT");
+        auftr_text.setAttribute("xsi:type", "xsd:string");
+//        auftr_text.setValue("Testing2");
+        auftr_text.setValue(tpx.getTpx_name());
+        SOAPElement auftr_betrag = root.addChildElement("AUFTR_BETRAG");
+        auftr_betrag.setAttribute("xsi:type", "xsd:float");
+        auftr_betrag.setValue("0");
+        SOAPElement steuer1 = root.addChildElement("STEUER1");
+        steuer1.setAttribute("xsi:type", "xsd:float");
+        steuer1.setValue("0");
+        SOAPElement positionsdaten = root.addChildElement("POSITIONSDATEN");
+        positionsdaten.setAttribute("xsi:type", "xsd:string");
+        positionsdaten.setValue("POSDEF\tARTIKEL\tPOS_BETRAG\tPOS_MENGE");
+        SOAPElement at_wiederkehrend = root.addChildElement("AT_WIEDERKEHREND");
+        at_wiederkehrend.setAttribute("xsi:type", "xsd:boolean");
+        at_wiederkehrend.setValue("False");
+        SOAPElement preise_aus_artikelstamm = root.addChildElement("PREISE_AUS_ARTIKELSTAMM");
+        preise_aus_artikelstamm.setAttribute("xsi:type", "xsd:boolean");
+        preise_aus_artikelstamm.setValue("True");
+        SOAPElement positionsdaten_array = root.addChildElement("POSITIONSDATEN_ARRAY");
+        positionsdaten_array.setAttribute("xsi:arrayType", "xsd:string[2]");
+//	    positionsdaten_array.addChildElement("item0").setValue("POS\t07-0241\t0\t12");
+//	    positionsdaten_array.addChildElement("item1").setValue("POS\t07-0241\t0\t20");
+        for(int i=0; i<inv_refLs.size(); i++){
+        	positionsdaten_array.addChildElement("item"+i).setValue("POS\t"+inv_refLs.get(i).getTopix_article_id()+"\t0\t"+inv_refLs.get(i).getInv_ref_qty().toString());
+        }
+        SOAPElement kdlf_nr_als_id = root.addChildElement("KDLF_NR_ALS_ID");
+        kdlf_nr_als_id.setAttribute("xsi:type", "xsd:string");
+//        kdlf_nr_als_id.setValue("med0000081");
+        kdlf_nr_als_id.setValue(tpx.getTpx_cus_id());
+        
+        soapMessage.saveChanges();
+
+        System.out.println("Request SOAP Message:");
+        soapMessage.writeTo(System.out);
+
+
+        return soapMessage;
+    }
 	
 	public Map<String, Float> getCurrencyRate(HttpServletRequest request, HttpServletResponse response){
 		

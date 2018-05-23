@@ -182,7 +182,7 @@ public class CustomerController {
 		String billing_terms = request.getParameter("abilling_terms");
 		String transfer_dtl = request.getParameter("atransfer_dtl");
 		String regist_date = request.getParameter("aregist_date");
-		int topix_cus_id = Integer.parseInt(request.getParameter("atopix_cus_id"));
+		String topix_cus_id = request.getParameter("atopix_cus_id");
 		int payment_terms = Integer.parseInt(request.getParameter("apayment_terms"));
 		Timestamp regist_date_ts = null;
 		int key_acc_id = 0;
@@ -254,6 +254,11 @@ public class CustomerController {
 		}else{
 			cus.setBilling_terms("");
 		}
+		if(!topix_cus_id.equals("Customer ID(Topix)")){
+			cus.setTopix_cus_id(topix_cus_id);
+		}else{
+			cus.setTopix_cus_id("");
+		}
 		if(!transfer_dtl.equals("Transfer Detail")){
 			transfer_dtl = transfer_dtl.replace("\u2028", "\n");
 			transfer_dtl = transfer_dtl.replace("\u2029", "\n");
@@ -286,7 +291,7 @@ public class CustomerController {
 			String billing_terms = request.getParameter("ebilling_terms");
 			String transfer_dtl = request.getParameter("etransfer_dtl");
 			String regist_date = request.getParameter("eregist_date");
-			int topix_cus_id = Integer.parseInt(request.getParameter("etopix_cus_id"));
+			String topix_cus_id = request.getParameter("etopix_cus_id");
 			int payment_terms = Integer.parseInt(request.getParameter("epayment_terms"));
 			Timestamp regist_date_ts = null;
 			
@@ -295,7 +300,6 @@ public class CustomerController {
 			cus.setCus_name(cus_name);
 			cus.setCus_code(cus_code);
 			cus.setKey_acc_id(key_acc_id);
-			cus.setTopix_cus_id(topix_cus_id);
 			cus.setPayment_terms(payment_terms);
 			
 			if(!regist_date.equals("Register Date")){
@@ -347,6 +351,11 @@ public class CustomerController {
 				cus.setBilling_terms(billing_terms);
 			}else{
 				cus.setBilling_terms("");
+			}
+			if(!topix_cus_id.equals("Customer ID(Topix)")){
+				cus.setTopix_cus_id(topix_cus_id);
+			}else{
+				cus.setTopix_cus_id("");
 			}
 			if(!transfer_dtl.equals("Transfer Detail")){
 				transfer_dtl = transfer_dtl.replace("\u2028", "\n");

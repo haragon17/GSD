@@ -146,9 +146,16 @@ Ext.onReady(function() {
 	        					myText = myText.replace(/, topix_article_id=/gi, "<br>Article ID(Topix) = ");
 	        					myText = myText.replace(/, inv_ref_qty=/gi, "<br>QTY= ");
 	        					myText = myText.replace(/, inv_ref_desc=/gi, "<br>Remark= ");
+	        					myText = myText.replace(/, tpx_cfg_id=/gi, "<br>Topix Server= ");
+	        					myText = myText.replace(/, tpx_cus_id=/gi, "<br>Customer ID= ");
+	        					myText = myText.replace(/, tpx_res_nr=/gi, "<br>Response Number= ");
+	        					myText = myText.replace(/, tpx_res_msg=/gi, "<br>Response Text= ");
+	        					myText = myText.replace(/, tpx_inv_number=/gi, "<br>Topix Number= ");
+	        					myText = myText.replace(/, tpx_ref_info=/gi, "<br>Topix Item= ");
 	        					myText = myText.replace(/Item List/gi, "Item");
 	        					myText = myText.replace('Created row on ', "");
 	        					myText = myText.replace('Created ', "");
+	        					myText = myText.replace('Error on ', "");
 	        					myText = myText.replace(/name=/gi, "Name = ");
 	        					myText = myText.replace(/\r\n|\n/gi, " ");
 //

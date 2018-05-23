@@ -94,7 +94,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
-		if(cus_audit.getTopix_cus_id() != cus.getTopix_cus_id()){
+		if(cus_audit.getTopix_cus_id().equals(cus.getTopix_cus_id())){
 			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),

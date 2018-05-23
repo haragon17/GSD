@@ -716,7 +716,7 @@ public class JobsController {
 						    Date parsedJobIn = dateFormat.parse(job_in);
 						    job_in_ts = new java.sql.Timestamp(parsedJobIn.getTime());
 						}catch(Exception e){
-							logger.error(e.getMessage());
+//							logger.error(e.getMessage());
 						}
 					
 						try{
@@ -725,7 +725,7 @@ public class JobsController {
 							Date parsedJobOut = dateFormat.parse(job_out);
 							job_out_ts = new java.sql.Timestamp(parsedJobOut.getTime());
 						}catch(Exception e){
-							logger.error(e.getMessage());
+//							logger.error(e.getMessage());
 						}
 
 					jobRefLs.get(i).setJob_in_ts(job_in_ts);

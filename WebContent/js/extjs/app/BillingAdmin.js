@@ -490,29 +490,29 @@ Ext.onReady(function() {
 		                fn : function(buttonValue, inputText, showConfig){
 //		                    Ext.Msg.alert('Status', buttonValue);
 		                	if(buttonValue == "yes"){
-		                		Ext.getCmp('ainv_cus_name').setValue(inv_cus_name);
-		                		Ext.getCmp('ainv_cus_code').setValue(inv_cus_code);
-		                		Ext.getCmp('acus_id').setValue(inv_cus_id);
-		                		Ext.getCmp('ainv_job_id').setValue(Ext.getCmp('jobid_ref').getValue());
-		                		Ext.getCmp('ainv_portal').setValue(2);
-		                		Ext.getCmp('ainv_job_name').setValue(job_name);
-		                		Ext.getCmp('ainv_payment_terms').setValue(payment_terms);
-		                		addInvoice.show();
+		        						Ext.getCmp('ainv_cus_name').setValue(inv_cus_name);
+				                		Ext.getCmp('ainv_cus_code').setValue(inv_cus_code);
+				                		Ext.getCmp('acus_id').setValue(inv_cus_id);
+				                		Ext.getCmp('ainv_job_id').setValue(Ext.getCmp('jobid_ref').getValue());
+				                		Ext.getCmp('ainv_portal').setValue(2);
+				                		Ext.getCmp('ainv_job_name').setValue(job_name);
+				                		Ext.getCmp('ainv_payment_terms').setValue(payment_terms);
+				                		addInvoice.show();
 		                	}else if(buttonValue == "no"){
 //		                		Ext.Msg.alert('Information', 'Hang on, This feature will come soon! ;)')
 //		                		cus_id = Ext.getCmp('cusid').getValue();
-		                		Ext.getCmp('aeinv_job_name').setValue(job_name);
-		                		Ext.getCmp('aejob_id').setValue(Ext.getCmp('jobid_ref').getValue());
-		                		today = new Date();
-		                		month = today.getMonth()+1;
-		                		year = today.getFullYear();
-		                		aejob_inv_id = Ext.getCmp('aejob_inv_id');
-		                		aejob_inv_id.clearValue();
-		                		aejob_inv_id.getStore().removeAll();
-		                		aejob_inv_id.getStore().load({
-									url: 'showInvoiceCustomer.htm?cus_id='+inv_cus_id+'&month='+month+'&year='+year
-								});
-		                		addToExistInvoice.show();
+		        						Ext.getCmp('aeinv_job_name').setValue(job_name);
+				                		Ext.getCmp('aejob_id').setValue(Ext.getCmp('jobid_ref').getValue());
+				                		today = new Date();
+				                		month = today.getMonth()+1;
+				                		year = today.getFullYear();
+				                		aejob_inv_id = Ext.getCmp('aejob_inv_id');
+				                		aejob_inv_id.clearValue();
+				                		aejob_inv_id.getStore().removeAll();
+				                		aejob_inv_id.getStore().load({
+											url: 'showInvoiceCustomer.htm?cus_id='+inv_cus_id+'&month='+month+'&year='+year
+										});
+				                		addToExistInvoice.show();
 		                	}
 		                }
 		            });
@@ -3790,12 +3790,6 @@ Ext.onReady(function() {
 			id: 'addInvoiceButton',
 			handler: function(){
 				var form = Ext.getCmp('addInvoiceForm').getForm();
-				Ext.Ajax.request({
-					url : 'searchInvoiceParam.htm?AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
-					'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
-					'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&USD='+store.exchangeRates.getAt(0).data.USD,
-					success : function(response, opts) {}
-				});
 				if (form.isValid()){
    				 form.submit({
    				 url: 'addInvoice.htm',
@@ -3985,7 +3979,7 @@ Ext.onReady(function() {
 			text: 'Cancel',
 			width: 100,
 			handler: function(){
-				Ext.getCmp('addToExistInvoice').hide();
+				addToExistInvoice.hide();
 			}
 		}],
 		listeners: {
@@ -4386,6 +4380,12 @@ store.exchangeRates = Ext.create('Ext.data.JsonStore', {
 	listeners: {
 		load : function(){
 			notLoaded = false;
+			Ext.Ajax.request({
+				url : 'invoiceCurrencyParam.htm?AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
+				'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
+				'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&USD='+store.exchangeRates.getAt(0).data.USD,
+				success : function(response, opts) {}
+			});
 		}
 	}
 });

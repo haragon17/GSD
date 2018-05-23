@@ -6,6 +6,9 @@ import java.util.Map;
 import com.gsd.model.Invoice;
 import com.gsd.model.InvoiceCompany;
 import com.gsd.model.InvoiceReference;
+import com.gsd.model.Topix;
+import com.gsd.model.TopixConfig;
+import com.gsd.model.TopixReference;
 
 public interface InvoiceDao {
 
@@ -38,4 +41,18 @@ public interface InvoiceDao {
 	public List<InvoiceReference> getJobItemList(int job_id);
 	
 	public List<InvoiceReference> getListDataFromRequest(Object data);
+	
+	public List<Invoice> showInvoiceReport(String year, int inv_company_id);
+
+	public TopixConfig getTopixConfig();
+	
+	public int addTopix(Topix tpx);
+	
+	public void addTopixReference(TopixReference tpx_ref);
+	
+	public void updateInvoiceStatus(int inv_id, String status, String inv_number);
+	
+	public void updateTopixAuditLogging(Topix tpx);
+	
+	public String getLastInvoiceNumber(int inv_company_id, String delivery_date);
 }

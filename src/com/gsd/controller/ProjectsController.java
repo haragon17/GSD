@@ -91,11 +91,11 @@ public class ProjectsController {
 		session.setAttribute("key_acc_id", "");
 		session.setAttribute("updateStart", "");
 		session.setAttribute("updateLimit", "");
-		session.setAttribute("AUD", "");
-		session.setAttribute("CHF", "");
-		session.setAttribute("GBP", "");
-		session.setAttribute("THB", "");
-		session.setAttribute("EUR", "");
+//		session.setAttribute("AUD", "");
+//		session.setAttribute("CHF", "");
+//		session.setAttribute("GBP", "");
+//		session.setAttribute("THB", "");
+//		session.setAttribute("EUR", "");
 		
 		if(type == 0 || type == 1){
 			return new ModelAndView("ProjectsAdmin");

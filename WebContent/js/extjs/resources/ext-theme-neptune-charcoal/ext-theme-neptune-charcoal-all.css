@@ -34,6 +34,14 @@ img {
     background-image: url(images/icon-nd.png);
 }
 
+.icon-mail {
+	background-image: url(../../images/icons/fam/email_go.png) !important;
+}
+
+.icon-db {
+	background-image: url(../../images/icons/fam/database_go.png) !important;
+}
+
 .icon-go {
 	background-image: url(../../images/icons/fam/application_go.png) !important;
 }

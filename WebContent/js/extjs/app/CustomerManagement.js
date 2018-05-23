@@ -522,7 +522,7 @@ Ext.define('cusModel', {
 		dateFormat: 'Y-m-d H:i:s'
 	}, {
 		name : 'topix_cus_id',
-		type : 'int'
+		type : 'string'
 	}, {
 		name : 'payment_terms',
 		type : 'int'
@@ -783,16 +783,16 @@ editCustomer = new Ext.create('Ext.window.Window', {
 				editable: false,
 				format: 'Y-m-d',
 			}, {
-				xtype: 'numberfield',
+//				xtype: 'numberfield',
 				allowBlank: false,
 				fieldLabel: 'Customer ID(Topix) <font color="red">*</font> ',
 				name: 'etopix_cus_id',
 				id : 'etopix_cus_id',
 				labelWidth : 145,
-				minValue : 0,
 				emptyText : 'Customer ID(Topix)',
-				hideTrigger: true,
-				msgTarget : 'under',
+//				minValue : 0,
+//				hideTrigger: true,
+//				msgTarget : 'under',
 			}, {
 				xtype : 'hidden',
 				id : 'ecus_id',
@@ -1073,17 +1073,17 @@ addCustomer = new Ext.create('Ext.window.Window', {
 				editable: false,
 				format: 'Y-m-d',
 			}, {
-				xtype: 'numberfield',
+//				xtype: 'numberfield',
 				allowBlank: false,
 				fieldLabel: 'Customer ID(Topix) <font color="red">*</font> ',
 				name: 'atopix_cus_id',
 				id : 'atopix_cus_id',
 				labelWidth : 145,
-				minValue : 0,
-				value : 0,
 				emptyText : 'Customer ID(Topix)',
-				hideTrigger: true,
-				msgTarget : 'under',
+//				minValue : 0,
+//				value : 0,
+//				hideTrigger: true,
+//				msgTarget : 'under',
 			} ]
 		} ],
 	} ],
@@ -1152,8 +1152,7 @@ addCustomer = new Ext.create('Ext.window.Window', {
 
 function confirmChk(btn) {
 	if (btn == "yes") {
-		Ext.Ajax
-				.request({
+		Ext.Ajax.request({
 					url : 'deleteCustomer.htm',
 					params : {
 						id : Ext.getCmp('cusid').getValue()

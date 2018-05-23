@@ -36,8 +36,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public class PrintInvoice_iText {
 
-//	public static final String DEST = "/jview_pdf/GSD-Invoice.pdf";
-	public static final String DEST = "/Users/gsd/Desktop/GSD-Invoice.pdf";
+	public static final String DEST = "/jview_pdf/GSD-Invoice.pdf";
+//	public static final String DEST = "/Users/gsd/Desktop/GSD-Invoice.pdf";
 	
 	public void createPdf(HttpServletRequest request,
 			HttpServletResponse response, Invoice inv, InvoiceCompany inv_company, List<InvoiceReference> inv_ref) throws IOException, DocumentException {
@@ -79,15 +79,18 @@ public class PrintInvoice_iText {
 //        document.add(img2);
 //        document.add(img3);
         
-        Font f7p = new Font("Arial", Font.PLAIN, 7);
-        Font f7b = new Font("Arial", Font.BOLD, 7);
-        Font f8p = new Font("Arial", Font.PLAIN, 8);
-        Font f8b = new Font("Arial", Font.BOLD, 8);
-        Font f9p = new Font("Arial", Font.PLAIN, 9);
-        Font f9b = new Font("Arial", Font.BOLD, 9);
-        Font f10p = new Font("Arial", Font.PLAIN, 10);
-        Font f10b = new Font("Arial", Font.BOLD, 10);
-        Font f13p = new Font("Arial", Font.PLAIN, 13);
+        String font_name = "Arial";
+        
+        Font f7p = new Font(font_name, Font.PLAIN, 7);
+        Font f7b = new Font(font_name, Font.BOLD, 7);
+        Font f8i = new Font(font_name, Font.ITALIC, 8);
+        Font f8p = new Font(font_name, Font.PLAIN, 8);
+        Font f8b = new Font(font_name, Font.BOLD, 8);
+        Font f9p = new Font(font_name, Font.PLAIN, 9);
+        Font f9b = new Font(font_name, Font.BOLD, 9);
+        Font f10p = new Font(font_name, Font.PLAIN, 10);
+        Font f10b = new Font(font_name, Font.BOLD, 10);
+        Font f13p = new Font(font_name, Font.PLAIN, 13);
         
         String head = "";
         String tail = "";
@@ -112,6 +115,8 @@ public class PrintInvoice_iText {
 	        tail = "True Time Media Phnom Penh Co., Ltd";
 	        addr1 = "#184, St.217, Sangkat Tomnub Tek, Khan Chamkarmorn, Phnom Penh, Cambodia";
 	        addr2 = "Phone: (855-23) 21 59 76   E-Mail: truetime.kh@gmail.com";
+        }else if(inv.getInv_company_id() == 8){
+        	tail = "Stuber Asia Co., Ltd";
         }
         
         if(!head.equals("")){
@@ -139,20 +144,20 @@ public class PrintInvoice_iText {
         }
 //        g2d.drawString(inv.getAddress(), 75, 140);
         
-        int aY = 780;
+        float aY = 765;
         for(int a=0; a<page_count; a++){
         	if(!head.equals("")){
 		        g2d.setFont(f9b);
 		        g2d.setColor(Color.red);
 		        g2d.drawString(head, 75, aY);
 		        g2d.setColor(Color.gray);
-		        g2d.drawString(tail, 86, aY);
+		        g2d.drawString(tail, (float) 85.4, aY);
         	}else{
         		g2d.setFont(f9b);
 		        g2d.setColor(Color.gray);
 		        g2d.drawString(tail, 75, aY);
         	}
-	        g2d.drawLine(75, aY+5, 530, aY+5);
+	        g2d.drawLine(75, (int) aY+5, 530, (int) aY+5);
 	        g2d.setFont(f9p);
 	        g2d.drawString(addr1, 75, aY+18);
 	        g2d.drawString(addr2, 75, aY+30);
@@ -259,7 +264,7 @@ public class PrintInvoice_iText {
         g2d.drawString("Amount", 495, 390);
         g2d.drawLine(75, 395, 530, 395);
         
-        g2d.setFont(f9p);
+        g2d.setFont(f8p);
         g2d.setColor(Color.black);
         int itemY = 408;
         float total_price = 0;
@@ -268,8 +273,8 @@ public class PrintInvoice_iText {
         for(int i=0; i<inv_ref.size(); i++){
         	
         	if(i == 10){
-        		g2d.setFont(f10b);
-        		g2d.drawString("Continued on next page", 530 - g2d.getFontMetrics().stringWidth("Continued on next page"), itemY+14);
+        		g2d.setFont(f9b);
+        		g2d.drawString("Continued on next page", 528 - g2d.getFontMetrics().stringWidth("Continued on next page"), itemY+14);
         		
         		g2d.setFont(f9b);
                 g2d.setColor(Color.gray);
@@ -287,7 +292,7 @@ public class PrintInvoice_iText {
         		g2d.drawString("Amount brought forward", 453 - g2d.getFontMetrics().stringWidth("Amount brought forward"), 1040);
         		g2d.drawString(transfer, 529 - g2d.getFontMetrics().stringWidth(transfer), 1040);
         		
-        		g2d.setFont(f9p);
+        		g2d.setFont(f8p);
         		itemY = 1057;
         	}
         	
@@ -302,15 +307,17 @@ public class PrintInvoice_iText {
             
             g2d.drawString(inv_ref.get(i).getTopix_article_id(), 75, itemY);
             g2d.drawString(inv_ref.get(i).getInv_itm_name(), 140, itemY);
+            g2d.setFont(f8i);
             if(!inv_ref.get(i).getInv_ref_desc().equals("")){
             	g2d.drawString(inv_ref.get(i).getInv_ref_desc(), 140, itemY+10);
             }else{
             	g2d.drawString("-", 140, itemY+10);
             }
+            g2d.setFont(f8p);
             g2d.drawString(qty, 394 - g2d.getFontMetrics().stringWidth(qty), itemY);
-            g2d.drawString(price, 455 - g2d.getFontMetrics().stringWidth(price), itemY);
-            g2d.drawString(amount, 529 - g2d.getFontMetrics().stringWidth(amount), itemY);
-            itemY += 27;
+            g2d.drawString(price, 452 - g2d.getFontMetrics().stringWidth(price), itemY);
+            g2d.drawString(amount, 527 - g2d.getFontMetrics().stringWidth(amount), itemY);
+            itemY += 23;
             total_price += sum_price;
         }
         
@@ -380,11 +387,11 @@ public class PrintInvoice_iText {
             if(inv.getInv_company_id() == 1 || inv.getInv_company_id() == 2 || inv.getInv_company_id() == 3 || inv.getInv_company_id() == 5){
             	//GSD, JV(RS), FGS, GSDP
             	Image logo = Image.getInstance(rootDirectory+"image/invoice/"+inv_company.getInv_company_code()+".jpg");
-                logo.scaleToFit(150, 80);
-                logo.setAbsolutePosition(405, 750);
+                logo.scaleToFit(180, 70);
+                logo.setAbsolutePosition(420, 735);
                 document.add(logo);
             }else{
-            	//MM, GPS, TTA
+            	//MM, GPS, TTA, STU
             	Image logo = Image.getInstance(rootDirectory+"image/invoice/"+inv_company.getInv_company_code()+".jpg");
                 logo.scaleToFit(180, 80);
                 logo.setAbsolutePosition(350, 760);

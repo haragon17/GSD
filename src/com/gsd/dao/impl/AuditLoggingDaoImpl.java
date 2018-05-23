@@ -18,6 +18,7 @@ public class AuditLoggingDaoImpl extends JdbcDaoSupport implements AuditLoggingD
 				"WHEN aud.commit_desc LIKE 'C%' THEN 'Created'\n"+
 				"WHEN aud.commit_desc LIKE 'U%' THEN 'Updated'\n"+
 				"WHEN aud.commit_desc LIKE 'D%' THEN 'Deleted'\n"+
+				"WHEN aud.commit_desc LIKE 'E%' THEN 'Error'\n"+
 				"ELSE 'Got some error...'\n"+
 				"END AS commit_type, aud.commit_desc, aud.commit_date,\n"+
 				"CASE\n"+
