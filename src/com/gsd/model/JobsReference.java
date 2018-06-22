@@ -1,5 +1,6 @@
 package com.gsd.model;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 public class JobsReference {
@@ -8,7 +9,7 @@ public class JobsReference {
 	private int job_id;
 	private String job_ref_name;
 	private int proj_ref_id;
-	private float amount;
+	private BigDecimal amount;
 	private String job_in;
 	private String job_out;
 	private String job_ref_dtl;
@@ -26,8 +27,8 @@ public class JobsReference {
 	private String job_ref_status;
 	private String job_ref_approve;
 	private String dept;
-	private int sent_amount;
-	private int total_amount;
+	private BigDecimal sent_amount;
+	private BigDecimal total_amount;
 	private String job_ref_number;
 	
 	public int getJob_ref_id() {
@@ -54,10 +55,10 @@ public class JobsReference {
 	public void setProj_ref_id(int proj_ref_id) {
 		this.proj_ref_id = proj_ref_id;
 	}
-	public float getAmount() {
+	public BigDecimal getAmount() {
 		return amount;
 	}
-	public void setAmount(float amount) {
+	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
 	public String getJob_in() {
@@ -162,16 +163,16 @@ public class JobsReference {
 	public void setDept(String dept) {
 		this.dept = dept;
 	}
-	public int getSent_amount() {
+	public BigDecimal getSent_amount() {
 		return sent_amount;
 	}
-	public void setSent_amount(int sent_amount) {
+	public void setSent_amount(BigDecimal sent_amount) {
 		this.sent_amount = sent_amount;
 	}
-	public int getTotal_amount() {
+	public BigDecimal getTotal_amount() {
 		return total_amount;
 	}
-	public void setTotal_amount(int total_amount) {
+	public void setTotal_amount(BigDecimal total_amount) {
 		this.total_amount = total_amount;
 	}
 	public String getJob_ref_number() {

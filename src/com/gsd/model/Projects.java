@@ -16,7 +16,7 @@ public class Projects {
 	private String bill_to;
 	private String billing_terms;
 	private String file_name;
-	private String proj_title;
+	private String proj_currency;
 	
 	public int getProj_id() {
 		return proj_id;
@@ -102,11 +102,11 @@ public class Projects {
 	public void setFile_name(String file_name) {
 		this.file_name = file_name;
 	}
-	public String getProj_title() {
-		return proj_title;
+	public String getProj_currency() {
+		return proj_currency;
 	}
-	public void setProj_title(String proj_title) {
-		this.proj_title = proj_title;
+	public void setProj_currency(String proj_currency) {
+		this.proj_currency = proj_currency;
 	}
 	
 }

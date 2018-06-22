@@ -189,6 +189,11 @@ public class UserController {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		int type = user.getUserModel().getUsr_type();
 
+		uname = "";
+		fname = "";
+		lname = "";
+		email = "";
+		
 		if (type == 0) {
 			return new ModelAndView("MemberManagement");
 		} else {

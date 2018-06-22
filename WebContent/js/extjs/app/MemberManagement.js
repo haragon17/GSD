@@ -274,6 +274,7 @@ var department = Ext.create('Ext.data.Store', {
 			{"name":"E-Studio_Masking"},
 			{"name":"Catalog"},
 			{"name":"PP"},
+			{"name":"Pilot"},
 			{"name":"Manager"}
 	]
 });

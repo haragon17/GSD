@@ -37,7 +37,7 @@ public interface ProjectsDao {
 	
 	public void deleteProjects(int id);
 	
-	public List<Projects> showProjects(int cus_id);
+	public List<Projects> showProjects(int cus_id, String type);
 
 	public List<Projects> searchProjects(Map<String, String> data);
 

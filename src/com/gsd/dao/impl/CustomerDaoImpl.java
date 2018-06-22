@@ -98,7 +98,7 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
 					getLastAuditId(),
-					cus.getTopix_cus_id(),
+					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
 					"Customer ID(Topix)",

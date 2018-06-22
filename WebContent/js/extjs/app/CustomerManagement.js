@@ -1,5 +1,7 @@
 store = {};
 panels = {};
+userDept = "";
+userType = "";
 
 Ext.onReady(function() {
 	
@@ -359,24 +361,26 @@ Ext.onReady(function() {
 					items : [ {
 						iconCls : 'icon-delete',
 						handler : function(grid, rowIndex, colIndex) {
-							cus_id = grid.getStore().getAt(rowIndex).get(
-									'cus_id');
+							cus_id = grid.getStore().getAt(rowIndex).get('cus_id');
 							Ext.getCmp('cusid').setValue(cus_id);
-//							Ext.MessageBox.show({
-//								title : 'Confirm',
-//								msg : 'Are you sure you want to delete this?',
-//								buttons : Ext.MessageBox.YESNO,
-//								animateTarget : 'del',
-//								fn : confirmChk,
-//								icon : Ext.MessageBox.QUESTION
-//							});
-							Ext.MessageBox.show({
-								title : 'Information',
-								msg : 'Please contact IT Department for delete !',
-								buttons : Ext.MessageBox.OK,
-								animateTarget : 'del',
-								icon : Ext.MessageBox.INFO
-							});
+							if(userDept == "Manager" || userDept == "Billing" || userDept == "IT"){
+								Ext.MessageBox.show({
+									title : 'Confirm',
+									msg : 'Are you sure you want to delete this?',
+									buttons : Ext.MessageBox.YESNO,
+									animateTarget : 'del',
+									fn : confirmChk,
+									icon : Ext.MessageBox.QUESTION
+								});
+							}else{
+								Ext.MessageBox.show({
+									title : 'Information',
+									msg : 'Please contact Billing Department for delete !',
+									buttons : Ext.MessageBox.OK,
+									animateTarget : 'del',
+									icon : Ext.MessageBox.INFO
+								});
+							}
 						}
 					} ]
 				}, 
@@ -472,7 +476,20 @@ Ext.onReady(function() {
 		})
 	});
 
-});
+	Ext.Ajax.request({
+		url : 'userModel.htm',
+		success: function(response, opts){
+			var responseOject = Ext.decode(response.responseText);
+			userDept = responseOject.user[0].dept;
+			userType = responseOject.user[0].usr_type;
+		},
+		failure: function(response, opts){
+			var responseOject = Ext.util.JSON.decode(response.responseText);
+			Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+		}
+	});
+	
+}); //End onReady
 
 Ext.define('cusModel', {
 	extend : 'Ext.data.Model',
@@ -560,7 +577,8 @@ var billingTo = Ext.create('Ext.data.Store', {
 	data : [
 	        {"name":"Customer"},
 	        {"name":"GSDI (Direct)"},
-	        {"name":"GSDI (Angebote)"}
+	        {"name":"GSDI (Angebote)"},
+//	        {"name":"GSD"},
 	]
 });
 
@@ -729,16 +747,26 @@ editCustomer = new Ext.create('Ext.window.Window', {
 				valueField : 'key_acc_id',
 				displayField : 'key_acc_name'
 			},{
-				xtype : 'combobox',
-				labelWidth : 145,
-				fieldLabel : 'Billing To',
-				name : 'ebill_to',
-				id : 'ebill_to',
-				emptyText : 'Billing To',
+				xtype: 'combobox',
+				fieldLabel: 'Billing To <font color="red">*</font> ',
+				name: 'ebill_to',
+				id: 'ebill_to',
+				labelWidth: 145,
+				store : {
+					fields : ['db_ref_name'],
+					proxy : {
+						type : 'ajax',
+						url : 'showDBReference.htm?kind=CusBillTo&dept=-',
+						reader : {
+							type : 'json',
+							root : 'records',
+						}
+					},
+					autoLoad : true
+				},
+				valueField : 'db_ref_name',
+				displayField : 'db_ref_name',
 				editable : false,
-				store : billingTo,
-				valueField : 'name',
-				displayField : 'name'
 			},{
 				xtype : 'combobox',
 				labelWidth : 145,
@@ -1018,17 +1046,39 @@ addCustomer = new Ext.create('Ext.window.Window', {
 				},
 				valueField : 'key_acc_id',
 				displayField : 'key_acc_name'
+//			},{
+//				xtype : 'combobox',
+//				labelWidth : 145,
+//				fieldLabel : 'Billing To',
+//				name : 'abill_to',
+//				id : 'abill_to',
+//				emptyText : 'Billing To',
+//				editable : false,
+//				store : billingTo,
+//				valueField : 'name',
+//				displayField : 'name'
 			},{
-				xtype : 'combobox',
-				labelWidth : 145,
-				fieldLabel : 'Billing To',
-				name : 'abill_to',
-				id : 'abill_to',
-				emptyText : 'Billing To',
+				xtype: 'combobox',
+				fieldLabel: 'Billing To <font color="red">*</font> ',
+				name: 'abill_to',
+				id: 'abill_to',
+				labelWidth: 145,
+				store : {
+					fields : ['db_ref_name'],
+					proxy : {
+						type : 'ajax',
+						url : 'showDBReference.htm?kind=CusBillTo&dept=-',
+						reader : {
+							type : 'json',
+							root : 'records',
+						}
+					},
+					autoLoad : true
+				},
+				valueField : 'db_ref_name',
+				displayField : 'db_ref_name',
 				editable : false,
-				store : billingTo,
-				valueField : 'name',
-				displayField : 'name'
+				value : 'Customer'
 			},{
 				xtype : 'combobox',
 				labelWidth : 145,
@@ -1159,7 +1209,16 @@ function confirmChk(btn) {
 					},
 					success : function(response, opts) {
 						// window.location = "memberManagement.htm";
-						store.searchCustomer.reload();
+						Ext.MessageBox.show({
+							title : 'Infomation',
+							msg : 'Customer has been deleted!',
+							buttons : Ext.MessageBox.OK,
+							animateTarget : 'del',
+							fn : function(){
+								store.searchCustomer.reload();
+							},
+							icon : Ext.MessageBox.INFO
+						});
 					},
 					failure : function(response, opts) {
 						var responseOject = Ext.util.JSON

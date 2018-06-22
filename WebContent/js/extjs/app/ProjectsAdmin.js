@@ -1,5 +1,7 @@
 store = {};
 panels = {};
+userType = "";
+userDept = "";
 
 Ext.onReady(function() {
 
@@ -433,7 +435,7 @@ Ext.onReady(function() {
 					Ext.Ajax.request({
 						url : 'searchProjectsParam.htm?AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
 						'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
-						'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&cus_id='+Ext.getCmp('cusid').getValue() + getParamValues(),
+						'&USD='+store.exchangeRates.getAt(0).data.USD+'&cus_id='+Ext.getCmp('cusid').getValue() + getParamValues(),
 						success : function(response, opts) {
 //							store.projectsRef.loadPage(1);
 							store.projectsRef.reload();
@@ -548,21 +550,22 @@ Ext.onReady(function() {
 					dataIndex : 'proj_desc'
 				},
 				{
-					text : "Project Title",
-					flex : 1.5,
-					dataIndex : 'proj_title'
-				},
-				{
-					text : "Bill to",
-					flex : 0.8,
+					text : "Billing To",
+					flex : 1.2,
 					sortable : true,
 					dataIndex : 'bill_to'
 				},
 				{
 					text : "Terms",
-					flex : 0.5,
+					flex : 0.6,
 					sortable : true,
 					dataIndex : 'billing_terms'
+				},
+				{
+					text : "Currency",
+					flex : 0.8,
+					dataIndex : 'proj_currency',
+					renderer : currencyName
 				},
 //				{
 //					text : "Price",
@@ -663,14 +666,14 @@ Ext.onReady(function() {
 							proj_desc = grid.getStore().getAt(rowIndex).get('proj_desc');
 							cus_name = grid.getStore().getAt(rowIndex).get('cus_name');
 							cus_code = grid.getStore().getAt(rowIndex).get('cus_code');
-							proj_title = grid.getStore().getAt(rowIndex).get('proj_title');
+							proj_currency = grid.getStore().getAt(rowIndex).get('proj_currency');
 
 							Ext.getCmp('eproj_name').setValue(proj_name);
 							Ext.getCmp('ecus_id').setValue(cus_id);
 							Ext.getCmp('ecus_name').setValue(cus_name);
 							Ext.getCmp('ecus_code').setValue(cus_code);
 							Ext.getCmp('eproj_desc').setValue(proj_desc);
-							Ext.getCmp('eproj_title').setValue(proj_title);
+							Ext.getCmp('eproj_currency').setValue(proj_currency);
 							Ext.getCmp('eproj_id').setValue(proj_id);
 							Ext.getCmp('efile_id').setValue(file_id);
 							editProject.show();
@@ -690,21 +693,24 @@ Ext.onReady(function() {
 							file_id = grid.getStore().getAt(rowIndex).get('file_id');
 							Ext.getCmp('projid').setValue(proj_id);
 							Ext.getCmp('fid').setValue(file_id);
-//							Ext.MessageBox.show({
-//								title : 'Confirm',
-//								msg : 'Are you sure you want to delete this?',
-//								buttons : Ext.MessageBox.YESNO,
-//								animateTarget : 'del',
-//								fn : confirmChk,
-//								icon : Ext.MessageBox.QUESTION
-//							});
-							Ext.MessageBox.show({
-								title : 'Information',
-								msg : 'Please contact IT Department for delete !',
-								buttons : Ext.MessageBox.OK,
-								animateTarget : 'del',
-								icon : Ext.MessageBox.INFO
-							});
+							if(userDept == "Manager" || userDept == "Billing" || userDept == "IT"){
+								Ext.MessageBox.show({
+									title : 'Confirm',
+									msg : 'Are you sure you want to delete this?',
+									buttons : Ext.MessageBox.YESNO,
+									animateTarget : 'del',
+									fn : confirmChk,
+									icon : Ext.MessageBox.QUESTION
+								});
+							}else{
+								Ext.MessageBox.show({
+									title : 'Information',
+									msg : 'Please contact Billing Department for delete !',
+									buttons : Ext.MessageBox.OK,
+									animateTarget : 'del',
+									icon : Ext.MessageBox.INFO
+								});
+							}
 						}
 					} ]
 				},
@@ -741,10 +747,13 @@ Ext.onReady(function() {
 		plugins: [{
 	        ptype: 'rowexpander',
 	        rowBodyTpl : new Ext.XTemplate(
-	        		'{proj_id:this.myTest}',
+	        		'{proj_id:this.projects_reference}',
 	        		{
-	        			myTest: function(v){
+	        			projects_reference: function(v){
 		            		var myText = "";
+		            		var record = store.projects.findRecord('proj_id',v);
+		    				var myIndex = store.projects.indexOf(record);
+		    				var proj_currency = store.projects.getAt(myIndex).data.proj_currency;
 		            		 store.projectsRef.each(function(rec){
 //		            			 alert(rec);
 		            			 var myIndex = store.projectsRef.indexOf(rec);
@@ -755,21 +764,36 @@ Ext.onReady(function() {
 		            			 }else{
 		            				 myDesc = "-";
 		            			 }
-		            			 if(rec.data.currency == "USD"){
-		            				 myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)*store.exchangeRates.getAt(0).data.EUR)*100)/100);
-		            					}else if(rec.data.currency == "EUR"){
-		            						myEuro = '€ '+(Math.round(rec.data.price*100)/100);
-		            					}else if(rec.data.currency == "THB"){
-		            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.THB*store.exchangeRates.getAt(0).data.EUR)*100)/100);
-		            					}else if(rec.data.currency == "AUD"){
-		            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.AUD*store.exchangeRates.getAt(0).data.EUR)*100)/100);
-		            					}else if(rec.data.currency == "GBP"){
-		            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.GBP*store.exchangeRates.getAt(0).data.EUR)*100)/100);
-		            					}else if(rec.data.currency == "CHF"){
-		            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.CHF*store.exchangeRates.getAt(0).data.EUR)*100)/100);
-		            					}else{
-		            						myEuro = '-';
-		            					}
+//		            			if(proj_currency == "USD"){
+//		            				 myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)*store.exchangeRates.getAt(0).data.EUR)*100)/100);
+//            					}else if(proj_currency == "EUR"){
+//            						myEuro = '€ '+(Math.round(rec.data.price*100)/100);
+//            					}else if(proj_currency == "THB"){
+//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.THB*store.exchangeRates.getAt(0).data.EUR)*100)/100);
+//            					}else if(proj_currency == "AUD"){
+//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.AUD*store.exchangeRates.getAt(0).data.EUR)*100)/100);
+//            					}else if(proj_currency == "GBP"){
+//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.GBP*store.exchangeRates.getAt(0).data.EUR)*100)/100);
+//            					}else if(proj_currency == "CHF"){
+//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.CHF*store.exchangeRates.getAt(0).data.EUR)*100)/100);
+//            					}else{
+//            						myEuro = '-';
+//            					}
+		            			if(proj_currency == "EUR"){
+            						myEuro = '€ '+(Math.round(rec.data.price*100)/100);
+		            			}else if(proj_currency == "USD"){
+		            				myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.USD)*100)/100);
+            					}else if(proj_currency == "THB"){
+            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.THB)*100)/100);
+            					}else if(proj_currency == "AUD"){
+            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.AUD)*100)/100);
+            					}else if(proj_currency == "GBP"){
+            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.GBP)*100)/100);
+            					}else if(proj_currency == "CHF"){
+            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.CHF)*100)/100);
+            					}else{
+            						myEuro = '-';
+            					}
 		            			if(rec.data.proj_id == v){
 		            				var actual_time = "";
 		            				var target_time = "";
@@ -800,12 +824,17 @@ Ext.onReady(function() {
 		            				 target_time+
 //		            				 '<td bgcolor=#F0F0F0>Actual Time: <b>'+rec.data.actual_time+'</b></td>'+
 		            				 actual_time+
-		            				 '<td bgcolor=#F0F0F0>Price: <b>'+(Math.round(rec.data.price*100)/100)+' '+rec.data.currency+'</b></td>'+
+		            				 '<td bgcolor=#F0F0F0>Price: <b>'+(Math.round(rec.data.price*100)/100)+' '+proj_currency+'</b></td>'+
 		            				 '<td bgcolor=#F0F0F0>Price(Euro): <b>'+myEuro+'</b></td>'+
 		            				 '<td bgcolor=#F0F0F0>Description: <b>'+myDesc+'</b></td>'+
-		            				 '<td><a href="javascript:editItemFunction('+myIndex+');"><font color=#B0B0B0><u>edit</u></font></a></td>'+
-		            				 '<td><a href="javascript:contactIT();"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
-//		            				 '<td><a href="javascript:deleteItem('+rec.data.proj_ref_id+');"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+		            				 '<td><a href="javascript:editItemFunction('+myIndex+');"><font color=#B0B0B0><u>edit</u></font></a></td>';
+//		            				 '<td><a href="javascript:contactBilling();"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+		            				if(userDept == "Manager" || userDept == "Billing" || userDept == "IT"){
+		            					myText += '<td><a href="javascript:deleteItem('+rec.data.proj_ref_id+');"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+		            				}else{
+		            					myText += '<td><a href="javascript:contactBilling();"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+		            				}
+		            				 
 		            			}
 		            		})
 		            		if(myText !== ""){
@@ -826,6 +855,19 @@ Ext.onReady(function() {
 		})
 	});
 
+	Ext.Ajax.request({
+		url : 'userModel.htm',
+		success: function(response, opts){
+			var responseOject = Ext.decode(response.responseText);
+			userDept = responseOject.user[0].dept;
+			userType = responseOject.user[0].usr_type;
+		},
+		failure: function(response, opts){
+			var responseOject = Ext.util.JSON.decode(response.responseText);
+			Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+		}
+	});
+	
 });
 
 Ext.define('projRefModel', {
@@ -930,7 +972,7 @@ Ext.define('projModel', {
 		name : 'billing_terms',
 		type : 'string'
 	}, {
-		name : 'proj_title',
+		name : 'proj_currency',
 		type : 'string'
 	}
 
@@ -967,7 +1009,7 @@ Ext.Ajax.useDefaultXhrHeader = false;
 
 Ext.define('exModel', {
 	extend : 'Ext.data.Model',
-	fields : [ {
+	fields : [{
 		name : 'USD',
 		type : 'float'
 	}, {
@@ -985,9 +1027,7 @@ Ext.define('exModel', {
 	}, {
 		name : 'CHF',
 		type : 'float'
-	}
-
-	]
+	}]
 });
 
 store.exchangeRates = Ext.create('Ext.data.JsonStore', {
@@ -996,13 +1036,22 @@ store.exchangeRates = Ext.create('Ext.data.JsonStore', {
 	autoLoad : true,
 	proxy : {
 		type : 'ajax',
-		url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c',
+		url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c&base=EUR',
 		reader : {
 			type : 'json',
 			root : 'rates',
 		}
 	}
 });
+
+//store.exchangeRates = Ext.create('Ext.data.JsonPStore', {
+//	model: 'exModel',
+//	id : 'exStore',
+//	autoLoad : true,
+//	url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c',
+//	root : 'rates',
+//	
+//});
 
 var currency = Ext.create('Ext.data.Store', {
     fields: ['currency','name'],
@@ -1199,13 +1248,20 @@ editProject = new Ext.create('Ext.window.Window', {
 
 			}
 		},{
-			xtype:'textfield',
-            fieldLabel: 'Project Title ',
+			xtype:'combobox',
+            fieldLabel: 'Currency <font color="red">*</font> ',
             labelWidth: 120,
-            name: 'eproj_title',
-            id: 'eproj_title',
-            msgTarget: 'under',
-            emptyText: 'Project Title'
+            name: 'eproj_currency',
+            id: 'eproj_currency',
+            queryMode : 'local',
+			labelWidth : 120,
+			emptyText : 'Price Currency',
+			editable : false,
+			allowBlank: false,
+			msgTarget : 'side',
+			store : currency,
+			valueField : 'currency',
+			displayField : 'name',
 		},{
 	    	xtype:'filefield',
 	    	labelWidth: 120,
@@ -1387,32 +1443,32 @@ addItem = new Ext.create('Ext.window.Window', {
     	    	name: 'aprice',
     	    	id: 'aprice',
     	    	emptyText : 'Project Price',
-    	    	listeners: {
-    	            change: function(field, value) {
-    	                if(value == null || value == 0){
-    	                	Ext.getCmp('acurrency').clearInvalid();
-    	                	Ext.getCmp('acurrency').allowBlank = true;
-    	                }else{
-    	                	if(Ext.getCmp('acurrency').value == null){
-	    	                	Ext.getCmp('acurrency').markInvalid('Currency Required!');
-	    	                	Ext.getCmp('acurrency').allowBlank = false;
-    	                	}
-    	                }
-    	            }
-    	        }
-    	    },{
-				xtype : 'combobox',
-				fieldLabel : 'Currency ',
-				name : 'acurrency',
-				id : 'acurrency',
-				queryMode : 'local',
-				labelWidth : 120,
-				emptyText : 'Price Currency',
-				editable : false,
-				msgTarget: 'under',
-				store : currency,
-				valueField : 'currency',
-				displayField : 'name',
+//    	    	listeners: {
+//    	            change: function(field, value) {
+//    	                if(value == null || value == 0){
+//    	                	Ext.getCmp('acurrency').clearInvalid();
+//    	                	Ext.getCmp('acurrency').allowBlank = true;
+//    	                }else{
+//    	                	if(Ext.getCmp('acurrency').value == null){
+//	    	                	Ext.getCmp('acurrency').markInvalid('Currency Required!');
+//	    	                	Ext.getCmp('acurrency').allowBlank = false;
+//    	                	}
+//    	                }
+//    	            }
+//    	        }
+//    	    },{
+//				xtype : 'combobox',
+//				fieldLabel : 'Currency ',
+//				name : 'acurrency',
+//				id : 'acurrency',
+//				queryMode : 'local',
+//				labelWidth : 120,
+//				emptyText : 'Price Currency',
+//				editable : false,
+//				msgTarget: 'under',
+//				store : currency,
+//				valueField : 'currency',
+//				displayField : 'name',
 			},{
     	    	xtype: 'textarea',
     	    	labelWidth: 120,
@@ -1678,13 +1734,20 @@ addProject = new Ext.create('Ext.window.Window', {
 
 				}
 			},{
-				xtype:'textfield',
-                fieldLabel: 'Project Title ',
+				xtype:'combobox',
+                fieldLabel: 'Currency <font color="red">*</font> ',
                 labelWidth: 120,
-                name: 'cproj_title',
-                id: 'cproj_title',
-                msgTarget: 'under',
-                emptyText: 'Project Title'
+                name: 'cproj_currency',
+                id: 'cproj_currency',
+                queryMode : 'local',
+    			labelWidth : 120,
+    			emptyText : 'Price Currency',
+    			editable : false,
+    			allowBlank: false,
+    			msgTarget : 'side',
+    			store : currency,
+    			valueField : 'currency',
+    			displayField : 'name',
 			},{
     	    	xtype:'filefield',
     	    	labelWidth: 120,
@@ -2002,33 +2065,32 @@ editItem = new Ext.create('Ext.window.Window', {
     	    	name: 'eprice',
     	    	id: 'eprice',
     	    	emptyText : 'Project Price',
-    	    	listeners: {
-    	            change: function(field, value) {
-    	                if(value == null || value == 0){
-    	                	Ext.getCmp('ecurrency').clearInvalid();
-    	                	Ext.getCmp('ecurrency').allowBlank = true;
-    	                }else{
-    	                	if(Ext.getCmp('ecurrency').value == null){
-    	                	Ext.getCmp('ecurrency').markInvalid('Currency Required!');
-    	                	Ext.getCmp('ecurrency').allowBlank = false;
-    	                	}
-    	                }
-    	            }
-    	        }
-//    	    	emptyText: 'java,art,animal,etc...'
-    	    },{
-				xtype : 'combobox',
-				fieldLabel : 'Currency ',
-				name : 'ecurrency',
-				id : 'ecurrency',
-				queryMode : 'local',
-				labelWidth : 120,
-				emptyText : 'Price Currency',
-				editable : false,
-				msgTarget : 'side',
-				store : currency,
-				valueField : 'currency',
-				displayField : 'name',
+//    	    	listeners: {
+//    	            change: function(field, value) {
+//    	                if(value == null || value == 0){
+//    	                	Ext.getCmp('ecurrency').clearInvalid();
+//    	                	Ext.getCmp('ecurrency').allowBlank = true;
+//    	                }else{
+//    	                	if(Ext.getCmp('ecurrency').value == null){
+//    	                	Ext.getCmp('ecurrency').markInvalid('Currency Required!');
+//    	                	Ext.getCmp('ecurrency').allowBlank = false;
+//    	                	}
+//    	                }
+//    	            }
+//    	        }
+//    	    },{
+//				xtype : 'combobox',
+//				fieldLabel : 'Currency ',
+//				name : 'ecurrency',
+//				id : 'ecurrency',
+//				queryMode : 'local',
+//				labelWidth : 120,
+//				emptyText : 'Price Currency',
+//				editable : false,
+//				msgTarget : 'side',
+//				store : currency,
+//				valueField : 'currency',
+//				displayField : 'name',
 			},{
     	    	xtype: 'textarea',
     	    	labelWidth: 120,
@@ -2121,7 +2183,7 @@ function editItemFunction(v){
 	Ext.getCmp('etime').setValue(myData.data.time);
 	Ext.getCmp('eactual_time').setValue(myData.data.actual_time);
 	Ext.getCmp('eprice').setValue(myData.data.price);
-	Ext.getCmp('ecurrency').setValue(myData.data.currency);
+//	Ext.getCmp('ecurrency').setValue(myData.data.currency);
 	Ext.getCmp('eproj_ref_desc').setValue(myData.data.proj_ref_desc);
 	Ext.getCmp('eproj_ref_id').setValue(myData.data.proj_ref_id);
 	Ext.getCmp('etopix_article_id').setValue(myData.data.topix_article_id);
@@ -2143,8 +2205,17 @@ function deleteItem(proj_ref_id){
 						id : proj_ref_id
 					},
 					success : function(response, opts) {
-						store.projectsRef.reload();
-						setTimeout(function(){store.projects.reload()},500);
+						Ext.MessageBox.show({
+							title : 'Infomation',
+							msg : 'Item has been deleted!',
+							buttons : Ext.MessageBox.OK,
+							animateTarget : 'del',
+							fn : function(){
+								store.projectsRef.reload();
+								setTimeout(function(){store.projects.reload()},500);
+							},
+							icon : Ext.MessageBox.INFO
+						});
 					},
 					failure : function(response, opts) {
 						store.projectsRef.reload();
@@ -2161,10 +2232,10 @@ function deleteItem(proj_ref_id){
 	});
 }
 
-function contactIT(){
+function contactBilling(){
 	Ext.MessageBox.show({
 		title : 'Information',
-		msg : 'Please contact IT Department for delete !',
+		msg : 'Please contact Billing Department for delete !',
 		buttons : Ext.MessageBox.OK,
 		animateTarget : 'del',
 		icon : Ext.MessageBox.INFO
@@ -2180,8 +2251,17 @@ function confirmChk(btn) {
 						fid : Ext.getCmp('fid').getValue()
 					},
 					success : function(response, opts) {
-						store.projectsRef.reload();
-						store.projects.reload();
+						Ext.MessageBox.show({
+							title : 'Infomation',
+							msg : 'Project has been deleted!',
+							buttons : Ext.MessageBox.OK,
+							animateTarget : 'del',
+							fn : function(){
+								store.projectsRef.reload();
+								store.projects.reload();
+							},
+							icon : Ext.MessageBox.INFO
+						});
 					},
 					failure : function(response, opts) {
 						var responseOject = Ext.util.JSON
@@ -2239,20 +2319,41 @@ function renderTime(value, meta, record, rowIndex, colIndex, store) {
     return record.get('time')+' mins';
 } 
 
-function currencyToEuro(value, meta, record, rowIndex, colIndex) {
-	if(record.get('currency') == "USD"){
-    return '€ '+(Math.round(((Math.round(record.get('price')*100)/100)*store.exchangeRates.getAt(0).data.EUR)*10000)/10000);
-	}else if(record.get('currency') == "EUR"){
-		return '€ '+(Math.round(record.get('price')*100)/100);
-	}else if(record.get('currency') == "THB"){
-		return '€ '+(Math.round(((Math.round(record.get('price')*100)/100)/store.exchangeRates.getAt(0).data.THB*store.exchangeRates.getAt(0).data.EUR)*10000)/10000);
-	}else if(record.get('currency') == "AUD"){
-		return '€ '+(Math.round(((Math.round(record.get('price')*100)/100)/store.exchangeRates.getAt(0).data.AUD*store.exchangeRates.getAt(0).data.EUR)*10000)/10000);
-	}else if(record.get('currency') == "GBP"){
-		return '€ '+(Math.round(((Math.round(record.get('price')*100)/100)/store.exchangeRates.getAt(0).data.GBP*store.exchangeRates.getAt(0).data.EUR)*10000)/10000);
-	}else if(record.get('currency') == "CHF"){
-		return '€ '+(Math.round(((Math.round(record.get('price')*100)/100)/store.exchangeRates.getAt(0).data.CHF*store.exchangeRates.getAt(0).data.EUR)*10000)/10000);
-	}else{
-		return '-';
+function currencyName(value, meta, record, rowIndex, colIndex, store) {
+	
+	var myCurrency = record.get('proj_currency');
+	var fullName = "";
+	if(myCurrency == "AUD"){
+		fullName = "Australian Dollar[AUD]";
+	}else if(myCurrency == "CHF"){
+		fullName = "Swiss Franc[CHF]";
+	}else if(myCurrency == "EUR"){
+		fullName = "Euro[EUR]";
+	}else if(myCurrency == "GBP"){
+		fullName = "British Pound[GBP]";
+	}else if(myCurrency == "THB"){
+		fullName = "Thai Bath[THB]";
+	}else if(myCurrency == "USD"){
+		fullName = "US Dollar[USD]";
 	}
+	
+	return fullName;
 } 
+
+//function currencyToEuro(value, meta, record, rowIndex, colIndex) {
+//	if(record.get('currency') == "USD"){
+//    return '€ '+(Math.round(((Math.round(record.get('price')*100)/100)*store.exchangeRates.getAt(0).data.EUR)*10000)/10000);
+//	}else if(record.get('currency') == "EUR"){
+//		return '€ '+(Math.round(record.get('price')*100)/100);
+//	}else if(record.get('currency') == "THB"){
+//		return '€ '+(Math.round(((Math.round(record.get('price')*100)/100)/store.exchangeRates.getAt(0).data.THB*store.exchangeRates.getAt(0).data.EUR)*10000)/10000);
+//	}else if(record.get('currency') == "AUD"){
+//		return '€ '+(Math.round(((Math.round(record.get('price')*100)/100)/store.exchangeRates.getAt(0).data.AUD*store.exchangeRates.getAt(0).data.EUR)*10000)/10000);
+//	}else if(record.get('currency') == "GBP"){
+//		return '€ '+(Math.round(((Math.round(record.get('price')*100)/100)/store.exchangeRates.getAt(0).data.GBP*store.exchangeRates.getAt(0).data.EUR)*10000)/10000);
+//	}else if(record.get('currency') == "CHF"){
+//		return '€ '+(Math.round(((Math.round(record.get('price')*100)/100)/store.exchangeRates.getAt(0).data.CHF*store.exchangeRates.getAt(0).data.EUR)*10000)/10000);
+//	}else{
+//		return '-';
+//	}
+//} 

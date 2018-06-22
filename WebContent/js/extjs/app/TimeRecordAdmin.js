@@ -332,7 +332,7 @@ Ext.onReady(function() {
 							proj.clearValue();
 							proj.getStore().removeAll();
 							proj.getStore().load({
-								url: 'showProjects.htm?id='+myId
+								url: 'showProjects.htm?type=all&id='+myId
 							});
 							job_ref.clearValue();
 							job_ref.getStore().removeAll();
@@ -391,7 +391,7 @@ Ext.onReady(function() {
 							proj.clearValue();
 							proj.getStore().removeAll();
 							proj.getStore().load({
-								url: 'showProjects.htm?id='+myId
+								url: 'showProjects.htm?type=all&id='+myId
 							});
 							job_ref.clearValue();
 							job_ref.getStore().removeAll();
@@ -416,7 +416,7 @@ Ext.onReady(function() {
 						fields : [ 'proj_id', 'proj_name' ],
 						proxy : {
 							type : 'ajax',
-							url : 'showProjects.htm?id=0',
+							url : 'showProjects.htm?type=all&id=0',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -558,7 +558,7 @@ Ext.onReady(function() {
 				proj.clearValue();
 				proj.getStore().removeAll();
 				proj.getStore().load({
-					url: 'showProjects.htm?id=0'
+					url: 'showProjects.htm?type=all&id=0'
 				});
 				job_ref.clearValue();
 				job_ref.getStore().removeAll();

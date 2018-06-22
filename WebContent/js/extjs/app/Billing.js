@@ -189,9 +189,10 @@ Ext.onReady(function() {
 						proj_id = grid.getStore().getAt(rowIndex).get('proj_id');
 						job_dtl = grid.getStore().getAt(rowIndex).get('job_dtl');
 						status = grid.getStore().getAt(rowIndex).get('job_status');
+						dept = grid.getStore().getAt(rowIndex).get('dept');
 						
 						Ext.getCmp('eproj_id').getStore().load({
-							url: 'showProjects.htm?id='+cus_id
+							url: 'showProjects.htm?type=all&id='+cus_id
 						});
 						
 						Ext.getCmp('ejob_id').setValue(job_id);
@@ -201,6 +202,7 @@ Ext.onReady(function() {
 						Ext.getCmp('eproj_id').setValue(proj_id);
 						Ext.getCmp('ejob_dtl').setValue(job_dtl);
 						Ext.getCmp('ejob_status').setValue(status);
+						Ext.getCmp('edept').setValue(dept);
 						editJob.show();
 					}
 				}]
@@ -688,24 +690,7 @@ Ext.onReady(function() {
 	grid.publication = Ext.create('Ext.grid.Panel', {
 		id : 'publicationGrid',
 		store : store.publicationJobRef,
-		tbar : [{
-			xtype : 'button',
-			text : 'Report',
-			id : 'ireporttoday',
-			iconCls : 'icon-excel',
-			disabled: true,
-			handler : function() {
-				job_id = Ext.getCmp('jobid_ref').getValue();
-				myForm = Ext.getCmp('formPanel').getForm();
-				myForm.submit({
-					target : '_blank',
-	                        url: 'printReport.htm?job_id='+job_id,
-	                        method: 'POST',
-	                        reset: true,
-	                        standardSubmit: true
-				})
-			}
-		},"->",
+		tbar : ["->",
 		{
 			type:'refresh',
 			iconCls: 'icon-refresh',
@@ -1090,24 +1075,7 @@ Ext.onReady(function() {
 	grid.estudio = Ext.create('Ext.grid.Panel', {
 		id : 'estudioGrid',
 		store : store.estudioJobRef,
-		tbar : [{
-			xtype : 'button',
-			text : 'Report',
-			id : 'ireporttoday',
-			iconCls : 'icon-excel',
-			disabled: true,
-			handler : function() {
-				job_id = Ext.getCmp('jobid_ref').getValue();
-				myForm = Ext.getCmp('formPanel').getForm();
-				myForm.submit({
-					target : '_blank',
-	                        url: 'printReport.htm?job_id='+job_id,
-	                        method: 'POST',
-	                        reset: true,
-	                        standardSubmit: true
-				})
-			}
-		},"->",
+		tbar : ["->",
 		{
 			type:'refresh',
 			iconCls: 'icon-refresh',
@@ -1547,27 +1515,448 @@ Ext.onReady(function() {
 			})
 	});
 
+	grid.pilot = Ext.create('Ext.grid.Panel', {
+		id : 'pilotGrid',
+		store : store.pilotJobRef,
+		tbar : ["->",
+		{
+			type:'refresh',
+			iconCls: 'icon-refresh',
+		    tooltip: 'Refresh grid below',
+		    // hidden:true,
+		    handler: function() {
+		        // refresh logic
+		    	store.pilotJobRef.reload();
+		    }
+	    },
+		{
+			iconCls: 'icon-save',
+			text: 'Save All',
+			id: 'isave-syncPilot',
+			iconAlign: 'right',
+	        tooltip: 'Sync data from server',
+	        disabled: false,
+	        itemId: 'saveSync',
+	        scope: this,
+	        handler: function(){
+	        	store.pilotJobRef.sync();
+	        }
+		}],
+		minHeight: 608,
+		columnLines : true,
+		columns : [
+			{
+		    	text : "Customer Name",
+		    	flex : 2,
+		    	sortable : true,
+		    	dataIndex : 'cus_name',
+		    	renderer : renderCustomer
+		    },
+			{
+				text : "Job Name",
+				flex : 2.5,
+				sortable : true,
+				dataIndex : 'job_ref_name',
+				editor: {
+					xtype: 'textfield',
+					allowBlank: false
+				}
+			},
+			{
+				text : "Item",
+				flex : 1.5,
+				sortable : true,
+				hidden : true,
+				dataIndex : 'itm_name',
+				editor: {
+					xtype: 'combobox',
+					id: 'edit_itm_today',
+					store : {
+						fields : [ 'proj_ref_id', 'itm_name', 'proj_ref_desc' ],
+						proxy : {
+							type : 'ajax',
+							url : '',
+							reader : {
+								type : 'json',
+								root : 'records',
+								idProperty : 'proj_ref_id'
+							}
+						},
+//						autoLoad : true,
+						sorters: [{
+					         property: 'itm_name',
+					         direction: 'ASC'
+					     }]
+					},
+					valueField : 'itm_name',
+					displayField : 'itm_name',
+//				    tpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'<div class="x-boundlist-item">{itm_name}</div>',
+//				            '<tpl else>',
+//				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
+//				            '</tpl>',
+//			            '</tpl>'
+//				    ),
+//				    displayTpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'{itm_name}',
+//				            '<tpl else>',
+//				            '{itm_name} - {proj_ref_desc}',
+//				            '</tpl>',
+//				        '</tpl>'
+//				    ),
+				    listeners: {
+				    	select : function(){
+				    		var v = this.getValue();
+							var record = this.findRecord(this.valueField || this.displayField, v);
+							var myIndex = this.store.indexOf(record);
+							var myValue = this.store.getAt(myIndex).data.proj_ref_id;
+							Ext.getCmp('projrefidtoday').setValue(myValue);
+				    	}
+				    }
+				}
+			},
+			{
+				dataIndex : 'proj_ref_id',
+				hidden : true,
+				hideable : false
+			},
+			{
+				text : "Amount",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'amount',
+				editor: {
+					xtype:'numberfield',
+					minValue : 0,
+					allowBlank: false
+				}
+			},
+			{
+				text : "Sent",
+				flex : 0.6,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'sent_amount',
+				editor: {
+					xtype:'numberfield',
+					id : 'esent_amount',
+					minValue : 0,
+					allowBlank: false
+				}
+			},
+			{
+				text : "Remain",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'total_amount'
+			},
+			{
+				text : "Date in",
+				flex : 1,
+				sortable : true,
+				dataIndex : 'job_in',
+				renderer: Ext.util.Format.dateRenderer('Y-m-d'),
+				editor: {
+					xtype: 'datefield',
+					format: 'Y-m-d',
+					editable: false
+				}
+			},
+			{
+				text : "Date out",
+				flex : 1,
+				sortable : true,
+				dataIndex : 'job_out',
+				renderer: function(value, meta, record, rowIndex, colIndex, store){
+					myStatus = record.get('job_ref_status');
+					today = new Date();
+					getDay = today.getDay();
+					if(getDay == 6){
+						today.setDate(today.getDate()+2);
+					}
+					todayFormat = Ext.util.Format.date(today, 'Y-m-d');
+					dateOut = Ext.util.Format.date(value, 'Y-m-d');
+					if(myStatus != "Hold"){
+						if(dateOut <= todayFormat){
+							return '<b><span style="color:red;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+						}else{
+							return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+						}
+					}else{
+						return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+					}
+				},
+				editor: {
+					xtype: 'datefield',
+					id: 'edit_date_today',
+					format: 'Y-m-d        H:i',
+					editable: false,
+					listeners: {
+						"change": function () {
+							newDate = Ext.getCmp('edit_date_today').getValue();
+							var myDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate(), editorDate.getHours(), editorDate.getMinutes());
+							Ext.getCmp('edit_date_today').setValue(myDate);
+						}
+					}
+				}
+			},
+			{
+				text : "Time",
+				flex : 0.6,
+				sortable : true,
+				dataIndex : 'job_out',
+				renderer: function(value, meta, record, rowIndex, colIndex, store){
+					myStatus = record.get('job_ref_status');
+					today = new Date();
+					getDay = today.getDay();
+					if(getDay == 6){
+						today.setDate(today.getDate()+2);
+					}
+					todayFormat = Ext.util.Format.date(today, 'Y-m-d');
+					timeOut = Ext.util.Format.date(value, 'H:i');
+					if(myStatus != "Hold"){
+						if(dateOut <= todayFormat){
+							if(timeOut == "00:00"){
+								return '<b><span style="color:red;">ASAP</span></b>';
+							}else{
+								return '<b><span style="color:red;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+							}
+						}else{
+							return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+						}
+					}else{
+						return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+					}
+				},
+				editor: {
+					xtype: 'timefield',
+					id: 'edit_time_today',
+					format: 'H:i',
+					listeners: {
+						blur: function () {
+							myTime = Ext.getCmp('edit_time_today').getValue();
+							var myDate = new Date(editorDate.getFullYear(), editorDate.getMonth(), editorDate.getDate(), myTime.getHours(), myTime.getMinutes());
+							Ext.getCmp('edit_time_today').setValue(myDate);
+						}
+					}
+				}
+			},
+			{
+				text : "Status",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				renderer : function(val){
+					if(val == "New"){
+						return '<b><span style="color:blue;">' + val + '</span></b>';
+					}else if(val == "Hold"){
+						return '<b><span style="color:red;">' + val + '</span></b>';
+					}else if(val == "CC"){
+						return '<b><span style="color:b;">' + val + '</span></b>';
+					}else{
+						return '<b>'+val+'</b>';
+					}
+				},
+				dataIndex : 'job_ref_status',
+				editor: {
+					xtype: 'combobox',
+//					store : 'jobRefStatusEstudio',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showJobReference.htm?kind=JobRefStatus&dept=E-Studio',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+//						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+					editable : false
+				}
+			},
+			{
+				text : "Approve",
+				flex : 1.3,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'job_ref_approve',
+				renderer : function(val){
+					if(val == "Done"){
+						return '<b><span style="color:#8F00FF;">' + val + '</span></b>';
+					}else if(val == "Hold Wait Info" || val == "Hold Other"){	
+						return '<b><span style="color:red;">' + val + '</span></b>';
+					}else if(val == "Working" || val == "Checking" || val == "Wait FI"){
+						return '<b><span style="color:#FF8F00;">' + val + '</span></b>';
+					}else if(val.indexOf("Wait Check") !== -1){
+						return '<b><span style="color:#0EB400;">' + val + '</span></b>';
+					}else if(val.indexOf("Wait") !== -1){
+						return '<b><span style="color:grey;">' + val + '</span></b>';
+					}else if(val == "Finish Path"){
+						return '<b><span style="color:#B99200;">' + val + '</span></b>';
+					}else{
+						return '<b>'+val+'</b>';
+					}
+				},
+				editor : {
+					xtype : 'combobox',
+					id : 'edit_job_ref_approve_jmd_pilot',
+//					store : 'jobRefApproveEstudio',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : '',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+//						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+					editable : false
+				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
+				}
+			},
+		    {
+				text : "Name",
+				flex : 1.5,
+				sortable : true,
+				dataIndex : 'job_name',
+				hidden : true,
+			},
+			],
+			viewConfig: { 
+		        stripeRows: false, 
+		        getRowClass: function(record) {
+		        	if(record.get('job_ref_status') == "Hold"){
+		        		return 'hold-row';
+		        	}else{
+		        		return 'process-row';
+		        	}
+		        }
+			},
+			listeners : {
+				viewready: function (grid) {
+			        var view = grid.view;
+			        this.toolTip = Ext.create('Ext.tip.ToolTip', {
+			            target: view.el,
+			            delegate: view.cellSelector,
+			            trackMouse: true,
+			            renderTo: Ext.getBody(),
+			            listeners: {
+			                beforeshow: function(tip) {
+			                    var trigger = tip.triggerElement,
+			                        parent = tip.triggerElement.parentElement,
+			                        columnTitle = view.getHeaderByCell(trigger).text,
+			                        columnDataIndex = view.getHeaderByCell(trigger).dataIndex,
+			                        columnText = view.getRecord(parent).get(columnDataIndex).toString();
+			                    if(columnDataIndex == "cus_name"){
+			                    	columnText += "("+view.getRecord(parent).get('proj_name').toString()+")";
+			                    }
+			                    if (columnText){
+			                        tip.update("<b>"+(columnText.replace(/\r\n|\n/gi, "<br>"))+"</b>");
+			                    } else {
+			                        return false;
+			                    }
+			                }
+			            }
+			        });
+		        }
+		    },
+		    plugins: 
+			    [{ 
+			        ptype: 'cellediting',
+			        clicksToEdit: 2,
+			        listeners: {
+				        beforeedit: function (editor, e) {
+				        	Ext.getCmp('projrefidtoday').setValue(0);
+				        	if(e.field == "job_out"){
+								editorDate = e.value;
+				        	}else if(e.field == "itm_name"){
+				        		Ext.getCmp('edit_itm_today').getStore().load({
+									url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
+								});
+				        	}
+				        	if(e.field == "job_ref_approve"){
+//				        		if(e.record.get('dept') == "E-Studio"){
+//				        			Ext.getCmp('edit_job_ref_approve_jmd_estudio').bindStore('jobRefApproveEstudio');
+//				        		}else if(e.record.get('dept') == "E-Studio_OTTO"){
+//				        			Ext.getCmp('edit_job_ref_approve_jmd_estudio').bindStore('jobRefApproveEstudioOTTO');
+//				        		}else if(e.record.get('dept') == "E-Studio_MM"){
+//				        			Ext.getCmp('edit_job_ref_approve_jmd_estudio').bindStore('jobRefApproveEstudioMM');
+//				        		}else if(e.record.get('dept') == "E-Studio_Masking"){
+//				        			Ext.getCmp('edit_job_ref_approve_jmd_estudio').bindStore('jobRefApproveEstudioMasking');
+//				        		}
+				        		var gjob_ref = Ext.getCmp('edit_job_ref_approve_jmd_pilot');
+								
+			        			gjob_ref.clearValue();
+			        			gjob_ref.getStore().removeAll();
+			        			gjob_ref.getStore().load({
+									url: 'showJobReference.htm?kind=JobRefApprove&dept='+e.record.get('dept')
+								});
+				        	}
+				        	if(e.field == "sent_amount"){
+				        		Ext.getCmp('esent_amount').setMaxValue(e.record.get('amount'));
+				        	}
+						},
+						afteredit: function (editor, e) {
+							if(e.field == "itm_name"){
+								if(Ext.getCmp('projrefidtoday').getValue() != 0){
+									e.record.set('proj_ref_id', Ext.getCmp('projrefidtoday').getValue());
+								}
+							}
+						},
+						edit: function (editor, e) {
+							if(e.field == "job_out"){
+								try{
+									myTime = Ext.getCmp('edit_time_today').getValue();
+									var myDate = new Date(editorDate.getFullYear(), editorDate.getMonth(), editorDate.getDate(), myTime.getHours(), myTime.getMinutes());
+									Ext.getCmp('edit_time_today').setValue(myDate);
+									e.record.set('job_out', myDate);
+								}catch(e){
+									console.log(e.message);
+								}
+							}
+							if(e.field == "job_ref_approve"){
+								if(Ext.getCmp('edit_job_ref_approve_jmd_estudio').getValue() == "-"){
+									e.record.set("job_ref_approve", "");
+								}
+							}
+						}
+			        }
+			    }],
+		    bbar : Ext.create('Ext.PagingToolbar', {
+				store : store.estudioJobRef,
+				displayInfo : true,
+				displayMsg : '<b>Total Count : {2} <b>&nbsp;&nbsp;&nbsp;',
+				emptyMsg : "<b>No Job to display</b>",
+			})
+	});
+
+	
 	grid.publicationType3 = Ext.create('Ext.grid.Panel', {
 		id : 'publicationGridType3',
 		store : store.publicationJobRef,
-		tbar : [{
-			xtype : 'button',
-			text : 'Report',
-			id : 'ireporttoday',
-			iconCls : 'icon-excel',
-			disabled: true,
-			handler : function() {
-				job_id = Ext.getCmp('jobid_ref').getValue();
-				myForm = Ext.getCmp('formPanel').getForm();
-				myForm.submit({
-					target : '_blank',
-	                        url: 'printReport.htm?job_id='+job_id,
-	                        method: 'POST',
-	                        reset: true,
-	                        standardSubmit: true
-				})
-			}
-		},"->",
+		tbar : ["->",
 		{
 			type:'refresh',
 			iconCls: 'icon-refresh',
@@ -1840,24 +2229,7 @@ Ext.onReady(function() {
 	grid.estudioType3 = Ext.create('Ext.grid.Panel', {
 		id : 'estudioGridType3',
 		store : store.estudioJobRef,
-		tbar : [{
-			xtype : 'button',
-			text : 'Report',
-			id : 'ireporttoday',
-			iconCls : 'icon-excel',
-			disabled: true,
-			handler : function() {
-				job_id = Ext.getCmp('jobid_ref').getValue();
-				myForm = Ext.getCmp('formPanel').getForm();
-				myForm.submit({
-					target : '_blank',
-	                        url: 'printReport.htm?job_id='+job_id,
-	                        method: 'POST',
-	                        reset: true,
-	                        standardSubmit: true
-				})
-			}
-		},"->",
+		tbar : ["->",
 		{
 			type:'refresh',
 			iconCls: 'icon-refresh',
@@ -2165,6 +2537,315 @@ Ext.onReady(function() {
 				})
 	});
 
+	grid.pilotType3 = Ext.create('Ext.grid.Panel', {
+		id : 'pilotGridType3',
+		store : store.pilotJobRef,
+		tbar : [,"->",
+		{
+			type:'refresh',
+			iconCls: 'icon-refresh',
+		    tooltip: 'Refresh grid below',
+		    // hidden:true,
+		    handler: function() {
+		        // refresh logic
+		    	store.pilotJobRef.reload();
+		    }
+	    },
+		{
+			iconCls: 'icon-save',
+			text: 'Save All',
+			id: 'isave-syncPilotType3',
+			iconAlign: 'right',
+	        tooltip: 'Sync data from server',
+	        disabled: false,
+	        itemId: 'saveSync',
+	        scope: this,
+	        handler: function(){
+	        	store.pilotJobRef.sync();
+	        }
+		}],
+		minHeight: 608,
+		columnLines : true,
+		columns : [
+			{
+				text : "Customer Name",
+				flex : 2.2,
+				sortable : true,
+				dataIndex : 'cus_name',
+				renderer : renderCustomer,
+			},
+			{
+				text : "Job Name",
+				flex : 2.5,
+				sortable : true,
+				dataIndex : 'job_ref_name',
+			},
+			{
+				text : "Item",
+				flex : 1.5,
+				sortable : true,
+				hidden : true,
+				dataIndex : 'itm_name',
+			},
+			{
+				text : "Amount",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'amount',
+			},
+			{
+				text : "Sent",
+				flex : 0.5,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'sent_amount',
+			},
+			{
+				text : "Remain",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'total_amount'
+			},
+			{
+				text : "Date in",
+				flex : 1,
+				sortable : true,
+				dataIndex : 'job_in',
+				renderer: Ext.util.Format.dateRenderer('Y-m-d'),
+			},
+			{
+				text : "Date out",
+				flex : 1,
+				sortable : true,
+				dataIndex : 'job_out',
+				renderer: function(value, meta, record, rowIndex, colIndex, store){
+					myStatus = record.get('job_ref_status');
+					today = new Date();
+					getDay = today.getDay();
+					if(getDay == 6){
+						today.setDate(today.getDate()+2);
+					}
+					todayFormat = Ext.util.Format.date(today, 'Y-m-d');
+					dateOut = Ext.util.Format.date(value, 'Y-m-d');
+					if(myStatus != "Hold"){
+						if(dateOut <= todayFormat){
+							return '<b><span style="color:red;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+						}else{
+							return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+						}
+					}else{
+						return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+					}
+				},
+			},
+			{
+				text : "Time",
+				flex : 0.6,
+				sortable : true,
+				dataIndex : 'job_out',
+				renderer: function(value, meta, record, rowIndex, colIndex, store){
+					myStatus = record.get('job_ref_status');
+					today = new Date();
+					getDay = today.getDay();
+					if(getDay == 6){
+						today.setDate(today.getDate()+2);
+					}
+					todayFormat = Ext.util.Format.date(today, 'Y-m-d');
+					timeOut = Ext.util.Format.date(value, 'H:i');
+					if(myStatus != "Hold"){
+						if(dateOut <= todayFormat){
+							if(timeOut == "00:00"){
+								return '<b><span style="color:red;">ASAP</span></b>';
+							}else{
+								return '<b><span style="color:red;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+							}
+						}else{
+							return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+						}
+					}else{
+						return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+					}
+				},
+			},
+			{
+				dataIndex : 'proj_ref_id',
+				hidden : true,
+				hideable : false
+			},
+			{
+				text : "Status",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				renderer : function(val){
+					if(val == "New"){
+						return '<b><span style="color:blue;">' + val + '</span></b>';
+					}else if(val == "Hold"){
+						return '<b><span style="color:red;">' + val + '</span></b>';
+					}else{
+						return '<b>'+val+'</b>';
+					}
+				},
+				dataIndex : 'job_ref_status',
+			},
+			{
+				text : "Approve",
+				flex : 1.3,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'job_ref_approve',
+				renderer : function(val){
+					if(val == "Done"){
+						return '<b><span style="color:#8F00FF;">' + val + '</span></b>';
+					}else if(val == "Hold Wait Info" || val == "Hold Other"){	
+						return '<b><span style="color:red;">' + val + '</span></b>';
+					}else if(val == "Working" || val == "Checking" || val == "Wait FI"){
+						return '<b><span style="color:#FF8F00;">' + val + '</span></b>';
+					}else if(val.indexOf("Wait Check") !== -1){
+						return '<b><span style="color:#0EB400;">' + val + '</span></b>';
+					}else if(val.indexOf("Wait") !== -1){
+						return '<b><span style="color:grey;">' + val + '</span></b>';
+					}else if(val == "Finish Path"){
+						return '<b><span style="color:#B99200;">' + val + '</span></b>';
+					}else{
+						return '<b>'+val+'</b>';
+					}
+				},
+				editor : {
+					xtype : 'combobox',
+					id : 'edit_job_ref_approve_pilot_type3',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : '',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+//						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+					editable : false
+				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
+				}
+			},
+		    {
+				text : "Name",
+				flex : 1.5,
+				sortable : true,
+				dataIndex : 'job_name',
+				hidden : true,
+			}],
+			viewConfig: { 
+		        stripeRows: false, 
+		        getRowClass: function(record) {
+		        	if(record.get('job_ref_status') == "Hold"){
+		        		return 'hold-row';
+		        	}else{
+		        		return 'process-row';
+		        	}
+		        }
+			},
+			listeners : {
+				viewready: function (grid) {
+			        var view = grid.view;
+			        this.toolTip = Ext.create('Ext.tip.ToolTip', {
+			            target: view.el,
+			            delegate: view.cellSelector,
+			            trackMouse: true,
+			            renderTo: Ext.getBody(),
+			            listeners: {
+			                beforeshow: function(tip) {
+			                    var trigger = tip.triggerElement,
+			                        parent = tip.triggerElement.parentElement,
+			                        columnTitle = view.getHeaderByCell(trigger).text,
+			                        columnDataIndex = view.getHeaderByCell(trigger).dataIndex,
+			                        columnText = view.getRecord(parent).get(columnDataIndex).toString();
+			                    if(columnDataIndex == "cus_name"){
+			                    	columnText += "("+view.getRecord(parent).get('proj_name').toString()+")";
+			                    }
+			                    if (columnText){
+			                        tip.update("<b>"+(columnText.replace(/\r\n|\n/gi, "<br>"))+"</b>");
+			                    } else {
+			                        return false;
+			                    }
+			                }
+			            }
+			        });
+		        }
+		    },
+		    plugins: 
+			    [{ 
+			        ptype: 'cellediting',
+			        clicksToEdit: 2,
+			        listeners: {
+				        beforeedit: function (editor, e) {
+				        	Ext.getCmp('projrefidtoday').setValue(0);
+				        	if(e.field == "job_out"){
+								editorDate = e.value;
+				        	}else if(e.field == "itm_name"){
+				        		Ext.getCmp('edit_itm_today').getStore().load({
+									url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
+								});
+				        	}
+				        	if(e.field == "job_ref_approve"){
+				        		var gjob_ref = Ext.getCmp('edit_job_ref_approve_pilot_type3');
+								
+				        		gjob_ref.clearValue();
+				        		gjob_ref.getStore().removeAll();
+				        		gjob_ref.getStore().load({
+									url: 'showJobReference.htm?kind=JobRefApprove&dept='+e.record.get('dept')
+								});
+				        	}
+						},
+						afteredit: function (editor, e) {
+							if(e.field == "itm_name"){
+								if(Ext.getCmp('projrefidtoday').getValue() != 0){
+									e.record.set('proj_ref_id', Ext.getCmp('projrefidtoday').getValue());
+								}
+							}
+						},
+						edit: function (editor, e) {
+							if(e.field == "job_out"){
+								try{
+									myTime = Ext.getCmp('edit_time_today').getValue();
+									var myDate = new Date(editorDate.getFullYear(), editorDate.getMonth(), editorDate.getDate(), myTime.getHours(), myTime.getMinutes());
+									Ext.getCmp('edit_time_today').setValue(myDate);
+									e.record.set('job_out', myDate);
+								}catch(e){
+									console.log(e.message);
+								}
+							}
+							if(e.field == "job_ref_approve"){
+								if(Ext.getCmp('edit_job_ref_approve_estudio_type3').getValue() == "-"){
+									e.record.set("job_ref_approve", "");
+								}
+							}
+						}
+			        }
+			    }],
+			    bbar : Ext.create('Ext.PagingToolbar', {
+					store : store.estudioJobRef,
+					displayInfo : true,
+					displayMsg : '<b>Total Count : {2} <b>&nbsp;&nbsp;&nbsp;',
+					emptyMsg : "<b>No Job to display</b>",
+//					plugins : Ext.create('Ext.ux.ProgressBarPager', {}),
+				})
+	});
+
+	
 	addJob = new Ext.create('Ext.window.Window', {
 		title: "Add Job's Project",
 	    animateTarget: 'job_add',
@@ -2182,6 +2863,7 @@ Ext.onReady(function() {
 	            layout: 'anchor',
 	            padding: 10,
 	            width:400,
+	            id: 'addJobFieldSet',
 	            style: {
 	                "margin-left": "auto",
 	                "margin-right": "auto",
@@ -2266,7 +2948,7 @@ Ext.onReady(function() {
 							proj.clearValue();
 							proj.getStore().removeAll();
 							proj.getStore().load({
-								url: 'showProjects.htm?id='+myId
+								url: 'showProjects.htm?type=all&id='+myId
 							});
 							
 						}
@@ -2316,7 +2998,7 @@ Ext.onReady(function() {
 							proj.clearValue();
 							proj.getStore().removeAll();
 							proj.getStore().load({
-								url: 'showProjects.htm?id='+myId
+								url: 'showProjects.htm?type=all&id='+myId
 							});
 							
 						}
@@ -2388,10 +3070,10 @@ Ext.onReady(function() {
 	    	    	maxLength : 500,
 					maxLengthText : 'Maximum input 500 Character',
 	    	    }]
-	            },{
-	            	xtype : 'hidden',
-					id : 'adept',
-					name : 'adept'
+//	            },{
+//	            	xtype : 'hidden',
+//					id : 'adept',
+//					name : 'adept'
 	            }]
 	    		}],
 	            buttons:[{	
@@ -2472,6 +3154,7 @@ Ext.onReady(function() {
 	            layout: 'anchor',
 	            padding: 10,
 	            width:400,
+	            id: 'editJobFieldSet',
 	            style: {
 	                "margin-left": "auto",
 	                "margin-right": "auto",
@@ -2557,7 +3240,7 @@ Ext.onReady(function() {
 							proj.clearValue();
 							proj.getStore().removeAll();
 							proj.getStore().load({
-								url: 'showProjects.htm?id='+myId
+								url: 'showProjects.htm?type=all&id='+myId
 							});
 							
 						}
@@ -2607,7 +3290,7 @@ Ext.onReady(function() {
 							proj.clearValue();
 							proj.getStore().removeAll();
 							proj.getStore().load({
-								url: 'showProjects.htm?id='+myId
+								url: 'showProjects.htm?type=all&id='+myId
 							});
 							
 						}
@@ -3424,6 +4107,71 @@ Ext.onReady(function() {
 //					grid.job.getStore().reload();
 				}
 			});
+			if(userDept == "E-Studio" && userType == 2){
+				Ext.getCmp('addJobFieldSet').add({
+					xtype : 'combobox',
+					fieldLabel : 'Department <font color="red">*</font> ',
+					name : 'adept',
+					id : 'adept',
+					queryMode : 'local',
+					labelWidth : 120,
+					emptyText : 'Department',
+					allowBlank: false,
+					editable : false,
+					msgTarget: 'under',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showDepartment.htm',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name'
+				});
+				Ext.getCmp('editJobFieldSet').add({
+					xtype : 'combobox',
+					fieldLabel : 'Department <font color="red">*</font> ',
+					name : 'edept',
+					id : 'edept',
+					queryMode : 'local',
+					labelWidth : 120,
+					emptyText : 'Department',
+					allowBlank: false,
+					editable : false,
+					msgTarget: 'under',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showDepartment.htm',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name'
+				});
+			}else{
+				Ext.getCmp('addJobFieldSet').add({
+					xtype: 'hidden',
+					id: 'adept',
+					name: 'adept'
+				});
+				Ext.getCmp('editJobFieldSet').add({
+					xtype: 'hidden',
+					id: 'edept',
+					name: 'edept'
+				});
+			}
 			userGridType();
 		},
 		failure: function(response, opts){
@@ -3474,6 +4222,10 @@ Ext.onReady(function() {
 				    	id: 'todayTabs',
 				    	title: 'E-Studio Jobs',
 				    	items: grid.estudio
+				    },{
+				    	id: 'pilotTabs',
+				    	title: 'Pilot Jobs',
+				    	items: grid.pilot
 				    }]
 				var userStore = grid.estudio.getStore();
 			}else{
@@ -3483,6 +4235,31 @@ Ext.onReady(function() {
 				    	items: grid.estudioType3
 				    }]
 				var userStore = grid.estudioType3.getStore();
+			}
+		}else if(userDept == "Pilot"){
+			if(userType == 2){
+				var userGrid = [{
+			    	id: 'projTabs',
+			    	title: 'Projects',
+			    	items: grid.job
+			    },{
+			    	id: 'jobTabs',
+			    	disabled: true,
+			    	title: 'Jobs',
+			    	items: grid.jobRef
+			    },{
+			    	id: 'pilotTabs',
+			    	title: 'Pilot Jobs',
+			    	items: grid.pilot
+			    }]
+			var userStore = grid.pilot.getStore();
+			}else{
+				var userGrid = [{
+					id: 'todayTabs',
+			    	title: 'Pilot Jobs',
+			    	items: grid.pilotType3
+			    }]
+			var userStore = grid.pilotType3.getStore();
 			}
 		}else{
 			deptRef = "E-Studio";
@@ -3606,7 +4383,7 @@ Ext.onReady(function() {
 									proj.clearValue();
 									proj.getStore().removeAll();
 									proj.getStore().load({
-										url: 'showProjects.htm?id='+myId
+										url: 'showProjects.htm?type=all&id='+myId
 									});
 								}
 
@@ -3659,7 +4436,7 @@ Ext.onReady(function() {
 									proj.clearValue();
 									proj.getStore().removeAll();
 									proj.getStore().load({
-										url: 'showProjects.htm?id='+myId
+										url: 'showProjects.htm?type=all&id='+myId
 									});
 								}
 
@@ -3679,7 +4456,7 @@ Ext.onReady(function() {
 								fields : [ 'proj_id', 'proj_name' ],
 								proxy : {
 									type : 'ajax',
-									url : 'showProjects.htm?id=0',
+									url : 'showProjects.htm?type=all&id=0',
 									reader : {
 										type : 'json',
 										root : 'records',
@@ -3798,7 +4575,7 @@ Ext.onReady(function() {
 					text : 'Reset',
 					handler : function() {
 						this.up('form').getForm().reset();
-						Ext.getCmp('sproj_id').getStore().load({url: 'showProjects.htm?id=0'});
+						Ext.getCmp('sproj_id').getStore().load({url: 'showProjects.htm?type=all&id=0'});
 					}
 				} ]
 
@@ -3828,6 +4605,8 @@ Ext.onReady(function() {
 	                	store.jobs.reload();
 	                	Ext.getCmp('filterSearchField').setValue("");
 	                	store.jobs.clearFilter();
+	                }else{
+	                	store.pilotJobRef.reload();
 	                }
 	            },
 	            'afterrender': function(){
@@ -3853,6 +4632,7 @@ Ext.onReady(function() {
 	
 	setInterval(function(){store.publicationJobRef.reload()},240000);
 	setInterval(function(){store.estudioJobRef.reload()},240000);
+	setInterval(function(){store.pilotJobRef.reload()},240000);
 	
 }); //end onReady
 
@@ -3875,7 +4655,7 @@ Ext.define('jobRefModel', {
 		type : 'int'
 	},{
 		name : 'amount',
-		type : 'int'
+		type : 'float'
 	},{
 		name : 'job_in',
 		type : 'date',
@@ -3910,10 +4690,10 @@ Ext.define('jobRefModel', {
 		type : 'string'
 	},{
 		name : 'sent_amount',
-		type : 'int'
+		type : 'float'
 	},{
 		name : 'total_amount',
-		type : 'int'
+		type : 'float'
 	},{
 		name : 'job_ref_number',
 		type : 'string'
@@ -4087,6 +4867,62 @@ store.estudioJobRef = Ext.create('Ext.data.JsonStore', {
     }
 });
 
+store.pilotJobRef = Ext.create('Ext.data.JsonStore', {
+	model : 'jobRefModel',
+	id : 'pilotJobRefStore',
+	pageSize : 999,
+	autoLoad : true,
+	proxy : {
+		type : 'ajax',
+//		url : 'searchTodayJobsReference.htm',
+		api: {
+			read: 'searchTodayJobsReference.htm?grid_dept=Pilot',
+			update: 'updateJobReferenceBatch.htm'
+		},
+		reader : {
+			type : 'json',
+			root : 'records',
+			idProperty : 'job_ref_id',
+			totalProperty : 'total'
+		},
+		writer: {
+            type: 'json',
+            root: 'data',
+            encode: true,
+            writeAllFields: true,
+        },
+        listeners: {
+            exception: function(proxy, response, operation){
+//            	console.log(operation.getError());
+                Ext.MessageBox.show({
+                    title: 'REMOTE EXCEPTION',
+                    msg: operation.getError(),
+                    icon: Ext.MessageBox.ERROR,
+                    buttons: Ext.Msg.OK,
+                    fn: function(){location.reload()}
+                });
+            }
+        }
+	},
+    listeners: {
+        write: function(proxy, operation){
+            if(operation.action == 'update'){
+            	Ext.MessageBox.show({
+						title: 'Information',
+						msg: 'Job Has Been Update!',
+						buttons: Ext.MessageBox.OK,
+						icon: Ext.MessageBox.INFO,
+						animateTarget: 'isave-syncPilot',
+						fn: function(){
+							store.pilotJobRef.reload();
+							}
+					});
+            }
+            
+        },
+    }
+});
+
 Ext.define('jobModel', {
 	extend : 'Ext.data.Model',
 	fields : [ {
@@ -4121,7 +4957,7 @@ Ext.define('jobModel', {
 		type : 'string'
 	}, {
 		name : 'total_amount',
-		type : 'int'
+		type : 'float'
 	}, {
 		name : 'remain_job',
 		type : 'int'

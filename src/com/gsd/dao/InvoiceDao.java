@@ -42,8 +42,10 @@ public interface InvoiceDao {
 	
 	public List<InvoiceReference> getListDataFromRequest(Object data);
 	
-	public List<Invoice> showInvoiceReport(String year, int inv_company_id);
+	public List<Invoice> showInvoiceMonthlyReport(String year, int inv_company_id);
 
+	public List<Invoice> showInvoiceReport(Map<String, String> data);
+	
 	public TopixConfig getTopixConfig();
 	
 	public int addTopix(Topix tpx);
@@ -54,5 +56,5 @@ public interface InvoiceDao {
 	
 	public void updateTopixAuditLogging(Topix tpx);
 	
-	public String getLastInvoiceNumber(int inv_company_id, String delivery_date);
+	public String getLastInvoiceNumber(int inv_company_id, String delivery_date, String inv_bill_type);
 }

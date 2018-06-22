@@ -45,6 +45,13 @@ public class AuditLoggingDaoImpl extends JdbcDaoSupport implements AuditLoggingD
 				"WHERE aud_id <> 0\n";
 				
 		if(dept == "" || dept == null){
+		}else if(dept.equals("E-Studio")){
+			sql +=  "AND ((CASE\n"+
+					"WHEN aud.parent_object LIKE '%Jobs Reference%' THEN jobs2.dept\n"+
+					"WHEN aud.parent_object = 'Jobs' THEN jobs.dept END) LIKE '"+dept+"%'\n"+
+					"OR (CASE\n"+
+					"WHEN aud.parent_object LIKE '%Jobs Reference%' THEN jobs2.dept\n"+
+					"WHEN aud.parent_object = 'Jobs' THEN jobs.dept END) LIKE 'Pilot%')\n";
 		}else{
 			sql +=  "AND (CASE\n"+
 					"WHEN aud.parent_object LIKE '%Jobs Reference%' THEN jobs2.dept\n"+

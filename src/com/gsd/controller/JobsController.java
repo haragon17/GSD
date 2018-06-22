@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -469,16 +470,20 @@ public class JobsController {
 		String job_dtl = request.getParameter("ejob_dtl");
 		String status = request.getParameter("ejob_status");
 		int proj_id = Integer.parseInt(request.getParameter("eproj_id"));
-		UserDetailsApp user = UserLoginDetail.getUser();
-		int userType = user.getUserModel().getUsr_type();
-		String dept = "";
-		if(userType == 0 || userType == 1){
-			dept = request.getParameter("edept");
-		}else{
-			Jobs myJob = new Jobs();
-			myJob = jobsDao.searchJobsByID(job_id);
-			dept = myJob.getDept();
-		}
+		String dept = request.getParameter("edept");
+		
+//		UserDetailsApp user = UserLoginDetail.getUser();
+//		int userType = user.getUserModel().getUsr_type();
+//		String dept = "";
+//		if(userType == 0 || userType == 1){
+//			dept = request.getParameter("edept");
+//		}else if(!request.getParameter("edept").equals("")){
+//			dept = request.getParameter("edept");
+//		}else{
+//			Jobs myJob = new Jobs();
+//			myJob = jobsDao.searchJobsByID(job_id);
+//			dept = myJob.getDept();
+//		}
 		
 		Jobs job = new Jobs();
 		job.setJob_id(job_id);
@@ -563,9 +568,9 @@ public class JobsController {
 		}
 		
 		if(!amount.equals("Amount or Hours")){
-			jobRef.setAmount(Integer.parseInt(amount));
+			jobRef.setAmount(new BigDecimal(amount));
 		}else{
-			jobRef.setAmount(0);
+			jobRef.setAmount(new BigDecimal(0));
 		}
 		
 		if(!job_dtl.equals("Job Details")){
@@ -674,9 +679,9 @@ public class JobsController {
 		}
 		
 		if(!amount.equals("Amount or Hours")){
-			jobRef.setAmount(Integer.parseInt(amount));
+			jobRef.setAmount(new BigDecimal(amount));
 		}else{
-			jobRef.setAmount(0);
+			jobRef.setAmount(new BigDecimal(0));
 		}
 		
 		if(!job_dtl.equals("Job Details")){

@@ -44,8 +44,14 @@ public class Invoice {
 	private BigDecimal dec;
 	private int inv_tpx_id;
 	private BigDecimal total_inv_price;
-	private String inv_ref_currency;
 	private int count_tpx;
+	private String bill_to;
+	private String inv_itm_name;
+	private BigDecimal inv_ref_qty;
+	private BigDecimal inv_ref_price;
+	private BigDecimal total_price;
+	private String inv_bill_to;
+	private String inv_currency;
 	
 	public int getInv_id() {
 		return inv_id;
@@ -281,17 +287,53 @@ public class Invoice {
 	public void setTotal_inv_price(BigDecimal total_inv_price) {
 		this.total_inv_price = total_inv_price;
 	}
-	public String getInv_ref_currency() {
-		return inv_ref_currency;
-	}
-	public void setInv_ref_currency(String inv_ref_currency) {
-		this.inv_ref_currency = inv_ref_currency;
-	}
 	public int getCount_tpx() {
 		return count_tpx;
 	}
 	public void setCount_tpx(int count_tpx) {
 		this.count_tpx = count_tpx;
+	}
+	public String getBill_to() {
+		return bill_to;
+	}
+	public void setBill_to(String bill_to) {
+		this.bill_to = bill_to;
+	}
+	public String getInv_itm_name() {
+		return inv_itm_name;
+	}
+	public void setInv_itm_name(String inv_itm_name) {
+		this.inv_itm_name = inv_itm_name;
+	}
+	public BigDecimal getInv_ref_qty() {
+		return inv_ref_qty;
+	}
+	public void setInv_ref_qty(BigDecimal inv_ref_qty) {
+		this.inv_ref_qty = inv_ref_qty;
+	}
+	public BigDecimal getInv_ref_price() {
+		return inv_ref_price;
+	}
+	public void setInv_ref_price(BigDecimal inv_ref_price) {
+		this.inv_ref_price = inv_ref_price;
+	}
+	public BigDecimal getTotal_price() {
+		return total_price;
+	}
+	public void setTotal_price(BigDecimal total_price) {
+		this.total_price = total_price;
+	}
+	public String getInv_bill_to() {
+		return inv_bill_to;
+	}
+	public void setInv_bill_to(String inv_bill_to) {
+		this.inv_bill_to = inv_bill_to;
+	}
+	public String getInv_currency() {
+		return inv_currency;
+	}
+	public void setInv_currency(String inv_currency) {
+		this.inv_currency = inv_currency;
 	}
 	
 }

@@ -48,7 +48,7 @@ public class PrintInvoice_iText {
         int page_count = 1;
         if(item_count <= 10){
         	page_count = 1;
-        }else if(item_count > 10 && item_count < 27){
+        }else if(item_count > 10 && item_count < 29){
         	page_count = 2;
         }else{
         	page_count = 3;
@@ -63,21 +63,6 @@ public class PrintInvoice_iText {
         PdfContentByte canvas = writer.getDirectContent();
         PdfTemplate template = canvas.createTemplate(width, height);
         Graphics2D g2d = new PdfGraphics2D(template, width, height);
-        
-        
-//        Image img = Image.getInstance(rootDirectory+"image/bill-icon1.png");
-//        Image img2 = Image.getInstance(rootDirectory+"image/bill-icon2.png");
-//        Image img3 = Image.getInstance(rootDirectory+"image/gsd-icon.png");
-//        Image img3 = Image.getInstance(rootDirectory+"image/bill-icon3.png");
-//        img.scaleToFit(300f, 220f);
-//        img.setAbsolutePosition(250f, 770f);
-//        img2.scaleToFit(550f, 250f);
-//        img2.setAbsolutePosition(20f, 15f);
-//        img3.scaleToFit(130f, 15f);
-//        img3.setAbsolutePosition(75, 690);
-//        document.add(img);
-//        document.add(img2);
-//        document.add(img3);
         
         String font_name = "Arial";
         
@@ -117,6 +102,11 @@ public class PrintInvoice_iText {
 	        addr2 = "Phone: (855-23) 21 59 76   E-Mail: truetime.kh@gmail.com";
         }else if(inv.getInv_company_id() == 8){
         	tail = "Stuber Asia Co., Ltd";
+        }else if(inv.getInv_company_id() == 9){
+        	tail = "GSD ASIA Co., Ltd";
+        }else if(inv.getInv_company_id() == 0){
+        	tail = "MIMAMI INTERNATIONAL LAW OFFICE CO., LTD.";
+        	addr2 = "Phone: +66 76 24 81 00   FAX: +66 76 24 80 99";
         }
         
         if(!head.equals("")){
@@ -130,19 +120,59 @@ public class PrintInvoice_iText {
 	        g2d.setColor(Color.gray);
 	        g2d.drawString(tail, 75, 125);
         }
-//        g2d.setFont(f7b);
-//        g2d.setColor(Color.red);
-//        g2d.drawString("gs", 75, 125);
-//        g2d.setColor(Color.gray);
-//        g2d.drawString("d graphic solution digital Co., Ltd", 83, 125);
         
         g2d.setFont(f8b);
         g2d.setColor(Color.black);
         int addrY = 130;
-        for (String line : inv.getAddress().split("\n")){
-            g2d.drawString(line, 75, addrY += g2d.getFontMetrics().getHeight());
+        if(inv.getInv_bill_to().equals("Customer")){
+        	for (String line : inv.getAddress().split("\n")){
+	            g2d.drawString(line, 75, addrY += g2d.getFontMetrics().getHeight());
+	        }
+        }else if(!inv.getInv_bill_to().equals("")){
+        	String inv_addr1 = "";
+        	String inv_addr2 = "74/6-9 Moo 2, Tambon Wichit,";
+        	String inv_addr3 = "Amphoe Muang, Phuket 83000,";
+        	String inv_addr4 = "Thailand";
+        	if(inv.getInv_bill_to().equals("GSD")){
+        		inv_addr1 = "gsd graphic solution digital Co., Ltd.";
+        	}else if(inv.getInv_bill_to().equals("JV")){
+        		inv_addr1 = "RS GSD Marketing Service Co., Ltd.";
+        	}else if(inv.getInv_bill_to().equals("FGS")){
+        		inv_addr1 = "FGS Media Co., Ltd.";
+        	}else if(inv.getInv_bill_to().equals("MM")){
+        		inv_addr1 = "M.M. ASIA Co., Ltd.";
+        		inv_addr2 = "490 Moo 6, Reanthai Group Building, Maliwan Road,";
+        		inv_addr3 = "T.Banped, A.Muang, Khon Kaen 40000,";
+        	}else if(inv.getInv_bill_to().equals("GSDP")){
+        		inv_addr1 = "gsd packaging Co., Ltd.";
+        	}else if(inv.getInv_bill_to().equals("GPS")){
+        		inv_addr1 = "GPS Global Packaging Solutions Co., Ltd.";
+        	}else if(inv.getInv_bill_to().equals("TTA")){
+        		inv_addr1 = "True Time Media Phnom Penh Co., Ltd.";
+        		inv_addr2 = "#184, St.217, Sangkat Tomnub Tek,";
+        		inv_addr3 = "Khan Chamkarmorn, Phnom Penh,";
+        		inv_addr4 = "Cambodia";
+        	}else if(inv.getInv_bill_to().equals("STU")){
+        		inv_addr1 = "Stuber Asia Co., Ltd.";
+        	}else if(inv.getInv_bill_to().equals("GSDA")){
+        		inv_addr1 = "GSD ASIA Co., Ltd.";
+        	}
+        	g2d.drawString(inv_addr1, 75, addrY += g2d.getFontMetrics().getHeight());
+        	g2d.drawString(inv_addr2, 75, addrY += g2d.getFontMetrics().getHeight());
+        	g2d.drawString(inv_addr3, 75, addrY += g2d.getFontMetrics().getHeight());
+        	g2d.drawString(inv_addr4, 75, addrY += g2d.getFontMetrics().getHeight());
         }
-//        g2d.drawString(inv.getAddress(), 75, 140);
+        
+//        if(inv.getBill_to().equals("GSD")){
+//        	g2d.drawString("gsd graphic solution digital Co., Ltd.", 75, addrY += g2d.getFontMetrics().getHeight());
+//        	g2d.drawString("74/6-9 Moo 2, Tambon Wichit,", 75, addrY += g2d.getFontMetrics().getHeight());
+//        	g2d.drawString("Amphoe Muang, Phuket 83000,", 75, addrY += g2d.getFontMetrics().getHeight());
+//        	g2d.drawString("Thailand", 75, addrY += g2d.getFontMetrics().getHeight());
+//        }else{
+//	        for (String line : inv.getAddress().split("\n")){
+//	            g2d.drawString(line, 75, addrY += g2d.getFontMetrics().getHeight());
+//	        }
+//        }
         
         float aY = 765;
         for(int a=0; a<page_count; a++){
@@ -163,19 +193,14 @@ public class PrintInvoice_iText {
 	        g2d.drawString(addr2, 75, aY+30);
 	        aY += 842;
         }
-//        g2d.setFont(f9b);
-//        g2d.setColor(Color.red);
-//        g2d.drawString("gs", 75, 1622);
-//        g2d.setColor(Color.gray);
-//        g2d.drawString("d graphic solution digital Co., Ltd", 85, 1622);
-//        g2d.drawLine(75, 1627, 530, 1627);
-//        g2d.setFont(f9p);
-//        g2d.drawString("74/6-9 Moo 2, Tambon Wichit, Amphoe Muang, Phuket 83000, Thailand", 75, 1640);
-//        g2d.drawString("Phone +66 76 21 84 45   E-Mail: info@gsd-digital.com", 75, 1652);
         
         g2d.setFont(f7p);
         g2d.setColor(Color.gray);
-        g2d.drawString("Invoice No:", 350, 140);
+        if(inv.getInv_bill_type().equals("Credit Note")){
+        	g2d.drawString("Credit Note No:", 350, 140);
+        }else{
+        	g2d.drawString("Invoice No:", 350, 140);
+        }
         g2d.drawString("Invoice date:", 350, 150);
         g2d.drawString("Project-No:", 350, 160);
         g2d.drawString("Delivery Date:", 350, 170);
@@ -248,8 +273,11 @@ public class PrintInvoice_iText {
         
         g2d.setFont(f13p);
         g2d.setColor(Color.gray);
-        g2d.drawString("INVOICE", 75, 350);
-        
+        if(inv.getInv_bill_type().equals("Credit Note")){
+        	g2d.drawString("CREDIT NOTE", 75, 350);
+        }else{
+        	g2d.drawString("INVOICE", 75, 350);
+        }
         g2d.setFont(f10b);
         g2d.drawString("Subject:", 75, 370);
         g2d.setColor(Color.black);
@@ -259,7 +287,7 @@ public class PrintInvoice_iText {
         g2d.setColor(Color.gray);
         g2d.drawString("No.", 75, 390);
         g2d.drawString("Description", 140, 390);
-        g2d.drawString("Qty", 380, 390);
+        g2d.drawString("Qty", 370, 390);
         g2d.drawString("Rate", 435, 390);
         g2d.drawString("Amount", 495, 390);
         g2d.drawLine(75, 395, 530, 395);
@@ -268,38 +296,52 @@ public class PrintInvoice_iText {
         g2d.setColor(Color.black);
         int itemY = 408;
         float total_price = 0;
+        float positive_price = 0;
+        float negative_price = 0;
         DecimalFormat df = new DecimalFormat("#,###.##");
         DecimalFormat df2 = new DecimalFormat("#,###.00");
         for(int i=0; i<inv_ref.size(); i++){
         	
-        	if(i == 10){
+        	if(i == 10 || i == 28){
+        		int myY =0;
+        		String myPage = "";
         		g2d.setFont(f9b);
         		g2d.drawString("Continued on next page", 528 - g2d.getFontMetrics().stringWidth("Continued on next page"), itemY+14);
         		
+        		if(i == 10){
+                	myY = 980;
+                	myPage = "2";
+                	itemY = 1057;
+                }else if(i == 28){
+                	myY = 1822;
+                	myPage = "3";
+                	itemY = 1899;
+                }
+        		
         		g2d.setFont(f9b);
                 g2d.setColor(Color.gray);
-                g2d.drawString("Page 2 of Invoice No. "+inv.getInv_number()+" from "+inv_bill_date, 75, 980);
+                g2d.drawString("Page "+myPage+" of Invoice No. "+inv.getInv_number()+" from "+inv_bill_date, 75, myY);
                 
-                g2d.drawString("No.", 75, 1020);
-                g2d.drawString("Description", 140, 1020);
-                g2d.drawString("Qty", 380, 1020);
-                g2d.drawString("Rate", 435, 1020);
-                g2d.drawString("Amount", 495, 1020);
-                g2d.drawLine(75, 1025, 530, 1025);
+                g2d.drawString("No.", 75, myY+40);
+                g2d.drawString("Description", 140, myY+40);
+                g2d.drawString("Qty", 370, myY+40);
+                g2d.drawString("Rate", 435, myY+40);
+                g2d.drawString("Amount", 495, myY+40);
+                g2d.drawLine(75, myY+45, 530, myY+45);
         		
                 g2d.setColor(Color.black);
-                String transfer = String.format("%,.2f", total_price)+" "+inv_ref.get(0).getInv_ref_currency();
-        		g2d.drawString("Amount brought forward", 453 - g2d.getFontMetrics().stringWidth("Amount brought forward"), 1040);
-        		g2d.drawString(transfer, 529 - g2d.getFontMetrics().stringWidth(transfer), 1040);
+                String transfer = String.format("%,.2f", total_price)+" "+inv_ref.get(0).getInv_currency();
+        		g2d.drawString("Amount brought forward", 453 - g2d.getFontMetrics().stringWidth("Amount brought forward"), myY+60);
+        		g2d.drawString(transfer, 529 - g2d.getFontMetrics().stringWidth(transfer), myY+60);
         		
         		g2d.setFont(f8p);
-        		itemY = 1057;
         	}
         	
         	BigDecimal inv_ref_price = inv_ref.get(i).getInv_ref_price();
         	BigDecimal inv_ref_qty = inv_ref.get(i).getInv_ref_qty();
-        	String currency = inv_ref.get(i).getInv_ref_currency();
-            float sum_price = inv_ref_qty.floatValue()*inv_ref_price.floatValue();
+        	String currency = inv_ref.get(i).getInv_currency();
+        	BigDecimal sum_price = inv_ref_qty.multiply(inv_ref_price);
+        	sum_price = sum_price.setScale(2, BigDecimal.ROUND_HALF_UP);
             String qty = df.format(inv_ref_qty);
             String price = String.format("%,.2f", inv_ref_price)+" "+currency;
             String amount = String.format("%,.2f", sum_price)+" "+currency;
@@ -314,81 +356,72 @@ public class PrintInvoice_iText {
             	g2d.drawString("-", 140, itemY+10);
             }
             g2d.setFont(f8p);
-            g2d.drawString(qty, 394 - g2d.getFontMetrics().stringWidth(qty), itemY);
+            g2d.drawString(qty, 384 - g2d.getFontMetrics().stringWidth(qty), itemY);
             g2d.drawString(price, 452 - g2d.getFontMetrics().stringWidth(price), itemY);
             g2d.drawString(amount, 527 - g2d.getFontMetrics().stringWidth(amount), itemY);
             itemY += 23;
-            total_price += sum_price;
+            if(sum_price.compareTo(new BigDecimal(0)) < 0){
+            	positive_price += sum_price.floatValue();
+            }else{
+            	negative_price += sum_price.floatValue();
+            }
+            total_price += sum_price.floatValue();
         }
         
         itemY += 20;
-        float sum_vat = (inv.getInv_vat().floatValue()/100)*total_price;
-        total_price += sum_vat;
         String vat = "";
-        if(sum_vat != 0){
-        	vat = String.format("%,.2f", sum_vat)+" "+inv_ref.get(0).getInv_ref_currency();
+        float sum_vat = 0;
+        float subtotal = inv.getTotal_inv_price().floatValue();
+        float price_total = subtotal;
+        if(inv.getInv_vat().floatValue() != 0){
+//        	sum_vat = (inv.getInv_vat().floatValue()/100)*positive_price;
+        	sum_vat = (inv.getInv_vat().floatValue()/100)*subtotal;
+        	price_total += sum_vat;
+            vat = String.format("%,.2f", sum_vat)+" "+inv_ref.get(0).getInv_currency();
         }else{
-        	vat = String.format("%.2f", sum_vat)+" "+inv_ref.get(0).getInv_ref_currency();
+        	vat = String.format("%.2f", sum_vat)+" "+inv_ref.get(0).getInv_currency();
         }
-        String total = String.format("%,.2f", total_price)+" "+inv_ref.get(0).getInv_ref_currency();
         g2d.setFont(f9b);
+        String total = String.format("%,.2f", price_total)+" "+inv.getInv_currency();
+        String subtotal_str = String.format("%,.2f", subtotal)+" "+inv_ref.get(0).getInv_currency();
+        g2d.drawString("Subtotal", 384 - g2d.getFontMetrics().stringWidth("Subtotal"), itemY);
+        g2d.drawString(subtotal_str, 529 - g2d.getFontMetrics().stringWidth(subtotal_str), itemY);
+        total_price += sum_vat;
+        itemY += 12;
         String vat_text = "plus "+df.format(inv.getInv_vat())+"% VAT";
-        g2d.drawString(vat_text, 394 - g2d.getFontMetrics().stringWidth(vat_text), itemY);
+        g2d.drawString(vat_text, 384 - g2d.getFontMetrics().stringWidth(vat_text), itemY);
         g2d.drawString(vat, 529 - g2d.getFontMetrics().stringWidth(vat), itemY);
-        g2d.drawString("Total", 394 - g2d.getFontMetrics().stringWidth("Total"), itemY+12);
-        g2d.drawString(total, 529 - g2d.getFontMetrics().stringWidth(total), itemY+12);
-        
-        
-        
-//        g2d.setFont(f9b);
+        itemY += 12;
+        g2d.drawString("Total", 384 - g2d.getFontMetrics().stringWidth("Total"), itemY);
+        g2d.drawString(total, 529 - g2d.getFontMetrics().stringWidth(total), itemY);
+
+//        g2d.setFont(f13p);
 //        g2d.setColor(Color.gray);
-//        g2d.drawString("Page 2 of Invoice No. "+inv.getInv_number()+" from "+inv_bill_date, 75, 980);
-//        g2d.setFont(f9b);
-//        g2d.drawString("No.", 75, 1020);
-//        g2d.drawString("Description", 140, 1020);
-//        g2d.drawString("Qty", 380, 1020);
-//        g2d.drawString("Rate", 435, 1020);
-//        g2d.drawString("Amount", 490, 1020);
-//        g2d.drawLine(75, 1025, 530, 1025);
-//        
-//        g2d.setColor(Color.black);
-//        g2d.drawString("Transfer", 394 - g2d.getFontMetrics().stringWidth("Transfer"), 1040);
-//        g2d.drawString("226.93 EUR", 524 - g2d.getFontMetrics().stringWidth("226.93 EUR"), 1040);
-//        g2d.setFont(f9p);
-//        g2d.setColor(Color.black);
-//        g2d.drawString("article id", 75, 1038);
-//        g2d.drawString("Item name example : Clipping Basic", 140, 1038);
-//        g2d.drawString("This item remark or description....", 140, 1048);
-//        g2d.drawString("5", 392 - g2d.getFontMetrics().stringWidth("5"), 1038);
-//        g2d.drawString("11.00 EUR", 451 - g2d.getFontMetrics().stringWidth("11.00 EUR"), 1038);
-//        g2d.drawString("55.00 EUR", 519 - g2d.getFontMetrics().stringWidth("55.00 EUR"), 1038);
         
-//        g2d.setFont(f9p);
-//        g2d.drawString("0794-GSD", 75, 1060);
-//        g2d.drawString("Retouch Complex", 140, 1060);
-//        g2d.drawString("17EUR18758", 140, 1070);
-//        g2d.drawString("15", 392 - g2d.getFontMetrics().stringWidth("15"), 1060);
-//        g2d.drawString("2.25 EUR", 455 - g2d.getFontMetrics().stringWidth("2.25 EUR"), 1060);
-//        g2d.drawString("33.75 EUR", 524 - g2d.getFontMetrics().stringWidth("33.75 EUR"), 1060);
+//        if(total_price >= 0){
+//            g2d.drawString("INVOICE", 75, 350);
+//        }else{
+//        	g2d.drawString("CREDIT NOTE", 75, 350);
+//        }
         
-//        g2d.setFont(f8b);
-//        DecimalFormat df = new DecimalFormat("#.##");
-//        String vat_text = "plus "+String.format("%,.2f", inv.getInv_vat())+"% VAT";
-//        g2d.drawString(vat_text, 451 - g2d.getFontMetrics().stringWidth(vat_text), 456);
-//        g2d.drawString("0.00 EUR", 519 - g2d.getFontMetrics().stringWidth("0.00 EUR"), 456);
-//        g2d.drawString("Total", 451 - g2d.getFontMetrics().stringWidth("Total"), 468);
-//        g2d.drawString("88.75 EUR", 519 - g2d.getFontMetrics().stringWidth("88.75 EUR"), 468);
+        
         
         g2d.dispose();
         int pages = ((int)height / (int)maxHeight);
         for (int p = 0; p < pages; ) {
             p++;
             
-            if(inv.getInv_company_id() == 1 || inv.getInv_company_id() == 2 || inv.getInv_company_id() == 3 || inv.getInv_company_id() == 5){
+            if(inv.getInv_company_id() == 0 ||inv.getInv_company_id() == 1 || inv.getInv_company_id() == 2 || inv.getInv_company_id() == 3 || inv.getInv_company_id() == 5){
             	//GSD, JV(RS), FGS, GSDP
             	Image logo = Image.getInstance(rootDirectory+"image/invoice/"+inv_company.getInv_company_code()+".jpg");
                 logo.scaleToFit(180, 70);
                 logo.setAbsolutePosition(420, 735);
+                document.add(logo);
+            }else if(inv.getInv_company_id() == 9){
+            	//GSDA
+            	Image logo = Image.getInstance(rootDirectory+"image/invoice/"+inv_company.getInv_company_code()+".jpg");
+                logo.scaleToFit(180, 70);
+                logo.setAbsolutePosition(350, 742);
                 document.add(logo);
             }else{
             	//MM, GPS, TTA, STU
@@ -398,48 +431,6 @@ public class PrintInvoice_iText {
                 document.add(logo);
             }
             
-            //GSD
-//            Image logo = Image.getInstance(rootDirectory+"image/invoice/GSD.jpg");
-//            logo.scaleToFit(150, 80);
-//            logo.setAbsolutePosition(405, 750);
-//            document.add(logo);
-            
-            //JV (RS)
-//            Image logo = Image.getInstance(rootDirectory+"image/invoice/JV.jpg");
-//            logo.scaleToFit(150, 80);
-//            logo.setAbsolutePosition(405, 750);
-//            document.add(logo);
-            
-            //FGS
-//            Image logo = Image.getInstance(rootDirectory+"image/invoice/FGS.jpg");
-//            logo.scaleToFit(150, 80);
-//            logo.setAbsolutePosition(405, 750);
-//            document.add(logo);
-            
-            //MM
-//            Image logo = Image.getInstance(rootDirectory+"image/invoice/MM.jpg");
-//            logo.scaleToFit(180, 80);
-//            logo.setAbsolutePosition(350, 760);
-//            document.add(logo);
-            
-            //GSDP
-//            Image logo = Image.getInstance(rootDirectory+"image/invoice/GSDP.jpg");
-//            logo.scaleToFit(150, 80);
-//            logo.setAbsolutePosition(405, 750);
-//            document.add(logo);
-            
-            //GPS
-//            Image logo = Image.getInstance(rootDirectory+"image/invoice/GPS.jpg");
-//            logo.scaleToFit(180, 80);
-//            logo.setAbsolutePosition(350, 760);
-//            document.add(logo);
-            
-            //TTA
-//            Image logo = Image.getInstance(rootDirectory+"image/invoice/TTA.jpg");
-//            logo.scaleToFit(180, 80);
-//            logo.setAbsolutePosition(350, 760);
-//            document.add(logo);
-            
             canvas.addTemplate(template, 0, (p * maxHeight) - height);
             document.newPage();
         }
@@ -447,7 +438,7 @@ public class PrintInvoice_iText {
         
         response.setContentType("application/pdf");
 
-		response.setHeader("Content-Disposition", "inline; filename=" + "GSD-BillTicket.pdf" + ";");
+		response.setHeader("Content-Disposition", "inline; filename=" + inv.getInv_number() +".pdf" + ";");
 
 		byte[] fileData = new byte[(int)file.length()];
 

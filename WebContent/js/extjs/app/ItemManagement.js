@@ -1,5 +1,7 @@
 store = {};
 panels = {};
+userDept = "";
+userType = "";
 
 Ext.onReady(function() {
 
@@ -180,21 +182,24 @@ Ext.onReady(function() {
 						itm_id = grid.getStore().getAt(rowIndex).get(
 								'itm_id');
 						Ext.getCmp('itmid').setValue(itm_id);
-//						Ext.MessageBox.show({
-//							title : 'Confirm',
-//							msg : 'Are you sure you want to delete this?',
-//							buttons : Ext.MessageBox.YESNO,
-//							animateTarget : 'del',
-//							fn : confirmChk,
-//							icon : Ext.MessageBox.QUESTION
-//						});
-						Ext.MessageBox.show({
-							title : 'Information',
-							msg : 'Please contact IT Department for delete !',
-							buttons : Ext.MessageBox.OK,
-							animateTarget : 'del',
-							icon : Ext.MessageBox.INFO
-						});
+						if(userDept == "Manager" || userDept == "Billing" || userDept == "IT"){
+							Ext.MessageBox.show({
+								title : 'Confirm',
+								msg : 'Are you sure you want to delete this?',
+								buttons : Ext.MessageBox.YESNO,
+								animateTarget : 'del',
+								fn : confirmChk,
+								icon : Ext.MessageBox.QUESTION
+							});
+						}else{
+							Ext.MessageBox.show({
+								title : 'Information',
+								msg : 'Please contact Billing Department for delete !',
+								buttons : Ext.MessageBox.OK,
+								animateTarget : 'del',
+								icon : Ext.MessageBox.INFO
+							});
+						}
 					}
 				} ]
 			}
@@ -507,7 +512,20 @@ Ext.onReady(function() {
 		}
 	});
 	
-});
+	Ext.Ajax.request({
+		url : 'userModel.htm',
+		success: function(response, opts){
+			var responseOject = Ext.decode(response.responseText);
+			userDept = responseOject.user[0].dept;
+			userType = responseOject.user[0].usr_type;
+		},
+		failure: function(response, opts){
+			var responseOject = Ext.util.JSON.decode(response.responseText);
+			Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+		}
+	});
+	
+}); // End onReady
 
 function confirmChk(btn) {
 	if (btn == "yes") {
@@ -518,8 +536,16 @@ function confirmChk(btn) {
 						id : Ext.getCmp('itmid').getValue()
 					},
 					success : function(response, opts) {
-						// window.location = "memberManagement.htm";
-						store.item.reload();
+						Ext.MessageBox.show({
+							title : 'Infomation',
+							msg : 'Customer has been deleted!',
+							buttons : Ext.MessageBox.OK,
+							animateTarget : 'del',
+							fn : function(){
+								store.item.reload();
+							},
+							icon : Ext.MessageBox.INFO
+						});
 					},
 					failure : function(response, opts) {
 						var responseOject = Ext.util.JSON

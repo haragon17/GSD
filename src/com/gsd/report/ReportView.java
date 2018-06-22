@@ -91,7 +91,7 @@ public class ReportView extends AbstractJExcelView{
         	
         	int col = map.get(list.get(i).getProj_ref_id());
         	String amount = "";
-        	if(list.get(i).getAmount() == 0){
+        	if(list.get(i).getAmount().floatValue() == 0){
         		amount = "***NO AMOUNT***";
         	}
         	Number num = new Number(3, 0, 9.99);
@@ -99,11 +99,11 @@ public class ReportView extends AbstractJExcelView{
         	if(map_name.get(list.get(i).getJob_ref_name()) == null){
 	        	ws.addCell(new Label(0,row,job_in,date));
 	        	ws.addCell(new Label(1,row,list.get(i).getJob_ref_name()+amount,job_name));
-	        	ws.addCell(new Number(col,row,list.get(i).getAmount(),ws.getWritableCell(col, 4).getCellFormat()));
+	        	ws.addCell(new Number(col,row,list.get(i).getAmount().floatValue(),ws.getWritableCell(col, 4).getCellFormat()));
 	        	map_name.put(list.get(i).getJob_ref_name(), row);
 	        	row++;
         	}else{
-        		ws.addCell(new Number(col,map_name.get(list.get(i).getJob_ref_name()),list.get(i).getAmount(),ws.getWritableCell(col, 4).getCellFormat()));
+        		ws.addCell(new Number(col,map_name.get(list.get(i).getJob_ref_name()),list.get(i).getAmount().floatValue(),ws.getWritableCell(col, 4).getCellFormat()));
         	}
         	
         }

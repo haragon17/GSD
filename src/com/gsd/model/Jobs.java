@@ -1,5 +1,6 @@
 package com.gsd.model;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 public class Jobs {
@@ -26,7 +27,7 @@ public class Jobs {
 	private int cus_id;
 	private int proj_id;
 	private int itm_id;
-	private int total_amount;
+	private BigDecimal total_amount;
 	private int remain_job;
 	private int remain_item;
 	private int payment_terms;
@@ -163,10 +164,10 @@ public class Jobs {
 	public void setItm_id(int itm_id) {
 		this.itm_id = itm_id;
 	}
-	public int getTotal_amount() {
+	public BigDecimal getTotal_amount() {
 		return total_amount;
 	}
-	public void setTotal_amount(int total_amount) {
+	public void setTotal_amount(BigDecimal total_amount) {
 		this.total_amount = total_amount;
 	}
 	public int getRemain_job() {

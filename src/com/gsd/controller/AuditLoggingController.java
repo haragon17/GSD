@@ -57,7 +57,7 @@ public class AuditLoggingController {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		int type = user.getUserModel().getUsr_type();
 		String dept = "";
-		if(type != 1){
+		if(type != 1 && type != 0){
 			dept = user.getUserModel().getDept();
 		}
 		

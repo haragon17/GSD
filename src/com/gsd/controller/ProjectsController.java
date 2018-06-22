@@ -144,7 +144,7 @@ public class ProjectsController {
 		session.setAttribute("CHF", request.getParameter("CHF"));
 		session.setAttribute("GBP", request.getParameter("GBP"));
 		session.setAttribute("THB", request.getParameter("THB"));
-		session.setAttribute("EUR", request.getParameter("EUR"));
+		session.setAttribute("USD", request.getParameter("USD"));
 //		proj_name = request.getParameter("sproj_name");
 //		itm_id = request.getParameter("sitm_id");
 //		cus_id = request.getParameter("cus_id");
@@ -199,7 +199,7 @@ public class ProjectsController {
 		map.put("CHF", (String)session.getAttribute("CHF"));
 		map.put("GBP", (String)session.getAttribute("GBP"));
 		map.put("THB", (String)session.getAttribute("THB"));
-		map.put("EUR", (String)session.getAttribute("EUR"));
+		map.put("USD", (String)session.getAttribute("USD"));
 		
 		try {
 			projRef = projectsDao.searchProjectsReferences(map);
@@ -252,7 +252,7 @@ public class ProjectsController {
 		map.put("CHF", (String)session.getAttribute("CHF"));
 		map.put("GBP", (String)session.getAttribute("GBP"));
 		map.put("THB", (String)session.getAttribute("THB"));
-		map.put("EUR", (String)session.getAttribute("EUR"));
+		map.put("USD", (String)session.getAttribute("USD"));
 		
 		int start = Integer.parseInt(request.getParameter("start"));
 		int limit = Integer.parseInt(request.getParameter("limit"));
@@ -281,14 +281,14 @@ public class ProjectsController {
 	}
 
 	@RequestMapping(value = "/showProjects")
-	public ModelAndView showProjects(@RequestParam("id") int id, HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView showProjects(@RequestParam("id") int id, @RequestParam("type") String type, HttpServletRequest request, HttpServletResponse response) {
 
 		List<Projects> proj = null;
 
 		int cus_id = id;
 		
 		try {
-			proj = projectsDao.showProjects(cus_id);
+			proj = projectsDao.showProjects(cus_id,type);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
@@ -446,7 +446,7 @@ public class ProjectsController {
 		String currency = request.getParameter("ccurrency");
 		String proj_ref_desc = request.getParameter("cproj_ref_desc");
 		String proj_desc = request.getParameter("cproj_desc");
-		String proj_title = request.getParameter("cproj_title");
+		String proj_currency = request.getParameter("cproj_currency");
 		String topix_article_id = request.getParameter("ctopix_article_id");
 
 		ProjectsReference projRef = new ProjectsReference();
@@ -457,12 +457,13 @@ public class ProjectsController {
 		proj.setProj_name(proj_name);
 		proj.setCus_id(cus_id);
 		proj.setCretd_usr(user.getUserModel().getUsr_id());
+		proj.setProj_currency(proj_currency);
 
-		if(!proj_title.equals("Project Title")){
-			proj.setProj_title(proj_title);
-		}else{
-			proj.setProj_title("");
-		}
+//		if(!proj_currency.equals("Price Currency")){
+//			proj.setProj_currency(proj_currency);
+//		}else{
+//			proj.setProj_currency("");
+//		}
 		
 		if (!proj_desc.equals("Project Details")) {
 			proj_desc = proj_desc.replace("\u2028", "\n");
@@ -601,7 +602,7 @@ public class ProjectsController {
 		int cus_id = Integer.parseInt(request.getParameter("ecus_id"));
 		String proj_desc = request.getParameter("eproj_desc");
 		int file_id = Integer.parseInt(request.getParameter("efile_id"));
-		String proj_title = request.getParameter("eproj_title");
+		String proj_currency = request.getParameter("eproj_currency");
 		
 		Projects proj = new Projects();
 		FileModel fileModel = new FileModel();
@@ -609,12 +610,13 @@ public class ProjectsController {
 		proj.setProj_id(proj_id);
 		proj.setProj_name(proj_name);
 		proj.setCus_id(cus_id);
+		proj.setProj_currency(proj_currency);
 
-		if(!proj_title.equals("Project Title")){
-			proj.setProj_title(proj_title);
-		}else{
-			proj.setProj_title("");
-		}
+//		if(!proj_currency.equals("Price Currency")){
+//			proj.setProj_currency(proj_currency);
+//		}else{
+//			proj.setProj_currency("");
+//		}
 		
 		if (!proj_desc.equals("Project Details")) {
 			proj_desc = proj_desc.replace("\u2028", "\n");
@@ -626,7 +628,7 @@ public class ProjectsController {
 
 		System.out.println("name = " + proj.getProj_name());
 		System.out.println("cus_id = " + proj.getCus_id());
-		System.out.println("title = " + proj.getProj_title());
+		System.out.println("title = " + proj.getProj_currency());
 		System.out.println("detail = " + proj.getProj_desc());
 
 		OutputStream outputStream = null;
@@ -754,7 +756,7 @@ public class ProjectsController {
 		String time = request.getParameter("atime");
 		String actual_time = request.getParameter("aactual_time");
 		String price = request.getParameter("aprice");
-		String currency = request.getParameter("acurrency");
+//		String currency = request.getParameter("acurrency");
 		String proj_ref_desc = request.getParameter("aproj_ref_desc");
 		String topix_article_id = request.getParameter("atopix_article_id");
 		
@@ -762,6 +764,7 @@ public class ProjectsController {
 		projRef.setProj_ref_id(projectsDao.getLastProjectRefId());
 		projRef.setProj_id(proj_id);
 		projRef.setItm_id(itm_id);
+		projRef.setCurrency("");
 		
 		if (!time.equals("Time in minutes")) {
 			projRef.setTime(Float.parseFloat(time));
@@ -778,11 +781,11 @@ public class ProjectsController {
 		} else {
 			projRef.setPrice(new BigDecimal(0));
 		}
-		if (!currency.equals("Price Currency")) {
-			projRef.setCurrency(currency);
-		} else {
-			projRef.setCurrency("");
-		}
+//		if (!currency.equals("Price Currency")) {
+//			projRef.setCurrency(currency);
+//		} else {
+//			projRef.setCurrency("");
+//		}
 		if (!proj_ref_desc.equals("Item Details")) {
 			proj_ref_desc = proj_ref_desc.replace("\u2028", "\n");
 			proj_ref_desc = proj_ref_desc.replace("\u2029", "\n");
@@ -811,13 +814,14 @@ public class ProjectsController {
 		String time = request.getParameter("etime");
 		String actual_time = request.getParameter("eactual_time");
 		String price = request.getParameter("eprice");
-		String currency = request.getParameter("ecurrency");
+//		String currency = request.getParameter("ecurrency");
 		String proj_ref_desc = request.getParameter("eproj_ref_desc");
 		String topix_article_id = request.getParameter("etopix_article_id");
 		
 		ProjectsReference projRef = new ProjectsReference();
 		projRef.setProj_ref_id(proj_ref_id);
 		projRef.setItm_id(itm_id);
+		projRef.setCurrency("");
 		
 		if (!time.equals("Time in minutes")) {
 			projRef.setTime(Float.parseFloat(time));
@@ -834,11 +838,11 @@ public class ProjectsController {
 		} else {
 			projRef.setPrice(new BigDecimal(0));
 		}
-		if (!currency.equals("Price Currency")) {
-			projRef.setCurrency(currency);
-		} else {
-			projRef.setCurrency("");
-		}
+//		if (!currency.equals("Price Currency")) {
+//			projRef.setCurrency(currency);
+//		} else {
+//			projRef.setCurrency("");
+//		}
 		if (!proj_ref_desc.equals("Item Details")) {
 			proj_ref_desc = proj_ref_desc.replace("\u2028", "\n");
 			proj_ref_desc = proj_ref_desc.replace("\u2029", "\n");

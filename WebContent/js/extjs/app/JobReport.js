@@ -126,7 +126,7 @@ Ext.onReady(function() {
 							proj.clearValue();
 							proj.getStore().removeAll();
 							proj.getStore().load({
-								url: 'showProjects.htm?id='+myId
+								url: 'showProjects.htm?type=all&id='+myId
 							});
 						}
 
@@ -179,7 +179,7 @@ Ext.onReady(function() {
 							proj.clearValue();
 							proj.getStore().removeAll();
 							proj.getStore().load({
-								url: 'showProjects.htm?id='+myId
+								url: 'showProjects.htm?type=all&id='+myId
 							});
 						}
 
@@ -199,7 +199,7 @@ Ext.onReady(function() {
 						fields : [ 'proj_id', 'proj_name' ],
 						proxy : {
 							type : 'ajax',
-							url : 'showProjects.htm?id=0',
+							url : 'showProjects.htm?type=all&id=0',
 							reader : {
 								type : 'json',
 								root : 'records',
@@ -390,7 +390,7 @@ Ext.onReady(function() {
 			text : 'Reset',
 			handler : function() {
 				this.up('form').getForm().reset();
-				Ext.getCmp('sproj_id').getStore().load({url: 'showProjects.htm?id=0'});
+				Ext.getCmp('sproj_id').getStore().load({url: 'showProjects.htm?type=all&id=0'});
 //				Ext.getCmp('scus_id').setValue("");
 //				Ext.getCmp('update_start').setMaxValue(new Date());
 //				Ext.getCmp('update_limit').setMinValue('');
@@ -587,7 +587,7 @@ Ext.onReady(function() {
 
 							
 							Ext.getCmp('eproj_id').getStore().load({
-								url: 'showProjects.htm?id='+cus_id
+								url: 'showProjects.htm?type=all&id='+cus_id
 							});
 							
 							Ext.getCmp('eproj_ref_id').getStore().load({
@@ -1407,7 +1407,7 @@ addJob = new Ext.create('Ext.window.Window', {
 						proj.clearValue();
 						proj.getStore().removeAll();
 						proj.getStore().load({
-							url: 'showProjects.htm?id='+myId
+							url: 'showProjects.htm?type=all&id='+myId
 						});
 						
 					}
@@ -1460,7 +1460,7 @@ addJob = new Ext.create('Ext.window.Window', {
 						proj.clearValue();
 						proj.getStore().removeAll();
 						proj.getStore().load({
-							url: 'showProjects.htm?id='+myId
+							url: 'showProjects.htm?type=all&id='+myId
 						});
 						
 					}
@@ -1788,7 +1788,7 @@ editJob = new Ext.create('Ext.window.Window', {
 						proj.clearValue();
 						proj.getStore().removeAll();
 						proj.getStore().load({
-							url: 'showProjects.htm?id='+myId
+							url: 'showProjects.htm?type=all&id='+myId
 						});
 						
 					}
@@ -1841,7 +1841,7 @@ editJob = new Ext.create('Ext.window.Window', {
 						proj.clearValue();
 						proj.getStore().removeAll();
 						proj.getStore().load({
-							url: 'showProjects.htm?id='+myId
+							url: 'showProjects.htm?type=all&id='+myId
 						});
 						
 					}

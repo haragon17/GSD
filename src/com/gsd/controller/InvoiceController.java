@@ -136,6 +136,8 @@ public class InvoiceController {
 		
 		inv_ref = invoiceDao.searchInvoiceReference(inv_id);
 		
+//		System.out.println("CURRENCY = "+inv_ref.get(0).getInv_currency());
+		
 		JSONObject jobj = new JSONObject();
 		jobj.put("records", inv_ref);
 		jobj.put("total", inv_ref.size());
@@ -217,6 +219,8 @@ public class InvoiceController {
 		int cus_id = Integer.parseInt(request.getParameter("acus_id"));
 		String inv_bill_date = request.getParameter("ainv_bill_date");
 		int inv_portal = Integer.parseInt(request.getParameter("ainv_portal"));
+		String inv_bill_to = request.getParameter("ainv_bill_to");
+		String inv_currency = request.getParameter("ainv_currency");
 		
 //		System.out.println("delivery date = "+inv_delivery_date);
 		
@@ -228,6 +232,8 @@ public class InvoiceController {
 		inv.setCus_id(cus_id);
 		inv.setCretd_usr(usr_id);
 		inv.setInv_bill_type("");
+		inv.setInv_bill_to(inv_bill_to);
+		inv.setInv_currency(inv_currency);
 		
 		try{
 			SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yy");
@@ -262,10 +268,18 @@ public class InvoiceController {
 			map = getCurrencyRate(request, response);
 			int job_id = Integer.parseInt(request.getParameter("ainv_job_id"));
 			String job_name = request.getParameter("ainv_job_name");
+			BigDecimal inv_currency_rate = new BigDecimal(map.get(inv.getInv_currency()));
 			List<InvoiceReference> inv_refLs = invoiceDao.getJobItemList(job_id);
 			for(int i=0; i<inv_refLs.size(); i++){
 				inv_refLs.get(i).setInv_id(inv_id);
 				inv_refLs.get(i).setInv_ref_desc(job_name);
+				String currency = inv_refLs.get(i).getInv_currency();
+				BigDecimal currency_rate = new BigDecimal(map.get(currency));
+				if(!inv.getInv_currency().equals(currency)){
+					BigDecimal price = inv_refLs.get(i).getInv_ref_price().divide(currency_rate, 2, BigDecimal.ROUND_HALF_UP).multiply(inv_currency_rate);
+					price = price.setScale(2, BigDecimal.ROUND_HALF_UP);
+					inv_refLs.get(i).setInv_ref_price(price);
+				}
 //				System.out.println("item name = "+inv_refLs.get(i).getInv_itm_name());
 //				System.out.println("proj_ref_id = "+inv_refLs.get(i).getProj_ref_id());
 //				System.out.println("price = "+inv_refLs.get(i).getInv_ref_price());
@@ -292,7 +306,7 @@ public class InvoiceController {
 		String inv_itm_name = request.getParameter("ainv_itm_name");
 		BigDecimal inv_ref_price = new BigDecimal(request.getParameter("ainv_ref_price"));
 		BigDecimal inv_ref_qty = new BigDecimal(request.getParameter("ainv_ref_qty"));
-		String inv_ref_currency = request.getParameter("ainv_ref_currency");
+//		String inv_ref_currency = request.getParameter("ainv_ref_currency");
 		String inv_ref_desc = request.getParameter("ainv_ref_desc");
 		
 		InvoiceReference inv_ref = new InvoiceReference();
@@ -301,7 +315,7 @@ public class InvoiceController {
 		inv_ref.setProj_ref_id(proj_ref_id);
 		inv_ref.setInv_ref_price(inv_ref_price);
 		inv_ref.setInv_ref_qty(inv_ref_qty);
-		inv_ref.setInv_ref_currency(inv_ref_currency);
+//		inv_ref.setInv_ref_currency(inv_ref_currency);
 		inv_ref.setCretd_usr(usr_id);
 		
 		if(!inv_ref_desc.equals("Remark")){
@@ -328,10 +342,19 @@ public class InvoiceController {
 		int job_id = Integer.parseInt(request.getParameter("aejob_id"));
 		int inv_id = Integer.parseInt(request.getParameter("aejob_inv_id"));
 		String job_name = request.getParameter("aeinv_job_name");
+		Invoice inv = invoiceDao.getInvoiceById(inv_id);
+		BigDecimal inv_currency_rate = new BigDecimal(map.get(inv.getInv_currency()));
 		List<InvoiceReference> inv_refLs = invoiceDao.getJobItemList(job_id);
 		for(int i=0; i<inv_refLs.size(); i++){
 			inv_refLs.get(i).setInv_id(inv_id);
 			inv_refLs.get(i).setInv_ref_desc(job_name);
+			String currency = inv_refLs.get(i).getInv_currency();
+			BigDecimal currency_rate = new BigDecimal(map.get(currency));
+			if(!inv.getInv_currency().equals(currency)){
+				BigDecimal price = inv_refLs.get(i).getInv_ref_price().divide(currency_rate, 2, BigDecimal.ROUND_HALF_UP).multiply(inv_currency_rate);
+				price = price.setScale(2, BigDecimal.ROUND_HALF_UP);
+				inv_refLs.get(i).setInv_ref_price(price);
+			}
 			invoiceDao.addInvoiceReference(inv_refLs.get(i), map);
 		}
 		jobsDao.billedJobProjects(job_id);
@@ -363,12 +386,18 @@ public class InvoiceController {
 		}
 		String delivery_year = sdf.format(parsed_delivery_date);
 		InvoiceCompany inv_company = invoiceDao.getInvoiceCompanyById(inv.getInv_company_id());
-		String inv_number = inv_company.getInv_company_code()+delivery_year;
+		
+		String inv_number = "";
+		if(inv_bill_type.equals("Direct")){
+			inv_number = inv_company.getInv_company_code()+delivery_year;
+		}else if(inv_bill_type.equals("Credit Note")){
+			inv_number = "CN"+inv_company.getInv_company_code()+delivery_year;
+		}
 		String last_inv_number = "";
 		try{
-			last_inv_number = invoiceDao.getLastInvoiceNumber(inv.getInv_company_id(),delivery_year);
+			last_inv_number = invoiceDao.getLastInvoiceNumber(inv.getInv_company_id(),delivery_year,inv_bill_type);
 		}catch(Exception e){
-			System.out.println("First job of "+inv_company.getInv_company_name());
+			System.out.println("First inv/cn of "+inv_company.getInv_company_name());
 		}
 		if(last_inv_number == ""){
 			inv_number += "00001";
@@ -415,6 +444,8 @@ public class InvoiceController {
 //		String inv_bill_type = request.getParameter("einv_bill_type");
 		int cus_id = Integer.parseInt(request.getParameter("ecus_id"));
 		String inv_bill_date = request.getParameter("einv_bill_date");
+		String inv_bill_to = request.getParameter("einv_bill_to");
+		String inv_currency = request.getParameter("einv_currency");
 		
 		Map<String, Float> map = new HashMap<String, Float>();
 		map = getCurrencyRate(request, response);
@@ -426,6 +457,8 @@ public class InvoiceController {
 		inv.setInv_vat(inv_vat);
 		inv.setCus_id(cus_id);
 //		inv.setInv_bill_type(inv_bill_type);
+		inv.setInv_bill_to(inv_bill_to);
+		inv.setInv_currency(inv_currency);
 		
 		java.sql.Date inv_delivery_date_sql = null;
 		java.sql.Date inv_bill_date_sql = null;
@@ -468,7 +501,7 @@ public class InvoiceController {
 		String inv_itm_name = request.getParameter("einv_itm_name");
 		BigDecimal inv_ref_price = new BigDecimal(request.getParameter("einv_ref_price"));
 		BigDecimal inv_ref_qty = new BigDecimal(request.getParameter("einv_ref_qty"));
-		String inv_ref_currency = request.getParameter("einv_ref_currency");
+//		String inv_ref_currency = request.getParameter("einv_ref_currency");
 		String inv_ref_desc = request.getParameter("einv_ref_desc");
 		
 		Map<String, Float> map = new HashMap<String, Float>();
@@ -481,7 +514,7 @@ public class InvoiceController {
 		inv_ref.setProj_ref_id(proj_ref_id);
 		inv_ref.setInv_ref_price(inv_ref_price);
 		inv_ref.setInv_ref_qty(inv_ref_qty);
-		inv_ref.setInv_ref_currency(inv_ref_currency);
+//		inv_ref.setInv_ref_currency(inv_ref_currency);
 		
 		if(!inv_ref_desc.equals("Remark")){
 			inv_ref.setInv_ref_desc(inv_ref_desc);
@@ -548,21 +581,22 @@ public class InvoiceController {
 		
 	}
 	
-	@RequestMapping(value = "/printInvoiceReport")
-	public ModelAndView printInvoiceSummary(HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/invoiceMonthlyReport")
+	public ModelAndView printInvoiceMonthlyReport(HttpServletRequest request, HttpServletResponse response) {
 	
 		Calendar now = Calendar.getInstance();
 		int year = now.get(Calendar.YEAR);
 		String yearInString = String.valueOf(year);
 		
-		List<Invoice> gsd = invoiceDao.showInvoiceReport(yearInString, 1);
-		List<Invoice> jv = invoiceDao.showInvoiceReport(yearInString, 2);
-		List<Invoice> fgs = invoiceDao.showInvoiceReport(yearInString, 3);
-		List<Invoice> mm = invoiceDao.showInvoiceReport(yearInString, 4);
-		List<Invoice> gsdp = invoiceDao.showInvoiceReport(yearInString, 5);
-		List<Invoice> gps = invoiceDao.showInvoiceReport(yearInString, 6);
-		List<Invoice> tta = invoiceDao.showInvoiceReport(yearInString, 7);
-		List<Invoice> stu = invoiceDao.showInvoiceReport(yearInString, 8);
+		List<Invoice> gsd = invoiceDao.showInvoiceMonthlyReport(yearInString, 1);
+		List<Invoice> jv = invoiceDao.showInvoiceMonthlyReport(yearInString, 2);
+		List<Invoice> fgs = invoiceDao.showInvoiceMonthlyReport(yearInString, 3);
+		List<Invoice> mm = invoiceDao.showInvoiceMonthlyReport(yearInString, 4);
+		List<Invoice> gsdp = invoiceDao.showInvoiceMonthlyReport(yearInString, 5);
+		List<Invoice> gps = invoiceDao.showInvoiceMonthlyReport(yearInString, 6);
+		List<Invoice> tta = invoiceDao.showInvoiceMonthlyReport(yearInString, 7);
+		List<Invoice> stu = invoiceDao.showInvoiceMonthlyReport(yearInString, 8);
+		List<Invoice> gsda = invoiceDao.showInvoiceMonthlyReport(yearInString, 9);
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("gsd", gsd);
@@ -573,8 +607,47 @@ public class InvoiceController {
 		map.put("gps", gps);
 		map.put("tta", tta);
 		map.put("stu", stu);
+		map.put("gsda", gsda);
 		
-		return new ModelAndView("invoice-print", map);
+		return new ModelAndView("invoice_monthly-print", map);
+	}
+	
+	@RequestMapping(value = "/invoiceReport")
+	public ModelAndView printInvoiceReport(HttpServletRequest request, HttpServletResponse response) {
+	
+		HttpSession session = request.getSession();
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("inv_proj_no", (String)session.getAttribute("inv_proj_no"));
+		map.put("inv_company_id", (String)session.getAttribute("inv_company_id"));
+		map.put("delivery_start", (String)session.getAttribute("delivery_start"));
+		map.put("delivery_limit", (String)session.getAttribute("delivery_limit"));
+		map.put("inv_cus_id", (String)session.getAttribute("inv_cus_id"));
+		map.put("inv_bill_type", (String)session.getAttribute("inv_bill_type"));
+		
+		if(map.get("delivery_start")!=null && !map.get("delivery_start").isEmpty()){
+			String delivery_start = map.get("delivery_start");
+			String[] parts = delivery_start.split("/");
+			String month = parts[0];
+			String year = parts[1];
+			String myDate = "20"+year+"-"+month+"-01";
+			map.put("delivery_start", myDate);
+		}
+		
+		if(map.get("delivery_limit")!=null && !map.get("delivery_limit").isEmpty()){
+			String delivery_limit = map.get("delivery_limit");
+			String[] parts = delivery_limit.split("/");
+			String month = parts[0];
+			String year = parts[1];
+			String myDate = "20"+year+"-"+month+"-01";
+			map.put("delivery_limit", myDate);
+		}
+		
+		List<Invoice> inv = invoiceDao.showInvoiceReport(map);
+		
+		Map<String, Object> map2 = new HashMap<String, Object>();
+		map2.put("list", inv);
+		
+		return new ModelAndView("invoice-print", map2);
 	}
 	
 	@RequestMapping(value = "/topixSoap")

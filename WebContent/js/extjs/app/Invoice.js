@@ -8,6 +8,20 @@ Ext.onReady(function() {
 	Ext.util.Format.thousandSeparator = ',';
 	Ext.util.Format.decimalSeparator = '.';
 	
+	Ext.define('RevRec.util.Format', {
+	    override: 'Ext.util.Format',
+	    originalNumberFormatter: Ext.util.Format.number,
+	    number: function(v, formatString) {
+	        if (v < 0) {
+	            //negative number: flip the sign, format then prepend '-' onto output
+	            return '-' + this.originalNumberFormatter(v * -1, formatString);
+	        } else {
+	            //positive number: as you were
+	            return this.originalNumberFormatter(v, formatString);
+	        }
+	    }
+	});
+	
 	Ext.define('Ext.form.field.Month', {
         extend: 'Ext.form.field.Date',
         alias: 'widget.monthfield',
@@ -57,37 +71,49 @@ Ext.onReady(function() {
         onOKClick: function () {
             var me = this;
             if (me.selectMonth) {
-            	if(Ext.getCmp('einv_delivery_date').getValue() != null && Ext.getCmp('ainv_delivery_date').getValue() != null){
-	            	if(me.selectMonth.getFullYear() == inv_year){
-		                try{
-		    	            var delivery_date = Ext.getCmp('einv_delivery_date').getValue();
-		    				var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0);
-		    				var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1);
-//	    					var val_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), new Date().getDay());
-		    				Ext.getCmp('einv_bill_date').setValue('');
-		    				Ext.getCmp('einv_bill_date').setMinValue(min_date);
-		    				Ext.getCmp('einv_bill_date').setMaxValue(max_date);
-		                }catch(err){
-		    				var delivery_date = Ext.getCmp('ainv_delivery_date').getValue();
-		    				var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0);
-		    				var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1);
-//	    					var val_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), new Date().getDay());
-		    				Ext.getCmp('ainv_bill_date').setValue('');
-		    				Ext.getCmp('ainv_bill_date').setMinValue(min_date);
-		    				Ext.getCmp('ainv_bill_date').setMaxValue(max_date);
-		                }
-	            	}else{
-	            		Ext.MessageBox.show({
+            	var delivery_date = me.selectMonth;
+				var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0);
+				var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1);
+            	if(Ext.getCmp('einv_delivery_date').getValue() != null){
+            		if(me.selectMonth.getFullYear() == inv_year){
+//		                try{
+////		    	            var delivery_date = Ext.getCmp('einv_delivery_date').getValue();
+//		                	var delivery_date = me.selectMonth;
+//		    				var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0);
+//		    				var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1);
+////	    					var val_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), new Date().getDay());
+//		    				Ext.getCmp('einv_bill_date').setValue('');
+//		    				Ext.getCmp('einv_bill_date').setMinValue(min_date);
+//		    				Ext.getCmp('einv_bill_date').setMaxValue(max_date);
+//		                }catch(err){
+//		                	var delivery_date = me.selectMonth;
+//		    				var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0);
+//		    				var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1);
+////	    					var val_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), new Date().getDay());
+//		    				Ext.getCmp('ainv_bill_date').setValue('');
+//		    				Ext.getCmp('ainv_bill_date').setMinValue(min_date);
+//		    				Ext.getCmp('ainv_bill_date').setMaxValue(max_date);
+//		                }
+		                
+	    				Ext.getCmp('einv_bill_date').setValue('');
+	    				Ext.getCmp('einv_bill_date').setMinValue(min_date);
+	    				Ext.getCmp('einv_bill_date').setMaxValue(max_date);
+	    			}else{
+	    				Ext.MessageBox.show({
 	            			title : 'Error',
 	            			msg : 'Please select only year \''+inv_year+'\' !',
 	            			buttons : Ext.MessageBox.OK,
 //            				animateTarget : 'del',
 	            			icon : Ext.MessageBox.ERROR
 	            		});
-	            	}
+	    			}
+            	}else if(Ext.getCmp('ainv_delivery_date').getValue() != null){
+            		Ext.getCmp('ainv_bill_date').setValue('');
+    				Ext.getCmp('ainv_bill_date').setMinValue(min_date);
+    				Ext.getCmp('ainv_bill_date').setMaxValue(max_date);
             	}
             	me.setValue(me.selectMonth);
-                me.fireEvent('select', me, me.selectMonth);
+            	me.fireEvent('select', me, me.selectMonth);
             }
             me.collapse();
         },
@@ -216,6 +242,8 @@ Ext.onReady(function() {
 				inv_vat = Ext.getCmp('dinv_vat').getValue();
 //				inv_bill_type = Ext.getCmp('dinv_bill_type').getValue();
 				inv_bill_date = new Date(Ext.getCmp('dinv_bill_date').getValue());
+				inv_bill_to = Ext.getCmp('dinv_bill_to').getValue();
+				inv_currency = Ext.getCmp('dinv_currency').getValue();
 				
 				min_year = new Date(inv_delivery_date.getFullYear(), 0, 1);
 				max_year = new Date(inv_delivery_date.getFullYear()+1, 0, 0);
@@ -236,6 +264,8 @@ Ext.onReady(function() {
 				Ext.getCmp('einv_payment_terms').setValue(inv_payment_terms);
 				Ext.getCmp('einv_vat').setValue(inv_vat);
 //				Ext.getCmp('einv_bill_type').setValue(inv_bill_type);
+				Ext.getCmp('einv_bill_to').setValue(inv_bill_to);
+				Ext.getCmp('einv_currency').setValue(inv_currency);
 				editInvoice.show();
 			}
 		} ],
@@ -365,6 +395,14 @@ Ext.onReady(function() {
 				xtype: 'hidden',
 				name: 'dcus_code',
 				id: 'dcus_code'
+			},{
+				xtype: 'hidden',
+				name: 'dinv_currency',
+				id: 'dinv_currency'
+			},{
+				xtype: 'hidden',
+				name: 'dinv_bill_to',
+				id: 'dinv_bill_to'
 			}  ]
 		} ],
 		buttons: [{
@@ -425,6 +463,7 @@ Ext.onReady(function() {
 			           					if(err_nr == '0'){
 			           						Ext.getCmp('angeboteButton').setDisabled(true);
 			           						Ext.getCmp('directButton').setDisabled(true);
+			           						Ext.getCmp('creditNoteButton').setDisabled(true);
 			           						Ext.getCmp('printInvoiceButton').setDisabled(false);
 			           						var inv_number = responseOject.records[0].tpx_inv_number;
 			           						Ext.getCmp('dinv_bill_type').setValue("Angebote");
@@ -483,6 +522,7 @@ Ext.onReady(function() {
 			       				success: function(response, opts){
 			       					Ext.getCmp('angeboteButton').setDisabled(true);
 	           						Ext.getCmp('directButton').setDisabled(true);
+	           						Ext.getCmp('creditNoteButton').setDisabled(true);
 	           						Ext.getCmp('printInvoiceButton').setDisabled(false);
 			       					var responseOject = Ext.decode(response.responseText);
 			       					var inv_number = responseOject.records[0].inv_number;
@@ -495,6 +535,52 @@ Ext.onReady(function() {
 			   							buttons: Ext.MessageBox.OK,
 			   							icon: Ext.MessageBox.INFO,
 			   							animateTarget: 'directButton'
+			   						});
+			       				},
+			       				failure: function(response, opts){
+			       					var responseOject = Ext.util.JSON.decode(response.responseText);
+			       					Ext.Msg.alert(responseOject.messageHeader, responseOject.message);
+			       				}
+							});
+						}
+					}
+				});
+			}
+		},{
+			text: 'Credit Note',
+			id: 'creditNoteButton',
+			disabled: true,
+			iconCls: 'icon-mail',
+			handler: function(){
+				Ext.MessageBox.show({
+					title : 'Confirm',
+					msg : 'Are you sure you want to make Credit Note?',
+					buttons : Ext.MessageBox.YESNO,
+					animateTarget : 'creditNoteButton',
+					icon : Ext.MessageBox.QUESTION,
+					width: 350,
+					fn: function(btn){
+						if(btn == "yes"){
+							var inv_id = Ext.getCmp('dinv_id').getValue();
+							Ext.Ajax.request({
+								url : 'updateInvoiceStatus.htm',
+			       				params: {inv_bill_type : "Credit Note", inv_id : inv_id},
+			       				success: function(response, opts){
+			       					Ext.getCmp('angeboteButton').setDisabled(true);
+	           						Ext.getCmp('directButton').setDisabled(true);
+	           						Ext.getCmp('creditNoteButton').setDisabled(true);
+	           						Ext.getCmp('printInvoiceButton').setDisabled(false);
+			       					var responseOject = Ext.decode(response.responseText);
+			       					var inv_number = responseOject.records[0].inv_number;
+			       					Ext.getCmp('dinv_bill_type').setValue("Credit Note");
+			   						Ext.getCmp('dinv_number').setValue(inv_number);
+			   						Ext.MessageBox.show({
+			   							title: 'Information',
+			   							msg: "Credit Note has been assign to: "+inv_number,
+			   							width: 370,
+			   							buttons: Ext.MessageBox.OK,
+			   							icon: Ext.MessageBox.INFO,
+			   							animateTarget: 'creditNoteButton'
 			   						});
 			       				},
 			       				failure: function(response, opts){
@@ -925,16 +1011,27 @@ Ext.onReady(function() {
             			var responseObject = Ext.decode(response.responseText);
             			usr_id = responseObject.user[0].usr_id;
             			usr_dept = responseObject.user[0].dept;
+            			usr_type = responseObject.user[0].usr_type;
             			
-            			if(usr_dept == 'Billing'){
+            			if(usr_dept == 'Billing' || usr_type == 0){
+            				Ext.getCmp('inv_del').setVisible(true);
             				grid.invoice.down('toolbar').add('->',{
                                 xtype: 'button',
-                                id: 'inv_report_btn',
-                                text: 'Report',
+                                id: 'inv_monthly_btn',
+                                text: 'Monthly Report',
                                 margin : '0 5 0 0',
                                 iconCls : 'icon-excel',
                     			handler : function() {
-                    				window.open('printInvoiceReport.htm', '_blank');
+                    				window.open('invoiceMonthlyReport.htm', '_blank');
+                    			}
+                            },{
+                                xtype: 'button',
+                                id: 'inv_report_btn',
+                                text: 'Invoice Report',
+                                margin : '0 5 0 0',
+                                iconCls : 'icon-excel',
+                    			handler : function() {
+                    				window.open('invoiceReport.htm', '_blank');
                     			}
                             },{
                         		xtype : 'button',
@@ -943,6 +1040,12 @@ Ext.onReady(function() {
                         		iconCls : 'icon-add',
                         		handler : function() {
                         			Ext.getCmp('ainv_portal').setValue(1);
+                        			var todayDate = new Date();
+                        			var max_date = new Date(todayDate.getFullYear(), todayDate.getMonth()+1, 0);
+                        			var min_date = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
+                        			Ext.getCmp('ainv_bill_date').setValue(todayDate);
+                        			Ext.getCmp('ainv_bill_date').setMinValue(min_date);
+                        			Ext.getCmp('ainv_bill_date').setMaxValue(max_date);
                         			addInvoice.show();
                         		}
                         	});
@@ -954,6 +1057,12 @@ Ext.onReady(function() {
                         		iconCls : 'icon-add',
                         		handler : function() {
                         			Ext.getCmp('ainv_portal').setValue(1);
+                        			var todayDate = new Date();
+                        			var max_date = new Date(todayDate.getFullYear(), todayDate.getMonth()+1, 0);
+                        			var min_date = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
+                        			Ext.getCmp('ainv_bill_date').setValue(todayDate);
+                        			Ext.getCmp('ainv_bill_date').setMinValue(min_date);
+                        			Ext.getCmp('ainv_bill_date').setMaxValue(max_date);
                         			addInvoice.show();
                         		}
                         	});
@@ -1217,28 +1326,43 @@ Ext.onReady(function() {
 					minValue : 0,
 					msgTarget: 'under',
 					allowBlank: false
-//				},{
-//					xtype: 'combobox',
-//					fieldLabel: 'Billing Type <font color="red">*</font> ',
-//					name: 'ainv_bill_type',
-//					id: 'ainv_bill_type',
-//					labelWidth: 120,
-//					store : {
-//						fields : ['db_ref_name'],
-//						proxy : {
-//							type : 'ajax',
-//							url : 'showDBReference.htm?kind=BillingType&dept=-',
-//							reader : {
-//								type : 'json',
-//								root : 'records',
-//							}
-//						},
-//						autoLoad : true
-//					},
-//					valueField : 'db_ref_name',
-//					displayField : 'db_ref_name',
-//					editable : false,
-//					value : 'Direct'
+				},{
+					xtype: 'combobox',
+					fieldLabel: 'Billing To <font color="red">*</font> ',
+					name: 'ainv_bill_to',
+					id: 'ainv_bill_to',
+					labelWidth: 120,
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showDBReference.htm?kind=BillingTo&dept=-',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+					editable : false,
+					value : 'Customer'
+				},{
+					xtype:'combobox',
+	                fieldLabel: 'Currency <font color="red">*</font> ',
+	                labelWidth: 120,
+	                name: 'ainv_currency',
+	                id: 'ainv_currency',
+	                queryMode : 'local',
+	    			labelWidth : 120,
+	    			emptyText : 'Price Currency',
+	    			editable : false,
+	    			allowBlank: false,
+	    			msgTarget : 'under',
+	    			store : currency,
+	    			valueField : 'currency',
+	    			displayField : 'name',
 				}]
 			},{
 				xtype: 'hidden',
@@ -1363,18 +1487,18 @@ Ext.onReady(function() {
 					format: 'm/y',
 					allowBlank: false,
 					editable: false,
-					listener: {
-						"select": function(){
-							console.log("change devilery date!!");
-							var delivery_date = Ext.getCmp('einv_delivery_date').getValue();
-							var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0).toString();
-							var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1).toString();
-							Ext.getCmp('einv_bill_date').setValue('');
-							Ext.getCmp('einv_bill_date').setMinValue(min_date);
-							Ext.getCmp('einv_bill_date').setMaxValue(max_date);
-							console.log("change devilery date!!");
-						}
-					}
+//					listener: {
+//						"select": function(){
+//							console.log("change devilery date!!");
+//							var delivery_date = Ext.getCmp('einv_delivery_date').getValue();
+//							var max_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth()+1, 0).toString();
+//							var min_date = new Date(delivery_date.getFullYear(), delivery_date.getMonth(), 1).toString();
+//							Ext.getCmp('einv_bill_date').setValue('');
+//							Ext.getCmp('einv_bill_date').setMinValue(min_date);
+//							Ext.getCmp('einv_bill_date').setMaxValue(max_date);
+//							console.log("change devilery date!!");
+//						}
+//					}
 	            },{
 	            	xtype: 'datefield',
 	            	fieldLabel : 'Billing Date <font color="red">*</font> ',
@@ -1516,27 +1640,43 @@ Ext.onReady(function() {
 					minValue : 0,
 					msgTarget: 'under',
 					allowBlank: false
-//				},{
-//					xtype: 'combobox',
-//					fieldLabel: 'Billing Type <font color="red">*</font> ',
-//					name: 'einv_bill_type',
-//					id: 'einv_bill_type',
-//					labelWidth: 120,
-//					store : {
-//						fields : ['db_ref_name'],
-//						proxy : {
-//							type : 'ajax',
-//							url : 'showDBReference.htm?kind=BillingType&dept=-',
-//							reader : {
-//								type : 'json',
-//								root : 'records',
-//							}
-//						},
-//						autoLoad : true
-//					},
-//					valueField : 'db_ref_name',
-//					displayField : 'db_ref_name',
-//					editable : false,
+				},{
+					xtype: 'combobox',
+					fieldLabel: 'Billing To <font color="red">*</font> ',
+					name: 'einv_bill_to',
+					id: 'einv_bill_to',
+					labelWidth: 120,
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showDBReference.htm?kind=BillingTo&dept=-',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+					editable : false,
+//					value : 'Customer'
+				},{
+					xtype:'combobox',
+	                fieldLabel: 'Currency <font color="red">*</font> ',
+	                labelWidth: 120,
+	                name: 'einv_currency',
+	                id: 'einv_currency',
+	                queryMode : 'local',
+	    			labelWidth : 120,
+	    			emptyText : 'Price Currency',
+	    			editable : false,
+	    			allowBlank: false,
+	    			msgTarget : 'under',
+	    			store : currency,
+	    			valueField : 'currency',
+	    			displayField : 'name',
 				}]
 			},{
 				xtype: 'hidden',
@@ -1590,6 +1730,8 @@ Ext.onReady(function() {
 			     								inv_vat = Ext.getCmp('einv_vat').getValue();
 //			     								inv_bill_type = editForm.getValues().einv_bill_type;
 			     								inv_bill_date = Ext.getCmp('einv_bill_date').getValue();
+			     								inv_bill_to = editForm.getValues().einv_bill_to;
+			     								inv_currency = editForm.getValues().einv_currency;
 			     								
 			     								if(cus_id != Ext.getCmp('dcus_id').getValue()){
 			     									console.log("Change Customer!");
@@ -1598,14 +1740,14 @@ Ext.onReady(function() {
 			     									aproj_id.clearValue();
 			     									aproj_id.getStore().removeAll();
 			     									aproj_id.getStore().load({
-			     										url: 'showProjects.htm?id='+cus_id
+			     										url: 'showProjects.htm?type=inv&id='+cus_id
 			     									});
 			     									
 			     									var eproj_id = Ext.getCmp('eproj_id');
 			     									eproj_id.clearValue();
 			     									eproj_id.getStore().removeAll();
 			     									eproj_id.getStore().load({
-			     										url: 'showProjects.htm?id='+cus_id
+			     										url: 'showProjects.htm?type=inv&id='+cus_id
 			     									});
 			     								}
 			     								
@@ -1619,6 +1761,8 @@ Ext.onReady(function() {
 			     								Ext.getCmp('dinv_vat').setValue(inv_vat);
 //			     								Ext.getCmp('dinv_bill_type').setValue(inv_bill_type);
 			     								Ext.getCmp('dinv_bill_date').setValue(inv_bill_date);
+			     								Ext.getCmp('dinv_bill_to').setValue(inv_bill_to);
+			     								Ext.getCmp('dinv_currency').setValue(inv_currency);
 			     								editInvoice.hide();
 			     								store.invoice.reload();
 			     								store.invoiceRef.reload();
@@ -1739,6 +1883,12 @@ Ext.define('invoiceModel', {
 	},{
 		name: 'topix_cus_id',
 		type: 'string'
+	},{
+		name: 'inv_currency',
+		type: 'string'
+	},{
+		name: 'inv_bill_to',
+		type: 'string'
 	}]
 });
 
@@ -1758,7 +1908,7 @@ store.invoice = Ext.create('Ext.data.JsonStore', {
 		}
 	},
 	sorters: [{
-        property: 'inv_id',
+        property: 'inv_bill_date',
         direction: 'DESC'
     }],
 	listeners: {
@@ -1770,7 +1920,7 @@ store.invoice = Ext.create('Ext.data.JsonStore', {
 				var record = store.invoice.findRecord('inv_id',Ext.getCmp('dinv_id').getValue());
 				var myIndex = store.invoice.indexOf(record);
 				var total_price = store.invoice.getAt(myIndex).data.total_inv_price;
-				var currency = store.invoice.getAt(myIndex).data.inv_ref_currency;
+				var currency = store.invoice.getAt(myIndex).data.inv_currency;
 				var sum_price = Ext.util.Format.number(total_price, '0,000.##');
 				store.invoiceRef.reload();
 				setTimeout(function(){
@@ -1835,6 +1985,12 @@ Ext.define('invoiceRefModel', {
 	},{
 		name: 'topix_article_id',
 		type: 'string'
+	},{
+		name: 'proj_currency',
+		type: 'string'
+	},{
+		name: 'inv_currency',
+		type: 'string'
 	}]
 });
 
@@ -1884,14 +2040,17 @@ store.invoiceRef = Ext.create('Ext.data.JsonStore', {
         	if(store.invoiceRef.count() == 0){
         		Ext.getCmp('angeboteButton').setDisabled(true);
 	        	Ext.getCmp('directButton').setDisabled(true);
+	        	Ext.getCmp('creditNoteButton').setDisabled(true);
         		Ext.getCmp('printInvoiceButton').setDisabled(true);
-        	}else if(inv_status !== "Direct" && inv_status !== "Angebote" && store.invoiceRef.count() !== 0){
+        	}else if(inv_status !== "Direct" && inv_status !== "Angebote" && inv_status !== "Credit Note" && store.invoiceRef.count() !== 0){
 	        	Ext.getCmp('angeboteButton').setDisabled(false);
 	        	Ext.getCmp('directButton').setDisabled(false);
+	        	Ext.getCmp('creditNoteButton').setDisabled(false);
 	        	Ext.getCmp('printInvoiceButton').setDisabled(true);
 			}else{
 				Ext.getCmp('angeboteButton').setDisabled(true);
 				Ext.getCmp('directButton').setDisabled(true);
+				Ext.getCmp('creditNoteButton').setDisabled(true);
 				Ext.getCmp('printInvoiceButton').setDisabled(false);
 			}
     	}
@@ -1931,7 +2090,7 @@ store.exchangeRates = Ext.create('Ext.data.JsonStore', {
 	autoLoad : true,
 	proxy : {
 		type : 'ajax',
-		url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c',
+		url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c&base=EUR',
 		reader : {
 			type : 'json',
 			root : 'rates',
@@ -1947,6 +2106,18 @@ store.exchangeRates = Ext.create('Ext.data.JsonStore', {
 			});
 		}
 	}
+});
+
+var currency = Ext.create('Ext.data.Store', {
+    fields: ['currency','name'],
+    data : [
+        {"currency":"AUD", "name":"Australian Dollar[AUD]"},
+        {"currency":"CHF", "name":"Swiss Franc[CHF]"},
+        {"currency":"EUR", "name":"Euro[EUR]"},
+        {"currency":"GBP", "name":"British Pound[GBP]"},
+        {"currency":"THB", "name":"Thai Bath[THB]"},
+        {"currency":"USD", "name":"US Dollar[USD]"}
+    ]
 });
 
 grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
@@ -1979,6 +2150,8 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				inv_bill_type = grid.getStore().getAt(rowIndex).get('inv_bill_type');
 				inv_bill_date = grid.getStore().getAt(rowIndex).get('inv_bill_date');
 				inv_number = grid.getStore().getAt(rowIndex).get('inv_number');
+				inv_bill_to = grid.getStore().getAt(rowIndex).get('inv_bill_to');
+				inv_currency = grid.getStore().getAt(rowIndex).get('inv_currency');
 				
 				Ext.getCmp('invid').setValue(inv_id);
 				Ext.getCmp('dinv_id').setValue(inv_id);
@@ -1995,19 +2168,21 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				Ext.getCmp('dinv_vat').setValue(inv_vat);
 				Ext.getCmp('dinv_bill_type').setValue(inv_bill_type);
 				Ext.getCmp('dinv_number').setValue(inv_number);
+				Ext.getCmp('dinv_bill_to').setValue(inv_bill_to);
+				Ext.getCmp('dinv_currency').setValue(inv_currency);
 				
 				var aproj_id = Ext.getCmp('aproj_id');
 				aproj_id.clearValue();
 				aproj_id.getStore().removeAll();
 				aproj_id.getStore().load({
-					url: 'showProjects.htm?id='+cus_id
+					url: 'showProjects.htm?type=inv&id='+cus_id
 				});
 				
 				var eproj_id = Ext.getCmp('eproj_id');
 				eproj_id.clearValue();
 				eproj_id.getStore().removeAll();
 				eproj_id.getStore().load({
-					url: 'showProjects.htm?id='+cus_id
+					url: 'showProjects.htm?type=inv&id='+cus_id
 				});
 				
 //				Ext.apply(store.invoiceRef.getProxy().api,{read: 'searchInvoiceReference.htm?inv_id='+inv_id});
@@ -2061,7 +2236,7 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 	},{
     	text : 'Edit',
 		xtype : 'actioncolumn',
-		flex : 0.5,
+		flex : 0.3,
 		align : 'center',
 		id : 'inv_edit',
 		items : [{
@@ -2079,6 +2254,8 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				inv_vat = grid.getStore().getAt(rowIndex).get('inv_vat');
 //				inv_bill_type = grid.getStore().getAt(rowIndex).get('inv_bill_type');
 				inv_bill_date = grid.getStore().getAt(rowIndex).get('inv_bill_date');
+				inv_bill_to = grid.getStore().getAt(rowIndex).get('inv_bill_to');
+				inv_currency = grid.getStore().getAt(rowIndex).get('inv_currency');
 				
 				min_year = new Date(inv_delivery_date.getFullYear(), 0, 1);
 				max_year = new Date(inv_delivery_date.getFullYear()+1, 0, 0);
@@ -2100,30 +2277,45 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				Ext.getCmp('einv_payment_terms').setValue(inv_payment_terms);
 				Ext.getCmp('einv_vat').setValue(inv_vat);
 //				Ext.getCmp('einv_bill_type').setValue(inv_bill_type);
+				Ext.getCmp('einv_bill_to').setValue(inv_bill_to);
+				Ext.getCmp('einv_currency').setValue(inv_currency);
 				editInvoice.show();
 			}
 		}]
-//	},{
-//		text : 'Delete',
-//		xtype : 'actioncolumn',
-//		flex : 0.5,
-//		align : 'center',
-//		id : 'inv_del',
-//		items : [ {
-//			iconCls : 'icon-delete',
-//			handler : function(grid, rowIndex, colIndex) {
-//				inv_id = grid.getStore().getAt(rowIndex).get('inv_id');
-//				Ext.getCmp('invid_del').setValue(inv_id);
-//				Ext.MessageBox.show({
-//					title : 'Confirm',
-//					msg : 'Are you sure you want to delete this?',
-//					buttons : Ext.MessageBox.YESNO,
-//					animateTarget : 'inv_del',
-//					fn : confirmChk,
-//					icon : Ext.MessageBox.QUESTION
-//				});
-//			}
-//		}]
+	},{
+		text : 'Delete',
+		xtype : 'actioncolumn',
+		flex : 0.3,
+		align : 'center',
+		id : 'inv_del',
+		hidden : true,
+		items : [ {
+			iconCls : 'icon-delete',
+			handler : function(grid, rowIndex, colIndex) {
+				inv_id = grid.getStore().getAt(rowIndex).get('inv_id');
+				inv_number = grid.getStore().getAt(rowIndex).get('inv_number');
+				if(inv_number == ""){
+					Ext.getCmp('invid_del').setValue(inv_id);
+					Ext.MessageBox.show({
+						title : 'Confirm',
+						msg : 'Are you sure you want to delete this?',
+						buttons : Ext.MessageBox.YESNO,
+						animateTarget : 'inv_del',
+						fn : confirmChk,
+						icon : Ext.MessageBox.QUESTION
+					});
+				}else{
+					Ext.MessageBox.show({
+						title : 'Information',
+						msg : 'Cannot delete assigned invoice!',
+						width: 270,
+						buttons : Ext.MessageBox.OK,
+						animateTarget : 'inv_del',
+						icon : Ext.MessageBox.ERROR
+					});
+				}
+			}
+		}]
 	}],
 	listeners : {
 	    itemdblclick: function(dv, record, item, index, e) {
@@ -2141,6 +2333,8 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 			inv_bill_type = dv.getStore().getAt(index).get('inv_bill_type');
 			inv_bill_date = dv.getStore().getAt(index).get('inv_bill_date');
 			inv_number = dv.getStore().getAt(index).get('inv_number');
+			inv_bill_to = dv.getStore().getAt(index).get('inv_bill_to');
+			inv_currency = dv.getStore().getAt(index).get('inv_currency');
 			
 			Ext.getCmp('invid').setValue(inv_id);
 			Ext.getCmp('dinv_id').setValue(inv_id);
@@ -2157,19 +2351,21 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 			Ext.getCmp('dinv_vat').setValue(inv_vat);
 			Ext.getCmp('dinv_bill_type').setValue(inv_bill_type);
 			Ext.getCmp('dinv_number').setValue(inv_number);
+			Ext.getCmp('dinv_bill_to').setValue(inv_bill_to);
+			Ext.getCmp('dinv_currency').setValue(inv_currency);
 			
 			var aproj_id = Ext.getCmp('aproj_id');
 			aproj_id.clearValue();
 			aproj_id.getStore().removeAll();
 			aproj_id.getStore().load({
-				url: 'showProjects.htm?id='+cus_id
+				url: 'showProjects.htm?type=inv&id='+cus_id
 			});
 			
 			var eproj_id = Ext.getCmp('eproj_id');
 			eproj_id.clearValue();
 			eproj_id.getStore().removeAll();
 			eproj_id.getStore().load({
-				url: 'showProjects.htm?id='+cus_id
+				url: 'showProjects.htm?type=inv&id='+cus_id
 			});
 			
 			Ext.apply(store.invoiceRef.getProxy().extraParams,{'inv_id': inv_id});
@@ -2233,7 +2429,10 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
                 fn : function(buttonValue, inputText, showConfig){
                 	if(buttonValue == "yes"){
                 		var inv_id = Ext.getCmp('dinv_id').getValue();
+                		var inv_currency = Ext.getCmp('dinv_currency').getValue();
             			Ext.getCmp('ainv_id').setValue(inv_id);
+            			Ext.getCmp('ainv_ref_currency').setValue(inv_currency);
+            			Ext.getCmp('dinv_ref_currency').setValue(inv_currency);
             			addInvoiceItem.show();
                 	}else if(buttonValue == "no"){
                 		var cus_id = Ext.getCmp('dcus_id').getValue();
@@ -2281,9 +2480,9 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 			}
 		},{
 			text : "Topix ID",
-			flex : 0.6,
+			flex : 0.7,
 			dataIndex: 'topix_article_id',
-			align : 'right'
+			align : 'center'
 		},{
 			text : "Item Name",
 			flex : 2.5,
@@ -2385,7 +2584,11 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 			flex : 0.8,
 			align : 'right',
 			dataIndex : 'inv_ref_price',
-			renderer: roundDecimal
+			renderer: roundDecimal,
+			editor: {
+				xtype:'numberfield',
+				allowBlank: false
+			}
 		},
 	    {
 	    	text : "Amount",
@@ -2415,6 +2618,7 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 					inv_ref_qty = grid.getStore().getAt(rowIndex).get('inv_ref_qty');
 					inv_ref_currency = grid.getStore().getAt(rowIndex).get('inv_ref_currency');
 					inv_ref_desc = grid.getStore().getAt(rowIndex).get('inv_ref_desc');
+					inv_currency = grid.getStore().getAt(rowIndex).get('inv_currency');
 					
 					Ext.getCmp('eproj_ref_id').getStore().load({
 						url: 'showProjectsReference.htm?id='+proj_id
@@ -2427,7 +2631,8 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 					Ext.getCmp('einv_itm_name').setValue(inv_itm_name);
 					Ext.getCmp('einv_ref_price').setValue(inv_ref_price);
 					Ext.getCmp('einv_ref_qty').setValue(inv_ref_qty);
-					Ext.getCmp('einv_ref_currency').setValue(inv_ref_currency);
+					Ext.getCmp('einv_ref_currency').setValue(inv_currency);
+					Ext.getCmp('deinv_ref_currency').setValue(inv_currency);
 					Ext.getCmp('einv_ref_desc').setValue(inv_ref_desc);
 					editInvoiceItem.show();
 				}
@@ -2512,7 +2717,7 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 			        	Ext.getCmp('projRefId_invRef').setValue(0);
 			        	if(e.field == "inv_itm_name"){
 			        		Ext.getCmp('edit_itm_invRef').getStore().load({
-			        			url: 'showProjects.htm?id='+Ext.getCmp('dcus_id').getValue()
+			        			url: 'showProjects.htm?type=inv&id='+Ext.getCmp('dcus_id').getValue()
 							});
 			        	}
 //			        	if(e.field == "sent_amount"){
@@ -2614,10 +2819,10 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 							}
 						},
 						autoLoad : true,
-						sorters: [{
-					         property: 'proj_name',
-					         direction: 'ASC'
-					     }]
+//						sorters: [{
+//					         property: 'proj_name',
+//					         direction: 'ASC'
+//					     }]
 					},
 					valueField : 'proj_id',
 					displayField : 'proj_name',
@@ -2645,7 +2850,7 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 					msgTarget: 'under',
 					emptyText : 'Item Name',
 					store : {
-						fields : [ 'proj_ref_id', 'itm_name', 'proj_ref_desc', 'price', 'currency', 'topix_article_id' ],
+						fields : [ 'proj_ref_id', 'itm_name', 'proj_ref_desc', 'price', 'proj_currency', 'topix_article_id' ],
 						proxy : {
 							type : 'ajax',
 							url : '',
@@ -2657,7 +2862,7 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 						},
 						autoLoad : true,
 						sorters: [{
-					         property: 'itm_name',
+					         property: 'topix_article_id',
 					         direction: 'ASC'
 					     }]
 					},
@@ -2669,9 +2874,9 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 				    tpl: Ext.create('Ext.XTemplate',
 				        '<tpl for=".">',
 				        	"<tpl if='price == \"\"'>",
-				        	'<div class="x-boundlist-item">{itm_name}</div>',
+				        	'<div class="x-boundlist-item">{topix_article_id} : {itm_name}</div>',
 				            '<tpl else>',
-				            '<div class="x-boundlist-item">{topix_article_id} : {itm_name} - {price} {currency}</div>',
+				            '<div class="x-boundlist-item">{topix_article_id} : {itm_name} : {price} {proj_currency}</div>',
 				            '</tpl>',
 			            '</tpl>'
 				    ),
@@ -2679,9 +2884,9 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 				    displayTpl: Ext.create('Ext.XTemplate',
 				        '<tpl for=".">',
 				        	"<tpl if='price == \"\"'>",
-				        	'{itm_name}',
+				        	'{topix_article_id} : {itm_name}',
 				            '<tpl else>',
-				            '{topix_article_id} : {itm_name} - {price} {currency}',
+				            '{topix_article_id} : {itm_name} : {price} {proj_currency}',
 				            '</tpl>',
 				        '</tpl>'
 				    ),
@@ -2692,10 +2897,50 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 							var myIndex = this.store.indexOf(record);
 							var price = this.store.getAt(myIndex).data.price;
 							var item = this.store.getAt(myIndex).data.itm_name;
-							var currency = this.store.getAt(myIndex).data.currency;
+							var currency = this.store.getAt(myIndex).data.proj_currency;
+							var inv_currency = Ext.getCmp('dinv_currency').getValue();
+							var new_price = 0;
 							
-							Ext.getCmp('ainv_ref_price').setValue(price);
-							Ext.getCmp('ainv_ref_currency').setValue(currency);
+							if(currency !== inv_currency){
+								var EUR = 1;
+								var USD = store.exchangeRates.getAt(0).data.USD;
+								var THB = store.exchangeRates.getAt(0).data.THB;
+								var AUD = store.exchangeRates.getAt(0).data.AUD;
+								var GBP = store.exchangeRates.getAt(0).data.GBP;
+								var CHF = store.exchangeRates.getAt(0).data.CHF;
+								var myRate = 0;
+								if(currency == "EUR"){
+									myRate = price;
+								}else if(currency == "USD"){
+									myRate = price/USD;
+								}else if(currency == "THB"){
+									myRate = price/THB;
+								}else if(currency == "AUD"){
+									myRate = price/AUD;
+								}else if(currency == "GBP"){
+									myRate = price/GBP;
+								}else if(currency == "CHF"){
+									myRate = price/CHF;
+								}
+								if(inv_currency == "EUR"){
+									new_price = myRate;
+								}else if(inv_currency == "USD"){
+									new_price = myRate*USD;
+								}else if(inv_currency == "THB"){
+									new_price = myRate*THB;
+								}else if(inv_currency == "AUD"){
+									new_price = myRate*AUD;
+								}else if(inv_currency == "GBP"){
+									new_price = myRate*GBP;
+								}else if(inv_currency == "CHF"){
+									new_price = myRate*CHF;
+								}
+							}else{
+								new_price = price;
+							}
+							
+							Ext.getCmp('ainv_ref_price').setValue(new_price);
+//							Ext.getCmp('ainv_ref_currency').setValue(currency);
 							Ext.getCmp('ainv_itm_name').setValue(item);
 							console.log(item + " = " + price + " " + currency);
 						}
@@ -2704,13 +2949,28 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 					xtype:'numberfield',
 	    	    	labelWidth: 120,
 	    	    	fieldLabel: 'Qty <font color="red">*</font> ',
-	    	    	minValue: 1,
+//	    	    	minValue: 0,
 	    	    	value: 1,
 	    	    	msgTarget : 'under',
 	    	    	name: 'ainv_ref_qty',
 	    	    	id: 'ainv_ref_qty',
 	    	    	emptyText : 'Qty',
 	    	    	allowBlank: false,
+				},{
+					xtype:'numberfield',
+	    	    	labelWidth: 120,
+	    	    	fieldLabel: 'Price <font color="red">*</font> ',
+	    	    	msgTarget : 'under',
+	    	    	name: 'ainv_ref_price',
+	    	    	id: 'ainv_ref_price',
+	    	    	emptyText : 'Price',
+	    	    	allowBlank: false,
+				},{
+					xtype:'displayfield',
+	                fieldLabel: 'Currency ',
+	                labelWidth: 120,
+	                name: 'dinv_ref_currency',
+	                id: 'dinv_ref_currency',
 				},{
 					labelWidth: 120,
 					fieldLabel: 'Remark ',
@@ -2720,10 +2980,10 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 					maxLength: 100,
 					emptyText: 'Remark'
 				},{
-					xtype: 'hidden',
-					name: 'ainv_ref_price',
-					id: 'ainv_ref_price'
-				},{
+//					xtype: 'hidden',
+//					name: 'ainv_ref_price',
+//					id: 'ainv_ref_price'
+//				},{
 					xtype: 'hidden',
 					name: 'ainv_ref_currency',
 					id: 'ainv_ref_currency'
@@ -2849,10 +3109,10 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 							}
 						},
 						autoLoad : true,
-						sorters: [{
-					         property: 'proj_name',
-					         direction: 'ASC'
-					     }]
+//						sorters: [{
+//					         property: 'proj_name',
+//					         direction: 'ASC'
+//					     }]
 					},
 					valueField : 'proj_id',
 					displayField : 'proj_name',
@@ -2880,7 +3140,7 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 					msgTarget: 'under',
 					emptyText : 'Item Name',
 					store : {
-						fields : [ 'proj_ref_id', 'itm_name', 'proj_ref_desc', 'price', 'currency' ],
+						fields : [ 'proj_ref_id', 'itm_name', 'proj_ref_desc', 'price', 'proj_currency', 'topix_article_id' ],
 						proxy : {
 							type : 'ajax',
 							url : '',
@@ -2892,7 +3152,7 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 						},
 						autoLoad : true,
 						sorters: [{
-					         property: 'itm_name',
+					         property: 'topix_article_id',
 					         direction: 'ASC'
 					     }]
 					},
@@ -2904,9 +3164,9 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 				    tpl: Ext.create('Ext.XTemplate',
 				        '<tpl for=".">',
 				        	"<tpl if='price == \"\"'>",
-				        	'<div class="x-boundlist-item">{itm_name}</div>',
+				        	'<div class="x-boundlist-item">{topix_article_id} : {itm_name}</div>',
 				            '<tpl else>',
-				            '<div class="x-boundlist-item">{itm_name} - {price} {currency}</div>',
+				            '<div class="x-boundlist-item">{topix_article_id} : {itm_name} : {price} {proj_currency}</div>',
 				            '</tpl>',
 			            '</tpl>'
 				    ),
@@ -2914,9 +3174,9 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 				    displayTpl: Ext.create('Ext.XTemplate',
 				        '<tpl for=".">',
 				        	"<tpl if='price == \"\"'>",
-				        	'{itm_name}',
+				        	'{topix_article_id} : {itm_name}',
 				            '<tpl else>',
-				            '{itm_name} - {price} {currency}',
+				            '{topix_article_id} : {itm_name} : {price} {proj_currency}',
 				            '</tpl>',
 				        '</tpl>'
 				    ),
@@ -2927,10 +3187,49 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 							var myIndex = this.store.indexOf(record);
 							var price = this.store.getAt(myIndex).data.price;
 							var item = this.store.getAt(myIndex).data.itm_name;
-							var currency = this.store.getAt(myIndex).data.currency;
+							var currency = this.store.getAt(myIndex).data.proj_currency;
+							var inv_currency = Ext.getCmp('dinv_currency').getValue();
+							var new_price = 0;
 							
-							Ext.getCmp('einv_ref_price').setValue(price);
-							Ext.getCmp('einv_ref_currency').setValue(currency);
+							if(currency !== inv_currency){
+								var EUR = 1;
+								var USD = store.exchangeRates.getAt(0).data.USD;
+								var THB = store.exchangeRates.getAt(0).data.THB;
+								var AUD = store.exchangeRates.getAt(0).data.AUD;
+								var GBP = store.exchangeRates.getAt(0).data.GBP;
+								var CHF = store.exchangeRates.getAt(0).data.CHF;
+								var myRate = 0;
+								if(currency == "EUR"){
+									myRate = price;
+								}else if(currency == "USD"){
+									myRate = price/USD;
+								}else if(currency == "THB"){
+									myRate = price/THB;
+								}else if(currency == "AUD"){
+									myRate = price/AUD;
+								}else if(currency == "GBP"){
+									myRate = price/GBP;
+								}else if(currency == "CHF"){
+									myRate = price/CHF;
+								}
+								if(inv_currency == "EUR"){
+									new_price = myRate;
+								}else if(inv_currency == "USD"){
+									new_price = myRate*USD;
+								}else if(inv_currency == "THB"){
+									new_price = myRate*THB;
+								}else if(inv_currency == "AUD"){
+									new_price = myRate*AUD;
+								}else if(inv_currency == "GBP"){
+									new_price = myRate*GBP;
+								}else if(inv_currency == "CHF"){
+									new_price = myRate*CHF;
+								}
+							}else{
+								new_price = price;
+							}
+							
+							Ext.getCmp('einv_ref_price').setValue(new_price);
 							Ext.getCmp('einv_itm_name').setValue(item);
 							console.log(item + " = " + price + " " + currency);
 						}
@@ -2939,13 +3238,28 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 					xtype:'numberfield',
 	    	    	labelWidth: 120,
 	    	    	fieldLabel: 'Qty <font color="red">*</font> ',
-	    	    	minValue: 1,
+//	    	    	minValue: 0,
 	    	    	value: 1,
 	    	    	msgTarget : 'under',
 	    	    	name: 'einv_ref_qty',
 	    	    	id: 'einv_ref_qty',
 	    	    	emptyText : 'Qty',
 	    	    	allowBlank: false,
+				},{
+					xtype:'numberfield',
+	    	    	labelWidth: 120,
+	    	    	fieldLabel: 'Price <font color="red">*</font> ',
+	    	    	msgTarget : 'under',
+	    	    	name: 'einv_ref_price',
+	    	    	id: 'einv_ref_price',
+	    	    	emptyText : 'Price',
+	    	    	allowBlank: false,
+				},{
+					xtype:'displayfield',
+	                fieldLabel: 'Currency ',
+	                labelWidth: 120,
+	                name: 'deinv_ref_currency',
+	                id: 'deinv_ref_currency',
 				},{
 					labelWidth: 120,
 					fieldLabel: 'Remark ',
@@ -2955,10 +3269,10 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 					maxLength: 100,
 					emptyText: 'Remark'
 				},{
-					xtype: 'hidden',
-					name: 'einv_ref_price',
-					id: 'einv_ref_price'
-				},{
+//					xtype: 'hidden',
+//					name: 'einv_ref_price',
+//					id: 'einv_ref_price'
+//				},{
 					xtype: 'hidden',
 					name: 'einv_ref_currency',
 					id: 'einv_ref_currency'
@@ -3186,7 +3500,7 @@ function confirmChk(btn) {
 					success : function(response, opts) {
 						Ext.MessageBox.show({
 							title : 'Infomation',
-							msg : 'Invoice has been delete!',
+							msg : 'Invoice has been deleted!',
 							buttons : Ext.MessageBox.OK,
 							animateTarget : 'inv_del',
 							fn : function(){
@@ -3271,7 +3585,7 @@ function getParamValues() {
 }
 
 function roundDecimal(value, meta, record, rowIndex, colIndex, store) {
-    return Ext.util.Format.number(value, '0,000.##')+' '+record.get('inv_ref_currency');
+    return Ext.util.Format.number(value, '0,000.##')+' '+record.get('inv_currency');
 //	return Math.round(value * 100) / 100;
 }
 

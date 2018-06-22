@@ -20,6 +20,7 @@ public class ProjectsReference {
 	private String cus_code;
 	private float actual_time;
 	private String topix_article_id;
+	private String proj_currency;
 	
 	public int getProj_ref_id() {
 		return proj_ref_id;
@@ -116,6 +117,12 @@ public class ProjectsReference {
 	}
 	public void setTopix_article_id(String topix_article_id) {
 		this.topix_article_id = topix_article_id;
+	}
+	public String getProj_currency() {
+		return proj_currency;
+	}
+	public void setProj_currency(String proj_currency) {
+		this.proj_currency = proj_currency;
 	}
 	
 }

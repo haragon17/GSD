@@ -23,6 +23,10 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 
 	@Override
 	public List<Jobs> searchJobs(Map<String, String> data) {
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		int type = user.getUserModel().getUsr_type();
+		
 		String sql = "SELECT jobs.job_id, job_name, jobs.proj_id, proj_name, cus_name, cus_code, cus.cus_id, payment_terms, job_dtl, job_status, dept,\n"
 				+ "CASE WHEN y.remain_job IS NULL THEN 0 ELSE y.remain_job END,\n"
 				+ "CASE WHEN x.total_amount IS NULL THEN 0 ELSE x.total_amount END,\n"
@@ -30,7 +34,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				+ "FROM jobs\n"
 				+ "LEFT JOIN projects proj ON proj.proj_id = jobs.proj_id\n"
 				+ "LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"
-				+ "LEFT JOIN (select job_id, sum(amount) as total_amount from jobs_reference group by job_id) x on x.job_id = jobs.job_id\n"
+				+ "LEFT JOIN (select job_id, cast(sum(amount) as numeric(9,2)) as total_amount from jobs_reference group by job_id) x on x.job_id = jobs.job_id\n"
 				+ "LEFT JOIN (select job_id, count(*) as remain_job from jobs_reference where job_ref_status != 'Sent' and job_ref_status != 'Checked' group by job_id) y on y.job_id = jobs.job_id\n"
 				+ "LEFT JOIN (select job_id, count(*) as remain_item from jobs_reference where proj_ref_id = 0 group by job_id) z on z.job_id = jobs.job_id\n"
 				+ "WHERE jobs.job_id != 0\n";
@@ -52,7 +56,11 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		if(data.get("dept")==null || data.get("dept").isEmpty()){
 		}else{
-			sql += "AND dept LIKE '"+data.get("dept")+"%'\n";
+			if(data.get("dept").equals("E-Studio") && type == 2){
+				sql += "AND (dept LIKE '"+data.get("dept")+"%' OR dept LIKE 'Pilot%')\n";
+			}else{
+				sql += "AND dept LIKE '"+data.get("dept")+"%'\n";
+			}
 		}
 		if(data.get("status")==null || data.get("status").isEmpty()){
 		}else{
@@ -261,6 +269,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}else{
 			sql+= " ORDER BY jobs_reference.job_in ASC ,job_ref_id ASC";
 		}
+		
+//		System.out.println(sql);
 		
 		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
 		return result;
@@ -864,13 +874,13 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					JobsReference jobRef = jobRefLs.get(i);
 					ps.setString(1, jobRef.getJob_ref_name());
 					ps.setInt(2, jobRef.getProj_ref_id());
-					ps.setFloat(3, jobRef.getAmount());
+					ps.setBigDecimal(3, jobRef.getAmount());
 					ps.setTimestamp(4, jobRef.getJob_in_ts());
 					ps.setTimestamp(5, jobRef.getJob_out_ts());
 					ps.setString(6, jobRef.getJob_ref_dtl());
 					ps.setString(7, jobRef.getJob_ref_status());
 					ps.setString(8, jobRef.getJob_ref_approve());
-					ps.setInt(9, jobRef.getSent_amount());
+					ps.setBigDecimal(9, jobRef.getSent_amount());
 					ps.setInt(10, jobRef.getJob_ref_id());
 				}
 				

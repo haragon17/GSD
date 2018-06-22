@@ -34,17 +34,17 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 	@Override
 	public List<Invoice> searchInvoice(Map<String, String> data) {
 		
-		String sql = "SELECT inv.inv_id, inv_number, inv_name, inv.inv_company_id, inv_proj_no, inv_bill_date, inv_delivery_date, "+
+		String sql = "SELECT inv.inv_id, inv_number, inv_name, inv.inv_company_id, inv_proj_no, inv_bill_date, inv_delivery_date, inv_currency, inv_bill_to, "+
 				"inv_payment_terms, inv_vat, inv_bill_type, inv.cus_id, inv.cretd_usr, inv_comp.inv_company_name, inv_comp.inv_company_code, "+
 				"cus.cus_name, cus.cus_code, users.usr_name, topix_cus_id,\n"+
 				"CASE WHEN x.total_inv_price IS NULL THEN 0 ELSE x.total_inv_price END,\n"+
-				"CASE WHEN x.inv_ref_currency IS NULL THEN '' ELSE x.inv_ref_currency END,\n"+
+//				"CASE WHEN x.inv_ref_currency IS NULL THEN '' ELSE x.inv_ref_currency END,\n"+
 				"CASE WHEN y.count_tpx IS NULL THEN 0 ELSE y.count_tpx END\n"+
 				"FROM invoice inv\n"+
 				"LEFT JOIN invoice_company inv_comp ON inv_comp.inv_company_id = inv.inv_company_id\n"+
 				"LEFT JOIN customer cus ON cus.cus_id = inv.cus_id\n"+
 				"LEFT JOIN users ON users.usr_id = inv.cretd_usr\n"+
-				"LEFT JOIN (select inv_id, inv_ref_currency, sum(inv_ref_price*inv_ref_qty) as total_inv_price from invoice_reference group by inv_id, inv_ref_currency) x on x.inv_id = inv.inv_id\n"+
+				"LEFT JOIN (select inv_id, sum(inv_ref_price*inv_ref_qty) as total_inv_price from invoice_reference group by inv_id) x on x.inv_id = inv.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, count(*) AS count_tpx FROM invoice_reference inv_ref LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = inv_ref.proj_ref_id WHERE topix_article_id = '' GROUP BY inv_id) y on y.inv_id = inv.inv_id\n"+
 				"WHERE inv.inv_id != 0\n";				
 				
@@ -75,7 +75,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 			sql += "AND inv.inv_delivery_date BETWEEN '"+data.get("delivery_start")+"' AND '"+data.get("delivery_limit")+"'\n";
 		}
 		
-		sql += "ORDER BY inv.inv_id DESC";
+		sql += "ORDER BY inv.inv_bill_date DESC, inv.inv_id DESC";
 		
 //		System.out.println(sql);
 		
@@ -85,10 +85,11 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 	
 	public List<InvoiceReference> searchInvoiceReference(int id){
 		
-		String sql = "SELECT inv_ref.*, proj_ref.proj_id, proj_ref.topix_article_id, proj.proj_name, cast((inv_ref_price*inv_ref_qty) as numeric(9,2)) as total_amount FROM invoice_reference inv_ref "
+		String sql = "SELECT inv_ref.*, invoice.inv_currency, proj_ref.proj_id, proj_ref.topix_article_id, proj.proj_name, proj.proj_currency, cast((inv_ref_price*inv_ref_qty) as numeric(9,2)) as total_amount FROM invoice_reference inv_ref "
+				+ "LEFT JOIN invoice ON invoice.inv_id = inv_ref.inv_id "
 				+ "LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = inv_ref.proj_ref_id "
 				+ "LEFT JOIN projects proj ON proj.proj_id = proj_ref.proj_id "
-				+ "WHERE inv_id="+id
+				+ "WHERE inv_ref.inv_id="+id
 				+ " ORDER BY order_by ASC";
 		
 		List<InvoiceReference> inv_ref = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<InvoiceReference>(InvoiceReference.class));
@@ -164,7 +165,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 //			inv.getCretd_usr(),
 //		});
 		
-		String sql = "INSERT INTO invoice VALUES (default,?,?,?,?,?,?,?,?,?,?,0,?,now(),now(),0)";
+		String sql = "INSERT INTO invoice VALUES (default,?,?,?,?,?,?,?,?,?,?,0,?,now(),now(),0,?,?)";
 		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
 		String id_column = "inv_id";
 		
@@ -181,6 +182,8 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		    ps.setString(9, inv.getInv_bill_type());
 		    ps.setInt(10, inv.getCus_id());
 		    ps.setInt(11, inv.getCretd_usr());
+		    ps.setString(12, inv.getInv_bill_to());
+		    ps.setString(13, inv.getInv_currency());
 		    return ps;
 		  }
 		  , keyHolder);
@@ -202,7 +205,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				user.getUserModel().getUsr_name(),
 				"Created Invoice name="+inv.getInv_name()+" on Company name="+inv.getInv_company_name()+", customer="+inv_audit.getCus_name()
 				+", inv_proj_no="+inv.getInv_proj_no()+", inv_delivery_date="+delivery_date+", inv_payment_terms="+inv.getInv_payment_terms()
-				+", inv_vat="+inv.getInv_vat()+", inv_bill_type="+inv.getInv_bill_type(),
+				+", inv_vat="+inv.getInv_vat()+", bill_to="+inv.getInv_bill_to()+", currency="+inv.getInv_currency(),
 				inv.getInv_name()
 		});
 		
@@ -216,7 +219,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		String order_by_sql = "SELECT count(inv_ref_id) FROM invoice_reference WHERE inv_id="+inv_ref.getInv_id();
 		int order_by = this.getJdbcTemplate().queryForInt(order_by_sql)+1;
 		
-		String sql = "INSERT INTO invoice_reference VALUES (default,?,?,?,?,?,?,?,?,?,now(),now())";
+		String sql = "INSERT INTO invoice_reference VALUES (default,?,?,?,?,?,?,?,?,now(),now())";
 		
 		this.getJdbcTemplate().update(sql, new Object[] {
 				inv_ref.getInv_id(),
@@ -224,7 +227,6 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				inv_ref.getInv_itm_name(),
 				inv_ref.getInv_ref_price(),
 				inv_ref.getInv_ref_qty(),
-				inv_ref.getInv_ref_currency(),
 				inv_ref.getInv_ref_desc(),
 				inv_ref.getCretd_usr(),
 				order_by
@@ -233,18 +235,24 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		Invoice inv = getInvoiceById(inv_ref.getInv_id());
 		List<InvoiceReference> inv_refLs = searchInvoiceReference(inv_ref.getInv_id());
 		BigDecimal total_price = BigDecimal.ZERO;
+		BigDecimal negative_price = BigDecimal.ZERO;
 		for(int i=0; i<inv_refLs.size(); i++){
 			BigDecimal price = inv_refLs.get(i).getInv_ref_price().multiply(inv_refLs.get(i).getInv_ref_qty());
-			float vat = (inv.getInv_vat().floatValue() / 100)+1;
-			price = price.multiply(new BigDecimal(vat));
-			total_price = total_price.add(price);
+			if(price.floatValue() >= 0){
+				BigDecimal vat = (inv.getInv_vat().divide(new BigDecimal(100))).add(new BigDecimal(1));
+				price = price.multiply(vat);
+				total_price = total_price.add(price);
+			}else{
+				negative_price = negative_price.add(price);
+			}
 		}
-		String currency = inv_refLs.get(0).getInv_ref_currency();
+		total_price = total_price.add(negative_price);
+		String currency = inv.getInv_currency();
 		if(currency.equals("EUR")){
 //			System.out.println(String.format("%.2f", total_price)+" EUR");
 		}else{
-			float convert_eur = map.get("EUR") / map.get(currency);
-			float total_eur = total_price.floatValue() * convert_eur;
+//			float convert_eur = map.get("EUR") / map.get(currency);
+			float total_eur = total_price.floatValue() / map.get(currency);
 //			System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
 			total_price = new BigDecimal(total_eur);
 		}
@@ -262,7 +270,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				"Invoice Reference:"+inv.getInv_id(),
 				user.getUserModel().getUsr_name(),
 				"Created Invoice Item name="+inv_ref.getInv_itm_name()+" on Invoice name="+inv.getInv_name()+", price="+inv_ref.getInv_ref_price()
-				+", currency="+inv_ref.getInv_ref_currency()+", inv_ref_qty="+inv_ref.getInv_ref_qty()+", inv_ref_desc="+inv_ref.getInv_ref_desc(),
+				+", inv_ref_qty="+inv_ref.getInv_ref_qty()+", inv_ref_desc="+inv_ref.getInv_ref_desc(),
 				inv.getInv_name()+" : "+inv_ref.getInv_itm_name()
 		});
 	}
@@ -281,6 +289,8 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				+ "inv_vat=?, "
 //				+ "inv_bill_type=?, "
 				+ "cus_id=?, "
+				+ "inv_bill_to=?, "
+				+ "inv_currency=?, "
 				+ "update_date=now() "
 				+ "WHERE inv_id=?";
 		
@@ -293,11 +303,56 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 			inv.getInv_vat(),
 //			inv.getInv_bill_type(),
 			inv.getCus_id(),
+			inv.getInv_bill_to(),
+			inv.getInv_currency(),
 			inv.getInv_id()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		Invoice inv_new = getInvoiceById(inv.getInv_id());
+		
+		if(!inv_audit.getInv_currency().equals(inv_new.getInv_currency())){
+			
+			List<InvoiceReference> inv_refLs = searchInvoiceReference(inv.getInv_id());
+			for(int i=0; i<inv_refLs.size(); i++){
+				BigDecimal currency = new BigDecimal(map.get(inv_audit.getInv_currency()));
+				BigDecimal new_currency = new BigDecimal(map.get(inv_new.getInv_currency()));
+				BigDecimal price = (inv_refLs.get(i).getInv_ref_price().divide(currency, 2, BigDecimal.ROUND_HALF_UP)).multiply(new_currency);
+				price = price.setScale(2, BigDecimal.ROUND_HALF_UP);
+//				System.out.println("item "+i+" : "+price+" "+inv_new.getInv_currency());
+				
+				String sql_price = "UPDATE invoice_reference SET inv_ref_price="+price+" WHERE inv_ref_id="+inv_refLs.get(i).getInv_ref_id();
+				this.getJdbcTemplate().update(sql_price);
+			}
+			
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				inv_new.getInv_id(),
+				"Invoice",
+				user.getUserModel().getUsr_name(),
+				"Currency",
+				inv_audit.getInv_currency(),
+				inv_new.getInv_currency(),
+				"Updated",
+				inv_new.getInv_name()
+			});
+		}
+		
+		if(!inv_audit.getInv_bill_to().equals(inv_new.getInv_bill_to())){
+			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				getLastAuditId(),
+				inv_new.getInv_id(),
+				"Invoice",
+				user.getUserModel().getUsr_name(),
+				"Billing To",
+				inv_audit.getInv_bill_to(),
+				inv_new.getInv_bill_to(),
+				"Updated",
+				inv_new.getInv_name()
+			});
+		}
 		
 //		if(inv_audit.getInv_delivery_date() == null){
 //			if(inv_new.getInv_delivery_date() != null){
@@ -403,12 +458,12 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				price = price.multiply(new BigDecimal(vat));
 				total_price = total_price.add(price);
 			}
-			String currency = inv_refLs.get(0).getInv_ref_currency();
+			String currency = inv_new.getInv_currency();
 			if(currency.equals("EUR")){
 //				System.out.println(String.format("%.2f", total_price)+" EUR");
 			}else{
-				float convert_eur = map.get("EUR") / map.get(currency);
-				float total_eur = total_price.floatValue() * convert_eur;
+//				float convert_eur = map.get("EUR") / map.get(currency);
+				float total_eur = total_price.floatValue() / map.get(currency);
 //				System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
 				total_price = new BigDecimal(total_eur);
 			}
@@ -486,7 +541,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				+ "inv_itm_name=?, "
 				+ "inv_ref_price=?, "
 				+ "inv_ref_qty=?, "
-				+ "inv_ref_currency=?, "
+//				+ "inv_ref_currency=?, "
 				+ "inv_ref_desc=?, "
 				+ "update_date=now() "
 				+ "WHERE inv_ref_id=?";
@@ -496,7 +551,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				inv_ref.getInv_itm_name(),
 				inv_ref.getInv_ref_price(),
 				inv_ref.getInv_ref_qty(),
-				inv_ref.getInv_ref_currency(),
+//				inv_ref.getInv_ref_currency(),
 				inv_ref.getInv_ref_desc(),
 				inv_ref.getInv_ref_id()
 		});
@@ -504,18 +559,24 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		Invoice inv = getInvoiceById(inv_ref.getInv_id());
 		List<InvoiceReference> inv_refLs = searchInvoiceReference(inv_ref.getInv_id());
 		BigDecimal total_price = BigDecimal.ZERO;
+		BigDecimal negative_price = BigDecimal.ZERO;
 		for(int i=0; i<inv_refLs.size(); i++){
 			BigDecimal price = inv_refLs.get(i).getInv_ref_price().multiply(inv_refLs.get(i).getInv_ref_qty());
-			float vat = (inv.getInv_vat().floatValue() / 100)+1;
-			price = price.multiply(new BigDecimal(vat));
-			total_price = total_price.add(price);
+			if(price.floatValue() >= 0){
+				BigDecimal vat = (inv.getInv_vat().divide(new BigDecimal(100))).add(new BigDecimal(1));
+				price = price.multiply(vat);
+				total_price = total_price.add(price);
+			}else{
+				negative_price = negative_price.add(price);
+			}
 		}
-		String currency = inv_refLs.get(0).getInv_ref_currency();
+		total_price = total_price.add(negative_price);
+		String currency = inv.getInv_currency();
 		if(currency.equals("EUR")){
 //			System.out.println(String.format("%.2f", total_price)+" EUR");
 		}else{
-			float convert_eur = map.get("EUR") / map.get(currency);
-			float total_eur = total_price.floatValue() * convert_eur;
+//			float convert_eur = map.get("EUR") / map.get(currency);
+			float total_eur = total_price.floatValue() / map.get(currency);
 //			System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
 			total_price = new BigDecimal(total_eur);
 		}
@@ -564,8 +625,8 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				"Invoice Reference:"+invRef_new.getInv_id(),
 				user.getUserModel().getUsr_name(),
 				"Price",
-				inv_ref_audit.getInv_ref_price()+" "+inv_ref_audit.getInv_ref_currency(),
-				invRef_new.getInv_ref_price()+" "+invRef_new.getInv_ref_currency(),
+				inv_ref_audit.getInv_ref_price()+" "+inv.getInv_currency(),
+				invRef_new.getInv_ref_price()+" "+inv.getInv_currency(),
 				"Updated",
 				invRef_new.getInv_name()+" : "+invRef_new.getInv_itm_name()
 			});
@@ -600,13 +661,13 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 			invRefLs_audit.add(invRef);
 		}
 		
-		try{
+//		try{
 			String sql = "UPDATE invoice_reference SET "
 					+ "proj_ref_id=?, "
 					+ "inv_itm_name=?, "
 					+ "inv_ref_price=?, "
 					+ "inv_ref_qty=?, "
-					+ "inv_ref_currency=?, "
+//					+ "inv_ref_currency=?, "
 					+ "inv_ref_desc=?, "
 					+ "order_by=?, "
 					+ "update_date=now() "
@@ -621,10 +682,10 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 					ps.setString(2, invRef.getInv_itm_name());
 					ps.setBigDecimal(3, invRef.getInv_ref_price());
 					ps.setBigDecimal(4, invRef.getInv_ref_qty());
-					ps.setString(5, invRef.getInv_ref_currency());
-					ps.setString(6, invRef.getInv_ref_desc());
-					ps.setInt(7, invRef.getOrder_by());
-					ps.setInt(8, invRef.getInv_ref_id());
+//					ps.setString(5, invRef.getInv_ref_currency());
+					ps.setString(5, invRef.getInv_ref_desc());
+					ps.setInt(6, invRef.getOrder_by());
+					ps.setInt(7, invRef.getInv_ref_id());
 				}
 				
 				@Override
@@ -640,18 +701,24 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				Invoice inv = getInvoiceById(invRefLs.get(y).getInv_id());
 				List<InvoiceReference> inv_refLs = searchInvoiceReference(invRefLs.get(y).getInv_id());
 				BigDecimal total_price = BigDecimal.ZERO;
+				BigDecimal negative_price = BigDecimal.ZERO;
 				for(int i=0; i<inv_refLs.size(); i++){
 					BigDecimal price = inv_refLs.get(i).getInv_ref_price().multiply(inv_refLs.get(i).getInv_ref_qty());
-					float vat = (inv.getInv_vat().floatValue() / 100)+1;
-					price = price.multiply(new BigDecimal(vat));
-					total_price = total_price.add(price);
+					if(price.floatValue() >= 0){
+						BigDecimal vat = (inv.getInv_vat().divide(new BigDecimal(100))).add(new BigDecimal(1));
+						price = price.multiply(vat);
+						total_price = total_price.add(price);
+					}else{
+						negative_price = negative_price.add(price);
+					}
 				}
-				String currency = inv_refLs.get(0).getInv_ref_currency();
+				total_price = total_price.add(negative_price);
+				String currency = inv.getInv_currency();
 				if(currency.equals("EUR")){
 //					System.out.println(String.format("%.2f", total_price)+" EUR");
 				}else{
-					float convert_eur = map.get("EUR") / map.get(currency);
-					float total_eur = total_price.floatValue() * convert_eur;
+//					float convert_eur = map.get("EUR") / map.get(currency);
+					float total_eur = total_price.floatValue() / map.get(currency);
 //					System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
 					total_price = new BigDecimal(total_eur);
 				}
@@ -700,8 +767,8 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 						"Invoice Reference:"+invRef_new.getInv_id(),
 						user.getUserModel().getUsr_name(),
 						"Price",
-						invRefLs_audit.get(y).getInv_ref_price()+" "+invRefLs_audit.get(y).getInv_ref_currency(),
-						invRef_new.getInv_ref_price()+" "+invRef_new.getInv_ref_currency(),
+						invRefLs_audit.get(y).getInv_ref_price()+" "+inv.getInv_currency(),
+						invRef_new.getInv_ref_price()+" "+inv.getInv_currency(),
 						"Updated",
 						invRef_new.getInv_name()+" : "+invRef_new.getInv_itm_name()
 					});
@@ -724,9 +791,9 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				
 			}
 			
-		}catch(Exception e){
-			logger.error(e.getMessage());
-		}
+//		}catch(Exception e){
+//			logger.error(e.getMessage());
+//		}
 		
 	}
 	
@@ -741,10 +808,13 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 	
 	public Invoice getInvoiceById(int id){
 		
-		String sql = "SELECT invoice.*, cus.cus_name, cus.cus_code, cus.address, cus.topix_cus_id, inv_comp.inv_company_name, inv_comp.inv_company_code FROM invoice "
+		String sql = "SELECT invoice.*, cus.cus_name, cus.cus_code, cus.address, cus.topix_cus_id, cus.bill_to, inv_comp.inv_company_name, inv_comp.inv_company_code, "
+				+ "CASE WHEN x.total_inv_price IS NULL THEN 0 ELSE x.total_inv_price END\n"
+				+ "FROM invoice "
 				+ "LEFT JOIN customer cus ON cus.cus_id = invoice.cus_id "
+				+ "LEFT JOIN (select inv_id, sum(inv_ref_price*inv_ref_qty) as total_inv_price from invoice_reference group by inv_id) x on x.inv_id = invoice.inv_id\n"
 				+ "LEFT JOIN invoice_company inv_comp ON inv_comp.inv_company_id = invoice.inv_company_id "
-				+ "WHERE inv_id="+id;
+				+ "WHERE invoice.inv_id="+id;
 		
 		Invoice inv = this.getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<Invoice>(Invoice.class));
 		
@@ -760,12 +830,12 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		return invRef;
 	}
 	
-	public String getLastInvoiceNumber(int inv_company_id, String delivery_date){
+	public String getLastInvoiceNumber(int inv_company_id, String delivery_date, String inv_bill_type){
 		
 		String sql = "SELECT inv_number FROM invoice"
 				+ " WHERE inv_company_id = "+inv_company_id
 				+ " AND EXTRACT(YEAR FROM inv_delivery_date) = '20"+delivery_date+"'"
-				+ " AND inv_bill_type = 'Direct'"
+				+ " AND inv_bill_type = '"+inv_bill_type+"'"
 				+ " ORDER BY inv_number DESC LIMIT 1";
 		
 //		System.out.println(sql);
@@ -786,12 +856,13 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 	@Override
 	public List<InvoiceReference> getJobItemList(int job_id) {
 		
-		String sql = "SELECT jobs_reference.proj_ref_id, itm_name as inv_itm_name, sum(amount) as inv_ref_qty, price as inv_ref_price, currency as inv_ref_currency\n"+
+		String sql = "SELECT jobs_reference.proj_ref_id, itm_name as inv_itm_name, sum(amount) as inv_ref_qty, price as inv_ref_price, proj_currency as inv_currency\n"+
 				"FROM jobs_reference\n"+
 				"LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"+
+				"LEFT JOIN projects proj on proj.proj_id = proj_ref.proj_id\n"+
 				"LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n"+
 				"WHERE job_id="+job_id+"\n"+
-				"GROUP BY jobs_reference.proj_ref_id, inv_itm_name, price, currency";
+				"GROUP BY jobs_reference.proj_ref_id, inv_itm_name, price, proj_currency";
 		
 		List<InvoiceReference> inv_ref = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<InvoiceReference>(InvoiceReference.class));
 		return inv_ref;
@@ -891,7 +962,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 	}
 	
 	@Override
-	public List<Invoice> showInvoiceReport(String year, int inv_company_id){
+	public List<Invoice> showInvoiceMonthlyReport(String year, int inv_company_id){
 		
 		String sql = "SELECT cus_name,\n"+
 				"CASE WHEN sum(jan.sum_price) IS NULL THEN 0 ELSE sum(jan.sum_price) END AS jan,\n"+
@@ -909,40 +980,40 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				"FROM invoice\n"+
 				"LEFT JOIN customer cus ON cus.cus_id = invoice.cus_id\n"+
 				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'1\' \n"+
+				"WHERE inv_bill_type <> 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'1\' \n"+
 				"GROUP BY inv_id) jan ON jan.inv_id = invoice.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"where EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'2\' \n"+
+				"WHERE inv_bill_type <> 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'2\' \n"+
 				"GROUP BY inv_id) feb ON feb.inv_id = invoice.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'3\' \n"+
+				"WHERE inv_bill_type <> 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'3\' \n"+
 				"GROUP BY inv_id) mar ON mar.inv_id = invoice.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"where EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'4\' \n"+
+				"WHERE inv_bill_type <> 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'4\' \n"+
 				"GROUP BY inv_id) apr ON apr.inv_id = invoice.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'5\' \n"+
+				"WHERE inv_bill_type <> 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'5\' \n"+
 				"GROUP BY inv_id) may ON may.inv_id = invoice.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'6\' \n"+
+				"WHERE inv_bill_type <> 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'6\' \n"+
 				"GROUP BY inv_id) jun ON jun.inv_id = invoice.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'7\' \n"+
+				"WHERE inv_bill_type <> 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'7\' \n"+
 				"GROUP BY inv_id) jul ON jul.inv_id = invoice.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'8\' \n"+
+				"WHERE inv_bill_type <> 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'8\' \n"+
 				"GROUP BY inv_id) aug ON aug.inv_id = invoice.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'9\' \n"+
+				"WHERE inv_bill_type <> 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'9\' \n"+
 				"GROUP BY inv_id) sep ON sep.inv_id = invoice.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'10\' \n"+
+				"WHERE inv_bill_type <> 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'10\' \n"+
 				"GROUP BY inv_id) oct ON oct.inv_id = invoice.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'11\' \n"+
+				"WHERE inv_bill_type <> 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'11\' \n"+
 				"GROUP BY inv_id) nov ON nov.inv_id = invoice.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'12\' \n"+
+				"WHERE inv_bill_type <> 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'12\' \n"+
 				"GROUP BY inv_id) dec ON dec.inv_id = invoice.inv_id\n"+
 				"WHERE inv_company_id = "+inv_company_id+"\n"+
 				"GROUP BY cus_name\n"+
@@ -1055,6 +1126,49 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				+", tpx_res_msg="+tpx.getTpx_res_msg(),
 				tpx.getTpx_name()+" Error("+tpx.getTpx_res_nr()+ "): " +tpx.getTpx_res_msg()
 		});
+	}
+
+	@Override
+	public List<Invoice> showInvoiceReport(Map<String, String> data) {
+		
+		String sql = "SELECT inv.inv_id, inv_currency, inv_bill_date, inv_number, cus.cus_name, inv_name, inv_itm_name, inv_ref_qty, inv_ref_price, inv_total_price_eur, x.total_price\n"+
+				"FROM invoice inv\n"+
+				"LEFT JOIN invoice_reference inv_ref ON inv_ref.inv_id = inv.inv_id\n"+
+				"LEFT JOIN customer cus ON cus.cus_id = inv.cus_id\n"+
+				"LEFT JOIN (SELECT inv_id, SUM(inv_ref_price * inv_ref_qty) AS total_price FROM invoice_reference GROUP BY inv_id) x ON x.inv_id = inv.inv_id\n"+
+				"WHERE inv.inv_id != 0\n";
+				
+		if(data.get("inv_proj_no")==null || data.get("inv_proj_no").isEmpty()){
+		}else{
+			sql += "AND LOWER(inv.inv_proj_no) LIKE LOWER('%"+data.get("inv_proj_no")+"%')\n";
+		}
+		if(data.get("inv_company_id")==null || data.get("inv_company_id").isEmpty()){
+		}else{
+			sql += "AND inv.inv_company_id = "+data.get("inv_company_id")+"\n";
+		}
+		if(data.get("inv_cus_id")==null || data.get("inv_cus_id").isEmpty()){
+		}else{
+			sql += "AND inv.cus_id = "+data.get("inv_cus_id")+"\n";
+		}
+		if(data.get("inv_bill_type")==null || data.get("inv_bill_type").isEmpty() || data.get("inv_bill_type").equals("All")){
+		}else{
+			sql += "AND inv.inv_bill_type LIKE '"+data.get("inv_bill_type")+"%'\n";
+		}
+		if(data.get("delivery_start")==null || data.get("delivery_start").isEmpty()){
+			if(data.get("delivery_limit")==null || data.get("delivery_limit").isEmpty()){
+			}else{
+				sql += "AND inv.inv_delivery_date <= '"+data.get("delivery_limit")+"'\n";
+			}
+		}else if(data.get("delivery_limit")==null || data.get("delivery_limit").isEmpty()){
+			sql += "AND inv.inv_delivery_date >= '"+data.get("delivery_start")+"'\n";
+		}else{
+			sql += "AND inv.inv_delivery_date BETWEEN '"+data.get("delivery_start")+"' AND '"+data.get("delivery_limit")+"'\n";
+		}
+		
+		sql += "ORDER BY inv_number DESC";
+		
+		List<Invoice> inv = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Invoice>(Invoice.class));
+		return inv;
 	}
 	
 }
