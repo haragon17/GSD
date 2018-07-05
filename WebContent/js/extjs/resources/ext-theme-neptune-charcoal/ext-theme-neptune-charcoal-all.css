@@ -34,6 +34,10 @@ img {
     background-image: url(images/icon-nd.png);
 }
 
+.icon-disk {
+	background-image: url(../../images/icons/fam/disk_multiple.png) !important;
+}
+
 .icon-mail {
 	background-image: url(../../images/icons/fam/email_go.png) !important;
 }

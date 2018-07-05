@@ -853,7 +853,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 			jobRefLs_audit.add(jobRef);
 		}
 		
-		try{
+//		try{
 			String sql = "UPDATE jobs_reference set "
 					+ "job_ref_name=?, "
 					+ "proj_ref_id=?, "
@@ -909,6 +909,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					});
 				}
 				
+				try{
 				if(!jobRefLs_audit.get(y).getJob_ref_approve().equals(jobRef_new.getJob_ref_approve())){
 					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
@@ -922,6 +923,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 						"Updated",
 						jobRefLs_audit.get(y).getJob_name()+" : "+jobRef_new.getJob_ref_name()
 					});
+				}
+				}catch (Exception e){
+					logger.error(e.getMessage());
 				}
 				
 				if(!jobRefLs_audit.get(y).getJob_ref_dtl().equals(jobRef_new.getJob_ref_dtl())){
@@ -1047,9 +1051,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				}
 			}
 			
-		}catch(Exception e){
-			logger.error(e.toString());
-		}
+//		}catch(Exception e){
+//			logger.error(e.toString());
+//		}
 		
 	}
 	

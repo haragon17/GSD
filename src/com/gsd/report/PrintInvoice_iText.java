@@ -295,7 +295,7 @@ public class PrintInvoice_iText {
         g2d.setFont(f8p);
         g2d.setColor(Color.black);
         int itemY = 408;
-        float total_price = 0;
+        double total_price = 0;
         float positive_price = 0;
         float negative_price = 0;
         DecimalFormat df = new DecimalFormat("#,###.##");
@@ -370,13 +370,15 @@ public class PrintInvoice_iText {
         
         itemY += 20;
         String vat = "";
-        float sum_vat = 0;
-        float subtotal = inv.getTotal_inv_price().floatValue();
-        float price_total = subtotal;
+        double sum_vat = 0;
+        double subtotal = inv.getTotal_inv_price().doubleValue();
+        double price_total = Math.round(subtotal*100.0)/100.0;
+        System.out.println("Price total : "+price_total);
         if(inv.getInv_vat().floatValue() != 0){
 //        	sum_vat = (inv.getInv_vat().floatValue()/100)*positive_price;
-        	sum_vat = (inv.getInv_vat().floatValue()/100)*subtotal;
-        	price_total += sum_vat;
+        	sum_vat = (inv.getInv_vat().doubleValue()/100.0)*subtotal;
+        	price_total += (Math.round(sum_vat*100.0)/100.0);
+        	System.out.println("Price total : "+price_total);
             vat = String.format("%,.2f", sum_vat)+" "+inv_ref.get(0).getInv_currency();
         }else{
         	vat = String.format("%.2f", sum_vat)+" "+inv_ref.get(0).getInv_currency();

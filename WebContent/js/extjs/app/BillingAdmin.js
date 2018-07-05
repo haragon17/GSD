@@ -751,6 +751,28 @@ Ext.onReady(function() {
 					}
 				},
 				{
+					text : 'Dupplicate',
+					xtype : 'actioncolumn',
+					flex : 0.7,
+					align : 'center',
+					id : 'duplicate_job_ref',
+					items : [ {
+						iconCls : 'icon-disk',
+						handler : function(grid, rowIndex, colIndex) {
+							job_ref_id = grid.getStore().getAt(rowIndex).get('job_ref_id');
+							amount = grid.getStore().getAt(rowIndex).get('amount');
+							job_ref_name = grid.getStore().getAt(rowIndex).get('job_ref_name');
+							Ext.getCmp('dup_job_ref_id').setValue(job_ref_id);
+							Ext.getCmp('dup_amount').setValue(amount);
+							Ext.getCmp('dup_job_ref_name').setValue(job_ref_name);
+							Ext.getCmp('dup_proj_ref_id').getStore().load({
+								url: 'showProjectsReference.htm?id='+Ext.getCmp('projid').getValue()
+							});
+							duplicateJobRef.show();
+						}
+					} ]
+				},
+				{
 					text : 'Time',
 					xtype : 'actioncolumn',
 					flex : 0.7,
@@ -4254,6 +4276,170 @@ Ext.onReady(function() {
 			}
 		}
 	})
+	
+	duplicateJobRef = new Ext.create('Ext.window.Window', {
+		title: 'Duplicate Job',
+		width: 450,
+		animateTarget: 'duplicate_job_ref',
+		resizable: false,
+		closeAction: 'hide',
+		items: [{
+			xtype: 'form',
+			id: 'duplicateJobRefForm',
+			items: [{
+				xtype: 'fieldset',
+				title: 'Job Information',
+				defaultType: 'textfield',
+				layout: 'anchor',
+				padding: 10,
+				width: 400,
+				style: {
+	                "margin-left": "auto",
+	                "margin-right": "auto",
+	                "margin-top": "10px",
+	                "margin-bottom": "10px"
+	            },
+	            defaults: {
+	                anchor: '100%'
+	            },
+	            items: [{
+	            	allowBlank: false,
+	    	    	fieldLabel: 'Job Name <font color="red">*</font> ',
+	            	labelWidth : 120,
+	            	name: 'dup_job_ref_name',
+	            	id: 'dup_job_ref_name',
+	            	msgTarget: 'under'
+	            },{
+					xtype: 'combobox',
+					fieldLabel : 'Item Name ',
+					name : 'dup_proj_ref_id',
+					id : 'dup_proj_ref_id',
+//					allowBlank: false,
+					editable : false,
+					queryMode : 'local',
+					labelWidth : 120,
+					msgTarget: 'under',
+					emptyText : 'Item Name',
+					store : {
+						fields : [ 'proj_ref_id', 'itm_name', 'proj_ref_desc' ],
+						proxy : {
+							type : 'ajax',
+							url : '',
+							reader : {
+								type : 'json',
+								root : 'records',
+								idProperty : 'proj_ref_id'
+							}
+						},
+						autoLoad : true,
+						sorters: [{
+					         property: 'itm_name',
+					         direction: 'ASC'
+					     }]
+					},
+					valueField : 'proj_ref_id',
+//					displayField : 'itm_name'
+					// Template for the dropdown menu.
+				    // Note the use of "x-boundlist-item" class,
+				    // this is required to make the items selectable.
+				    tpl: Ext.create('Ext.XTemplate',
+				        '<tpl for=".">',
+				        	"<tpl if='proj_ref_desc == \"\"'>",
+				        	'<div class="x-boundlist-item">{itm_name}</div>',
+				            '<tpl else>',
+				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
+				            '</tpl>',
+			            '</tpl>'
+				    ),
+				    // template for the content inside text field
+				    displayTpl: Ext.create('Ext.XTemplate',
+				        '<tpl for=".">',
+				        	"<tpl if='proj_ref_desc == \"\"'>",
+				        	'{itm_name}',
+				            '<tpl else>',
+				            '{itm_name} - {proj_ref_desc}',
+				            '</tpl>',
+				        '</tpl>'
+				    )
+				},
+				{
+	    	    	xtype:'numberfield',
+	    	    	labelWidth: 120,
+	    	    	fieldLabel: 'Amount / Hours ',
+	    	    	minValue : 0,
+	    	    	msgTarget : 'under',
+	    	    	name: 'dup_amount',
+	    	    	id: 'dup_amount',
+	    	    	emptyText : 'Amount or Hours',
+	    	    }]
+			},{
+				xtype : 'hidden',
+				id : 'dup_job_ref_id',
+				name : 'dup_job_ref_id'
+            }]
+		}],
+		buttons:[{
+			text: 'Add',
+			width: 100,
+			id: 'duplicateJobRefBtn',
+			handler: function(){
+				var form = Ext.getCmp('duplicateJobRefForm').getForm();
+				if (form.isValid()){
+					 form.submit({
+					 url: 'duplicateJobReference.htm',
+					 waitTitle: 'Adding Job',
+					 waitMsg: 'Please wait...',
+					 standardSubmit: false,
+	                success: function(form, action) {
+	               	 Ext.MessageBox.show({
+	 						title: 'Information',
+	 						msg: "Job Has Been Add!",
+	 						buttons: Ext.MessageBox.OK,
+	 						icon: Ext.MessageBox.INFO,
+	 						animateTarget: 'duplicate_job_ref',
+	 						fn: function(){
+	 							duplicateJobRef.hide();
+	 							store.jobs.reload();
+     							store.jobsRef.reload();
+	 						}
+	 					});
+	                   },
+	                   failure : function(form, action) {
+//							Ext.Msg.alert('Failed',
+//									action.result ? action.result.message
+//											: 'No response');
+	                   	Ext.MessageBox.show({
+			                    title: 'REMOTE EXCEPTION',
+			                    msg: operation.getError(),
+			                    icon: Ext.MessageBox.ERROR,
+			                    buttons: Ext.Msg.OK,
+			                    fn: function(){location.reload()}
+			                });
+						}
+	     			});
+	       	 }else {
+						Ext.MessageBox.show({
+							title: 'Failed',
+							msg: ' Please Insert All Required Field',
+							buttons: Ext.MessageBox.OK,
+							icon: Ext.MessageBox.ERROR,
+							animateTarget: 'duplicate_job_ref',
+						});
+					}
+			}
+		},{
+			text: 'Cancel',
+			width: 100,
+			handler: function(){
+				duplicateJobRef.hide();
+			}
+		}],
+		listeners: {
+			'beforehide': function(){
+				Ext.getCmp('duplicateJobRefForm').getForm().reset();
+			}
+		}
+	});
 	
 	addToExistInvoice = new Ext.create('Ext.window.Window', {
 		title: 'Add To Exist Invoice',

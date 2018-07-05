@@ -622,6 +622,61 @@ public class JobsController {
 		return new ModelAndView("jsonView", model);
 	}
 	
+	@RequestMapping(value="/duplicateJobReference")
+	public ModelAndView duplicateJobReference(HttpServletRequest request, HttpServletResponse response){
+		
+		int job_ref_id = Integer.parseInt(request.getParameter("dup_job_ref_id"));
+		String job_ref_name = request.getParameter("dup_job_ref_name");
+		String proj_ref_id = request.getParameter("dup_proj_ref_id");
+		String amount = request.getParameter("dup_amount");
+		Timestamp job_in_ts = null;
+		Timestamp job_out_ts = null;
+		
+		JobsReference jobRef = jobsDao.searchJobsReferenceByID(job_ref_id);
+		jobRef.setJob_ref_name(job_ref_name);
+		jobRef.setAmount(new BigDecimal(amount));
+		String job_in = jobRef.getJob_in();
+		String job_out = jobRef.getJob_out();
+		
+		if(!proj_ref_id.equals("Item Name")){
+			jobRef.setProj_ref_id(Integer.parseInt(proj_ref_id));
+		}else{
+			jobRef.setProj_ref_id(0);
+		}
+		
+		if(job_in != null){
+			try{
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			    Date parsedJobIn = dateFormat.parse(job_in);
+			    job_in_ts = new java.sql.Timestamp(parsedJobIn.getTime());
+			}catch(Exception e){
+				logger.error(e.getMessage());
+			}
+		}
+		
+		if(job_out != null){
+			try{
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+				Date parsedJobOut = dateFormat.parse(job_out);
+				job_out_ts = new java.sql.Timestamp(parsedJobOut.getTime());
+			}catch(Exception e){
+				logger.error(e.getMessage());
+			}
+		}
+		
+		jobRef.setJob_in_ts(job_in_ts);
+		jobRef.setJob_out_ts(job_out_ts);
+		
+		jobsDao.createJobReference(jobRef);
+		
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("success", true);
+		model.put("records", jobRef);
+		model.put("total", 1);
+		
+		return new ModelAndView("jsonView", model);
+	}
+	
 	@RequestMapping(value="/updateJobReference")
 	public ModelAndView updateJobReference(HttpServletRequest request, HttpServletResponse response){
 		
