@@ -329,7 +329,7 @@ Ext.onReady(function() {
 								success : function(form, action) {
 									Ext.MessageBox.show({
 										title : 'Information',
-										msg : 'Item Has Been Update!',
+										msg : 'Item Has Been Updated!',
 										buttons : Ext.MessageBox.OK,
 										icon : Ext.MessageBox.INFO,
 										animateTarget : 'ebtn',

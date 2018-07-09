@@ -844,7 +844,7 @@ editCustomer = new Ext.create('Ext.window.Window', {
 							success : function(form, action) {
 								Ext.MessageBox.show({
 									title : 'Information',
-									msg : 'Customer Has Been Update!',
+									msg : 'Customer Has Been Updated!',
 									buttons : Ext.MessageBox.OK,
 									icon : Ext.MessageBox.INFO,
 									animateTarget : 'ebtn',

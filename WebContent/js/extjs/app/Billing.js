@@ -3445,7 +3445,7 @@ Ext.onReady(function() {
 	                         success: function(form, action) {
 	                        	 Ext.MessageBox.show({
 	          						title: 'Information',
-	          						msg: "Job's Project Has Been Update!",
+	          						msg: "Job's Project Has Been Updated!",
 	          						buttons: Ext.MessageBox.OK,
 	          						icon: Ext.MessageBox.INFO,
 	          						animateTarget: 'ejob_btn',
@@ -4066,7 +4066,7 @@ Ext.onReady(function() {
 	                         success: function(form, action) {
 	                        	 Ext.MessageBox.show({
 	          						title: 'Information',
-	          						msg: 'Job Has Been Update!',
+	          						msg: 'Job Has Been Updated!',
 	          						buttons: Ext.MessageBox.OK,
 	          						icon: Ext.MessageBox.INFO,
 	          						animateTarget: 'ebtn',
@@ -4947,7 +4947,7 @@ store.jobsRef = Ext.create('Ext.data.JsonStore', {
             if(operation.action == 'update'){
             	Ext.MessageBox.show({
 						title: 'Information',
-						msg: 'Job Has Been Update!',
+						msg: 'Job Has Been Updated!',
 						buttons: Ext.MessageBox.OK,
 						icon: Ext.MessageBox.INFO,
 						animateTarget: 'isave-sync',
@@ -5001,7 +5001,7 @@ store.publicationJobRef = Ext.create('Ext.data.JsonStore', {
             if(operation.action == 'update'){
             	Ext.MessageBox.show({
 						title: 'Information',
-						msg: 'Job Has Been Update!',
+						msg: 'Job Has Been Updated!',
 						buttons: Ext.MessageBox.OK,
 						icon: Ext.MessageBox.INFO,
 						animateTarget: 'isave-syncPub',
@@ -5057,7 +5057,7 @@ store.estudioJobRef = Ext.create('Ext.data.JsonStore', {
             if(operation.action == 'update'){
             	Ext.MessageBox.show({
 						title: 'Information',
-						msg: 'Job Has Been Update!',
+						msg: 'Job Has Been Updated!',
 						buttons: Ext.MessageBox.OK,
 						icon: Ext.MessageBox.INFO,
 						animateTarget: 'isave-syncEstudio',
@@ -5113,7 +5113,7 @@ store.pilotJobRef = Ext.create('Ext.data.JsonStore', {
             if(operation.action == 'update'){
             	Ext.MessageBox.show({
 						title: 'Information',
-						msg: 'Job Has Been Update!',
+						msg: 'Job Has Been Updated!',
 						buttons: Ext.MessageBox.OK,
 						icon: Ext.MessageBox.INFO,
 						animateTarget: 'isave-syncPilot',

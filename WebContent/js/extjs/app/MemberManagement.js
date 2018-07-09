@@ -437,7 +437,7 @@ editMember = new Ext.create('Ext.window.Window', {
 	                 failure: function(form, action) {
 	                	 Ext.MessageBox.show({
 	  						title: 'Information',
-	  						msg: 'Member Has Been Update!',
+	  						msg: 'Member Has Been Updated!',
 	  						buttons: Ext.MessageBox.OK,
 	  						icon: Ext.MessageBox.INFO,
 	  						animateTarget: 'ebtn',

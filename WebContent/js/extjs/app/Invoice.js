@@ -1706,7 +1706,7 @@ Ext.onReady(function() {
 			                    success: function(form, action) {
 			                   	 Ext.MessageBox.show({
 			     						title: 'Information',
-			     						msg: 'Invoice Has Been Update!',
+			     						msg: 'Invoice Has Been Updated!',
 			     						buttons: Ext.MessageBox.OK,
 			     						icon: Ext.MessageBox.INFO,
 			     						animateTarget: 'updateInvoiceButton',
@@ -2023,7 +2023,7 @@ store.invoiceRef = Ext.create('Ext.data.JsonStore', {
             if(operation.action == 'update'){
             	Ext.MessageBox.show({
 						title: 'Information',
-						msg: 'Item Has Been Update!',
+						msg: 'Item Has Been Updated!',
 						buttons: Ext.MessageBox.OK,
 						icon: Ext.MessageBox.INFO,
 						animateTarget: 'invRefSync',
