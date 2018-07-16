@@ -244,7 +244,6 @@ Ext.onReady(function() {
 				inv_bill_date = new Date(Ext.getCmp('dinv_bill_date').getValue());
 				inv_bill_to = Ext.getCmp('dinv_bill_to').getValue();
 				inv_currency = Ext.getCmp('dinv_currency').getValue();
-				inv_discount = Ext.getCmp('dinv_discount').getValue();
 				
 				min_year = new Date(inv_delivery_date.getFullYear(), 0, 1);
 				max_year = new Date(inv_delivery_date.getFullYear()+1, 0, 0);
@@ -267,7 +266,6 @@ Ext.onReady(function() {
 //				Ext.getCmp('einv_bill_type').setValue(inv_bill_type);
 				Ext.getCmp('einv_bill_to').setValue(inv_bill_to);
 				Ext.getCmp('einv_currency').setValue(inv_currency);
-				Ext.getCmp('einv_discount').setValue(inv_discount);
 				editInvoice.show();
 			}
 		} ],
@@ -405,10 +403,6 @@ Ext.onReady(function() {
 				xtype: 'hidden',
 				name: 'dinv_bill_to',
 				id: 'dinv_bill_to'
-			},{
-				xtype: 'hidden',
-				name: 'dinv_discount',
-				id: 'dinv_discount'
 			}  ]
 		} ],
 		buttons: [{
@@ -1333,16 +1327,6 @@ Ext.onReady(function() {
 					msgTarget: 'under',
 					allowBlank: false
 				},{
-					xtype : 'numberfield',
-					fieldLabel : 'Discount(%) <font color="red">*</font> ',
-					name : 'ainv_discount',
-					id : 'ainv_discount',
-					labelWidth : 120,
-					value : 0,
-					minValue : 0,
-					msgTarget: 'under',
-					allowBlank: false
-				},{
 					xtype: 'combobox',
 					fieldLabel: 'Billing To <font color="red">*</font> ',
 					name: 'ainv_bill_to',
@@ -1657,16 +1641,6 @@ Ext.onReady(function() {
 					msgTarget: 'under',
 					allowBlank: false
 				},{
-					xtype : 'numberfield',
-					fieldLabel : 'Discount(%) <font color="red">*</font> ',
-					name : 'einv_discount',
-					id : 'einv_discount',
-					labelWidth : 120,
-					value : 0,
-					minValue : 0,
-					msgTarget: 'under',
-					allowBlank: false
-				},{
 					xtype: 'combobox',
 					fieldLabel: 'Billing To <font color="red">*</font> ',
 					name: 'einv_bill_to',
@@ -1915,9 +1889,6 @@ Ext.define('invoiceModel', {
 	},{
 		name: 'inv_bill_to',
 		type: 'string'
-	},{
-		name: 'inv_discount',
-		type: 'double'
 	}]
 });
 
@@ -2019,9 +1990,6 @@ Ext.define('invoiceRefModel', {
 		type: 'string'
 	},{
 		name: 'inv_currency',
-		type: 'string'
-	},{
-		name: 'inv_topix_id',
 		type: 'string'
 	}]
 });
@@ -2184,7 +2152,6 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				inv_number = grid.getStore().getAt(rowIndex).get('inv_number');
 				inv_bill_to = grid.getStore().getAt(rowIndex).get('inv_bill_to');
 				inv_currency = grid.getStore().getAt(rowIndex).get('inv_currency');
-				inv_discount = grid.getStore().getAt(rowIndex).get('inv_discount');
 				
 				Ext.getCmp('invid').setValue(inv_id);
 				Ext.getCmp('dinv_id').setValue(inv_id);
@@ -2203,7 +2170,6 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				Ext.getCmp('dinv_number').setValue(inv_number);
 				Ext.getCmp('dinv_bill_to').setValue(inv_bill_to);
 				Ext.getCmp('dinv_currency').setValue(inv_currency);
-				Ext.getCmp('dinv_discount').setValue(inv_discount);
 				
 				var aproj_id = Ext.getCmp('aproj_id');
 				aproj_id.clearValue();
@@ -2290,7 +2256,6 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 				inv_bill_date = grid.getStore().getAt(rowIndex).get('inv_bill_date');
 				inv_bill_to = grid.getStore().getAt(rowIndex).get('inv_bill_to');
 				inv_currency = grid.getStore().getAt(rowIndex).get('inv_currency');
-				inv_discount = grid.getStore().getAt(rowIndex).get('inv_discount');
 				
 				min_year = new Date(inv_delivery_date.getFullYear(), 0, 1);
 				max_year = new Date(inv_delivery_date.getFullYear()+1, 0, 0);
@@ -2314,7 +2279,6 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 //				Ext.getCmp('einv_bill_type').setValue(inv_bill_type);
 				Ext.getCmp('einv_bill_to').setValue(inv_bill_to);
 				Ext.getCmp('einv_currency').setValue(inv_currency);
-				Ext.getCmp('einv_discount').setValue(inv_discount);
 				editInvoice.show();
 			}
 		}]
@@ -2371,7 +2335,6 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 			inv_number = dv.getStore().getAt(index).get('inv_number');
 			inv_bill_to = dv.getStore().getAt(index).get('inv_bill_to');
 			inv_currency = dv.getStore().getAt(index).get('inv_currency');
-			inv_discount = dv.getStore().getAt(index).get('inv_discount');
 			
 			Ext.getCmp('invid').setValue(inv_id);
 			Ext.getCmp('dinv_id').setValue(inv_id);
@@ -2384,13 +2347,12 @@ grid.invoice = Ext.create('Ext.ux.LiveFilterGridPanel', {
 			Ext.getCmp('dcus_id').setValue(cus_id);
 			Ext.getCmp('dcus_name').setValue(cus_name);
 			Ext.getCmp('dcus_code').setValue(cus_code);
-			Ext.getCmp('dinv_payment_terms').setValue(inv_payment_terms + ' days net');
+			Ext.getCmp('dinv_payment_terms').setValue(inv_payment_terms);
 			Ext.getCmp('dinv_vat').setValue(inv_vat);
 			Ext.getCmp('dinv_bill_type').setValue(inv_bill_type);
 			Ext.getCmp('dinv_number').setValue(inv_number);
 			Ext.getCmp('dinv_bill_to').setValue(inv_bill_to);
 			Ext.getCmp('dinv_currency').setValue(inv_currency);
-			Ext.getCmp('dinv_discount').setValue(inv_discount);
 			
 			var aproj_id = Ext.getCmp('aproj_id');
 			aproj_id.clearValue();
@@ -2519,7 +2481,7 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 		},{
 			text : "Topix ID",
 			flex : 0.7,
-			dataIndex: 'inv_topix_id',
+			dataIndex: 'topix_article_id',
 			align : 'center'
 		},{
 			text : "Item Name",
@@ -2664,10 +2626,8 @@ grid.invoiceDetail = Ext.create('Ext.grid.Panel', {
 					
 					Ext.getCmp('einv_id_ref').setValue(inv_id);
 					Ext.getCmp('einv_ref_id').setValue(inv_ref_id);
-					if(proj_ref_id !== 0){
-						Ext.getCmp('eproj_id').setValue(proj_id);
-						Ext.getCmp('eproj_ref_id').setValue(proj_ref_id);
-					}
+					Ext.getCmp('eproj_id').setValue(proj_id);
+					Ext.getCmp('eproj_ref_id').setValue(proj_ref_id);
 					Ext.getCmp('einv_itm_name').setValue(inv_itm_name);
 					Ext.getCmp('einv_ref_price').setValue(inv_ref_price);
 					Ext.getCmp('einv_ref_qty').setValue(inv_ref_qty);
@@ -2937,7 +2897,6 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 							var myIndex = this.store.indexOf(record);
 							var price = this.store.getAt(myIndex).data.price;
 							var item = this.store.getAt(myIndex).data.itm_name;
-							var topix_id = this.store.getAt(myIndex).data.topix_article_id;
 							var currency = this.store.getAt(myIndex).data.proj_currency;
 							var inv_currency = Ext.getCmp('dinv_currency').getValue();
 							var new_price = 0;
@@ -2983,7 +2942,6 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 							Ext.getCmp('ainv_ref_price').setValue(new_price);
 //							Ext.getCmp('ainv_ref_currency').setValue(currency);
 							Ext.getCmp('ainv_itm_name').setValue(item);
-							Ext.getCmp('ainv_topix_id').setValue(topix_id);
 							console.log(item + " = " + price + " " + currency);
 						}
 				    }
@@ -3033,10 +2991,6 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 					xtype: 'hidden',
 					name: 'ainv_itm_name',
 					id: 'ainv_itm_name'
-				},{
-					xtype: 'hidden',
-					name: 'ainv_topix_id',
-					id: 'ainv_topix_id'
 				},{
 					xtype: 'hidden',
 					name: 'ainv_id',
@@ -3233,7 +3187,6 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 							var myIndex = this.store.indexOf(record);
 							var price = this.store.getAt(myIndex).data.price;
 							var item = this.store.getAt(myIndex).data.itm_name;
-							var topix_id = this.store.getAt(myIndex).data.topix_article_id;
 							var currency = this.store.getAt(myIndex).data.proj_currency;
 							var inv_currency = Ext.getCmp('dinv_currency').getValue();
 							var new_price = 0;
@@ -3278,7 +3231,6 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 							
 							Ext.getCmp('einv_ref_price').setValue(new_price);
 							Ext.getCmp('einv_itm_name').setValue(item);
-							Ext.getCmp('einv_topix_id').setValue(topix_id);
 							console.log(item + " = " + price + " " + currency);
 						}
 				    }
@@ -3328,10 +3280,6 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 					xtype: 'hidden',
 					name: 'einv_itm_name',
 					id: 'einv_itm_name'
-				},{
-					xtype: 'hidden',
-					name: 'einv_topix_id',
-					id: 'einv_topix_id'
 				},{
 					xtype: 'hidden',
 					name: 'einv_id_ref',

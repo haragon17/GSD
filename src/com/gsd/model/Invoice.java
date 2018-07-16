@@ -2,6 +2,7 @@ package com.gsd.model;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Invoice {
 
@@ -51,7 +52,6 @@ public class Invoice {
 	private BigDecimal total_price;
 	private String inv_bill_to;
 	private String inv_currency;
-	private BigDecimal inv_discount;
 	
 	public int getInv_id() {
 		return inv_id;
@@ -334,12 +334,6 @@ public class Invoice {
 	}
 	public void setInv_currency(String inv_currency) {
 		this.inv_currency = inv_currency;
-	}
-	public BigDecimal getInv_discount() {
-		return inv_discount;
-	}
-	public void setInv_discount(BigDecimal inv_discount) {
-		this.inv_discount = inv_discount;
 	}
 	
 }
