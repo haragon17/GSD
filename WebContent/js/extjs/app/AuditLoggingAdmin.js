@@ -148,6 +148,7 @@ Ext.onReady(function() {
 	        					myText = myText.replace(/, inv_ref_desc=/gi, "<br>Remark= ");
 	        					myText = myText.replace(/, tpx_cfg_id=/gi, "<br>Topix Server= ");
 	        					myText = myText.replace(/, tpx_cus_id=/gi, "<br>Customer ID= ");
+	        					myText = myText.replace(/, tpx_date=/gi, "<br>Topix Date= ");
 	        					myText = myText.replace(/, tpx_res_nr=/gi, "<br>Response Number= ");
 	        					myText = myText.replace(/, tpx_res_msg=/gi, "<br>Response Text= ");
 	        					myText = myText.replace(/, tpx_inv_number=/gi, "<br>Topix Number= ");

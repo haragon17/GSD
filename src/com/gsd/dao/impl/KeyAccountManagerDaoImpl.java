@@ -62,7 +62,7 @@ public class KeyAccountManagerDaoImpl extends JdbcDaoSupport implements KeyAccou
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
 		if(!keyAccMng_audit.getKey_acc_name().equals(keyAccMng.getKey_acc_name())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
 				getLastKeyAccId(),
 				keyAccMng.getKey_acc_id(),
@@ -89,7 +89,7 @@ public class KeyAccountManagerDaoImpl extends JdbcDaoSupport implements KeyAccou
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
-		String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+		String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
 			getLastKeyAccId(),
 			keyAccMng.getKey_acc_id(),
@@ -116,7 +116,7 @@ public class KeyAccountManagerDaoImpl extends JdbcDaoSupport implements KeyAccou
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
-		String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+		String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
 			getLastKeyAccId(),
 			keyAccMng.getKey_acc_id(),

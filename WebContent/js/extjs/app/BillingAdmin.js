@@ -4083,7 +4083,16 @@ Ext.onReady(function() {
 	            		sorters: [{
 	            			property: 'inv_company_id',
 	            			direction: 'ASC'
-	            		}]
+	            		}],
+	            		listeners: {
+	            			load: function(){
+	            				if(Ext.getCmp('ainv_company_id').store.count() > 8){
+	            					setTimeout(function(){
+	            						Ext.getCmp('ainv_company_id').getStore().removeAt(0);
+	            					},500);
+	            				}
+	            			}
+	            		}
 	            	},
 	            	valueField: 'inv_company_id',
 	            	displayField: 'inv_company_name'
@@ -4151,6 +4160,16 @@ Ext.onReady(function() {
 					fieldLabel : 'Vat(%) <font color="red">*</font> ',
 					name : 'ainv_vat',
 					id : 'ainv_vat',
+					labelWidth : 120,
+					value : 0,
+					minValue : 0,
+					msgTarget: 'under',
+					allowBlank: false
+				},{
+					xtype : 'numberfield',
+					fieldLabel : 'Discount(%) <font color="red">*</font> ',
+					name : 'ainv_discount',
+					id : 'ainv_discount',
 					labelWidth : 120,
 					value : 0,
 					minValue : 0,

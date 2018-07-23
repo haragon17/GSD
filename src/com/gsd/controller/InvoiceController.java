@@ -606,6 +606,7 @@ public class InvoiceController {
 		
 		List<Invoice> gsd_angebote = invoiceDao.showInvoiceMonthlyReport(yearInString, 1, "Angebote");
 		List<Invoice> tta_angebote = invoiceDao.showInvoiceMonthlyReport(yearInString, 7, "Angebote");
+		List<Invoice> gsda_angebote = invoiceDao.showInvoiceMonthlyReport(yearInString, 9, "Angebote");
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("gsd", gsd);
@@ -619,6 +620,7 @@ public class InvoiceController {
 		map.put("gsda", gsda);
 		map.put("gsd_angebote", gsd_angebote);
 		map.put("tta_angebote", tta_angebote);
+		map.put("gsda_angebote", gsda_angebote);
 		
 		return new ModelAndView("invoice_monthly-print", map);
 	}
@@ -736,7 +738,7 @@ public class InvoiceController {
 			for(int i=0; i<inv_refLs.size(); i++){
 				TopixReference tpx_ref = new TopixReference();
 				tpx_ref.setTpx_id(tpx_id);
-				tpx_ref.setTpx_article_id(inv_refLs.get(i).getTopix_article_id());
+				tpx_ref.setTpx_article_id(inv_refLs.get(i).getInv_topix_id());
 				tpx_ref.setTpx_ref_qty(inv_refLs.get(i).getInv_ref_qty());
 				invoiceDao.addTopixReference(tpx_ref);
 			}
@@ -844,7 +846,7 @@ public class InvoiceController {
 //	    positionsdaten_array.addChildElement("item0").setValue("POS\t07-0241\t0\t12");
 //	    positionsdaten_array.addChildElement("item1").setValue("POS\t07-0241\t0\t20");
         for(int i=0; i<inv_refLs.size(); i++){
-        	positionsdaten_array.addChildElement("item"+i).setValue("POS\t"+inv_refLs.get(i).getTopix_article_id()+"\t0\t"+inv_refLs.get(i).getInv_ref_qty().toString());
+        	positionsdaten_array.addChildElement("item"+i).setValue("POS\t"+inv_refLs.get(i).getInv_topix_id()+"\t0\t"+inv_refLs.get(i).getInv_ref_qty().toString());
         }
         SOAPElement kdlf_nr_als_id = root.addChildElement("KDLF_NR_ALS_ID");
         kdlf_nr_als_id.setAttribute("xsi:type", "xsd:string");

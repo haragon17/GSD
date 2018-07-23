@@ -21,6 +21,7 @@ public class ProjectsReference {
 	private float actual_time;
 	private String topix_article_id;
 	private String proj_currency;
+	private int activated;
 	
 	public int getProj_ref_id() {
 		return proj_ref_id;
@@ -123,6 +124,12 @@ public class ProjectsReference {
 	}
 	public void setProj_currency(String proj_currency) {
 		this.proj_currency = proj_currency;
+	}
+	public int getActivated() {
+		return activated;
+	}
+	public void setActivated(int activated) {
+		this.activated = activated;
 	}
 	
 }

@@ -801,38 +801,74 @@ Ext.onReady(function() {
 //		            				alert(rec.data.proj_id);
 //		            				alert(rec.data.actual_time);
 		            				
-		            				if(rec.data.actual_time == 0){
-		            					actual_time = '<td bgcolor=#FE7575>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td>';
-		            				}else if((rec.data.actual_time - rec.data.time) > 0){
-		            					actual_time = '<td bgcolor=#FE7575>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td>';
+		            				if(rec.data.activated == 0){
+			            				if(rec.data.actual_time == 0){
+			            					actual_time = '<td bgcolor=#FE7575><strike>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></strike></td>';
+			            				}else if((rec.data.actual_time - rec.data.time) > 0){
+			            					actual_time = '<td bgcolor=#FE7575><strike>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></strike></td>';
+			            				}else{
+			            					actual_time = '<td bgcolor=#F0F0F0><strike>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></strike></td>';
+			            				}
+			            				if(rec.data.time == 0){
+			            					target_time = '<td bgcolor=#FE7575><strike>Target Time: <b>'+(Math.round(rec.data.time*100)/100)+'</b></strike></td>';
+			            				}else{
+			            					target_time = '<td bgcolor=#F0F0F0><strike>Target Time: <b>'+(Math.round(rec.data.time*100)/100)+'</b></strike></td>';
+			            				}
+			            				if(rec.data.topix_article_id == "" || rec.data.topix_article_id == null){
+			            					topix_id = "-";
+			            				}else{
+			            					topix_id = rec.data.topix_article_id;
+			            				}
+		            					myText += '<td bgcolor=#F0F0F0><strike>Topix ID: <b>'+topix_id+'</b></strike></td>'+ 
+			            				'<td bgcolor=#F0F0F0><strike>Item: <b>'+rec.data.itm_name+'</b></strike></td>'+
+	//		            				 '<td bgcolor=#F0F0F0>Target Time: <b>'+rec.data.time+'</b></td>'+
+			            				 target_time+
+	//		            				 '<td bgcolor=#F0F0F0>Actual Time: <b>'+rec.data.actual_time+'</b></td>'+
+			            				 actual_time+
+			            				 '<td bgcolor=#F0F0F0><strike>Price: <b>'+(Math.round(rec.data.price*100)/100)+' '+proj_currency+'</b></strike></td>'+
+			            				 '<td bgcolor=#F0F0F0><strike>Price(Euro): <b>'+myEuro+'</strike></b></td>'+
+			            				 '<td bgcolor=#F0F0F0><strike>Description: <b>'+myDesc+'</strike></b></td>'+
+			            				 '<td><a href="javascript:editItemFunction('+myIndex+');"><font color=#B0B0B0><u>edit</u></font></a></td>';
+	//		            				 '<td><a href="javascript:contactBilling();"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+			            				if(userDept == "Manager" || userDept == "Billing" || userDept == "IT"){
+			            					myText += '<td><a href="javascript:deleteItem('+rec.data.proj_ref_id+');"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+			            				}else{
+			            					myText += '<td><a href="javascript:contactBilling();"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+			            				}
 		            				}else{
-		            					actual_time = '<td bgcolor=#F0F0F0>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td>';
-		            				}
-		            				if(rec.data.time == 0){
-		            					target_time = '<td bgcolor=#FE7575>Target Time: <b>'+(Math.round(rec.data.time*100)/100)+'</b></td>';
-		            				}else{
-		            					target_time = '<td bgcolor=#F0F0F0>Target Time: <b>'+(Math.round(rec.data.time*100)/100)+'</b></td>';
-		            				}
-		            				if(rec.data.topix_article_id == "" || rec.data.topix_article_id == null){
-		            					topix_id = "-";
-		            				}else{
-		            					topix_id = rec.data.topix_article_id;
-		            				}
-		            				myText += '<tr><td bgcolor=#F0F0F0>Topix ID: <b>'+topix_id+'</b></td>'+ 
-		            				'<td bgcolor=#F0F0F0>Item: <b>'+rec.data.itm_name+'</b></td>'+
-//		            				 '<td bgcolor=#F0F0F0>Target Time: <b>'+rec.data.time+'</b></td>'+
-		            				 target_time+
-//		            				 '<td bgcolor=#F0F0F0>Actual Time: <b>'+rec.data.actual_time+'</b></td>'+
-		            				 actual_time+
-		            				 '<td bgcolor=#F0F0F0>Price: <b>'+(Math.round(rec.data.price*100)/100)+' '+proj_currency+'</b></td>'+
-		            				 '<td bgcolor=#F0F0F0>Price(Euro): <b>'+myEuro+'</b></td>'+
-		            				 '<td bgcolor=#F0F0F0>Description: <b>'+myDesc+'</b></td>'+
-		            				 '<td><a href="javascript:editItemFunction('+myIndex+');"><font color=#B0B0B0><u>edit</u></font></a></td>';
-//		            				 '<td><a href="javascript:contactBilling();"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
-		            				if(userDept == "Manager" || userDept == "Billing" || userDept == "IT"){
-		            					myText += '<td><a href="javascript:deleteItem('+rec.data.proj_ref_id+');"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
-		            				}else{
-		            					myText += '<td><a href="javascript:contactBilling();"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+		            					if(rec.data.actual_time == 0){
+			            					actual_time = '<td bgcolor=#FE7575>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td>';
+			            				}else if((rec.data.actual_time - rec.data.time) > 0){
+			            					actual_time = '<td bgcolor=#FE7575>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td>';
+			            				}else{
+			            					actual_time = '<td bgcolor=#F0F0F0>Actual Time: <b>'+(Math.round(rec.data.actual_time*100)/100)+'</b></td>';
+			            				}
+			            				if(rec.data.time == 0){
+			            					target_time = '<td bgcolor=#FE7575>Target Time: <b>'+(Math.round(rec.data.time*100)/100)+'</b></td>';
+			            				}else{
+			            					target_time = '<td bgcolor=#F0F0F0>Target Time: <b>'+(Math.round(rec.data.time*100)/100)+'</b></td>';
+			            				}
+			            				if(rec.data.topix_article_id == "" || rec.data.topix_article_id == null){
+			            					topix_id = "-";
+			            				}else{
+			            					topix_id = rec.data.topix_article_id;
+			            				}
+			            				myText += '<td bgcolor=#F0F0F0>Topix ID: <b>'+topix_id+'</b></td>'+ 
+			            				'<td bgcolor=#F0F0F0>Item: <b>'+rec.data.itm_name+'</b></td>'+
+	//		            				 '<td bgcolor=#F0F0F0>Target Time: <b>'+rec.data.time+'</b></td>'+
+			            				 target_time+
+	//		            				 '<td bgcolor=#F0F0F0>Actual Time: <b>'+rec.data.actual_time+'</b></td>'+
+			            				 actual_time+
+			            				 '<td bgcolor=#F0F0F0>Price: <b>'+(Math.round(rec.data.price*100)/100)+' '+proj_currency+'</b></td>'+
+			            				 '<td bgcolor=#F0F0F0>Price(Euro): <b>'+myEuro+'</b></td>'+
+			            				 '<td bgcolor=#F0F0F0>Description: <b>'+myDesc+'</b></td>'+
+			            				 '<td><a href="javascript:editItemFunction('+myIndex+');"><font color=#B0B0B0><u>edit</u></font></a></td>';
+	//		            				 '<td><a href="javascript:contactBilling();"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+			            				if(userDept == "Manager" || userDept == "Billing" || userDept == "IT"){
+			            					myText += '<td><a href="javascript:deleteItem('+rec.data.proj_ref_id+');"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+			            				}else{
+			            					myText += '<td><a href="javascript:contactBilling();"><font color=#B0B0B0><u>delete</u></font></a></td></tr>';
+			            				}
 		            				}
 		            				 
 		            			}
@@ -917,6 +953,9 @@ Ext.define('projRefModel', {
 	}, {
 		name : 'topix_article_id',
 		type : 'string'
+	}, {
+		name : 'activated',
+		type : 'int'
 	}
 
 	]
@@ -1484,6 +1523,22 @@ addItem = new Ext.create('Ext.window.Window', {
     	    	name: 'atopix_article_id',
     	    	id: 'atopix_article_id',
     	    	emptyText: 'Article ID(Topix)'
+    	    },{
+    	    	xtype:'radiogroup',
+    	    	labelWidth: 120,
+    	    	fieldLabel: 'Activated ',
+    	    	name: 'aproj_ref_activated',
+    	    	id: 'aproj_ref_activated',
+    	    	items: [{
+                    inputValue: '1',
+                    boxLabel: 'Yes',
+                    name: 'aproj_ref_activated',
+                    checked: true
+                }, {
+                    inputValue: '0',
+                    boxLabel: 'No',
+                    name: 'aproj_ref_activated'
+                }]
     	    }]
             },{
 				xtype : 'hidden',
@@ -2106,6 +2161,22 @@ editItem = new Ext.create('Ext.window.Window', {
     	    	name: 'etopix_article_id',
     	    	id: 'etopix_article_id',
     	    	emptyText: 'Article ID(Topix)'
+    	    },{
+    	    	xtype:'radiogroup',
+    	    	labelWidth: 120,
+    	    	fieldLabel: 'Activated ',
+    	    	name: 'eproj_ref_activated',
+    	    	id: 'eproj_ref_activated',
+    	    	items: [{
+                    inputValue: '1',
+                    boxLabel: 'Yes',
+                    name: 'eproj_ref_activated',
+                    checked: true
+                }, {
+                    inputValue: '0',
+                    boxLabel: 'No',
+                    name: 'eproj_ref_activated'
+                }]
     	    }]
             },{
 				xtype : 'hidden',
@@ -2146,7 +2217,8 @@ editItem = new Ext.create('Ext.window.Window', {
 //												: 'No response');
 								Ext.MessageBox.show({
 				                    title: 'REMOTE EXCEPTION',
-				                    msg: operation.getError(),
+				                    msg: action.result ? action.result.message
+											: 'No response',
 				                    icon: Ext.MessageBox.ERROR,
 				                    buttons: Ext.Msg.OK,
 				                    fn: function(){location.reload()}
@@ -2187,6 +2259,7 @@ function editItemFunction(v){
 	Ext.getCmp('eproj_ref_desc').setValue(myData.data.proj_ref_desc);
 	Ext.getCmp('eproj_ref_id').setValue(myData.data.proj_ref_id);
 	Ext.getCmp('etopix_article_id').setValue(myData.data.topix_article_id);
+	Ext.getCmp('eproj_ref_activated').setValue({eproj_ref_activated:myData.data.activated});
 	editItem.show();
 }
 

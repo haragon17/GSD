@@ -759,12 +759,14 @@ public class ProjectsController {
 //		String currency = request.getParameter("acurrency");
 		String proj_ref_desc = request.getParameter("aproj_ref_desc");
 		String topix_article_id = request.getParameter("atopix_article_id");
+		int activated = Integer.parseInt(request.getParameter("aproj_ref_activated"));
 		
 		ProjectsReference projRef = new ProjectsReference();
 		projRef.setProj_ref_id(projectsDao.getLastProjectRefId());
 		projRef.setProj_id(proj_id);
 		projRef.setItm_id(itm_id);
 		projRef.setCurrency("");
+		projRef.setActivated(activated);
 		
 		if (!time.equals("Time in minutes")) {
 			projRef.setTime(Float.parseFloat(time));
@@ -817,11 +819,13 @@ public class ProjectsController {
 //		String currency = request.getParameter("ecurrency");
 		String proj_ref_desc = request.getParameter("eproj_ref_desc");
 		String topix_article_id = request.getParameter("etopix_article_id");
+		int activated = Integer.parseInt(request.getParameter("eproj_ref_activated"));
 		
 		ProjectsReference projRef = new ProjectsReference();
 		projRef.setProj_ref_id(proj_ref_id);
 		projRef.setItm_id(itm_id);
 		projRef.setCurrency("");
+		projRef.setActivated(activated);
 		
 		if (!time.equals("Time in minutes")) {
 			projRef.setTime(Float.parseFloat(time));

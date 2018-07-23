@@ -80,7 +80,7 @@ public class PrintInvoice_iText {
         String head = "";
         String tail = "";
         String addr1 = "74/6-9 Moo 2, Tambon Wichit, Amphoe Muang, Phuket 83000, Thailand";
-        String addr2 = "Phone: +66 76 21 84 45   E-Mail: info@gsd-digital.com";
+        String addr2 = "Phone: +66 76 24 81 00   E-Mail: info@gsd-digital.com";
         if(inv.getInv_company_id() == 1){
 	        head = "gs";
 	        tail = "d graphic solution digital Co., Ltd";

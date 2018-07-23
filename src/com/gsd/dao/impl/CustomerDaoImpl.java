@@ -95,9 +95,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
 		if(cus_audit.getTopix_cus_id().equals(cus.getTopix_cus_id())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
@@ -111,9 +110,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		
 		if(cus.getRegist_date_ts() != null){
 			if(!cus.getRegist_date_ts().toString().contains(((cus_audit.getRegist_date() == null) ? "no" : cus_audit.getRegist_date()))){
-				String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+				String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 				this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
 						cus.getCus_id(),
 						"Customer",
 						user.getUserModel().getUsr_name(),
@@ -126,9 +124,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 			}
 		}else{
 			if(cus_audit.getRegist_date() != null){
-				String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+				String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 				this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
 						cus.getCus_id(),
 						"Customer",
 						user.getUserModel().getUsr_name(),
@@ -142,9 +139,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getTransfer_dtl().equals(cus.getTransfer_dtl())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
@@ -157,9 +153,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getBilling_terms().equals(cus.getBilling_terms())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
@@ -172,9 +167,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getBill_to().equals(cus.getBill_to())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
@@ -187,9 +181,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getCus_phone().equals(cus.getCus_phone())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
@@ -202,9 +195,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getCus_fax().equals(cus.getCus_fax())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
@@ -217,9 +209,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getCus_email().equals(cus.getCus_email())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
@@ -232,9 +223,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getContact_person().equals(cus.getContact_person())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
@@ -247,9 +237,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getAddress().equals(cus.getAddress())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
@@ -262,9 +251,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(cus_audit.getKey_acc_id() != cus.getKey_acc_id()){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
@@ -277,9 +265,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getCus_code().equals(cus.getCus_code())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
@@ -292,9 +279,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		}
 		
 		if(!cus_audit.getCus_name().equals(cus.getCus_name())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					cus.getCus_id(),
 					"Customer",
 					user.getUserModel().getUsr_name(),
@@ -354,9 +340,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		KeyAccountManager key_acc = new KeyAccountManager();
 		key_acc = getJdbcTemplate().queryForObject("select * from key_account_mng where key_acc_id ="+cus.getKey_acc_id(), new BeanPropertyRowMapper<KeyAccountManager>(KeyAccountManager.class));
 		
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
 				cus.getCus_id(),
 				"Customer",
 				user.getUserModel().getUsr_name(),
@@ -380,9 +365,8 @@ public class CustomerDaoImpl extends JdbcDaoSupport implements CustomerDao {
 		getJdbcTemplate().update(sql);
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
 				id,
 				"Customer",
 				user.getUserModel().getUsr_name(),

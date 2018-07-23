@@ -37,7 +37,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		String sql = "SELECT inv.inv_id, inv_number, inv_name, inv.inv_company_id, inv_proj_no, inv_bill_date, inv_delivery_date, inv_currency, inv_bill_to, "+
 				"inv_payment_terms, inv_vat, inv_discount, inv_bill_type, inv.cus_id, inv.cretd_usr, inv_comp.inv_company_name, inv_comp.inv_company_code, "+
 				"cus.cus_name, cus.cus_code, users.usr_name, topix_cus_id,\n"+
-				"CASE WHEN x.total_inv_price IS NULL THEN 0 ELSE x.total_inv_price END,\n"+
+				"CASE WHEN x.total_inv_price IS NULL THEN 0 ELSE ROUND((x.total_inv_price-ROUND((x.total_inv_price*inv_discount/100),2))*((inv_vat/100)+1),2) END AS total_inv_price,\n"+
 //				"CASE WHEN x.inv_ref_currency IS NULL THEN '' ELSE x.inv_ref_currency END,\n"+
 				"CASE WHEN y.count_tpx IS NULL THEN 0 ELSE y.count_tpx END\n"+
 				"FROM invoice inv\n"+
@@ -46,7 +46,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				"LEFT JOIN users ON users.usr_id = inv.cretd_usr\n"+
 				"LEFT JOIN (select inv_id, sum(inv_ref_price*inv_ref_qty) as total_inv_price from invoice_reference group by inv_id) x on x.inv_id = inv.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, count(*) AS count_tpx FROM invoice_reference inv_ref LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = inv_ref.proj_ref_id WHERE topix_article_id = '' GROUP BY inv_id) y on y.inv_id = inv.inv_id\n"+
-				"WHERE inv.inv_id != 0\n";				
+				"WHERE inv.inv_id != 0\n";
 				
 		if(data.get("inv_proj_no")==null || data.get("inv_proj_no").isEmpty()){
 		}else{
@@ -201,9 +201,9 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yy");
 		String delivery_date = dateFormat.format(parsed_delivery_date);
 		
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				inv_audit.getInv_id(),
 				"Invoice",
 				user.getUserModel().getUsr_name(),
@@ -268,9 +268,9 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		int inv_ref_id = getLastInvoiceReferenceIdByInvoiceId(inv_ref.getInv_id());
 		
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				inv_ref_id,
 				"Invoice Reference:"+inv.getInv_id(),
 				user.getUserModel().getUsr_name(),
@@ -332,9 +332,9 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				this.getJdbcTemplate().update(sql_price);
 			}
 			
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				inv_new.getInv_id(),
 				"Invoice",
 				user.getUserModel().getUsr_name(),
@@ -347,9 +347,9 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		}
 		
 		if(!inv_audit.getInv_bill_to().equals(inv_new.getInv_bill_to())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				inv_new.getInv_id(),
 				"Invoice",
 				user.getUserModel().getUsr_name(),
@@ -366,9 +366,9 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 //				Date parsed_delivery_date = inv_new.getInv_delivery_date_sql();
 //				SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yy");
 //				String delivery_date = dateFormat.format(parsed_delivery_date);
-//				String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+//				String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 //				this.getJdbcTemplate().update(audit, new Object[]{
-//					getLastAuditId(),
+//					
 //					inv_new.getInv_id(),
 //					"Invoice",
 //					user.getUserModel().getUsr_name(),
@@ -395,9 +395,9 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 			String month_audit = inv_audit.getInv_delivery_date().substring(5, 7);		
 			String delivery_date_audit = month_audit+"/"+year_audit;
 			
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				inv_new.getInv_id(),
 				"Invoice",
 				user.getUserModel().getUsr_name(),
@@ -410,9 +410,9 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		}
 		
 		if(inv_audit.getCus_id() != inv_new.getCus_id()){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				inv_new.getInv_id(),
 				"Invoice",
 				user.getUserModel().getUsr_name(),
@@ -426,9 +426,8 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 			String del_item = "DELETE FROM invoice_reference WHERE inv_id="+inv_new.getInv_id();
 			this.getJdbcTemplate().update(del_item);
 			
-			String audit_del = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+			String audit_del = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 			this.getJdbcTemplate().update(audit_del, new Object[]{
-					getLastAuditId(),
 					inv_new.getInv_id(),
 					"Invoice",
 					user.getUserModel().getUsr_name(),
@@ -441,9 +440,9 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		}
 		
 		if(!inv_audit.getInv_bill_type().equals(inv_new.getInv_bill_type())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				inv_new.getInv_id(),
 				"Invoice",
 				user.getUserModel().getUsr_name(),
@@ -457,26 +456,28 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		
 if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 			
-//			List<InvoiceReference> inv_refLs = searchInvoiceReference(inv.getInv_id());
-//			BigDecimal total_price = BigDecimal.ZERO;
-//			for(int i=0; i<inv_refLs.size(); i++){
-//				BigDecimal price = inv_refLs.get(i).getInv_ref_price().multiply(inv_refLs.get(i).getInv_ref_qty());
-//				float vat = (inv.getInv_vat().floatValue() / 100)+1;
-//				price = price.multiply(new BigDecimal(vat));
-//				total_price = total_price.add(price);
-//			}
-//			String currency = inv_new.getInv_currency();
-//			if(!currency.equals("EUR")){
-//				float total_eur = total_price.floatValue() / map.get(currency);
-//				total_price = new BigDecimal(total_eur);
-//			}
-//			
-//			String sql_total = "UPDATE invoice SET inv_total_price_eur="+String.format("%.2f", total_price)+" WHERE inv_id="+inv.getInv_id();
-//			this.getJdbcTemplate().update(sql_total);
+			List<InvoiceReference> inv_refLs = searchInvoiceReference(inv.getInv_id());
+			BigDecimal total_price = BigDecimal.ZERO;
+			for(int i=0; i<inv_refLs.size(); i++){
+				BigDecimal price = inv_refLs.get(i).getInv_ref_price().multiply(inv_refLs.get(i).getInv_ref_qty());
+				total_price = total_price.add(price);
+			}
+			float discount = 1 - (inv.getInv_discount().floatValue() / 100);
+			total_price = total_price.multiply(new BigDecimal(discount));
+			float vat = (inv.getInv_vat().floatValue() / 100)+1;
+			total_price = total_price.multiply(new BigDecimal(vat));
+			String currency = inv_new.getInv_currency();
+			if(!currency.equals("EUR")){
+				float total_eur = total_price.floatValue() / map.get(currency);
+				total_price = new BigDecimal(total_eur);
+			}
 			
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String sql_total = "UPDATE invoice SET inv_total_price_eur="+String.format("%.2f", total_price)+" WHERE inv_id="+inv.getInv_id();
+			this.getJdbcTemplate().update(sql_total);
+			
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				inv_new.getInv_id(),
 				"Invoice",
 				user.getUserModel().getUsr_name(),
@@ -494,10 +495,12 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 			BigDecimal total_price = BigDecimal.ZERO;
 			for(int i=0; i<inv_refLs.size(); i++){
 				BigDecimal price = inv_refLs.get(i).getInv_ref_price().multiply(inv_refLs.get(i).getInv_ref_qty());
-				float vat = (inv.getInv_vat().floatValue() / 100)+1;
-				price = price.multiply(new BigDecimal(vat));
 				total_price = total_price.add(price);
 			}
+			float discount = 1 - (inv.getInv_discount().floatValue() / 100);
+			total_price = total_price.multiply(new BigDecimal(discount));
+			float vat = (inv.getInv_vat().floatValue() / 100)+1;
+			total_price = total_price.multiply(new BigDecimal(vat));
 			String currency = inv_new.getInv_currency();
 			if(currency.equals("EUR")){
 //				System.out.println(String.format("%.2f", total_price)+" EUR");
@@ -511,9 +514,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 			String sql_total = "UPDATE invoice SET inv_total_price_eur="+String.format("%.2f", total_price)+" WHERE inv_id="+inv.getInv_id();
 			this.getJdbcTemplate().update(sql_total);
 			
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				inv_new.getInv_id(),
 				"Invoice",
 				user.getUserModel().getUsr_name(),
@@ -526,9 +529,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		}
 		
 		if(inv_audit.getInv_payment_terms() != inv_new.getInv_payment_terms()){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				inv_new.getInv_id(),
 				"Invoice",
 				user.getUserModel().getUsr_name(),
@@ -541,9 +544,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		}
 		
 		if(!inv_audit.getInv_proj_no().equals(inv_new.getInv_proj_no())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				inv_new.getInv_id(),
 				"Invoice",
 				user.getUserModel().getUsr_name(),
@@ -556,9 +559,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		}
 		
 		if(!inv_audit.getInv_name().equals(inv_new.getInv_name())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				inv_new.getInv_id(),
 				"Invoice",
 				user.getUserModel().getUsr_name(),
@@ -629,9 +632,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		InvoiceReference invRef_new = getInvoiceReferenceById(inv_ref.getInv_ref_id());
 		
 		if(!inv_ref_audit.getInv_topix_id().equals(invRef_new.getInv_topix_id())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				invRef_new.getInv_ref_id(),
 				"Invoice Reference:"+invRef_new.getInv_id(),
 				user.getUserModel().getUsr_name(),
@@ -644,9 +647,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		}
 		
 		if(!inv_ref_audit.getInv_ref_desc().equals(invRef_new.getInv_ref_desc())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				invRef_new.getInv_ref_id(),
 				"Invoice Reference:"+invRef_new.getInv_id(),
 				user.getUserModel().getUsr_name(),
@@ -659,9 +662,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		}
 		
 		if(inv_ref_audit.getInv_ref_qty().compareTo(invRef_new.getInv_ref_qty()) != 0){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				invRef_new.getInv_ref_id(),
 				"Invoice Reference:"+invRef_new.getInv_id(),
 				user.getUserModel().getUsr_name(),
@@ -674,9 +677,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		}
 		
 		if(inv_ref_audit.getInv_ref_price().compareTo(invRef_new.getInv_ref_price()) != 0){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				invRef_new.getInv_ref_id(),
 				"Invoice Reference:"+invRef_new.getInv_id(),
 				user.getUserModel().getUsr_name(),
@@ -689,9 +692,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		}
 		
 		if(inv_ref_audit.getProj_ref_id() != invRef_new.getProj_ref_id()){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				invRef_new.getInv_ref_id(),
 				"Invoice Reference:"+invRef_new.getInv_id(),
 				user.getUserModel().getUsr_name(),
@@ -786,9 +789,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 				InvoiceReference invRef_new = getInvoiceReferenceById(invRefLs.get(y).getInv_ref_id());
 				
 				if(!invRefLs_audit.get(y).getInv_topix_id().equals(invRef_new.getInv_topix_id())){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						invRef_new.getInv_ref_id(),
 						"Invoice Reference:"+invRef_new.getInv_id(),
 						user.getUserModel().getUsr_name(),
@@ -801,9 +804,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 				}
 				
 				if(!invRefLs_audit.get(y).getInv_ref_desc().equals(invRef_new.getInv_ref_desc())){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						invRef_new.getInv_ref_id(),
 						"Invoice Reference:"+invRef_new.getInv_id(),
 						user.getUserModel().getUsr_name(),
@@ -816,9 +819,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 				}
 				
 				if(invRefLs_audit.get(y).getInv_ref_qty().compareTo(invRef_new.getInv_ref_qty()) != 0){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						invRef_new.getInv_ref_id(),
 						"Invoice Reference:"+invRef_new.getInv_id(),
 						user.getUserModel().getUsr_name(),
@@ -831,9 +834,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 				}
 				
 				if(invRefLs_audit.get(y).getInv_ref_price().compareTo(invRef_new.getInv_ref_price()) != 0){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						invRef_new.getInv_ref_id(),
 						"Invoice Reference:"+invRef_new.getInv_id(),
 						user.getUserModel().getUsr_name(),
@@ -846,9 +849,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 				}
 				
 				if(invRefLs_audit.get(y).getProj_ref_id() != invRef_new.getProj_ref_id()){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						invRef_new.getInv_ref_id(),
 						"Invoice Reference:"+invRef_new.getInv_id(),
 						user.getUserModel().getUsr_name(),
@@ -999,9 +1002,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		this.getJdbcTemplate().update(sql);
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				id,
 				"Invoice",
 				user.getUserModel().getUsr_name(),
@@ -1020,9 +1023,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		this.getJdbcTemplate().update(sql);
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				id,
 				"Invoice Reference:"+inv_ref_audit.getInv_id(),
 				user.getUserModel().getUsr_name(),
@@ -1035,61 +1038,207 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 	@Override
 	public List<Invoice> showInvoiceMonthlyReport(String year, int inv_company_id, String inv_bill_type){
 		
-		String sql = "SELECT cus_name,\n"+
-				"CASE WHEN sum(jan.sum_price) IS NULL THEN 0 ELSE sum(jan.sum_price) END AS jan,\n"+
-				"CASE WHEN sum(feb.sum_price) IS NULL THEN 0 ELSE sum(feb.sum_price) END AS feb,\n"+
-				"CASE WHEN sum(mar.sum_price) IS NULL THEN 0 ELSE sum(mar.sum_price) END AS mar,\n"+
-				"CASE WHEN sum(apr.sum_price) IS NULL THEN 0 ELSE sum(apr.sum_price) END AS apr,\n"+
-				"CASE WHEN sum(may.sum_price) IS NULL THEN 0 ELSE sum(may.sum_price) END AS may,\n"+
-				"CASE WHEN sum(jun.sum_price) IS NULL THEN 0 ELSE sum(jun.sum_price) END AS jun,\n"+
-				"CASE WHEN sum(jul.sum_price) IS NULL THEN 0 ELSE sum(jul.sum_price) END AS jul,\n"+
-				"CASE WHEN sum(aug.sum_price) IS NULL THEN 0 ELSE sum(aug.sum_price) END AS aug,\n"+
-				"CASE WHEN sum(sep.sum_price) IS NULL THEN 0 ELSE sum(sep.sum_price) END AS sep,\n"+
-				"CASE WHEN sum(oct.sum_price) IS NULL THEN 0 ELSE sum(oct.sum_price) END AS oct,\n"+
-				"CASE WHEN sum(nov.sum_price) IS NULL THEN 0 ELSE sum(nov.sum_price) END AS nov,\n"+
-				"CASE WHEN sum(dec.sum_price) IS NULL THEN 0 ELSE sum(dec.sum_price) END AS dec\n"+
-				"FROM invoice\n"+
-				"LEFT JOIN customer cus ON cus.cus_id = invoice.cus_id\n"+
-				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'1\' \n"+
-				"GROUP BY inv_id) jan ON jan.inv_id = invoice.inv_id\n"+
-				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'2\' \n"+
-				"GROUP BY inv_id) feb ON feb.inv_id = invoice.inv_id\n"+
-				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'3\' \n"+
-				"GROUP BY inv_id) mar ON mar.inv_id = invoice.inv_id\n"+
-				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'4\' \n"+
-				"GROUP BY inv_id) apr ON apr.inv_id = invoice.inv_id\n"+
-				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'5\' \n"+
-				"GROUP BY inv_id) may ON may.inv_id = invoice.inv_id\n"+
-				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'6\' \n"+
-				"GROUP BY inv_id) jun ON jun.inv_id = invoice.inv_id\n"+
-				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'7\' \n"+
-				"GROUP BY inv_id) jul ON jul.inv_id = invoice.inv_id\n"+
-				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'8\' \n"+
-				"GROUP BY inv_id) aug ON aug.inv_id = invoice.inv_id\n"+
-				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'9\' \n"+
-				"GROUP BY inv_id) sep ON sep.inv_id = invoice.inv_id\n"+
-				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'10\' \n"+
-				"GROUP BY inv_id) oct ON oct.inv_id = invoice.inv_id\n"+
-				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'11\' \n"+
-				"GROUP BY inv_id) nov ON nov.inv_id = invoice.inv_id\n"+
-				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
-				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'12\' \n"+
-				"GROUP BY inv_id) dec ON dec.inv_id = invoice.inv_id\n"+
-				"WHERE inv_company_id = "+inv_company_id+"\n"+
-				"AND inv_bill_type = '"+inv_bill_type+"'\n"+
-				"GROUP BY cus_name\n"+
-				"ORDER BY cus_name ASC";
+//		String sql = "SELECT cus_name,\n"+
+//				"CASE WHEN sum(jan.sum_price) IS NULL THEN 0 ELSE sum(jan.sum_price) END AS jan,\n"+
+//				"CASE WHEN sum(feb.sum_price) IS NULL THEN 0 ELSE sum(feb.sum_price) END AS feb,\n"+
+//				"CASE WHEN sum(mar.sum_price) IS NULL THEN 0 ELSE sum(mar.sum_price) END AS mar,\n"+
+//				"CASE WHEN sum(apr.sum_price) IS NULL THEN 0 ELSE sum(apr.sum_price) END AS apr,\n"+
+//				"CASE WHEN sum(may.sum_price) IS NULL THEN 0 ELSE sum(may.sum_price) END AS may,\n"+
+//				"CASE WHEN sum(jun.sum_price) IS NULL THEN 0 ELSE sum(jun.sum_price) END AS jun,\n"+
+//				"CASE WHEN sum(jul.sum_price) IS NULL THEN 0 ELSE sum(jul.sum_price) END AS jul,\n"+
+//				"CASE WHEN sum(aug.sum_price) IS NULL THEN 0 ELSE sum(aug.sum_price) END AS aug,\n"+
+//				"CASE WHEN sum(sep.sum_price) IS NULL THEN 0 ELSE sum(sep.sum_price) END AS sep,\n"+
+//				"CASE WHEN sum(oct.sum_price) IS NULL THEN 0 ELSE sum(oct.sum_price) END AS oct,\n"+
+//				"CASE WHEN sum(nov.sum_price) IS NULL THEN 0 ELSE sum(nov.sum_price) END AS nov,\n"+
+//				"CASE WHEN sum(dec.sum_price) IS NULL THEN 0 ELSE sum(dec.sum_price) END AS dec\n"+
+//				"FROM invoice\n"+
+//				"LEFT JOIN customer cus ON cus.cus_id = invoice.cus_id\n"+
+//				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
+//				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'1\' \n"+
+//				"GROUP BY inv_id) jan ON jan.inv_id = invoice.inv_id\n"+
+//				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
+//				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'2\' \n"+
+//				"GROUP BY inv_id) feb ON feb.inv_id = invoice.inv_id\n"+
+//				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
+//				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'3\' \n"+
+//				"GROUP BY inv_id) mar ON mar.inv_id = invoice.inv_id\n"+
+//				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
+//				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'4\' \n"+
+//				"GROUP BY inv_id) apr ON apr.inv_id = invoice.inv_id\n"+
+//				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
+//				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'5\' \n"+
+//				"GROUP BY inv_id) may ON may.inv_id = invoice.inv_id\n"+
+//				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
+//				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'6\' \n"+
+//				"GROUP BY inv_id) jun ON jun.inv_id = invoice.inv_id\n"+
+//				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
+//				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'7\' \n"+
+//				"GROUP BY inv_id) jul ON jul.inv_id = invoice.inv_id\n"+
+//				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
+//				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'8\' \n"+
+//				"GROUP BY inv_id) aug ON aug.inv_id = invoice.inv_id\n"+
+//				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
+//				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'9\' \n"+
+//				"GROUP BY inv_id) sep ON sep.inv_id = invoice.inv_id\n"+
+//				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
+//				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'10\' \n"+
+//				"GROUP BY inv_id) oct ON oct.inv_id = invoice.inv_id\n"+
+//				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
+//				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'11\' \n"+
+//				"GROUP BY inv_id) nov ON nov.inv_id = invoice.inv_id\n"+
+//				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n"+
+//				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = \'12\' \n"+
+//				"GROUP BY inv_id) dec ON dec.inv_id = invoice.inv_id\n"+
+//				"WHERE inv_company_id = "+inv_company_id+"\n"+
+//				"AND inv_bill_type = '"+inv_bill_type+"'\n"+
+//				"GROUP BY cus_name\n"+
+//				"ORDER BY cus_name ASC";
+		
+		String sql = "SELECT cus_name,\n" +
+				"CASE \n" +
+				"WHEN (sum(jan.sum_price) IS NULL) AND (sum(jan_c.sum_price) IS NULL) THEN 0\n" +
+				"WHEN (sum(jan.sum_price) IS NOT NULL) AND (sum(jan_c.sum_price) IS NULL) THEN sum(jan.sum_price)\n" +
+				"WHEN (sum(jan.sum_price) IS NULL) AND (sum(jan_c.sum_price) IS NOT NULL) THEN (sum(jan_c.sum_price)*-1)\n" +
+				"ELSE (sum(jan.sum_price)-sum(jan_c.sum_price)) END AS jan,\n" +
+				"CASE \n" +
+				"WHEN (sum(feb.sum_price) IS NULL) AND (sum(feb_c.sum_price) IS NULL) THEN 0\n" +
+				"WHEN (sum(feb.sum_price) IS NOT NULL) AND (sum(feb_c.sum_price) IS NULL) THEN sum(feb.sum_price)\n" +
+				"WHEN (sum(feb.sum_price) IS NULL) AND (sum(feb_c.sum_price) IS NOT NULL) THEN (sum(feb_c.sum_price)*-1)\n" +
+				"ELSE (sum(feb.sum_price)-sum(feb_c.sum_price)) END AS feb,\n" +
+				"CASE \n" +
+				"WHEN (sum(mar.sum_price) IS NULL) AND (sum(mar_c.sum_price) IS NULL) THEN 0\n" +
+				"WHEN (sum(mar.sum_price) IS NOT NULL) AND (sum(mar_c.sum_price) IS NULL) THEN sum(mar.sum_price)\n" +
+				"WHEN (sum(mar.sum_price) IS NULL) AND (sum(mar_c.sum_price) IS NOT NULL) THEN (sum(mar_c.sum_price)*-1)\n" +
+				"ELSE (sum(mar.sum_price)-sum(mar_c.sum_price)) END AS mar,\n" +
+				"CASE \n" +
+				"WHEN (sum(apr.sum_price) IS NULL) AND (sum(apr_c.sum_price) IS NULL) THEN 0\n" +
+				"WHEN (sum(apr.sum_price) IS NOT NULL) AND (sum(apr_c.sum_price) IS NULL) THEN sum(apr.sum_price)\n" +
+				"WHEN (sum(apr.sum_price) IS NULL) AND (sum(apr_c.sum_price) IS NOT NULL) THEN (sum(apr_c.sum_price)*-1)\n" +
+				"ELSE (sum(apr.sum_price)-sum(apr_c.sum_price)) END AS apr,\n" +
+				"CASE \n" +
+				"WHEN (sum(may.sum_price) IS NULL) AND (sum(may_c.sum_price) IS NULL) THEN 0\n" +
+				"WHEN (sum(may.sum_price) IS NOT NULL) AND (sum(may_c.sum_price) IS NULL) THEN sum(may.sum_price)\n" +
+				"WHEN (sum(may.sum_price) IS NULL) AND (sum(may_c.sum_price) IS NOT NULL) THEN (sum(may_c.sum_price)*-1)\n" +
+				"ELSE (sum(may.sum_price)-sum(may_c.sum_price)) END AS may,\n" +
+				"CASE \n" +
+				"WHEN (sum(jun.sum_price) IS NULL) AND (sum(jun_c.sum_price) IS NULL) THEN 0\n" +
+				"WHEN (sum(jun.sum_price) IS NOT NULL) AND (sum(jun_c.sum_price) IS NULL) THEN sum(jun.sum_price)\n" +
+				"WHEN (sum(jun.sum_price) IS NULL) AND (sum(jun_c.sum_price) IS NOT NULL) THEN (sum(jun_c.sum_price)*-1)\n" +
+				"ELSE (sum(jun.sum_price)-sum(jun_c.sum_price)) END AS jun,\n" +
+				"CASE \n" +
+				"WHEN (sum(jul.sum_price) IS NULL) AND (sum(jul_c.sum_price) IS NULL) THEN 0\n" +
+				"WHEN (sum(jul.sum_price) IS NOT NULL) AND (sum(jul_c.sum_price) IS NULL) THEN sum(jul.sum_price)\n" +
+				"WHEN (sum(jul.sum_price) IS NULL) AND (sum(jul_c.sum_price) IS NOT NULL) THEN (sum(jul_c.sum_price)*-1)\n" +
+				"ELSE (sum(jul.sum_price)-sum(jul_c.sum_price)) END AS jul,\n" +
+				"CASE \n" +
+				"WHEN (sum(aug.sum_price) IS NULL) AND (sum(aug_c.sum_price) IS NULL) THEN 0\n" +
+				"WHEN (sum(aug.sum_price) IS NOT NULL) AND (sum(aug_c.sum_price) IS NULL) THEN sum(aug.sum_price)\n" +
+				"WHEN (sum(aug.sum_price) IS NULL) AND (sum(aug_c.sum_price) IS NOT NULL) THEN (sum(aug_c.sum_price)*-1)\n" +
+				"ELSE (sum(aug.sum_price)-sum(aug_c.sum_price)) END AS aug,\n" +
+				"CASE \n" +
+				"WHEN (sum(sep.sum_price) IS NULL) AND (sum(sep_c.sum_price) IS NULL) THEN 0\n" +
+				"WHEN (sum(sep.sum_price) IS NOT NULL) AND (sum(sep_c.sum_price) IS NULL) THEN sum(sep.sum_price)\n" +
+				"WHEN (sum(sep.sum_price) IS NULL) AND (sum(sep_c.sum_price) IS NOT NULL) THEN (sum(sep_c.sum_price)*-1)\n" +
+				"ELSE (sum(sep.sum_price)-sum(sep_c.sum_price)) END AS sep,\n" +
+				"CASE \n" +
+				"WHEN (sum(oct.sum_price) IS NULL) AND (sum(oct_c.sum_price) IS NULL) THEN 0\n" +
+				"WHEN (sum(oct.sum_price) IS NOT NULL) AND (sum(oct_c.sum_price) IS NULL) THEN sum(oct.sum_price)\n" +
+				"WHEN (sum(oct.sum_price) IS NULL) AND (sum(oct_c.sum_price) IS NOT NULL) THEN (sum(oct_c.sum_price)*-1)\n" +
+				"ELSE (sum(oct.sum_price)-sum(oct_c.sum_price)) END AS oct,\n" +
+				"CASE \n" +
+				"WHEN (sum(nov.sum_price) IS NULL) AND (sum(nov_c.sum_price) IS NULL) THEN 0\n" +
+				"WHEN (sum(nov.sum_price) IS NOT NULL) AND (sum(nov_c.sum_price) IS NULL) THEN sum(nov.sum_price)\n" +
+				"WHEN (sum(nov.sum_price) IS NULL) AND (sum(nov_c.sum_price) IS NOT NULL) THEN (sum(nov_c.sum_price)*-1)\n" +
+				"ELSE (sum(nov.sum_price)-sum(nov_c.sum_price)) END AS nov,\n" +
+				"CASE \n" +
+				"WHEN (sum(dec.sum_price) IS NULL) AND (sum(dec_c.sum_price) IS NULL) THEN 0\n" +
+				"WHEN (sum(dec.sum_price) IS NOT NULL) AND (sum(dec_c.sum_price) IS NULL) THEN sum(dec.sum_price)\n" +
+				"WHEN (sum(dec.sum_price) IS NULL) AND (sum(dec_c.sum_price) IS NOT NULL) THEN (sum(dec_c.sum_price)*-1)\n" +
+				"ELSE (sum(dec.sum_price)-sum(dec_c.sum_price)) END AS dec\n" +
+				"FROM invoice\n" +
+				"LEFT JOIN customer cus ON cus.cus_id = invoice.cus_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '1' \n" +
+				"GROUP BY inv_id) jan ON jan.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '2' \n" +
+				"GROUP BY inv_id) feb ON feb.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '3' \n" +
+				"GROUP BY inv_id) mar ON mar.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '4' \n" +
+				"GROUP BY inv_id) apr ON apr.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '5' \n" +
+				"GROUP BY inv_id) may ON may.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '6' \n" +
+				"GROUP BY inv_id) jun ON jun.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '7' \n" +
+				"GROUP BY inv_id) jul ON jul.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '8' \n" +
+				"GROUP BY inv_id) aug ON aug.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '9' \n" +
+				"GROUP BY inv_id) sep ON sep.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '10' \n" +
+				"GROUP BY inv_id) oct ON oct.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '11' \n" +
+				"GROUP BY inv_id) nov ON nov.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = '"+inv_bill_type+"' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '12' \n" +
+				"GROUP BY inv_id) dec ON dec.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '1' \n" +
+				"GROUP BY inv_id) jan_c ON jan_c.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '2' \n" +
+				"GROUP BY inv_id) feb_c ON feb_c.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '3' \n" +
+				"GROUP BY inv_id) mar_c ON mar_c.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '4' \n" +
+				"GROUP BY inv_id) apr_c ON apr_c.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '5' \n" +
+				"GROUP BY inv_id) may_c ON may_c.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '6' \n" +
+				"GROUP BY inv_id) jun_c ON jun_c.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '7' \n" +
+				"GROUP BY inv_id) jul_c ON jul_c.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '8' \n" +
+				"GROUP BY inv_id) aug_c ON aug_c.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '9' \n" +
+				"GROUP BY inv_id) sep_c ON sep_c.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '10' \n" +
+				"GROUP BY inv_id) oct_c ON oct_c.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '11' \n" +
+				"GROUP BY inv_id) nov_c ON nov_c.inv_id = invoice.inv_id\n" +
+				"LEFT JOIN (SELECT inv_id, sum(inv_total_price_eur) AS sum_price FROM invoice \n" +
+				"WHERE inv_bill_type = 'Credit Note' AND EXTRACT(YEAR FROM inv_delivery_date) = '"+year+"' AND EXTRACT(MONTH FROM inv_delivery_date) = '12' \n" +
+				"GROUP BY inv_id) dec_c ON dec_c.inv_id = invoice.inv_id\n" +
+				"WHERE inv_company_id = "+inv_company_id+"\n";
+		
+		if(inv_bill_type == "Direct"){
+			sql += "AND (inv_bill_type = '"+inv_bill_type+"' OR inv_bill_type = 'Credit Note')\n";
+		}else{
+			sql += "AND inv_bill_type = '"+inv_bill_type+"'\n";
+		}
+				
+		sql += "GROUP BY cus_name\n" +
+			"ORDER BY cus_name ASC";
 		
 		List<Invoice> inv = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Invoice>(Invoice.class));
 		return inv;
@@ -1147,13 +1296,13 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		+", tpx_res_msg="+tpx.getTpx_res_msg()+", tpx_inv_number="+tpx.getTpx_inv_number();
 		
 		for(int i=0; i<inv_refLs.size(); i++){
-			topix_info += ", tpx_ref_info="+inv_refLs.get(i).getTopix_article_id()+" : "+inv_refLs.get(i).getInv_ref_qty()+" QTY";
+			topix_info += ", tpx_ref_info="+inv_refLs.get(i).getInv_topix_id()+" : "+inv_refLs.get(i).getInv_ref_qty()+" QTY";
 		}
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				tpx_id,
 				"Topix:"+tpx.getInv_id(),
 				user.getUserModel().getUsr_name(),
@@ -1187,9 +1336,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 	public void updateTopixAuditLogging(Topix tpx){
 	
 		UserDetailsApp user = UserLoginDetail.getUser();
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				tpx.getInv_id(),
 				"Topix:"+tpx.getInv_id(),
 				user.getUserModel().getUsr_name(),

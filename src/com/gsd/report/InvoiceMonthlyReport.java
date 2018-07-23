@@ -40,6 +40,7 @@ public class InvoiceMonthlyReport extends AbstractJExcelView{
 		map.put(8, (List<Invoice>) model.get("gsda"));
 		map.put(9, (List<Invoice>) model.get("gsd_angebote"));
 		map.put(10, (List<Invoice>) model.get("tta_angebote"));
+		map.put(11, (List<Invoice>) model.get("gsda_angebote"));
 		
 		Date dateTime = new Date();
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HHmmss");
@@ -68,7 +69,7 @@ public class InvoiceMonthlyReport extends AbstractJExcelView{
 				ws.addCell(new Number(12,row,myList.get(i).getDec().doubleValue(),ws.getWritableCell(12, 3).getCellFormat()));
 				row++;
 			}
-			if(x == 0 || x == 6){
+			if(x == 0 || x == 6 || x == 8){
 				row++;
 				ws.addCell(new Formula(1,2,"SUM(B4:B"+row+")",ws.getWritableCell(1, 2).getCellFormat()));
 				ws.addCell(new Formula(2,2,"SUM(C4:C"+row+")",ws.getWritableCell(2, 2).getCellFormat()));
@@ -101,8 +102,10 @@ public class InvoiceMonthlyReport extends AbstractJExcelView{
 				List<Invoice> angList;
 				if(x == 0){
 					angList = map.get(9);
-				}else{
+				}else if(x == 6){
 					angList = map.get(10);
+				}else{
+					angList = map.get(11);
 				}
 				for(int i=0; i<angList.size(); i++){
 					ws.addCell(new Label(0,row,angList.get(i).getCus_name()));

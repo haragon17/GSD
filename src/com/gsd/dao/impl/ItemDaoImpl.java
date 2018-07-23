@@ -78,9 +78,9 @@ public class ItemDaoImpl extends JdbcDaoSupport implements ItemDao {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
 		if(!itm_audit.getItm_desc().equals(itm.getItm_desc())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				itm.getItm_id(),
 				"Item List",
 				user.getUserModel().getUsr_name(),
@@ -93,9 +93,9 @@ public class ItemDaoImpl extends JdbcDaoSupport implements ItemDao {
 		}
 		
 		if(!itm_audit.getItm_name().equals(itm.getItm_name())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				itm.getItm_id(),
 				"Item List",
 				user.getUserModel().getUsr_name(),
@@ -122,9 +122,9 @@ String sql = "INSERT INTO item VALUES (?,?,?,?,now(),now())";
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				itm.getItm_id(),
 				"Item List",
 				user.getUserModel().getUsr_name(),
@@ -144,9 +144,9 @@ String sql = "INSERT INTO item VALUES (?,?,?,?,now(),now())";
 		getJdbcTemplate().update(sql);
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				id,
 				"Item List",
 				user.getUserModel().getUsr_name(),

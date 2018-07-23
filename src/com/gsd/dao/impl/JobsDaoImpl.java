@@ -374,9 +374,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		
 		Jobs job2 = searchJobsByName(job.getJob_name());
 		
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
 				job2.getJob_id(),
 				"Jobs",
 				user.getUserModel().getUsr_name(),
@@ -409,9 +408,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		
 		JobsReference jobRef2 = searchJobsReferenceByID(jobRef.getJob_ref_id());
 		
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				jobRef.getJob_ref_id(),
 				"Jobs Reference:"+jobRef.getJob_id(),
 				user.getUserModel().getUsr_name(),
@@ -459,9 +458,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
 		if(job_audit.getJob_status() != "Billed"){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				job_audit.getJob_id(),
 				"Jobs",
 				user.getUserModel().getUsr_name(),
@@ -500,9 +499,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
 		if(!job_audit.getDept().equals(job.getDept())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				job.getJob_id(),
 				"Jobs",
 				user.getUserModel().getUsr_name(),
@@ -515,9 +514,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		
 		if(!job_audit.getJob_status().equals(job.getJob_status())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				job.getJob_id(),
 				"Jobs",
 				user.getUserModel().getUsr_name(),
@@ -530,9 +529,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		
 		if(!job_audit.getJob_dtl().equals(job.getJob_dtl())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				job.getJob_id(),
 				"Jobs",
 				user.getUserModel().getUsr_name(),
@@ -546,9 +545,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		
 		if(job_audit.getProj_id() != job.getProj_id()){
 			Jobs job_new = searchJobsByID(job.getJob_id());
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				job.getJob_id(),
 				"Jobs",
 				user.getUserModel().getUsr_name(),
@@ -561,9 +560,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		
 		if(!job_audit.getJob_name().equals(job.getJob_name())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				job.getJob_id(),
 				"Jobs",
 				user.getUserModel().getUsr_name(),
@@ -611,9 +610,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		JobsReference jobRef_new = searchJobsReferenceByID(jobRef.getJob_ref_id());
 		
 		if(!jobRef_audit.getJob_ref_number().equals(jobRef.getJob_ref_number())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				jobRef.getJob_ref_id(),
 				"Jobs Reference:"+jobRef_audit.getJob_id(),
 				user.getUserModel().getUsr_name(),
@@ -626,9 +625,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		
 		if(!jobRef_audit.getJob_ref_status().equals(jobRef.getJob_ref_status())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				jobRef.getJob_ref_id(),
 				"Jobs Reference:"+jobRef_audit.getJob_id(),
 				user.getUserModel().getUsr_name(),
@@ -641,9 +640,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		
 		if(!jobRef_audit.getJob_ref_dtl().equals(jobRef.getJob_ref_dtl())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				jobRef.getJob_ref_id(),
 				"Jobs Reference:"+jobRef_audit.getJob_id(),
 				user.getUserModel().getUsr_name(),
@@ -657,9 +656,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		
 		if(jobRef_audit.getJob_out() == null){
 			if(jobRef_new.getJob_out() != null){
-				String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+				String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 				this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					jobRef.getJob_ref_id(),
 					"Jobs Reference:"+jobRef_audit.getJob_id(),
 					user.getUserModel().getUsr_name(),
@@ -672,9 +670,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 			}
 		}
 		else if(!jobRef_audit.getJob_out().equals(jobRef_new.getJob_out())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				jobRef.getJob_ref_id(),
 				"Jobs Reference:"+jobRef_audit.getJob_id(),
 				user.getUserModel().getUsr_name(),
@@ -688,9 +686,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		
 		if(jobRef_audit.getJob_in() == null){
 			if(jobRef_new.getJob_in() != null){
-				String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+				String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 				this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					jobRef.getJob_ref_id(),
 					"Jobs Reference:"+jobRef_audit.getJob_id(),
 					user.getUserModel().getUsr_name(),
@@ -703,9 +700,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 			}
 		}
 		else if(!jobRef_audit.getJob_in().equals(jobRef_new.getJob_in())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				jobRef.getJob_ref_id(),
 				"Jobs Reference:"+jobRef_audit.getJob_id(),
 				user.getUserModel().getUsr_name(),
@@ -718,9 +715,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		
 		if(jobRef_audit.getAmount() != jobRef.getAmount()){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				jobRef.getJob_ref_id(),
 				"Jobs Reference:"+jobRef_audit.getJob_id(),
 				user.getUserModel().getUsr_name(),
@@ -733,9 +730,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		
 		if(jobRef_audit.getProj_ref_id() != jobRef.getProj_ref_id()){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				jobRef.getJob_ref_id(),
 				"Jobs Reference:"+jobRef_audit.getJob_id(),
 				user.getUserModel().getUsr_name(),
@@ -748,9 +745,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		
 		if(!jobRef_audit.getJob_ref_name().equals(jobRef.getJob_ref_name())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				jobRef.getJob_ref_id(),
 				"Jobs Reference:"+jobRef_audit.getJob_id(),
 				user.getUserModel().getUsr_name(),
@@ -772,9 +769,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		this.getJdbcTemplate().update(sql);
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				id,
 				"Jobs",
 				user.getUserModel().getUsr_name(),
@@ -792,9 +789,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		this.getJdbcTemplate().update(sql);
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				id,
 				"Jobs Reference:"+jobRef_audit.getJob_id(),
 				user.getUserModel().getUsr_name(),
@@ -895,9 +892,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				JobsReference jobRef_new = searchJobsReferenceByID(jobRefLs.get(y).getJob_ref_id());
 				
 				if(!jobRefLs_audit.get(y).getJob_ref_status().equals(jobRef_new.getJob_ref_status())){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						jobRef_new.getJob_ref_id(),
 						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
 						user.getUserModel().getUsr_name(),
@@ -911,9 +908,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				
 				try{
 				if(!jobRefLs_audit.get(y).getJob_ref_approve().equals(jobRef_new.getJob_ref_approve())){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						jobRef_new.getJob_ref_id(),
 						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
 						user.getUserModel().getUsr_name(),
@@ -929,9 +926,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				}
 				
 				if(!jobRefLs_audit.get(y).getJob_ref_dtl().equals(jobRef_new.getJob_ref_dtl())){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						jobRef_new.getJob_ref_id(),
 						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
 						user.getUserModel().getUsr_name(),
@@ -945,9 +942,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				
 				if(jobRefLs_audit.get(y).getJob_out() == null){
 					if(jobRef_new.getJob_out() != null){
-						String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+						String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 						this.getJdbcTemplate().update(audit, new Object[]{
-							getLastAuditId(),
+							
 							jobRef_new.getJob_ref_id(),
 							"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
 							user.getUserModel().getUsr_name(),
@@ -960,9 +957,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					}
 				}
 				else if(!jobRefLs_audit.get(y).getJob_out().equals(jobRef_new.getJob_out())){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						jobRef_new.getJob_ref_id(),
 						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
 						user.getUserModel().getUsr_name(),
@@ -976,9 +973,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				
 				if(jobRefLs_audit.get(y).getJob_in() == null){
 					if(jobRef_new.getJob_in() != null){
-						String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+						String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 						this.getJdbcTemplate().update(audit, new Object[]{
-							getLastAuditId(),
+							
 							jobRef_new.getJob_ref_id(),
 							"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
 							user.getUserModel().getUsr_name(),
@@ -991,9 +988,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					}
 				}
 				else if(!jobRefLs_audit.get(y).getJob_in().equals(jobRef_new.getJob_in())){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						jobRef_new.getJob_ref_id(),
 						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
 						user.getUserModel().getUsr_name(),
@@ -1005,10 +1002,10 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					});
 				}
 				
-				if(jobRefLs_audit.get(y).getAmount() != jobRef_new.getAmount()){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+				if(jobRefLs_audit.get(y).getAmount().compareTo(jobRef_new.getAmount()) != 0){
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						jobRef_new.getJob_ref_id(),
 						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
 						user.getUserModel().getUsr_name(),
@@ -1021,9 +1018,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				}
 				
 				if(jobRefLs_audit.get(y).getProj_ref_id() != jobRef_new.getProj_ref_id()){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						jobRef_new.getJob_ref_id(),
 						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
 						user.getUserModel().getUsr_name(),
@@ -1036,9 +1033,9 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				}
 				
 				if(!jobRefLs_audit.get(y).getJob_ref_name().equals(jobRef_new.getJob_ref_name())){
-					String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+					String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 					this.getJdbcTemplate().update(audit, new Object[]{
-						getLastAuditId(),
+						
 						jobRef_new.getJob_ref_id(),
 						"Jobs Reference:"+jobRefLs_audit.get(y).getJob_id(),
 						user.getUserModel().getUsr_name(),

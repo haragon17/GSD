@@ -48,7 +48,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				"FROM projects_reference\n" +
 				"LEFT JOIN projects ON projects_reference.proj_id = projects.proj_id\n" +
 				"LEFT JOIN item ON projects_reference.itm_id = item.itm_id\n" +
-				"WHERE projects_reference.proj_id = "+ proj_id +"\n" +
+				"WHERE projects_reference.proj_id = "+ proj_id +" AND projects_reference.activated != 0\n" +
 				"ORDER BY topix_article_id";
 		
 		List<ProjectsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<ProjectsReference>(ProjectsReference.class));
@@ -143,7 +143,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	@Override
 	public List<ProjectsReference> searchProjectsReferences(Map<String, String> data) {
 		
-		String sql = "SELECT projects_reference.proj_ref_id, projects_reference.proj_id, projects.proj_name, \n" +
+		String sql = "SELECT projects_reference.proj_ref_id, projects_reference.proj_id, projects.proj_name, projects_reference.activated, \n" +
 				"projects_reference.itm_id, item.itm_name, projects_reference.\"time\", projects_reference.actual_time, \n" +
 				"projects_reference.price, projects_reference.proj_ref_desc, projects_reference.topix_article_id\n" +
 				"FROM projects_reference\n" +
@@ -220,7 +220,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 			sql += "AND projects_reference.update_date BETWEEN '"+data.get("updateStart")+"' AND '"+data.get("updateLimit")+" 23:59:59'\n";
 		}
 		
-		sql += "ORDER BY projects.proj_name, projects_reference.topix_article_id";
+		sql += "ORDER BY projects.proj_name, projects_reference.activated DESC, projects_reference.topix_article_id";
 		
 //		System.out.println(sql);
 		
@@ -266,7 +266,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 	@Override
 	public void createProjectsReference(ProjectsReference proj) {
 		// TODO Auto-generated method stub
-		String sql = "INSERT INTO projects_reference VALUES (?,?,?,?,?,?,now(),now(),?,?,?)";
+		String sql = "INSERT INTO projects_reference VALUES (?,?,?,?,?,?,now(),now(),?,?,?,?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[] { 
 				proj.getProj_ref_id(),
@@ -277,7 +277,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				proj.getCretd_usr(),
 				proj.getProj_ref_desc(),
 				proj.getActual_time(),
-				proj.getTopix_article_id()
+				proj.getTopix_article_id(),
+				proj.getActivated()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
@@ -289,9 +290,9 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		Customer cus = new Customer();
 		cus = getJdbcTemplate().queryForObject("select * from customer where cus_id ="+proj2.getCus_id(), new BeanPropertyRowMapper<Customer>(Customer.class));
 		
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				proj.getProj_ref_id(),
 				"Projects Reference:"+proj2.getProj_id(),
 				user.getUserModel().getUsr_name(),
@@ -327,9 +328,9 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 			file_name = myFile.getFile_name();
 		}
 		
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				proj.getProj_id(),
 				"Projects",
 				user.getUserModel().getUsr_name(),
@@ -397,7 +398,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 //				+ "currency=?, "
 				+ "proj_ref_desc=?, "
 				+ "actual_time=?, "
-				+ "topix_article_id=? "
+				+ "topix_article_id=?, "
+				+ "activated=? "
 				+ "where proj_ref_id=?";
 		
 		this.getJdbcTemplate().update(sql, new Object[] { 
@@ -408,15 +410,37 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				proj.getProj_ref_desc(),
 				proj.getActual_time(),
 				proj.getTopix_article_id(),
+				proj.getActivated(),
 				proj.getProj_ref_id()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
-		if(!proj_audit.getTopix_article_id().equals(proj.getTopix_article_id())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+		if(proj_audit.getActivated() != proj.getActivated()){
+			String aud_act = "Yes";
+			String new_act = "Yes";
+			if(proj_audit.getActivated() == 0){
+				aud_act = "No";
+			}
+			if(proj.getActivated() == 0){
+				new_act = "No";
+			}
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
+					proj.getProj_ref_id(),
+					"Projects Reference:"+proj_audit.getProj_id(),
+					user.getUserModel().getUsr_name(),
+					"Activated",
+					aud_act,
+					new_act,
+					"Updated",
+					projects.getProj_name()+" : "+itm.getItm_name()
+			});
+		}
+		
+		if(!proj_audit.getTopix_article_id().equals(proj.getTopix_article_id())){
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
 					proj.getProj_ref_id(),
 					"Projects Reference:"+proj_audit.getProj_id(),
 					user.getUserModel().getUsr_name(),
@@ -429,9 +453,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		}
 		
 		if(!proj_audit.getProj_ref_desc().equals(proj.getProj_ref_desc())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					proj.getProj_ref_id(),
 					"Projects Reference:"+proj_audit.getProj_id(),
 					user.getUserModel().getUsr_name(),
@@ -444,9 +467,9 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		}
 		
 //		if(!proj_audit.getCurrency().equals(proj.getCurrency())){
-//			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+//			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 //			this.getJdbcTemplate().update(audit, new Object[]{
-//					getLastAuditId(),
+//					
 //					proj.getProj_ref_id(),
 //					"Projects Reference:"+proj_audit.getProj_id(),
 //					user.getUserModel().getUsr_name(),
@@ -459,9 +482,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 //		}
 		
 		if(proj_audit.getPrice().compareTo(proj.getPrice()) != 0){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					proj.getProj_ref_id(),
 					"Projects Reference:"+proj_audit.getProj_id(),
 					user.getUserModel().getUsr_name(),
@@ -474,9 +496,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		}
 		
 		if(proj_audit.getActual_time() != proj.getActual_time()){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					proj.getProj_ref_id(),
 					"Projects Reference:"+proj_audit.getProj_id(),
 					user.getUserModel().getUsr_name(),
@@ -489,9 +510,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		}
 		
 		if(proj_audit.getTime() != proj.getTime()){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					proj.getProj_ref_id(),
 					"Projects Reference:"+proj_audit.getProj_id(),
 					user.getUserModel().getUsr_name(),
@@ -504,9 +524,9 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		}
 		
 		if(!itm_audit.getItm_name().equals(itm.getItm_name())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				proj.getProj_ref_id(),
 				"Projects Reference:"+proj_audit.getProj_id(),
 				user.getUserModel().getUsr_name(),
@@ -550,9 +570,9 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
 		if(!proj_audit.getProj_currency().equals(proj.getProj_currency())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				proj.getProj_id(),
 				"Projects",
 				user.getUserModel().getUsr_name(),
@@ -565,9 +585,9 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		}
 		
 		if(!cus_audit.getCus_name().equals(cus.getCus_name())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				proj.getProj_id(),
 				"Projects",
 				user.getUserModel().getUsr_name(),
@@ -583,9 +603,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 			FileModel file_new = new FileModel();
 			file_new = getFile(proj.getFile_id());
 			if(!proj.getFile_name().equals(file_new.getFile_name())){
-				String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+				String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 				this.getJdbcTemplate().update(audit, new Object[]{
-					getLastAuditId(),
 					proj.getProj_id(),
 					"Projects",
 					user.getUserModel().getUsr_name(),
@@ -599,9 +618,9 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		}
 		
 		if(!proj_audit.getProj_desc().equals(proj.getProj_desc())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				proj.getProj_id(),
 				"Projects",
 				user.getUserModel().getUsr_name(),
@@ -614,9 +633,9 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		}
 		
 		if(!proj_audit.getProj_name().equals(proj.getProj_name())){
-			String audit = "INSERT INTO audit_logging VALUES (?,?,?,?,now(),?,?,?,?,?)";
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				proj.getProj_id(),
 				"Projects",
 				user.getUserModel().getUsr_name(),
@@ -645,9 +664,9 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		this.getJdbcTemplate().update(sql);
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				id,
 				"Projects Reference:"+proj.getProj_id(),
 				user.getUserModel().getUsr_name(),
@@ -674,9 +693,9 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 		this.getJdbcTemplate().update(sql);
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
-		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (?,?,?,?,now(),?,?)";
+		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				getLastAuditId(),
+				
 				id,
 				"Projects",
 				user.getUserModel().getUsr_name(),

@@ -1146,7 +1146,16 @@ Ext.onReady(function() {
 	            		sorters: [{
 	            			property: 'inv_company_id',
 	            			direction: 'ASC'
-	            		}]
+	            		}],
+	            		listeners: {
+	            			load: function(){
+	            				if(Ext.getCmp('ainv_company_id').store.count() > 8){
+	            					setTimeout(function(){
+	            						Ext.getCmp('ainv_company_id').getStore().removeAt(0);
+	            					},500);
+	            				}
+	            			}
+	            		}
 	            	},
 	            	valueField: 'inv_company_id',
 	            	displayField: 'inv_company_name'
