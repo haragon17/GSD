@@ -42,7 +42,7 @@ public interface InvoiceDao {
 	
 	public List<InvoiceReference> getListDataFromRequest(Object data);
 	
-	public List<Invoice> showInvoiceMonthlyReport(String year, int inv_company_id);
+	public List<Invoice> showInvoiceMonthlyReport(String year, int inv_company_id, String inv_bill_type);
 
 	public List<Invoice> showInvoiceReport(Map<String, String> data);
 	

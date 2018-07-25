@@ -221,6 +221,7 @@ public class InvoiceController {
 		int inv_portal = Integer.parseInt(request.getParameter("ainv_portal"));
 		String inv_bill_to = request.getParameter("ainv_bill_to");
 		String inv_currency = request.getParameter("ainv_currency");
+		BigDecimal inv_discount = new BigDecimal(request.getParameter("ainv_discount"));
 		
 //		System.out.println("delivery date = "+inv_delivery_date);
 		
@@ -234,6 +235,7 @@ public class InvoiceController {
 		inv.setInv_bill_type("");
 		inv.setInv_bill_to(inv_bill_to);
 		inv.setInv_currency(inv_currency);
+		inv.setInv_discount(inv_discount);
 		
 		try{
 			SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yy");
@@ -306,7 +308,7 @@ public class InvoiceController {
 		String inv_itm_name = request.getParameter("ainv_itm_name");
 		BigDecimal inv_ref_price = new BigDecimal(request.getParameter("ainv_ref_price"));
 		BigDecimal inv_ref_qty = new BigDecimal(request.getParameter("ainv_ref_qty"));
-//		String inv_ref_currency = request.getParameter("ainv_ref_currency");
+		String inv_topix_id = request.getParameter("ainv_topix_id");
 		String inv_ref_desc = request.getParameter("ainv_ref_desc");
 		
 		InvoiceReference inv_ref = new InvoiceReference();
@@ -317,6 +319,7 @@ public class InvoiceController {
 		inv_ref.setInv_ref_qty(inv_ref_qty);
 //		inv_ref.setInv_ref_currency(inv_ref_currency);
 		inv_ref.setCretd_usr(usr_id);
+		inv_ref.setInv_topix_id(inv_topix_id);
 		
 		if(!inv_ref_desc.equals("Remark")){
 			inv_ref.setInv_ref_desc(inv_ref_desc);
@@ -446,6 +449,7 @@ public class InvoiceController {
 		String inv_bill_date = request.getParameter("einv_bill_date");
 		String inv_bill_to = request.getParameter("einv_bill_to");
 		String inv_currency = request.getParameter("einv_currency");
+		BigDecimal inv_discount = new BigDecimal(request.getParameter("einv_discount"));
 		
 		Map<String, Float> map = new HashMap<String, Float>();
 		map = getCurrencyRate(request, response);
@@ -459,6 +463,7 @@ public class InvoiceController {
 //		inv.setInv_bill_type(inv_bill_type);
 		inv.setInv_bill_to(inv_bill_to);
 		inv.setInv_currency(inv_currency);
+		inv.setInv_discount(inv_discount);
 		
 		java.sql.Date inv_delivery_date_sql = null;
 		java.sql.Date inv_bill_date_sql = null;
@@ -501,7 +506,7 @@ public class InvoiceController {
 		String inv_itm_name = request.getParameter("einv_itm_name");
 		BigDecimal inv_ref_price = new BigDecimal(request.getParameter("einv_ref_price"));
 		BigDecimal inv_ref_qty = new BigDecimal(request.getParameter("einv_ref_qty"));
-//		String inv_ref_currency = request.getParameter("einv_ref_currency");
+		String inv_topix_id = request.getParameter("einv_topix_id");
 		String inv_ref_desc = request.getParameter("einv_ref_desc");
 		
 		Map<String, Float> map = new HashMap<String, Float>();
@@ -514,7 +519,7 @@ public class InvoiceController {
 		inv_ref.setProj_ref_id(proj_ref_id);
 		inv_ref.setInv_ref_price(inv_ref_price);
 		inv_ref.setInv_ref_qty(inv_ref_qty);
-//		inv_ref.setInv_ref_currency(inv_ref_currency);
+		inv_ref.setInv_topix_id(inv_topix_id);
 		
 		if(!inv_ref_desc.equals("Remark")){
 			inv_ref.setInv_ref_desc(inv_ref_desc);
@@ -587,22 +592,21 @@ public class InvoiceController {
 		Calendar now = Calendar.getInstance();
 		int year = now.get(Calendar.YEAR);
 		String yearInString = String.valueOf(year);
+		String inv_bill_type = "Direct";
 		
-<<<<<<< HEAD
+		List<Invoice> gsd = invoiceDao.showInvoiceMonthlyReport(yearInString, 1, inv_bill_type);
+		List<Invoice> jv = invoiceDao.showInvoiceMonthlyReport(yearInString, 2, inv_bill_type);
+		List<Invoice> fgs = invoiceDao.showInvoiceMonthlyReport(yearInString, 3, inv_bill_type);
+		List<Invoice> mm = invoiceDao.showInvoiceMonthlyReport(yearInString, 4, inv_bill_type);
+		List<Invoice> gsdp = invoiceDao.showInvoiceMonthlyReport(yearInString, 5, inv_bill_type);
+		List<Invoice> gps = invoiceDao.showInvoiceMonthlyReport(yearInString, 6, inv_bill_type);
+		List<Invoice> tta = invoiceDao.showInvoiceMonthlyReport(yearInString, 7, inv_bill_type);
+		List<Invoice> stu = invoiceDao.showInvoiceMonthlyReport(yearInString, 8, inv_bill_type);
+		List<Invoice> gsda = invoiceDao.showInvoiceMonthlyReport(yearInString, 9, inv_bill_type);
+		
 		List<Invoice> gsd_angebote = invoiceDao.showInvoiceMonthlyReport(yearInString, 1, "Angebote");
 		List<Invoice> tta_angebote = invoiceDao.showInvoiceMonthlyReport(yearInString, 7, "Angebote");
 		List<Invoice> gsda_angebote = invoiceDao.showInvoiceMonthlyReport(yearInString, 9, "Angebote");
-=======
-		List<Invoice> gsd = invoiceDao.showInvoiceMonthlyReport(yearInString, 1);
-		List<Invoice> jv = invoiceDao.showInvoiceMonthlyReport(yearInString, 2);
-		List<Invoice> fgs = invoiceDao.showInvoiceMonthlyReport(yearInString, 3);
-		List<Invoice> mm = invoiceDao.showInvoiceMonthlyReport(yearInString, 4);
-		List<Invoice> gsdp = invoiceDao.showInvoiceMonthlyReport(yearInString, 5);
-		List<Invoice> gps = invoiceDao.showInvoiceMonthlyReport(yearInString, 6);
-		List<Invoice> tta = invoiceDao.showInvoiceMonthlyReport(yearInString, 7);
-		List<Invoice> stu = invoiceDao.showInvoiceMonthlyReport(yearInString, 8);
-		List<Invoice> gsda = invoiceDao.showInvoiceMonthlyReport(yearInString, 9);
->>>>>>> f934fd2dff8a360d60a176fdc55f9a9290ff4e4b
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("gsd", gsd);
@@ -614,12 +618,9 @@ public class InvoiceController {
 		map.put("tta", tta);
 		map.put("stu", stu);
 		map.put("gsda", gsda);
-<<<<<<< HEAD
 		map.put("gsd_angebote", gsd_angebote);
 		map.put("tta_angebote", tta_angebote);
 		map.put("gsda_angebote", gsda_angebote);
-=======
->>>>>>> f934fd2dff8a360d60a176fdc55f9a9290ff4e4b
 		
 		return new ModelAndView("invoice_monthly-print", map);
 	}

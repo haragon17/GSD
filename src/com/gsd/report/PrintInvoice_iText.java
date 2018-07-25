@@ -347,7 +347,7 @@ public class PrintInvoice_iText {
             String amount = String.format("%,.2f", sum_price)+" "+currency;
 //            String amount = String.format("%.2f", sum_price)+" "+currency;
             
-            g2d.drawString(inv_ref.get(i).getTopix_article_id(), 75, itemY);
+            g2d.drawString(inv_ref.get(i).getInv_topix_id(), 75, itemY);
             g2d.drawString(inv_ref.get(i).getInv_itm_name(), 140, itemY);
             g2d.setFont(f8i);
             if(!inv_ref.get(i).getInv_ref_desc().equals("")){
@@ -369,27 +369,37 @@ public class PrintInvoice_iText {
         }
         
         itemY += 20;
+        g2d.setFont(f9b);
         String vat = "";
-        double sum_vat = 0;
         double subtotal = inv.getTotal_inv_price().doubleValue();
+        String subtotal_str = String.format("%,.2f", subtotal)+" "+inv_ref.get(0).getInv_currency();
+        g2d.drawString("Subtotal", 384 - g2d.getFontMetrics().stringWidth("Subtotal"), itemY);
+        g2d.drawString(subtotal_str, 529 - g2d.getFontMetrics().stringWidth(subtotal_str), itemY);
+        itemY += 12;
+        double sum_disc = 0;
         double price_total = Math.round(subtotal*100.0)/100.0;
+        if(inv.getInv_discount().floatValue() != 0){
+        	sum_disc = (inv.getInv_discount().doubleValue()/100.0)*subtotal;
+        	String sum_disc_str = "-"+String.format("%,.2f", sum_disc)+" "+inv_ref.get(0).getInv_currency();
+        	String disc_text = "Discount "+df.format(inv.getInv_discount())+"%";
+        	g2d.drawString(disc_text, 384 - g2d.getFontMetrics().stringWidth(disc_text), itemY);
+            g2d.drawString(sum_disc_str, 529 - g2d.getFontMetrics().stringWidth(sum_disc_str), itemY);
+            itemY += 12;
+            price_total -= sum_disc;
+        }
+        double sum_vat = 0;
         System.out.println("Price total : "+price_total);
         if(inv.getInv_vat().floatValue() != 0){
 //        	sum_vat = (inv.getInv_vat().floatValue()/100)*positive_price;
-        	sum_vat = (inv.getInv_vat().doubleValue()/100.0)*subtotal;
+        	sum_vat = (inv.getInv_vat().doubleValue()/100.0)*price_total;
         	price_total += (Math.round(sum_vat*100.0)/100.0);
         	System.out.println("Price total : "+price_total);
             vat = String.format("%,.2f", sum_vat)+" "+inv_ref.get(0).getInv_currency();
         }else{
         	vat = String.format("%.2f", sum_vat)+" "+inv_ref.get(0).getInv_currency();
         }
-        g2d.setFont(f9b);
-        String total = String.format("%,.2f", price_total)+" "+inv.getInv_currency();
-        String subtotal_str = String.format("%,.2f", subtotal)+" "+inv_ref.get(0).getInv_currency();
-        g2d.drawString("Subtotal", 384 - g2d.getFontMetrics().stringWidth("Subtotal"), itemY);
-        g2d.drawString(subtotal_str, 529 - g2d.getFontMetrics().stringWidth(subtotal_str), itemY);
         total_price += sum_vat;
-        itemY += 12;
+        String total = String.format("%,.2f", price_total)+" "+inv.getInv_currency();
         String vat_text = "plus "+df.format(inv.getInv_vat())+"% VAT";
         g2d.drawString(vat_text, 384 - g2d.getFontMetrics().stringWidth(vat_text), itemY);
         g2d.drawString(vat, 529 - g2d.getFontMetrics().stringWidth(vat), itemY);
