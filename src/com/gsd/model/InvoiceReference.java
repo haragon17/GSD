@@ -22,7 +22,6 @@ public class InvoiceReference {
 	private String proj_name;
 	private String topix_article_id;
 	private String inv_currency;
-	private String inv_topix_id;
 	
 	public int getInv_ref_id() {
 		return inv_ref_id;
@@ -131,12 +130,6 @@ public class InvoiceReference {
 	}
 	public void setInv_currency(String inv_currency) {
 		this.inv_currency = inv_currency;
-	}
-	public String getInv_topix_id() {
-		return inv_topix_id;
-	}
-	public void setInv_topix_id(String inv_topix_id) {
-		this.inv_topix_id = inv_topix_id;
 	}
 	
 }

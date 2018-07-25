@@ -15,7 +15,6 @@ import org.springframework.web.servlet.view.document.AbstractJExcelView;
 import com.gsd.model.Invoice;
 
 import jxl.format.CellFormat;
-import jxl.write.Formula;
 import jxl.write.Label;
 import jxl.write.Number;
 import jxl.write.WritableSheet;
@@ -38,9 +37,12 @@ public class InvoiceMonthlyReport extends AbstractJExcelView{
 		map.put(6, (List<Invoice>) model.get("tta"));
 		map.put(7, (List<Invoice>) model.get("stu"));
 		map.put(8, (List<Invoice>) model.get("gsda"));
+<<<<<<< HEAD
 		map.put(9, (List<Invoice>) model.get("gsd_angebote"));
 		map.put(10, (List<Invoice>) model.get("tta_angebote"));
 		map.put(11, (List<Invoice>) model.get("gsda_angebote"));
+=======
+>>>>>>> f934fd2dff8a360d60a176fdc55f9a9290ff4e4b
 		
 		Date dateTime = new Date();
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HHmmss");
@@ -67,8 +69,10 @@ public class InvoiceMonthlyReport extends AbstractJExcelView{
 				ws.addCell(new Number(10,row,myList.get(i).getOct().doubleValue(),ws.getWritableCell(10, 3).getCellFormat()));
 				ws.addCell(new Number(11,row,myList.get(i).getNov().doubleValue(),ws.getWritableCell(11, 3).getCellFormat()));
 				ws.addCell(new Number(12,row,myList.get(i).getDec().doubleValue(),ws.getWritableCell(12, 3).getCellFormat()));
+				
 				row++;
 			}
+<<<<<<< HEAD
 			if(x == 0 || x == 6 || x == 8){
 				row++;
 				ws.addCell(new Formula(1,2,"SUM(B4:B"+row+")",ws.getWritableCell(1, 2).getCellFormat()));
@@ -124,6 +128,8 @@ public class InvoiceMonthlyReport extends AbstractJExcelView{
 					row++;
 				}
 			}
+=======
+>>>>>>> f934fd2dff8a360d60a176fdc55f9a9290ff4e4b
  		}
 		
 	}
