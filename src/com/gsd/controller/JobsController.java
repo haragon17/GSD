@@ -56,7 +56,7 @@ public class JobsController {
 		this.jobsDao = (JobsDao) this.context.getBean("JobsDao");
 	}
 	
-	@RequestMapping(value = "/jobReport")
+	@RequestMapping(value = "/jobSummaryReport")
 	public ModelAndView viewJobsReport(HttpServletRequest request, HttpServletResponse response){
 		
 		HttpSession session = request.getSession();
@@ -73,7 +73,7 @@ public class JobsController {
 		int type = user.getUserModel().getUsr_type();
 		
 		if (type == 0 || type == 1) {
-			return new ModelAndView("JobReport");
+			return new ModelAndView("jobSummaryReport");
 		} else {
 			return new ModelAndView("AccessDenied");
 		}
@@ -849,8 +849,8 @@ public class JobsController {
 		return new ModelAndView("jsonView", jobj);
 	}
 	
-	@RequestMapping(value="printReport")
-	public ModelAndView printReport(HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value="jobReport")
+	public ModelAndView printJobReport(HttpServletRequest request, HttpServletResponse response) {
 		
 		int job_id = Integer.parseInt(request.getParameter("job_id"));
 		
@@ -863,7 +863,24 @@ public class JobsController {
 		map.put("jobs", job);
 		map.put("item", item);
 		
-		return new ModelAndView("report-print", map);
+		return new ModelAndView("jobreport-print", map);
+	}
+	
+	@RequestMapping(value="jobDailyReport")
+	public ModelAndView printJobDailyReport(HttpServletRequest request, HttpServletResponse response) {
+		
+		int job_id = Integer.parseInt(request.getParameter("job_id"));
+		
+		Jobs job = jobsDao.searchJobsByID(job_id);
+		List<JobsReference> jobRefList = jobsDao.getJobDailyReportList(job_id);
+		List<JobsReference> jobRefItem = jobsDao.getJobDailyReportItem(job.getProj_id());
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("list", jobRefList);
+		map.put("item", jobRefItem);
+		map.put("jobs", job);
+		
+		return new ModelAndView("jobdailyreport-print", map);
 	}
 	
 	@RequestMapping(value="radarItem")

@@ -481,39 +481,20 @@ Ext.onReady(function() {
 		autoWidth : true,
 		frame : true,
 		store : store.projects,
-//		tbar: [{
-//            text: 'Expand All',
-//            scope: this,
-//            handler: this.onAddClick
-//        },{
-//        	text: 'Collapse All',
-//            scope: this,
-//            handler: this.onAddClick
-//        }],
-		tools : [ {
-			xtype : 'button',
-			text : 'Report',
-			id : 'ireport',
-			margin : '0 5 0 0',
-			disabled : true,
-			iconCls : 'icon-print',
-			handler : function() {
-				alert("Print Report!");
-				var form = Ext.getCmp('formPanel').getForm();	   	
-//				if (form.isValid()) {
-//                    
-//                	console.debug("Valid genarate form...");
-//                	
-//                    form.submit({
-//                    	target : '_blank',
-//                        url: 'printReport.htm',
-//                        method: 'POST',
-//                        reset: true,
-//                        standardSubmit: true,
-//                    });
-//                }
-			}
-		},{
+		tools : [ 
+//		{
+//			xtype : 'button',
+//			text : 'Report',
+//			id : 'ireport',
+//			margin : '0 5 0 0',
+//			disabled : true,
+//			iconCls : 'icon-print',
+//			handler : function() {
+//				alert("Print Report!");
+//				var form = Ext.getCmp('formPanel').getForm();	   	
+//			}
+//		},
+		{
 			xtype : 'button',
 			text : 'Add Project',
 			id : 'icreate',

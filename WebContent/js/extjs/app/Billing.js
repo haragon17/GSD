@@ -292,7 +292,7 @@ Ext.onReady(function() {
 				myForm = Ext.getCmp('formPanel').getForm();
 				myForm.submit({
 					target : '_blank',
-	                        url: 'printReport.htm?job_id='+job_id,
+	                        url: 'jobReport.htm?job_id='+job_id,
 	                        method: 'POST',
 	                        reset: true,
 	                        standardSubmit: true

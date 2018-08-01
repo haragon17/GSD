@@ -1447,4 +1447,34 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		return result;
 	}
 
+	@Override
+	public List<JobsReference> getJobDailyReportList(int job_id) {
+		
+		String sql = "SELECT job_in, jobs_reference.proj_ref_id, sum(amount) as total_amount\n" +
+				"FROM jobs_reference\n" +
+				"LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n" +
+				"LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n" +
+				"WHERE job_id="+job_id+"\n" +
+				"GROUP BY job_in, jobs_reference.proj_ref_id\n" +
+				"ORDER BY jobs_reference.job_in ASC";
+		
+		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
+		return result;
+	}
+	
+	@Override
+	public List<JobsReference> getJobDailyReportItem(int proj_id) {
+		
+		String sql = "SELECT projects_reference.proj_ref_id, projects_reference.topix_article_id, item.itm_name, projects_reference.price, projects.proj_currency\n" +
+				"FROM projects_reference\n" +
+				"LEFT JOIN projects ON projects.proj_id = projects_reference.proj_id\n" +
+				"LEFT JOIN item ON item.itm_id = projects_reference.itm_id\n" +
+				"WHERE projects_reference.proj_id = "+proj_id+"\n" +
+				"AND activated = 1\n" +
+				"ORDER BY projects_reference.topix_article_id ASC";
+		
+		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
+		return result;
+	}
+
 }

@@ -30,6 +30,9 @@ public class JobsReference {
 	private BigDecimal sent_amount;
 	private BigDecimal total_amount;
 	private String job_ref_number;
+	private String topix_article_id;
+	private BigDecimal price;
+	private String proj_currency;
 	
 	public int getJob_ref_id() {
 		return job_ref_id;
@@ -180,6 +183,24 @@ public class JobsReference {
 	}
 	public void setJob_ref_number(String job_ref_number) {
 		this.job_ref_number = job_ref_number;
+	}
+	public String getTopix_article_id() {
+		return topix_article_id;
+	}
+	public void setTopix_article_id(String topix_article_id) {
+		this.topix_article_id = topix_article_id;
+	}
+	public BigDecimal getPrice() {
+		return price;
+	}
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+	public String getProj_currency() {
+		return proj_currency;
+	}
+	public void setProj_currency(String proj_currency) {
+		this.proj_currency = proj_currency;
 	}
 	
 }

@@ -297,7 +297,8 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 				"Projects Reference:"+proj2.getProj_id(),
 				user.getUserModel().getUsr_name(),
 				"Created Item name="+itm.getItm_name()+" on Project name="+proj2.getProj_name()+", customer="+cus.getCus_name()
-				+", target_time="+proj.getTime()+", actual_time="+proj.getActual_time()+", price="+proj.getPrice()+", desc="+proj.getProj_ref_desc()+", topix_article_id="+proj.getTopix_article_id(),
+				+", target_time="+proj.getTime()+", actual_time="+proj.getActual_time()+", price="+proj.getPrice()+", desc="+proj.getProj_ref_desc()
+				+", topix_article_id="+proj.getTopix_article_id()+", activated="+((proj.getActivated() == 0) ? "No" : "Yes"),
 				proj2.getProj_name()+" : "+itm.getItm_name()
 		});
 	}

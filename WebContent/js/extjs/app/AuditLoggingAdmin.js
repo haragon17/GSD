@@ -154,6 +154,7 @@ Ext.onReady(function() {
 	        					myText = myText.replace(/, tpx_inv_number=/gi, "<br>Topix Number= ");
 	        					myText = myText.replace(/, tpx_ref_info=/gi, "<br>Topix Item= ");
 	        					myText = myText.replace(/, inv_discount=/gi, "<br>Discount(%)= ");
+	        					myText = myText.replace(/, activated=/gi, "<br>Activated= ");
 	        					myText = myText.replace(/Item List/gi, "Item");
 	        					myText = myText.replace('Created row on ', "");
 	        					myText = myText.replace('Created ', "");

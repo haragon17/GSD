@@ -58,6 +58,10 @@ public interface JobsDao {
 	
 	public void updateJobReferenceBatch(List<JobsReference> jobRefLs);
 	
+	public List<JobsReference> getJobDailyReportList(int job_id);
+	
+	public List<JobsReference> getJobDailyReportItem(int proj_id);
+	
 	public List<JobsReference> getListDataFromJson(Object data);
 	
 	public List<JobsReference> getListDataFromRequest(Object data);

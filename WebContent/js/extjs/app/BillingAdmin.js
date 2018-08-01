@@ -420,7 +420,7 @@ Ext.onReady(function() {
 			}
 		},{
 			xtype : 'button',
-			text : 'Report',
+			text : 'Job Report',
 			id : 'ireport',
 			iconCls : 'icon-excel',
 //			disabled : true,
@@ -429,7 +429,24 @@ Ext.onReady(function() {
 				myForm = Ext.getCmp('formPanel').getForm();
 				myForm.submit({
 					target : '_blank',
-	                        url: 'printReport.htm?job_id='+job_id,
+	                        url: 'jobReport.htm?job_id='+job_id,
+	                        method: 'POST',
+	                        reset: true,
+	                        standardSubmit: true
+				})
+			}
+		},{
+			xtype : 'button',
+			text : 'Daily Report',
+			id : 'ireport2',
+			iconCls : 'icon-excel',
+//			disabled : true,
+			handler : function() {
+				job_id = Ext.getCmp('jobid_ref').getValue();
+				myForm = Ext.getCmp('formPanel').getForm();
+				myForm.submit({
+					target : '_blank',
+	                        url: 'jobDailyReport.htm?job_id='+job_id,
 	                        method: 'POST',
 	                        reset: true,
 	                        standardSubmit: true
@@ -954,7 +971,7 @@ Ext.onReady(function() {
 //				myForm = Ext.getCmp('formPanel').getForm();
 //				myForm.submit({
 //					target : '_blank',
-//	                        url: 'printReport.htm?job_id='+job_id,
+//	                        url: 'jobReport.htm?job_id='+job_id,
 //	                        method: 'POST',
 //	                        reset: true,
 //	                        standardSubmit: true
@@ -1383,7 +1400,7 @@ Ext.onReady(function() {
 //				myForm = Ext.getCmp('formPanel').getForm();
 //				myForm.submit({
 //					target : '_blank',
-//	                        url: 'printReport.htm?job_id='+job_id,
+//	                        url: 'jobReport.htm?job_id='+job_id,
 //	                        method: 'POST',
 //	                        reset: true,
 //	                        standardSubmit: true
