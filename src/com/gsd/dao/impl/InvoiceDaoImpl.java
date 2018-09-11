@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,20 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				"LEFT JOIN (select inv_id, sum(inv_ref_price*inv_ref_qty) as total_inv_price from invoice_reference group by inv_id) x on x.inv_id = inv.inv_id\n"+
 				"LEFT JOIN (SELECT inv_id, count(*) AS count_tpx FROM invoice_reference inv_ref LEFT JOIN projects_reference proj_ref ON proj_ref.proj_ref_id = inv_ref.proj_ref_id WHERE topix_article_id = '' GROUP BY inv_id) y on y.inv_id = inv.inv_id\n"+
 				"WHERE inv.inv_id != 0\n";
-				
+		
+		if(data.get("first_inv")==null || data.get("first_inv").isEmpty()){
+		}else{
+			Date todayDate = new Date(); // your date
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(todayDate);
+//			cal.add(Calendar.MONTH, +4);
+			int year = cal.get(Calendar.YEAR);
+			int month = cal.get(Calendar.MONTH);
+			cal.add(Calendar.MONTH, -1);
+			int p_year = cal.get(Calendar.YEAR);
+			int p_month = cal.get(Calendar.MONTH);
+			sql += "AND inv.inv_delivery_date BETWEEN '"+p_year+"-"+(p_month+1)+"-01' AND '"+year+"-"+(month+1)+"-01'\n";
+		}
 		if(data.get("inv_proj_no")==null || data.get("inv_proj_no").isEmpty()){
 		}else{
 			sql += "AND LOWER(inv.inv_proj_no) LIKE LOWER('%"+data.get("inv_proj_no")+"%')\n";
@@ -1015,17 +1029,42 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 	}
 	
 	@Override
-	public void deleteInvoiceReference(int id) {
+	public void deleteInvoiceReference(int id, Map<String, Float> map) {
 		
 		InvoiceReference inv_ref_audit = getInvoiceReferenceById(id);
 		
 		String sql = "DELETE FROM invoice_reference WHERE inv_ref_id="+id;
 		this.getJdbcTemplate().update(sql);
 		
+		Invoice inv = getInvoiceById(inv_ref_audit.getInv_id());
+		List<InvoiceReference> inv_refLs = searchInvoiceReference(inv_ref_audit.getInv_id());
+		BigDecimal total_price = BigDecimal.ZERO;
+		BigDecimal negative_price = BigDecimal.ZERO;
+		for(int i=0; i<inv_refLs.size(); i++){
+			BigDecimal price = inv_refLs.get(i).getInv_ref_price().multiply(inv_refLs.get(i).getInv_ref_qty());
+			if(price.floatValue() >= 0){
+				BigDecimal vat = (inv.getInv_vat().divide(new BigDecimal(100))).add(new BigDecimal(1));
+				price = price.multiply(vat);
+				total_price = total_price.add(price);
+			}else{
+				negative_price = negative_price.add(price);
+			}
+		}
+		total_price = total_price.add(negative_price);
+		String currency = inv.getInv_currency();
+		if(currency.equals("EUR")){
+//			System.out.println(String.format("%.2f", total_price)+" EUR");
+		}else{
+			float total_eur = total_price.floatValue() / map.get(currency);
+			total_price = new BigDecimal(total_eur);
+		}
+		
+		String sql_total = "UPDATE invoice SET inv_total_price_eur="+String.format("%.2f", total_price)+" WHERE inv_id="+inv_ref_audit.getInv_id();
+		this.getJdbcTemplate().update(sql_total);
+		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
-				
 				id,
 				"Invoice Reference:"+inv_ref_audit.getInv_id(),
 				user.getUserModel().getUsr_name(),

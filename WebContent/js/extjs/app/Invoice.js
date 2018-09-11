@@ -945,7 +945,7 @@ Ext.onReady(function() {
 				var form = this.up('form').getForm();
 				if(form.isValid()){
 					Ext.Ajax.request({
-						url : 'searchInvoiceParam.htm' + getParamValues(),
+						url : 'searchInvoiceParam.htm?first_inv=' + getParamValues(),
 						success : function(response, opts) {
 							store.invoice.reload();
 							panel.tabs.setActiveTab('invoiceTabs');
@@ -1841,6 +1841,14 @@ Ext.onReady(function() {
 			}
 		}
 	});
+	
+	Ext.Ajax.request({
+		url : 'searchInvoiceParam.htm?first_inv=yes',
+		success : function(response, opts) {
+			store.invoice.loadPage(1);
+		}
+	});
+	
 }); //end on ready
 
 Ext.define('invoiceModel', {
@@ -1934,7 +1942,7 @@ store.invoice = Ext.create('Ext.data.JsonStore', {
 	model : 'invoiceModel',
 	id : 'invoiceStore',
 	pageSize : 999,
-	autoLoad : true,
+//	autoLoad : true,
 	proxy : {
 		type : 'ajax',
 		url : 'searchInvoice.htm',
@@ -3618,7 +3626,7 @@ function confirmChkRef(btn) {
 function getParamValues() {
 	var url = "";
 	var param = "";
-	var prefix = "?";
+	var prefix = "&";
 	var queryStr = "";
 	var i = 1;
 	var count = 0;

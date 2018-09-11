@@ -97,6 +97,8 @@ public class InvoiceController {
 		map.put("delivery_limit", (String)session.getAttribute("delivery_limit"));
 		map.put("inv_cus_id", (String)session.getAttribute("inv_cus_id"));
 		map.put("inv_bill_type", (String)session.getAttribute("inv_bill_type"));
+		map.put("first_inv", (String)session.getAttribute("first_inv"));
+		
 		
 		if(map.get("delivery_start")!=null && !map.get("delivery_start").isEmpty()){
 			String delivery_start = map.get("delivery_start");
@@ -156,7 +158,7 @@ public class InvoiceController {
 		session.setAttribute("delivery_limit", request.getParameter("delivery_limit"));
 		session.setAttribute("inv_cus_id", request.getParameter("scus_id"));
 		session.setAttribute("inv_bill_type", request.getParameter("sinv_bill_type"));
-		
+		session.setAttribute("first_inv", request.getParameter("first_inv"));
 	}
 	
 	@RequestMapping(value = "/invoiceCurrencyParam")
@@ -562,9 +564,11 @@ public class InvoiceController {
 	
 	@RequestMapping(value = "/deleteInvoiceReference")
 	public void deleteInvoiceReference(HttpServletRequest request, HttpServletResponse response){
+		Map<String, Float> map = new HashMap<String, Float>();
+		map = getCurrencyRate(request, response);
 		int id = Integer.parseInt(request.getParameter("id"));
 		try{
-			invoiceDao.deleteInvoiceReference(id);
+			invoiceDao.deleteInvoiceReference(id,map);
 		}catch(Exception e){
 			logger.error("Cannot delete inv_ref_id = "+id+"\n"+e.getMessage());
 		}

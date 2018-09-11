@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jxl.CellType;
+import jxl.biff.FontRecord;
 import jxl.format.Alignment;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
@@ -24,6 +25,7 @@ import jxl.write.Label;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.Number;
+import jxl.write.NumberFormat;
 import jxl.write.WritableCellFormat;
 
 import org.springframework.web.servlet.view.document.AbstractJExcelView;
@@ -53,6 +55,24 @@ public class JobDailyReport extends AbstractJExcelView{
         DateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //		Date date = new Date();
 		
+        String jobCurrency = item.get(0).getProj_currency();
+        System.out.println("Currency = "+jobCurrency);
+        
+        CellFormat currency;
+        
+        if(jobCurrency.equals("EUR")){
+        	currency = ws.getWritableCell(0, 1).getCellFormat();
+        }else if(jobCurrency.equals("USD") || jobCurrency.equals("AUD")){
+        	currency = ws.getWritableCell(1, 1).getCellFormat();
+        }else if(jobCurrency.equals("GBP")){
+        	currency = ws.getWritableCell(2, 1).getCellFormat();
+        }else if(jobCurrency.equals("CHF")){
+        	currency = ws.getWritableCell(3, 1).getCellFormat();
+        }else if(jobCurrency.equals("THB")){
+        	currency = ws.getWritableCell(4, 1).getCellFormat();
+        }else{
+        	currency = ws.getWritableCell(0, 1).getCellFormat();
+        }
         
 //        workbook.setColourRGB(Colour.LIGHT_GREEN, 197, 225, 182);
 //        workbook.setColourRGB(Colour.LIGHT_GREEN, 196, 190, 153);
@@ -61,9 +81,16 @@ public class JobDailyReport extends AbstractJExcelView{
         format04.setBackground(Colour.LIGHT_ORANGE);
         ws.getWritableCell(0, 4).setCellFormat(format04);
         
+//        NumberFormat euroSuffixCurrency = new NumberFormat("#,##0.00" + NumberFormat.CURRENCY_EURO_SUFFIX, NumberFormat.COMPLEX_FORMAT);
+        WritableCellFormat format14cur = new WritableCellFormat(currency);
         WritableCellFormat format14 = new WritableCellFormat(ws.getWritableCell(1, 4).getCellFormat());
-        format14.setBackground(Colour.LIGHT_ORANGE);
-        ws.getWritableCell(1, 4).setCellFormat(format14);
+        format14cur.setAlignment(format14.getAlignment());
+        format14cur.setBackground(Colour.LIGHT_ORANGE);
+        format14cur.setBorder(Border.ALL, BorderLineStyle.THIN);
+        format14cur.setFont((FontRecord) format14.getFont());
+//        format14.setBackground(Colour.LIGHT_ORANGE);
+        
+        ws.getWritableCell(1, 4).setCellFormat(format14cur);
 
         workbook.setColourRGB(Colour.OLIVE_GREEN, 110, 174, 79);
         WritableCellFormat format12 = new WritableCellFormat(ws.getWritableCell(1, 2).getCellFormat());
@@ -83,8 +110,8 @@ public class JobDailyReport extends AbstractJExcelView{
         
         //Header
         Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-        ws.addCell(new Label(0,0,job.getCus_name()+"("+job.getProj_name()+") : " +job.getJob_name(),ws.getWritableCell(0, 0).getCellFormat()));
-        ws.addCell(new Label(0,4,"Price per image ("+item.get(0).getProj_currency()+")",ws.getWritableCell(0, 4).getCellFormat()));
+        ws.addCell(new Label(0,0,job.getCus_name()+" - " +job.getJob_name(),ws.getWritableCell(0, 0).getCellFormat()));
+        ws.addCell(new Label(0,4,"Price per image",ws.getWritableCell(0, 4).getCellFormat()));
         int y=0;
         for(int x=0;x<item.size();x++){
         	y=x+1;
@@ -98,11 +125,17 @@ public class JobDailyReport extends AbstractJExcelView{
         	
         }
         
-        ws.addCell(new Label((y+3),4,"Daily Price ("+item.get(0).getProj_currency()+")",ws.getWritableCell(0, 4).getCellFormat()));
+        ws.addCell(new Label((y+3),4,"Daily Price",ws.getWritableCell(0, 4).getCellFormat()));
         workbook.setColourRGB(Colour.LIGHT_TURQUOISE2, 189, 215, 237);
         WritableCellFormat formatDailyPrice = new WritableCellFormat(ws.getWritableCell((y+3), 4).getCellFormat());
+        formatDailyPrice.setAlignment(Alignment.CENTRE);
         formatDailyPrice.setBackground(Colour.LIGHT_TURQUOISE2);
         ws.getWritableCell((y+3), 4).setCellFormat(formatDailyPrice);
+        
+        WritableCellFormat formatDailyPriceCur = new WritableCellFormat(currency);
+        formatDailyPriceCur.setBackground(Colour.LIGHT_TURQUOISE2);
+        formatDailyPriceCur.setBorder(Border.ALL, BorderLineStyle.THIN);
+        formatDailyPriceCur.setFont((FontRecord) formatDailyPrice.getFont());
         
         int row = 4;
         String chkDate = "";
@@ -140,18 +173,23 @@ public class JobDailyReport extends AbstractJExcelView{
         			}
         			sumDaily += "("+dd+(row+1)+"*"+dd+"5)";
         		}
-        		ws.addCell(new Formula((y+3), row, sumDaily, formatDailyPrice));
+        		ws.addCell(new Formula((y+3), row, sumDaily, formatDailyPriceCur));
         	}
         	
         	int col = map.get(list.get(i).getProj_ref_id());
         	ws.addCell(new Number(col,row,list.get(i).getTotal_amount().doubleValue(),ws.getWritableCell(col, 5).getCellFormat()));
         }
         row++;
-        ws.addCell(new Label(0,row,"Price per item ("+item.get(0).getProj_currency()+")",ws.getWritableCell(0, 4).getCellFormat()));
+        ws.addCell(new Label(0,row,"Price per item",ws.getWritableCell(0, 4).getCellFormat()));
         workbook.setColourRGB(Colour.LIGHT_BLUE, 180, 197, 230);
         WritableCellFormat formatPricePerItem = new WritableCellFormat(ws.getWritableCell(0, row).getCellFormat());
         formatPricePerItem.setBackground(Colour.LIGHT_BLUE);
         ws.getWritableCell(0, row).setCellFormat(formatPricePerItem);
+        WritableCellFormat formatPricePerItemCur = new WritableCellFormat(currency);
+        formatPricePerItemCur.setBackground(Colour.LIGHT_BLUE);
+        formatPricePerItemCur.setBorder(Border.ALL, BorderLineStyle.THIN);
+        formatPricePerItemCur.setFont((FontRecord) formatPricePerItem.getFont());
+        
         for(int b=1;b<=y;b++){
         	int c;
         	String d;
@@ -162,7 +200,7 @@ public class JobDailyReport extends AbstractJExcelView{
         		c = b+65;
         		d = "" + ((char)c);
         	}
-    		ws.addCell(new Formula(b,row,"SUM("+d+"6:"+d+row+")*"+d+"5",formatPricePerItem));
+    		ws.addCell(new Formula(b,row,"SUM("+d+"6:"+d+row+")*"+d+"5",formatPricePerItemCur));
     	}
         String sumRow;
 		if((y+3)>25){
@@ -172,12 +210,22 @@ public class JobDailyReport extends AbstractJExcelView{
 			int xx = y+3+65;
 			sumRow = ""+((char)xx);
 		}
-		ws.addCell(new Label(y+2,row, "Total Amount ("+item.get(0).getProj_currency()+")", ws.getWritableCell(0, 4).getCellFormat()));
+		ws.addCell(new Label(y+2,row, "Total Amount", ws.getWritableCell(0, 4).getCellFormat()));
 //		workbook.setColourRGB(Colour.LIGHT_ORANGE, 248, 203, 174);
         WritableCellFormat formatTotal = new WritableCellFormat(ws.getWritableCell(y+2, row).getCellFormat());
+        formatTotal.setAlignment(Alignment.CENTRE);
         formatTotal.setBackground(Colour.LIGHT_ORANGE);
         ws.getWritableCell(y+2, row).setCellFormat(formatTotal);
-		ws.addCell(new Formula(y+3,row,"SUM("+sumRow+"6:"+sumRow+row+")",formatTotal));
+        WritableCellFormat formatTotalCur = new WritableCellFormat(currency);
+        formatTotalCur.setBackground(Colour.LIGHT_ORANGE);
+        formatTotalCur.setBorder(Border.ALL, BorderLineStyle.THIN);
+        formatTotalCur.setFont((FontRecord) formatTotal.getFont());
+		ws.addCell(new Formula(y+3,row,"SUM("+sumRow+"6:"+sumRow+row+")",formatTotalCur));
+		if(job.getCus_code().equals("CBR")){
+			ws.addCell(new Label(y+2,row+1, "z.zgl 19% MwSt.",formatTotal));
+			ws.addCell(new Formula(y+3,row+1,sumRow+(row+1)+"*1.19",formatTotalCur));
+		}
+		
 		ws.mergeCells(0, 2, 0, 3);
 	}
 

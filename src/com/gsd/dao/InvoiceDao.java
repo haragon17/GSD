@@ -32,7 +32,7 @@ public interface InvoiceDao {
 	
 	public void deleteInvoice(int id);
 	
-	public void deleteInvoiceReference(int id);
+	public void deleteInvoiceReference(int id, Map<String, Float> map);
 	
 	public Invoice getInvoiceById(int id);
 	
