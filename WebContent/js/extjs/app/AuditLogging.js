@@ -3,7 +3,266 @@ panels = {};
 
 Ext.onReady(function() {
 
-	panels.log = Ext.create('Ext.grid.Panel', {
+	panels.search = Ext.create('Ext.form.Panel', {
+		title : 'Search Criteria',
+		autoWidth : true,
+		id : 'formPanel',
+		width : 800,
+		height : 175,
+		collapsible : true,
+		collapsed : true,
+		renderTo : document.body,
+		style : {
+			"margin-left" : "auto",
+			"margin-right" : "auto",
+			"margin-top" : "30px"
+		},
+		layout : 'column',
+		fieldDefaults : {
+			labelAlign : '',
+			msgTarget : 'side'
+		},
+		defaults : {
+			xtype : 'container',
+			layout : 'form',
+			columnWidth : 1,
+			labelWidth : 0,
+			anchor : '100%',
+			hideBorders : false,
+			padding : '10 10 10 10'
+		},
+
+		items : [ {
+			layout : 'column',
+			border : false,
+			items : [ {
+				columnWidth : 0.66,
+				border : false,
+				layout : 'anchor',
+				style : {
+					"margin-left" : "50px",
+					"margin-right" : "auto",
+					"margin-top" : "10px",
+					"margin-bottom" : "10px"
+				},
+				defaultType : 'textfield',
+				items : [ 
+				    {
+				    	fieldLabel : 'Reference ',
+				    	name : 'sparent_ref',
+				    	id : 'sparent_ref',
+				    	labelWidth : 110,
+						margin : '0 0 10 0',
+						width : 340,
+						emptyText : 'Reference'
+				    },     
+					{
+						fieldLabel : 'Update Date ',
+						name : 'scommit_date',
+						id : 'scommit_date',
+						combineErrors: true,
+						xtype: 'fieldcontainer',
+						labelWidth : 110,
+						margin : '0 0 10 0',
+						width : 350,
+						layout: 'hbox',
+		                defaults: {
+		                    flex: 1,
+		                },
+		                items: [
+		                    {
+		                        xtype     : 'datefield',
+		                        name      : 'commit_start',
+		                        id	: 'commit_start',
+		                        labelSeparator : '',
+		                        margin: '0 0 0 0',
+		                        msgTarget : 'side',
+		                        width: 50,
+		                        editable: false,
+		                        format: 'Y-m-d',
+		                        maxValue: new Date(),
+		                        emptyText : 'Start',
+		                        listeners: {
+		                        	   "change": function () {
+		                        		   			var startDate = Ext.getCmp('commit_start').getRawValue();
+		                        		   			Ext.getCmp('commit_finish').setMinValue(startDate);
+		                        	   }
+		                        }
+		                    },{
+		                    	 xtype: 'fieldcontainer',
+		     	                fieldLabel: 'To ',
+		     	                combineErrors: true,
+		     	                msgTarget : 'side',
+		     	                margin: '0 0 0 5',
+		                    	labelSeparator : '',
+		                        Width : 20
+		                    },
+		                    {
+		                        xtype     : 'datefield',
+		                        margin: '0 10 0 -80',	
+		                        name      : 'commit_finish',
+		                        id	: 'commit_finish',
+		                        labelSeparator : '',
+		                        msgTarget : 'side',
+		                        width: 50,
+		                        editable: false,
+		                        format: 'Y-m-d',
+		                        maxValue: new Date(),
+		                        emptyText : 'Finish',
+		                        listeners: {
+		                        	"change": function () {
+		                        		   	var endDate = Ext.getCmp('commit_finish').getRawValue();
+		                           			Ext.getCmp('commit_start').setMaxValue(endDate);
+		                        	}
+		                        }
+		                    }
+		                ]
+					} ]
+			}, {
+				columnWidth : 0.33,
+				style : {
+					"margin-left" : "-80px",
+					"margin-right" : "10px",
+					"margin-top" : "10px",
+				},
+				border : false,
+				layout : 'anchor',
+				defaultType : 'textfield',
+				items : [ 
+//				{
+//					xtype : 'combobox',
+//					fieldLabel : 'Department ',
+//					name : 'sdept',
+//					id : 'sdept',
+//					queryMode : 'local',
+//					labelWidth : 110,
+//					emptyText : 'Department',
+//					editable : false,
+//					width : 300,
+//					margin : '0 0 10 0',
+//					msgTarget: 'under',
+//					store : {
+//						fields : ['db_ref_name'],
+//						proxy : {
+//							type : 'ajax',
+//							url : 'showDepartment.htm',
+//							reader : {
+//								type : 'json',
+//								root : 'records',
+//							}
+//						},
+//						autoLoad : true
+//					},
+//					valueField : 'db_ref_name',
+//					displayField : 'db_ref_name',
+//					listeners : {
+//						select : function() {
+//							var dept = Ext.getCmp('sdept').getValue();
+//							var process = Ext.getCmp('sprocess');
+//							
+//							process.clearValue();
+//							process.getStore().removeAll();
+//							process.getStore().load({
+//								url: 'showTimeRecordReference.htm?kind=Process&dept='+dept
+//							});
+//						}
+//					}
+//				},
+				{
+					xtype : 'combobox',
+					fieldLabel : 'Object ',
+					name : 'sparent_object',
+					id : 'sparent_object',
+					queryMode : 'local',
+					labelWidth : 110,
+					emptyText : 'Object',
+					editable : false,
+					width : 300,
+					margin : '0 0 10 0',
+					msgTarget: 'under',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showDBReference.htm?kind=LoggingObject&dept=-',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name'
+				},
+				{
+					xtype : 'combobox',
+					fieldLabel : 'Operation ',
+					name : 'scommit_type',
+					id : 'scommit_type',
+					queryMode : 'local',
+					labelWidth : 110,
+					editable : false,
+					emptyText : 'Operation',
+					width : 300,
+					magin : '0 0 10 0',
+//					store : 'jobStatus',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showDBReference.htm?kind=LoggingType&dept=-',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+				}  ]
+			} ]
+		} ],
+
+		buttons : [ {
+			text : 'Search',
+			id : 'search_auddit',
+			handler : function() {
+				var form = this.up('form').getForm();
+				if (form.isValid()) {
+//					Ext.getCmp('ireport').setDisabled(false);
+					Ext.Ajax.request({
+						url : 'searchAudditParam.htm?first_aud='+ getParamValues(),
+						success : function(response, opts) {
+							store.audditLogging.loadPage(1);
+						}
+					});
+
+				} else {
+					Ext.MessageBox.show({
+						title : 'Failed',
+						msg : ' Please Check On Invalid Field!',
+						buttons : Ext.MessageBox.OK,
+						icon : Ext.MessageBox.ERROR,
+						animateTarget : 'search_auddit',
+					});
+					console.debug("AudditLogging.js - Search else conditions");
+				}
+			}
+		}, {
+			text : 'Reset',
+			handler : function() {
+				this.up('form').getForm().reset();
+				Ext.getCmp('commit_start').setMaxValue(new Date());
+				Ext.getCmp('commit_finish').setMinValue('');
+			}
+		} ]
+
+	});
+
+	
+	panels.audditLogging = Ext.create('Ext.grid.Panel', {
 		frame : true,
 		title : 'History State',
 //		bodyPadding : 5,
@@ -31,7 +290,7 @@ Ext.onReady(function() {
             "margin-top": "50px",
             "margin-bottom": "20px"
         },
-		store : store.log,
+		store : store.audditLogging,
 		columns : [ {
 			text : 'Object Name',
 			flex : 2,
@@ -189,13 +448,20 @@ Ext.onReady(function() {
 	        )
 	    }],
 		bbar : Ext.create('Ext.PagingToolbar', {
-			store : store.log,
+			store : store.audditLogging,
 			displayInfo : true,
 			displayMsg : 'Displaying Logs {0} - {1} of {2}',
 			emptyMsg : "No Logs to display",
 			plugins : Ext.create('Ext.ux.ProgressBarPager', {})
 		})
 
+	});
+	
+	Ext.Ajax.request({
+		url : 'searchAudditParam.htm?first_aud=yes',
+		success : function(response, opts) {
+			store.audditLogging.loadPage(1);
+		}
 	});
 	
 });
@@ -244,14 +510,14 @@ Ext.define('logModel', {
 	]
 });
 
-store.log = Ext.create('Ext.data.JsonStore', {
+store.audditLogging = Ext.create('Ext.data.JsonStore', {
 	model : 'logModel',
 	id : 'logStore',
 	pageSize : 100,
-	autoLoad : true,
+//	autoLoad : true,
 	proxy : {
 		type : 'ajax',
-		url : 'showAuditLogging.htm',
+		url : 'searchAuditLogging.htm',
 		reader : {
 			type : 'json',
 			root : 'records',
@@ -260,3 +526,33 @@ store.log = Ext.create('Ext.data.JsonStore', {
 		}
 	},
 });
+
+function getParamValues() {
+	var url = "";
+	var param = "";
+	var prefix = "&";
+	var queryStr = "";
+	var i = 1;
+	var count = 0;
+
+	for (param in panels.search.getValues()) {
+
+		count += panels.search.getValues()[param].length;
+
+		if (i == 1) {
+			queryStr += param + "=" + panels.search.getValues()[param];
+		} else {
+			queryStr += "&" + param + "=" + panels.search.getValues()[param];
+		}
+
+		i++;
+	}
+
+	if (count == 0) {
+		url = "";
+	} else {
+		url = prefix + queryStr;
+	}
+
+	return encodeURI(url);
+}

@@ -1,10 +1,13 @@
 package com.gsd.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -48,9 +51,23 @@ public class AuditLoggingController {
 		}
 	}
 	
-	@RequestMapping(value = "/showAuditLogging")
+	@RequestMapping(value = "/searchAudditParam")
+	public void searchAuditParam(HttpServletRequest request, HttpServletResponse response){
+		
+		HttpSession session = request.getSession();
+		session.setAttribute("parent_ref", request.getParameter("sparent_ref"));
+		session.setAttribute("parent_object", request.getParameter("sparent_object"));
+		session.setAttribute("commit_start", request.getParameter("commit_start"));
+		session.setAttribute("commit_finish", request.getParameter("commit_finish"));
+		session.setAttribute("commit_type", request.getParameter("scommit_type"));
+		session.setAttribute("first_aud", request.getParameter("first_aud"));
+		
+	}
+	
+	@RequestMapping(value = "/searchAuditLogging")
 	public ModelAndView showAuditLogging(HttpServletRequest request, HttpServletResponse response){
 	
+		HttpSession session = request.getSession();
 		List<AuditLogging> aud = null;
 		List<AuditLogging> audLs = new ArrayList<AuditLogging>();
 		
@@ -60,13 +77,21 @@ public class AuditLoggingController {
 		if(type != 1 && type != 0){
 			dept = user.getUserModel().getDept();
 		}
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("parent_ref", (String)session.getAttribute("parent_ref"));
+		map.put("parent_object", (String)session.getAttribute("parent_object"));
+		map.put("commit_start", (String)session.getAttribute("commit_start"));
+		map.put("commit_finish", (String)session.getAttribute("commit_finish"));
+		map.put("commit_type", (String)session.getAttribute("commit_type"));
+		map.put("aud_dept", dept);
+		map.put("first_aud", (String)session.getAttribute("first_aud"));
 		
 		int start = Integer.parseInt(request.getParameter("start"));
 		int limit = Integer.parseInt(request.getParameter("limit"));
 		
-		try{
+//		try{
 			
-			aud = auditLoggingDao.showAuditLogging(dept);
+			aud = auditLoggingDao.searchAuditLogging(map);
 			
 			if (limit + start > aud.size()) {
 				limit = aud.size();
@@ -76,9 +101,9 @@ public class AuditLoggingController {
 			for (int i = start; i < (limit); i++) {
 				audLs.add(aud.get(i));
 			}
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-		}
+//		} catch (Exception e) {
+//			logger.error(e.getMessage());
+//		}
 		
 		JSONObject jobj = new JSONObject();
 		jobj.put("records", audLs);
