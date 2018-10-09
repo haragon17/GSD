@@ -145,6 +145,7 @@ public class ProjectsController {
 		session.setAttribute("GBP", request.getParameter("GBP"));
 		session.setAttribute("THB", request.getParameter("THB"));
 		session.setAttribute("USD", request.getParameter("USD"));
+		session.setAttribute("SGD", request.getParameter("SGD"));
 //		proj_name = request.getParameter("sproj_name");
 //		itm_id = request.getParameter("sitm_id");
 //		cus_id = request.getParameter("cus_id");
@@ -200,6 +201,7 @@ public class ProjectsController {
 		map.put("GBP", (String)session.getAttribute("GBP"));
 		map.put("THB", (String)session.getAttribute("THB"));
 		map.put("USD", (String)session.getAttribute("USD"));
+		map.put("SGD", (String)session.getAttribute("SGD"));
 		
 		try {
 			projRef = projectsDao.searchProjectsReferences(map);
@@ -253,6 +255,7 @@ public class ProjectsController {
 		map.put("GBP", (String)session.getAttribute("GBP"));
 		map.put("THB", (String)session.getAttribute("THB"));
 		map.put("USD", (String)session.getAttribute("USD"));
+		map.put("SGD", (String)session.getAttribute("SGD"));
 		
 		int start = Integer.parseInt(request.getParameter("start"));
 		int limit = Integer.parseInt(request.getParameter("limit"));
@@ -443,11 +446,12 @@ public class ProjectsController {
 		String time = request.getParameter("ctime");
 		String actual_time = request.getParameter("cactual_time");
 		String price = request.getParameter("cprice");
-		String currency = request.getParameter("ccurrency");
+//		String currency = request.getParameter("ccurrency");
 		String proj_ref_desc = request.getParameter("cproj_ref_desc");
 		String proj_desc = request.getParameter("cproj_desc");
 		String proj_currency = request.getParameter("cproj_currency");
 		String topix_article_id = request.getParameter("ctopix_article_id");
+		int activated = Integer.parseInt(request.getParameter("cproj_ref_activated"));
 
 		ProjectsReference projRef = new ProjectsReference();
 		Projects proj = new Projects();
@@ -533,54 +537,55 @@ public class ProjectsController {
 			}
 			
 			if(!itm_id.equals("Item Name")){
-			projRef.setProj_ref_id(projectsDao.getLastProjectRefId());
-			projRef.setItm_id(Integer.parseInt(itm_id));
-			projRef.setProj_id(proj.getProj_id());
-
-			if (!time.equals("Time in minutes")) {
-				projRef.setTime(Float.parseFloat(time));
-			} else {
-				projRef.setTime(0);
-			}
-			if (!actual_time.equals("Time in minutes")) {
-				projRef.setActual_time(Float.parseFloat(actual_time));
-			} else {
-				projRef.setActual_time(0);
-			}
-			if (!price.equals("Project Price")) {
-				projRef.setPrice(new BigDecimal(price));
-			} else {
-				projRef.setPrice(new BigDecimal(0));
-			}
-			if (!currency.equals("Price Currency")) {
-				projRef.setCurrency(currency);
-			} else {
-				projRef.setCurrency("");
-			}
-			if (!proj_ref_desc.equals("Item Details")) {
-				proj_ref_desc = proj_ref_desc.replace("\u2028", "\n");
-				proj_ref_desc = proj_ref_desc.replace("\u2029", "\n");
-				projRef.setProj_ref_desc(proj_ref_desc);
-			} else {
-				projRef.setProj_ref_desc("");
-			}
-			if (!topix_article_id.equals("Article ID(Topix)")) {
-				projRef.setTopix_article_id(topix_article_id);
-			} else {
-				projRef.setTopix_article_id("");
-			}
-
-			projRef.setCretd_usr(user.getUserModel().getUsr_id());
-			
-			projectsDao.createProjectsReference(projRef);
-			
-			System.out.println("itm_id = " + projRef.getItm_id());
-			System.out.println("proj_id = " + projRef.getProj_id());
-			System.out.println("time = " + projRef.getTime());
-			System.out.println("price = " + projRef.getPrice());
-			System.out.println("currency = " + projRef.getCurrency());
-			System.out.println("item detail = " + projRef.getProj_ref_desc());
-			System.out.println("topix article id = " + projRef.getTopix_article_id());
+				projRef.setProj_ref_id(projectsDao.getLastProjectRefId());
+				projRef.setItm_id(Integer.parseInt(itm_id));
+				projRef.setProj_id(proj.getProj_id());
+				projRef.setActivated(activated);
+	
+				if (!time.equals("Time in minutes")) {
+					projRef.setTime(Float.parseFloat(time));
+				} else {
+					projRef.setTime(0);
+				}
+				if (!actual_time.equals("Time in minutes")) {
+					projRef.setActual_time(Float.parseFloat(actual_time));
+				} else {
+					projRef.setActual_time(0);
+				}
+				if (!price.equals("Project Price")) {
+					projRef.setPrice(new BigDecimal(price));
+				} else {
+					projRef.setPrice(new BigDecimal(0));
+				}
+//				if (!currency.equals("Price Currency")) {
+//					projRef.setCurrency(currency);
+//				} else {
+//					projRef.setCurrency("");
+//				}
+				if (!proj_ref_desc.equals("Item Details")) {
+					proj_ref_desc = proj_ref_desc.replace("\u2028", "\n");
+					proj_ref_desc = proj_ref_desc.replace("\u2029", "\n");
+					projRef.setProj_ref_desc(proj_ref_desc);
+				} else {
+					projRef.setProj_ref_desc("");
+				}
+				if (!topix_article_id.equals("Article ID(Topix)")) {
+					projRef.setTopix_article_id(topix_article_id);
+				} else {
+					projRef.setTopix_article_id("");
+				}
+	
+				projRef.setCretd_usr(user.getUserModel().getUsr_id());
+				
+				projectsDao.createProjectsReference(projRef);
+				
+				System.out.println("itm_id = " + projRef.getItm_id());
+				System.out.println("proj_id = " + projRef.getProj_id());
+				System.out.println("time = " + projRef.getTime());
+				System.out.println("price = " + projRef.getPrice());
+				System.out.println("currency = " + projRef.getCurrency());
+				System.out.println("item detail = " + projRef.getProj_ref_desc());
+				System.out.println("topix article id = " + projRef.getTopix_article_id());
 			}
 			
 //			Map<String, Object> model = new HashMap<String, Object>();

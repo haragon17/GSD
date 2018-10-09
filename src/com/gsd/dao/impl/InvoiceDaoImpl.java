@@ -221,7 +221,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				inv_audit.getInv_id(),
 				"Invoice",
 				user.getUserModel().getUsr_name(),
-				"Created Invoice name="+inv.getInv_name()+" on Company name="+inv.getInv_company_name()+", customer="+inv_audit.getCus_name()
+				"Created Invoice name="+inv.getInv_name()+" on Company name="+inv_audit.getInv_company_name()+", customer="+inv_audit.getCus_name()
 				+", inv_proj_no="+inv.getInv_proj_no()+", inv_delivery_date="+delivery_date+", inv_payment_terms="+inv.getInv_payment_terms()
 				+", inv_vat="+inv.getInv_vat()+", bill_to="+inv.getInv_bill_to()+", currency="+inv.getInv_currency()+", inv_discount="+inv.getInv_discount(),
 				inv.getInv_name()

@@ -5065,6 +5065,9 @@ Ext.define('exModel', {
 	}, {
 		name : 'CHF',
 		type : 'float'
+	}, {
+		name : 'SGD',
+		type : 'float'
 	}
 
 	]
@@ -5088,7 +5091,8 @@ store.exchangeRates = Ext.create('Ext.data.JsonStore', {
 			Ext.Ajax.request({
 				url : 'invoiceCurrencyParam.htm?AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
 				'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
-				'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&USD='+store.exchangeRates.getAt(0).data.USD,
+				'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&USD='+store.exchangeRates.getAt(0).data.USD+
+				'&SGD='+store.exchangeRates.getAt(0).data.SGD,
 				success : function(response, opts) {}
 			});
 		}
@@ -5103,7 +5107,8 @@ var currency = Ext.create('Ext.data.Store', {
         {"currency":"EUR", "name":"Euro[EUR]"},
         {"currency":"GBP", "name":"British Pound[GBP]"},
         {"currency":"THB", "name":"Thai Bath[THB]"},
-        {"currency":"USD", "name":"US Dollar[USD]"}
+        {"currency":"USD", "name":"US Dollar[USD]"},
+        {"currency":"SGD", "name":"Singapore Dollar[SGD]"}
     ]
 });
 

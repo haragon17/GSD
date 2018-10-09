@@ -772,6 +772,8 @@ Ext.onReady(function() {
             						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.GBP)*100)/100);
             					}else if(proj_currency == "CHF"){
             						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.CHF)*100)/100);
+            					}else if(proj_currency == "SGD"){
+            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.SGD)*100)/100);
             					}else{
             						myEuro = '-';
             					}
@@ -1047,6 +1049,9 @@ Ext.define('exModel', {
 	}, {
 		name : 'CHF',
 		type : 'float'
+	}, {
+		name : 'SGD',
+		type : 'float'
 	}]
 });
 
@@ -1081,7 +1086,8 @@ var currency = Ext.create('Ext.data.Store', {
         {"currency":"EUR", "name":"Euro[EUR]"},
         {"currency":"GBP", "name":"British Pound[GBP]"},
         {"currency":"THB", "name":"Thai Bath[THB]"},
-        {"currency":"USD", "name":"US Dollar[USD]"}
+        {"currency":"USD", "name":"US Dollar[USD]"},
+        {"currency":"SGD", "name":"Singapore Dollar[SGD]"}
         //...
     ]
 });
@@ -1906,19 +1912,19 @@ addProject = new Ext.create('Ext.window.Window', {
     	            }
     	        }
 //    	    	emptyText: 'java,art,animal,etc...'
-    	    },{
-				xtype : 'combobox',
-				fieldLabel : 'Currency ',
-				name : 'ccurrency',
-				id : 'ccurrency',
-				queryMode : 'local',
-				labelWidth : 120,
-				emptyText : 'Price Currency',
-				editable : false,
-				msgTarget : 'side',
-				store : currency,
-				valueField : 'currency',
-				displayField : 'name',
+//    	    },{
+//				xtype : 'combobox',
+//				fieldLabel : 'Currency ',
+//				name : 'ccurrency',
+//				id : 'ccurrency',
+//				queryMode : 'local',
+//				labelWidth : 120,
+//				emptyText : 'Price Currency',
+//				editable : false,
+//				msgTarget : 'side',
+//				store : currency,
+//				valueField : 'currency',
+//				displayField : 'name',
 			},{
     	    	xtype: 'textarea',
     	    	labelWidth: 120,
@@ -1934,6 +1940,22 @@ addProject = new Ext.create('Ext.window.Window', {
     	    	name: 'ctopix_article_id',
     	    	id: 'ctopix_article_id',
     	    	emptyText: 'Article ID(Topix)'
+    	    },{
+    	    	xtype:'radiogroup',
+    	    	labelWidth: 120,
+    	    	fieldLabel: 'Activated ',
+    	    	name: 'cproj_ref_activated',
+    	    	id: 'cproj_ref_activated',
+    	    	items: [{
+                    inputValue: '1',
+                    boxLabel: 'Yes',
+                    name: 'cproj_ref_activated',
+                    checked: true
+                }, {
+                    inputValue: '0',
+                    boxLabel: 'No',
+                    name: 'cproj_ref_activated'
+                }]
     	    }]
             },{
 				xtype : 'hidden',
@@ -2389,6 +2411,8 @@ function currencyName(value, meta, record, rowIndex, colIndex, store) {
 		fullName = "Thai Bath[THB]";
 	}else if(myCurrency == "USD"){
 		fullName = "US Dollar[USD]";
+	}else if(myCurrency == "SGD"){
+		fullName = "Singapore Dollar[SGD]";
 	}
 	
 	return fullName;

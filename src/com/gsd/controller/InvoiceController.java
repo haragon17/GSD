@@ -170,6 +170,7 @@ public class InvoiceController {
 		session.setAttribute("THB", request.getParameter("THB"));
 		session.setAttribute("EUR", request.getParameter("EUR"));
 		session.setAttribute("USD", request.getParameter("USD"));
+		session.setAttribute("SGD", request.getParameter("SGD"));
 	}
 	
 	@RequestMapping(value = "/showInvoiceCompany")
@@ -876,6 +877,7 @@ public class InvoiceController {
 		map.put("THB", Float.parseFloat((String)session.getAttribute("THB")));
 		map.put("USD", Float.parseFloat((String)session.getAttribute("USD")));
 		map.put("EUR", Float.parseFloat((String)session.getAttribute("EUR")));
+		map.put("SGD", Float.parseFloat((String)session.getAttribute("SGD")));
 		
 		return map;
 	}

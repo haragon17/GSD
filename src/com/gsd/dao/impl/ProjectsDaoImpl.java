@@ -89,6 +89,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 						"WHEN 'GBP' THEN "+data.get("GBP")+"\n" +
 						"WHEN 'THB' THEN "+data.get("THB")+"\n" +
 						"WHEN 'USD' THEN "+data.get("USD")+"\n" +
+						"WHEN 'SGD' THEN "+data.get("SGD")+"\n" +
 						"ELSE 1\n" +
 						"END)*10000)/10000) <= "+data.get("priceLimit")+"\n";
 			}
@@ -99,6 +100,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 					"WHEN 'GBP' THEN "+data.get("GBP")+"\n" +
 					"WHEN 'THB' THEN "+data.get("THB")+"\n" +
 					"WHEN 'USD' THEN "+data.get("USD")+"\n" +
+					"WHEN 'SGD' THEN "+data.get("SGD")+"\n" +
 					"ELSE 1\n" +
 					"END)*10000)/10000) >= "+data.get("priceStart")+"\n";
 		}else{
@@ -108,6 +110,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 					"WHEN 'GBP' THEN "+data.get("GBP")+"\n" +
 					"WHEN 'THB' THEN "+data.get("THB")+"\n" +
 					"WHEN 'USD' THEN "+data.get("USD")+"\n" +
+					"WHEN 'SGD' THEN "+data.get("SGD")+"\n" +
 					"ELSE 1\n" +
 					"END)*10000)/10000) BETWEEN "+data.get("priceStart")+" and "+data.get("priceLimit")+"\n";
 		}
@@ -177,6 +180,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 						"WHEN 'GBP' THEN "+data.get("GBP")+"\n" +
 						"WHEN 'THB' THEN "+data.get("THB")+"\n" +
 						"WHEN 'USD' THEN "+data.get("USD")+"\n" +
+						"WHEN 'SGD' THEN "+data.get("SGD")+"\n" +
 						"ELSE 1\n" +
 						"END)*10000)/10000) <= "+data.get("priceLimit")+"\n";
 			}
@@ -187,6 +191,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 					"WHEN 'GBP' THEN "+data.get("GBP")+"\n" +
 					"WHEN 'THB' THEN "+data.get("THB")+"\n" +
 					"WHEN 'USD' THEN "+data.get("USD")+"\n" +
+					"WHEN 'SGD' THEN "+data.get("SGD")+"\n" +
 					"ELSE 1\n" +
 					"END)*10000)/10000) >= "+data.get("priceStart")+"\n";
 		}else{
@@ -196,6 +201,7 @@ public class ProjectsDaoImpl extends JdbcDaoSupport implements ProjectsDao {
 					"WHEN 'GBP' THEN "+data.get("GBP")+"\n" +
 					"WHEN 'THB' THEN "+data.get("THB")+"\n" +
 					"WHEN 'USD' THEN "+data.get("USD")+"\n" +
+					"WHEN 'SGD' THEN "+data.get("SGD")+"\n" +
 					"ELSE 1\n" +
 					"END)*10000)/10000) BETWEEN "+data.get("priceStart")+" and "+data.get("priceLimit")+"\n";
 		}

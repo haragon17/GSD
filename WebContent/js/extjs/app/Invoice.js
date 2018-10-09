@@ -2128,6 +2128,9 @@ Ext.define('exModel', {
 	}, {
 		name : 'CHF',
 		type : 'float'
+	}, {
+		name : 'SGD',
+		type : 'float'
 	}
 
 	]
@@ -2150,7 +2153,8 @@ store.exchangeRates = Ext.create('Ext.data.JsonStore', {
 			Ext.Ajax.request({
 				url : 'invoiceCurrencyParam.htm?AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
 				'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
-				'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&USD='+store.exchangeRates.getAt(0).data.USD,
+				'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&USD='+store.exchangeRates.getAt(0).data.USD+
+				'&SGD='+store.exchangeRates.getAt(0).data.SGD,
 				success : function(response, opts) {}
 			});
 		}
@@ -2165,7 +2169,8 @@ var currency = Ext.create('Ext.data.Store', {
         {"currency":"EUR", "name":"Euro[EUR]"},
         {"currency":"GBP", "name":"British Pound[GBP]"},
         {"currency":"THB", "name":"Thai Bath[THB]"},
-        {"currency":"USD", "name":"US Dollar[USD]"}
+        {"currency":"USD", "name":"US Dollar[USD]"},
+        {"currency":"SGD", "name":"Singapore Dollar[SGD]"}
     ]
 });
 
@@ -2966,6 +2971,7 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 								var AUD = store.exchangeRates.getAt(0).data.AUD;
 								var GBP = store.exchangeRates.getAt(0).data.GBP;
 								var CHF = store.exchangeRates.getAt(0).data.CHF;
+								var SGD = store.exchangeRates.getAt(0).data.SGD;
 								var myRate = 0;
 								if(currency == "EUR"){
 									myRate = price;
@@ -2979,6 +2985,8 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 									myRate = price/GBP;
 								}else if(currency == "CHF"){
 									myRate = price/CHF;
+								}else if(currency == "SGD"){
+									myRate = price/SGD;
 								}
 								if(inv_currency == "EUR"){
 									new_price = myRate;
@@ -2992,6 +3000,8 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 									new_price = myRate*GBP;
 								}else if(inv_currency == "CHF"){
 									new_price = myRate*CHF;
+								}else if(inv_currency == "SGD"){
+									new_price = myRate*SGD;
 								}
 							}else{
 								new_price = price;
@@ -3262,6 +3272,7 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 								var AUD = store.exchangeRates.getAt(0).data.AUD;
 								var GBP = store.exchangeRates.getAt(0).data.GBP;
 								var CHF = store.exchangeRates.getAt(0).data.CHF;
+								var SGD = store.exchangeRates.getAt(0).data.SGD;
 								var myRate = 0;
 								if(currency == "EUR"){
 									myRate = price;
@@ -3275,6 +3286,8 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 									myRate = price/GBP;
 								}else if(currency == "CHF"){
 									myRate = price/CHF;
+								}else if(currency == "SGD"){
+									myRate = price/SGD;
 								}
 								if(inv_currency == "EUR"){
 									new_price = myRate;
@@ -3288,6 +3301,8 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 									new_price = myRate*GBP;
 								}else if(inv_currency == "CHF"){
 									new_price = myRate*CHF;
+								}else if(inv_currency == "SGD"){
+									new_price = myRate*SGD;
 								}
 							}else{
 								new_price = price;
