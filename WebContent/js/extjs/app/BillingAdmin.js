@@ -1262,9 +1262,17 @@ Ext.onReady(function() {
 				}
 			},
 			{
-				text : "Remark",
+				text : "Detail",
 				flex : 2,
 				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
+				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_remark',
 				editor : {
 					xtype : 'textfield'
 				}
@@ -1718,9 +1726,17 @@ Ext.onReady(function() {
 				hidden : true,
 			},
 			{
-				text : "Remark",
+				text : "Detail",
 				flex : 2,
 				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
+				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_remark',
 				editor : {
 					xtype : 'textfield'
 				}
@@ -2161,9 +2177,17 @@ Ext.onReady(function() {
 				hidden : true,
 			},
 			{
-				text : "Remark",
+				text : "Detail",
 				flex : 2,
 				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
+				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_remark',
 				editor : {
 					xtype : 'textfield'
 				}
@@ -3763,7 +3787,7 @@ Ext.onReady(function() {
 	               			Ext.getCmp('addJobRefForm').getForm().reset();
 	               			Ext.getCmp('atime').clearInvalid();
 		                	Ext.getCmp('atime').allowBlank = true;
-		                	addJobRef.setSize(500,526);
+//		                	addJobRef.setSize(500,526);
 		                	}
 	               	}
 	});
@@ -3907,7 +3931,7 @@ Ext.onReady(function() {
 				},
 	    	    {
 					fieldLabel : 'Deadline ',
-					name : 'ajob_date',
+					name : 'ejob_date',
 					combineErrors: true,
 					xtype: 'fieldcontainer',
 					labelWidth : 100,
@@ -4044,7 +4068,7 @@ Ext.onReady(function() {
 	               			Ext.getCmp('editJobRefForm').getForm().reset();
 	               			Ext.getCmp('etime').clearInvalid();
 	                		Ext.getCmp('etime').allowBlank = true;
-	                		editJobRef.setSize(500,473);
+//	                		editJobRef.setSize(500,473);
 	               		}
 	               	}
 	});
@@ -4703,6 +4727,9 @@ Ext.define('jobRefModel', {
 		type : 'float'
 	},{
 		name : 'job_ref_number',
+		type : 'string'
+	},{
+		name : 'job_ref_remark',
 		type : 'string'
 	}
 	]

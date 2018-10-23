@@ -991,9 +991,17 @@ Ext.onReady(function() {
 				}
 			},
 			{
-				text : "Remark",
+				text : "Detail",
 				flex : 2,
 				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
+				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_remark',
 				editor : {
 					xtype : 'textfield'
 				}
@@ -1408,9 +1416,17 @@ Ext.onReady(function() {
 				}
 			},
 			{
-				text : "Remark",
+				text : "Detail",
 				flex : 2,
 				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
+				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_remark',
 				editor : {
 					xtype : 'textfield'
 				}
@@ -1851,9 +1867,17 @@ Ext.onReady(function() {
 				}
 			},
 			{
-				text : "Remark",
+				text : "Detail",
 				flex : 2,
 				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
+				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_remark',
 				editor : {
 					xtype : 'textfield'
 				}
@@ -2148,9 +2172,17 @@ Ext.onReady(function() {
 				}
 			},
 			{
-				text : "Remark",
+				text : "Detail",
 				flex : 2,
 				dataIndex : 'job_ref_dtl',
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_remark',
+				editor : {
+					xtype : 'textfield'
+				}
 			},
 		    {
 				text : "Name",
@@ -2445,9 +2477,17 @@ Ext.onReady(function() {
 				}
 			},
 			{
-				text : "Remark",
+				text : "Detail",
 				flex : 2,
 				dataIndex : 'job_ref_dtl',
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_remark',
+				editor : {
+					xtype : 'textfield'
+				}
 			},
 		    {
 				text : "Name",
@@ -2756,9 +2796,14 @@ Ext.onReady(function() {
 				}
 			},
 			{
-				text : "Remark",
+				text : "Detail",
 				flex : 2,
 				dataIndex : 'job_ref_dtl',
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_remark',
 				editor : {
 					xtype : 'textfield'
 				}
@@ -4900,6 +4945,9 @@ Ext.define('jobRefModel', {
 		type : 'float'
 	},{
 		name : 'job_ref_number',
+		type : 'string'
+	},{
+		name : 'job_ref_remark',
 		type : 'string'
 	}
 	]

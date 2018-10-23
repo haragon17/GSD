@@ -33,6 +33,7 @@ public class JobsReference {
 	private String topix_article_id;
 	private BigDecimal price;
 	private String proj_currency;
+	private String job_ref_remark;
 	
 	public int getJob_ref_id() {
 		return job_ref_id;
@@ -201,6 +202,12 @@ public class JobsReference {
 	}
 	public void setProj_currency(String proj_currency) {
 		this.proj_currency = proj_currency;
+	}
+	public String getJob_ref_remark() {
+		return job_ref_remark;
+	}
+	public void setJob_ref_remark(String job_ref_remark) {
+		this.job_ref_remark = job_ref_remark;
 	}
 	
 }
