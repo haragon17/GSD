@@ -213,7 +213,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					"CASE\n"+
 					"WHEN dept = 'E-Studio'			THEN 1\n"+
 					"WHEN dept = 'E-Studio_OTTO'	THEN 2\n"+
-					"WHEN dept = 'E-Studio_MM'		THEN 3\n"+
+					"WHEN dept = 'E-Studio_C&A'		THEN 3\n"+
 					"ELSE 4\n"+
 					"END,"+
 					"CASE\n"+

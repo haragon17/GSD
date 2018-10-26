@@ -270,7 +270,7 @@ var department = Ext.create('Ext.data.Store', {
 			{"name":"Publication"},
 			{"name":"E-Studio"},
 			{"name":"E-Studio_OTTO"},
-			{"name":"E-Studio_MM"},
+			{"name":"E-Studio_C&A"},
 			{"name":"E-Studio_Masking"},
 			{"name":"Catalog"},
 			{"name":"PP"},

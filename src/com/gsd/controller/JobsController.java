@@ -86,15 +86,15 @@ public class JobsController {
 //		String rootDirectory = request.getSession().getServletContext().getRealPath("/");
 //		System.out.println(rootDirectory);
 		
-		HttpSession session = request.getSession();
-		session.setAttribute("cus_id", "");
-		session.setAttribute("proj_id", "");
-		session.setAttribute("itm_id", "");
-		session.setAttribute("job_name", "");
-		session.setAttribute("dept", "");
-		session.setAttribute("start", "");
-		session.setAttribute("end", "");
-		session.setAttribute("status", "");
+//		HttpSession session = request.getSession();
+//		session.setAttribute("cus_id", "");
+//		session.setAttribute("proj_id", "");
+//		session.setAttribute("itm_id", "");
+//		session.setAttribute("job_name", "");
+//		session.setAttribute("dept", "");
+//		session.setAttribute("start", "");
+//		session.setAttribute("end", "");
+//		session.setAttribute("status", "");
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		int type = user.getUserModel().getUsr_type();
@@ -240,6 +240,7 @@ public class JobsController {
 		}else{
 			session.setAttribute("job_id", request.getParameter("job_id"));
 		}
+		
 	}
 	
 	@RequestMapping(value="/searchJobs")
