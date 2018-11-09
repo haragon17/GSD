@@ -270,7 +270,7 @@ var department = Ext.create('Ext.data.Store', {
 			{"name":"Publication"},
 			{"name":"E-Studio"},
 			{"name":"E-Studio_OTTO"},
-			{"name":"E-Studio_C&A"},
+			{"name":"E-Studio_CandA"},
 			{"name":"E-Studio_Masking"},
 			{"name":"Catalog"},
 			{"name":"PP"},
@@ -433,17 +433,40 @@ editMember = new Ext.create('Ext.window.Window', {
 					 url: 'updateMember.htm',
 					 waitTitle: 'Update Member',
 					 waitMsg: 'Please wait...',
-					 standardSubmit: true,
-	                 failure: function(form, action) {
-	                	 Ext.MessageBox.show({
-	  						title: 'Information',
-	  						msg: 'Member Has Been Updated!',
-	  						buttons: Ext.MessageBox.OK,
-	  						icon: Ext.MessageBox.INFO,
-	  						animateTarget: 'ebtn',
-	  						fn: function(){editMember.hide();}
-	  					});
-	                    }
+					 standardSubmit: false,
+					 success: function(form, action) {
+                    	 Ext.MessageBox.show({
+      						title: 'Information',
+      						msg: 'Member Has Been Updated!',
+      						buttons: Ext.MessageBox.OK,
+      						icon: Ext.MessageBox.INFO,
+      						animateTarget: 'ebtn',
+      						fn: function(){
+      							editMember.hide();
+      							store.searchMember.reload();
+  							}
+                    	 });
+                     },
+                     failure : function(form, action) {
+                     	Ext.MessageBox.show({
+			                    title: 'REMOTE EXCEPTION',
+			                    msg: operation.getError(),
+			                    icon: Ext.MessageBox.ERROR,
+			                    buttons: Ext.Msg.OK,
+			                    fn: function(){location.reload()}
+		                });
+					}
+//					 standardSubmit: true,
+//	                 failure: function(form, action) {
+//	                	 Ext.MessageBox.show({
+//	  						title: 'Information',
+//	  						msg: 'Member Has Been Updated!',
+//	  						buttons: Ext.MessageBox.OK,
+//	  						icon: Ext.MessageBox.INFO,
+//	  						animateTarget: 'ebtn',
+//	  						fn: function(){editMember.hide();}
+//	  					});
+//	                    }
           			});
             	 }else {
  					Ext.MessageBox.show({

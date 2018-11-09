@@ -1448,8 +1448,8 @@ Ext.onReady(function() {
 		        		return 'process-row'; 
 		        	}else if(record.get('dept') == "E-Studio_OTTO"){
 		        		return 'estudio_otto-row'; 
-		        	}else if(record.get('dept') == "E-Studio_C&A"){
-		        		return 'estudio_mm-row'; 
+		        	}else if(record.get('dept') == "E-Studio_CandA"){
+		        		return 'estudio_canda-row'; 
 		        	}else{
 		        		return 'estudio_masking-row';
 		        	}
@@ -1509,15 +1509,15 @@ Ext.onReady(function() {
 //				        		}
 				        		var gjob_ref = Ext.getCmp('edit_job_ref_approve_jmd_estudio');
 								
-				        		var approve_dept = e.record.get('dept');
-				        		if(e.record.get('dept') == "E-Studio_C&A"){
-				        			approve_dept = "E-Studio_C%26A";
-				        		}
+//				        		var approve_dept = e.record.get('dept');
+//				        		if(e.record.get('dept') == "E-Studio_C&A"){
+//				        			approve_dept = "E-Studio_C%26A";
+//				        		}
 				        		
 			        			gjob_ref.clearValue();
 			        			gjob_ref.getStore().removeAll();
 			        			gjob_ref.getStore().load({
-									url: 'showJobReference.htm?kind=JobRefApprove&dept='+approve_dept
+									url: 'showJobReference.htm?kind=JobRefApprove&dept='+e.record.get('dept')
 								});
 				        	}
 				        	if(e.field == "sent_amount"){
@@ -2510,8 +2510,8 @@ Ext.onReady(function() {
 		        		return 'process-row'; 
 		        	}else if(record.get('dept') == "E-Studio_OTTO"){
 		        		return 'estudio_otto-row'; 
-		        	}else if(record.get('dept') == "E-Studio_C&A"){
-		        		return 'estudio_mm-row'; 
+		        	}else if(record.get('dept') == "E-Studio_CandA"){
+		        		return 'estudio_canda-row'; 
 		        	}else{
 		        		return 'estudio_masking-row';
 		        	}
@@ -2562,15 +2562,15 @@ Ext.onReady(function() {
 				        	if(e.field == "job_ref_approve"){
 				        		var gjob_ref = Ext.getCmp('edit_job_ref_approve_estudio_type3');
 				        		
-				        		var approve_dept = e.record.get('dept');
-				        		if(e.record.get('dept') == "E-Studio_C&A"){
-				        			approve_dept = "E-Studio_C%26A";
-				        		}
+//				        		var approve_dept = e.record.get('dept');
+//				        		if(e.record.get('dept') == "E-Studio_C&A"){
+//				        			approve_dept = "E-Studio_C%26A";
+//				        		}
 				        		
 			        			gjob_ref.clearValue();
 			        			gjob_ref.getStore().removeAll();
 			        			gjob_ref.getStore().load({
-									url: 'showJobReference.htm?kind=JobRefApprove&dept='+approve_dept
+									url: 'showJobReference.htm?kind=JobRefApprove&dept='+e.record.get('dept')
 								});
 				        	}
 						},

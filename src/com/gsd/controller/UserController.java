@@ -281,7 +281,11 @@ public class UserController {
 
 		userDao.updateMember(user);
 
-		return new ModelAndView("redirect:memberManagement.htm");
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("success", true);
+		return new ModelAndView("jsonView", model);
+		
+//		return new ModelAndView("redirect:memberManagement.htm");
 	}
 
 	@RequestMapping(value = "/deleteMember")

@@ -46,14 +46,25 @@ public class PrintInvoice_iText {
         file.getParentFile().mkdirs();
         int item_count = inv_ref.size();
         int page_count = 1;
+        
         if(item_count <= 10){
         	page_count = 1;
-        }else if(item_count > 10 && item_count < 29){
-        	page_count = 2;
         }else{
-        	page_count = 3;
+        	page_count = ((item_count - 10) / 18) + 2;
         }
-//        page_count = 2;
+        
+//        System.out.println("Page Count = "+page_count);
+        
+//        if(item_count <= 10){
+//        	page_count = 1;
+//        }else if(item_count > 10 && item_count < 29){
+//        	page_count = 2;
+//        }else if(item_count > 28 && item_count < 47){
+//        	page_count = 3;
+//        }else{
+//        	page_count = 4;
+//        }
+        
         float width = 595;
         float height = 842*page_count;
         float maxHeight = 842;
@@ -300,9 +311,22 @@ public class PrintInvoice_iText {
         float negative_price = 0;
         DecimalFormat df = new DecimalFormat("#,###.##");
         DecimalFormat df2 = new DecimalFormat("#,###.00");
+        int pageChk = 0;
+        int i_chk = 0;
+        int p_chk = 2;
         for(int i=0; i<inv_ref.size(); i++){
+        	pageChk = 0;
+        	if(i == 10){
+        		pageChk = 1;
+        	}else if(i > 10){
+        		i_chk = i - 10;
+        		if(i_chk%18 == 0){
+        			pageChk = 1;
+        		}
+        	}
         	
-        	if(i == 10 || i == 28){
+//        	if(i == 10 || i == 28 || i == 46){
+        	if(pageChk == 1){
         		int myY =0;
         		String myPage = "";
         		g2d.setFont(f9b);
@@ -310,13 +334,24 @@ public class PrintInvoice_iText {
         		
         		if(i == 10){
                 	myY = 980;
-                	myPage = "2";
+                	myPage = p_chk+"";
                 	itemY = 1057;
-                }else if(i == 28){
-                	myY = 1822;
-                	myPage = "3";
-                	itemY = 1899;
-                }
+                	p_chk++;
+        		}else if(i > 10){
+        			myY = 980 + (842 * (p_chk - 2));
+        			myPage = p_chk+"";
+        			itemY = myY + 77;
+        			p_chk++;
+        		}
+//                }else if(i == 28){
+//                	myY = 1822;
+//                	myPage = "3";
+//                	itemY = 1899;
+//                }else if(i == 46){
+//                	myY = 2664;
+//                	myPage = "4";
+//                	itemY = 2741;
+//                }
         		
         		g2d.setFont(f9b);
                 g2d.setColor(Color.gray);
@@ -388,12 +423,12 @@ public class PrintInvoice_iText {
             price_total -= sum_disc;
         }
         double sum_vat = 0;
-        System.out.println("Price total : "+price_total);
+//        System.out.println("Price total : "+price_total);
         if(inv.getInv_vat().floatValue() != 0){
 //        	sum_vat = (inv.getInv_vat().floatValue()/100)*positive_price;
         	sum_vat = (inv.getInv_vat().doubleValue()/100.0)*price_total;
         	price_total += (Math.round(sum_vat*100.0)/100.0);
-        	System.out.println("Price total : "+price_total);
+//        	System.out.println("Price total : "+price_total);
             vat = String.format("%,.2f", sum_vat)+" "+inv_ref.get(0).getInv_currency();
         }else{
         	vat = String.format("%.2f", sum_vat)+" "+inv_ref.get(0).getInv_currency();
