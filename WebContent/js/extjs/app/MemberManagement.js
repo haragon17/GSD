@@ -267,14 +267,18 @@ store.searchMember = Ext.create('Ext.data.JsonStore', {
 var department = Ext.create('Ext.data.Store', {
 	fields: ['name'],
 	data : [
-			{"name":"Publication"},
 			{"name":"E-Studio"},
 			{"name":"E-Studio_OTTO"},
 			{"name":"E-Studio_CandA"},
 			{"name":"E-Studio_Masking"},
-			{"name":"Catalog"},
-			{"name":"PP"},
+			{"name":"Publication"},
+			{"name":"Publication_Pubworx"},
+			{"name":"Publication_Stuber"},
+			{"name":"Publication_Migros"},
 			{"name":"Pilot"},
+			{"name":"PP"},
+			{"name":"Packaging"},
+			{"name":"Catalog"},
 			{"name":"Manager"}
 	]
 });

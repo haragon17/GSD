@@ -34,6 +34,7 @@ public class JobsReference {
 	private BigDecimal price;
 	private String proj_currency;
 	private String job_ref_remark;
+	private String job_ref_type;
 	
 	public int getJob_ref_id() {
 		return job_ref_id;
@@ -208,6 +209,12 @@ public class JobsReference {
 	}
 	public void setJob_ref_remark(String job_ref_remark) {
 		this.job_ref_remark = job_ref_remark;
+	}
+	public String getJob_ref_type() {
+		return job_ref_type;
+	}
+	public void setJob_ref_type(String job_ref_type) {
+		this.job_ref_type = job_ref_type;
 	}
 	
 }

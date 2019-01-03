@@ -396,6 +396,7 @@ Ext.onReady(function() {
 	        					myText = myText.replace(/, job_out=/gi, "<br>Date out = ");
 	        					myText = myText.replace(/, job_ref_dtl=/gi, "<br>Description = ");
 	        					myText = myText.replace(/, job_ref_number=/gi, "<br>Job Number = ");
+	        					myText = myText.replace(/, job_ref_type=/gi, "<br>Job Type = ");
 	        					myText = myText.replace(/, inv_proj_no=/gi, "<br>Project Number = ");
 	        					myText = myText.replace(/, inv_delivery_date=/gi, "<br>Delivery Date= ");
 	        					myText = myText.replace(/, inv_payment_terms=/gi, "<br>Payment Term= ");

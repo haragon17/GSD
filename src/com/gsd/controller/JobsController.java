@@ -525,6 +525,7 @@ public class JobsController {
 		String job_dtl = request.getParameter("ajob_ref_dtl");
 		String job_ref_status = request.getParameter("ajob_ref_status");
 		String job_ref_number = request.getParameter("ajob_ref_number");
+		String job_ref_type = request.getParameter("ajob_ref_type");
 		
 		List<JobsReference> jobRefLs = new ArrayList<JobsReference>();
 		JobsReference jobRef = new JobsReference();
@@ -555,6 +556,12 @@ public class JobsController {
 		
 		jobRef.setJob_in_ts(job_in_ts);
 		jobRef.setJob_out_ts(job_out_ts);
+		
+		if(!job_ref_type.equals("Job Type")){
+			jobRef.setJob_ref_type(job_ref_type);
+		}else{
+			jobRef.setJob_ref_type("");
+		}
 		
 		if(!job_ref_number.equals("Job Number")){
 			jobRef.setJob_ref_number(job_ref_number);
@@ -693,6 +700,7 @@ public class JobsController {
 		String job_dtl = request.getParameter("ejob_ref_dtl");
 		String job_ref_status = request.getParameter("ejob_ref_status");
 		String job_ref_number = request.getParameter("ejob_ref_number");
+		String job_ref_type = request.getParameter("ejob_ref_type");
 		
 		JobsReference jobRef = new JobsReference();
 		jobRef.setJob_ref_id(job_ref_id);
@@ -721,6 +729,12 @@ public class JobsController {
 		
 		jobRef.setJob_in_ts(job_in_ts);
 		jobRef.setJob_out_ts(job_out_ts);
+		
+		if(!job_ref_type.equals("Job Type")){
+			jobRef.setJob_ref_type(job_ref_type);
+		}else{
+			jobRef.setJob_ref_type("");
+		}
 		
 		if(!job_ref_number.equals("Job Number")){
 			jobRef.setJob_ref_number(job_ref_number);

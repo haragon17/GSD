@@ -164,6 +164,21 @@ img {
     color: black; 
 }
 
+.pub_pubworx-row .x-grid-cell { 
+    background-color: #f9e3d0 !important; 
+    color: black; 
+}
+
+.pub_stuber-row .x-grid-cell { 
+    background-color: #e2edee !important; 
+    color: black; 
+}
+
+.pub_migros-row .x-grid-cell { 
+    background-color: #f5e9d4 !important; 
+    color: black; 
+}
+
 a.ux-linkbutton {
     background-image: none;
     border: 0px none;

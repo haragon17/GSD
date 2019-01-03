@@ -594,38 +594,64 @@ public class InvoiceController {
 	@RequestMapping(value = "/invoiceMonthlyReport")
 	public ModelAndView printInvoiceMonthlyReport(HttpServletRequest request, HttpServletResponse response) {
 	
-		Calendar now = Calendar.getInstance();
-		int year = now.get(Calendar.YEAR);
-		String yearInString = String.valueOf(year);
+//		Calendar now = Calendar.getInstance();
+//		int year = now.get(Calendar.YEAR);
+//		String yearInString = String.valueOf(year);
 		String inv_bill_type = "Direct";
 		
-		List<Invoice> gsd = invoiceDao.showInvoiceMonthlyReport(yearInString, 1, inv_bill_type);
-		List<Invoice> jv = invoiceDao.showInvoiceMonthlyReport(yearInString, 2, inv_bill_type);
-		List<Invoice> fgs = invoiceDao.showInvoiceMonthlyReport(yearInString, 3, inv_bill_type);
-		List<Invoice> mm = invoiceDao.showInvoiceMonthlyReport(yearInString, 4, inv_bill_type);
-		List<Invoice> gsdp = invoiceDao.showInvoiceMonthlyReport(yearInString, 5, inv_bill_type);
-		List<Invoice> gps = invoiceDao.showInvoiceMonthlyReport(yearInString, 6, inv_bill_type);
-		List<Invoice> tta = invoiceDao.showInvoiceMonthlyReport(yearInString, 7, inv_bill_type);
-		List<Invoice> stu = invoiceDao.showInvoiceMonthlyReport(yearInString, 8, inv_bill_type);
-		List<Invoice> gsda = invoiceDao.showInvoiceMonthlyReport(yearInString, 9, inv_bill_type);
+		List<Invoice> gsd18 = invoiceDao.showInvoiceMonthlyReport("2018", 1, inv_bill_type);
+		List<Invoice> jv18 = invoiceDao.showInvoiceMonthlyReport("2018", 2, inv_bill_type);
+		List<Invoice> fgs18 = invoiceDao.showInvoiceMonthlyReport("2018", 3, inv_bill_type);
+		List<Invoice> mm18 = invoiceDao.showInvoiceMonthlyReport("2018", 4, inv_bill_type);
+		List<Invoice> gsdp18 = invoiceDao.showInvoiceMonthlyReport("2018", 5, inv_bill_type);
+		List<Invoice> gps18 = invoiceDao.showInvoiceMonthlyReport("2018", 6, inv_bill_type);
+		List<Invoice> tta18 = invoiceDao.showInvoiceMonthlyReport("2018", 7, inv_bill_type);
+		List<Invoice> stu18 = invoiceDao.showInvoiceMonthlyReport("2018", 8, inv_bill_type);
+		List<Invoice> gsda18 = invoiceDao.showInvoiceMonthlyReport("2018", 9, inv_bill_type);
 		
-		List<Invoice> gsd_angebote = invoiceDao.showInvoiceMonthlyReport(yearInString, 1, "Angebote");
-		List<Invoice> tta_angebote = invoiceDao.showInvoiceMonthlyReport(yearInString, 7, "Angebote");
-		List<Invoice> gsda_angebote = invoiceDao.showInvoiceMonthlyReport(yearInString, 9, "Angebote");
+		List<Invoice> gsd_angebote18 = invoiceDao.showInvoiceMonthlyReport("2018", 1, "Angebote");
+		List<Invoice> tta_angebote18 = invoiceDao.showInvoiceMonthlyReport("2018", 7, "Angebote");
+		List<Invoice> gsda_angebote18 = invoiceDao.showInvoiceMonthlyReport("2018", 9, "Angebote");
+		
+		List<Invoice> gsd19 = invoiceDao.showInvoiceMonthlyReport("2019", 1, inv_bill_type);
+		List<Invoice> jv19 = invoiceDao.showInvoiceMonthlyReport("2019", 2, inv_bill_type);
+		List<Invoice> fgs19 = invoiceDao.showInvoiceMonthlyReport("2019", 3, inv_bill_type);
+		List<Invoice> mm19 = invoiceDao.showInvoiceMonthlyReport("2019", 4, inv_bill_type);
+		List<Invoice> gsdp19 = invoiceDao.showInvoiceMonthlyReport("2019", 5, inv_bill_type);
+		List<Invoice> gps19 = invoiceDao.showInvoiceMonthlyReport("2019", 6, inv_bill_type);
+		List<Invoice> tta19 = invoiceDao.showInvoiceMonthlyReport("2019", 7, inv_bill_type);
+		List<Invoice> stu19 = invoiceDao.showInvoiceMonthlyReport("2019", 8, inv_bill_type);
+		List<Invoice> gsda19 = invoiceDao.showInvoiceMonthlyReport("2019", 9, inv_bill_type);
+		
+		List<Invoice> gsd_angebote19 = invoiceDao.showInvoiceMonthlyReport("2019", 1, "Angebote");
+		List<Invoice> tta_angebote19 = invoiceDao.showInvoiceMonthlyReport("2019", 7, "Angebote");
+		List<Invoice> gsda_angebote19 = invoiceDao.showInvoiceMonthlyReport("2019", 9, "Angebote");
 		
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("gsd", gsd);
-		map.put("jv", jv);
-		map.put("fgs", fgs);
-		map.put("mm", mm);
-		map.put("gsdp", gsdp);
-		map.put("gps", gps);
-		map.put("tta", tta);
-		map.put("stu", stu);
-		map.put("gsda", gsda);
-		map.put("gsd_angebote", gsd_angebote);
-		map.put("tta_angebote", tta_angebote);
-		map.put("gsda_angebote", gsda_angebote);
+		map.put("gsd18", gsd18);
+		map.put("jv18", jv18);
+		map.put("fgs18", fgs18);
+		map.put("mm18", mm18);
+		map.put("gsdp18", gsdp18);
+		map.put("gps18", gps18);
+		map.put("tta18", tta18);
+		map.put("stu18", stu18);
+		map.put("gsda18", gsda18);
+		map.put("gsd_angebote18", gsd_angebote18);
+		map.put("tta_angebote18", tta_angebote18);
+		map.put("gsda_angebote18", gsda_angebote18);
+		map.put("gsd19", gsd19);
+		map.put("jv19", jv19);
+		map.put("fgs19", fgs19);
+		map.put("mm19", mm19);
+		map.put("gsdp19", gsdp19);
+		map.put("gps19", gps19);
+		map.put("tta19", tta19);
+		map.put("stu19", stu19);
+		map.put("gsda19", gsda19);
+		map.put("gsd_angebote19", gsd_angebote19);
+		map.put("tta_angebote19", tta_angebote19);
+		map.put("gsda_angebote19", gsda_angebote19);
 		
 		return new ModelAndView("invoice_monthly-print", map);
 	}

@@ -155,7 +155,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	
 	public List<JobsReference> searchTodayJobsReference(Map<String, String> data){
 		
-		String sql = "SELECT job_ref_id, job_ref_name, jobs.job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, job_ref_remark, "
+		String sql = "SELECT job_ref_id, job_ref_name, jobs.job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, job_ref_remark, job_ref_type, "
 				+ "job_ref_approve, itm_name, job_name, proj_name, cus_name, dept, jobs.proj_id, sent_amount, (amount-sent_amount) as total_amount, job_ref_number\n"+
 				"FROM jobs_reference\n"+
 				"LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"+
@@ -190,8 +190,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 			sql += "AND job_status = '"+data.get("status")+"'\n";
 		}
 		
-		if(data.get("dept").equals("Publication")){
-			sql += 	"ORDER BY\n"+
+//		if(data.get("dept").equals("Packaging")){
+//			sql += 	"ORDER BY\n"+
 //					"CASE job_ref_status\n"+
 //					"WHEN 'New' 	THEN 1\n"+
 //					"WHEN 'CC' 		THEN 2\n"+
@@ -202,26 +202,30 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 //					"WHEN 'Hold' 	THEN 7\n"+
 //					"WHEN 'Sent' 	THEN 8\n"+
 //					"ELSE 9\n"+
-					"CASE\n"+
-					"WHEN job_ref_status LIKE 'New%'	THEN 1\n"+
-					"WHEN job_ref_status = 'Hold'		THEN 3\n"+
-					"ELSE 2\n"+
-					"END,"+
-					"jobs_reference.job_out ASC";
-		}else{
+//					"CASE\n"+
+//					"WHEN job_ref_status LIKE 'New%'	THEN 1\n"+
+//					"WHEN job_ref_status = 'Hold'		THEN 3\n"+
+//					"ELSE 2\n"+
+//					"END,"+
+//					"jobs_reference.job_out ASC";
+//		}else{
 			sql += 	"ORDER BY\n"+
 					"CASE\n"+
-					"WHEN dept = 'E-Studio'			THEN 1\n"+
-					"WHEN dept = 'E-Studio_OTTO'	THEN 2\n"+
-					"WHEN dept = 'E-Studio_CandA'	THEN 3\n"+
-					"ELSE 4\n"+
+					"WHEN dept = 'E-Studio'				THEN 1\n"+
+					"WHEN dept = 'E-Studio_OTTO'		THEN 2\n"+
+					"WHEN dept = 'E-Studio_CandA'		THEN 3\n"+
+					"WHEN dept = 'Publication'			THEN 4\n"+
+					"WHEN dept = 'Publication_Pubworx'	THEN 5\n"+
+					"WHEN dept = 'Publication_Stuber'	THEN 6\n"+
+					"WHEN dept = 'Publication_Migros'	THEN 7\n"+
+					"ELSE 8\n"+
 					"END,"+
 					"CASE\n"+
 					"WHEN job_ref_status = 'Hold'	THEN 2\n"+
 					"ELSE 1\n"+
 					"END,"+
 					"jobs_reference.job_out ASC";
-		}
+//		}
 		
 //		System.out.println(sql);
 		
@@ -231,7 +235,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	
 	@Override
 	public JobsReference searchJobsReferenceByID(int id) {
-		String sql = "SELECT job_ref_id, jobs.job_id, job_ref_name, cus_name, cus_code, proj_name, itm_name, job_name, amount, job_in, job_out, job_ref_dtl, job_ref_remark, "
+		String sql = "SELECT job_ref_id, jobs.job_id, job_ref_name, cus_name, cus_code, proj_name, itm_name, job_name, amount, job_in, job_out, job_ref_dtl, job_ref_remark, job_ref_type, "
 				+ "job_ref_status, job_ref_approve, dept, jobs_reference.proj_ref_id, sent_amount, (amount-sent_amount) as total_amount, job_ref_number\n"+
 				"FROM jobs_reference\n"+
 				"LEFT JOIN jobs ON jobs.job_id = jobs_reference.job_id\n"+
@@ -246,7 +250,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	@Override
 	public List<JobsReference> searchJobsReference(int id, String sort) {
 		
-		String sql = "SELECT job_ref_id, job_ref_name, job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, itm_name, sent_amount, (amount-sent_amount) as total_amount, job_ref_number, job_ref_remark\n"
+		String sql = "SELECT job_ref_id, job_ref_name, job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, itm_name, sent_amount, (amount-sent_amount) as total_amount, job_ref_number, job_ref_remark, job_ref_type\n"
 				+ "FROM jobs_reference\n"
 				+ "LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"
 				+ "LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n"
@@ -388,7 +392,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	@Override
 	public void createJobReference(JobsReference jobRef) {
 		
-		String sql = "INSERT INTO jobs_reference VALUES (default,?,?,?,?,?,?,?,?,now(),now(),?,null,default,?,'')";
+		String sql = "INSERT INTO jobs_reference VALUES (default,?,?,?,?,?,?,?,?,now(),now(),?,null,default,?,'',?)";
 		
 		this.getJdbcTemplate().update(sql, new Object[] {
 //				jobRef.getJob_ref_id(),
@@ -401,7 +405,8 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				jobRef.getJob_ref_dtl(),
 				jobRef.getCretd_usr(),
 				jobRef.getJob_ref_status(),
-				jobRef.getJob_ref_number()
+				jobRef.getJob_ref_number(),
+				jobRef.getJob_ref_type()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
@@ -416,7 +421,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				user.getUserModel().getUsr_name(),
 				"Created Jobs Reference name="+jobRef.getJob_ref_name()+" on Jobs name="+jobRef2.getJob_name()+", Item name="+jobRef2.getItm_name()
 				+", amount="+jobRef.getAmount()+", job_in="+jobRef2.getJob_in()+", job_out="+jobRef2.getJob_out()+", job_status="+jobRef2.getJob_ref_status()
-				+", job_ref_dtl="+jobRef.getJob_ref_dtl()+", job_ref_number="+jobRef.getJob_ref_number(),
+				+", job_ref_dtl="+jobRef.getJob_ref_dtl()+", job_ref_number="+jobRef.getJob_ref_number()+", job_ref_type="+jobRef.getJob_ref_type(),
 				jobRef2.getJob_name()+" : "+jobRef.getJob_ref_name()
 		});
 	}
@@ -590,6 +595,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				+ "job_ref_dtl=?, "
 				+ "job_ref_status=?, "
 				+ "job_ref_number=?, "
+				+ "job_ref_type=?, "
 				+ "update_date=now() "
 				+ "where job_ref_id=?";
 		
@@ -602,12 +608,28 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				jobRef.getJob_ref_dtl(),
 				jobRef.getJob_ref_status(),
 				jobRef.getJob_ref_number(),
+				jobRef.getJob_ref_type(),
 				jobRef.getJob_ref_id()
 		});
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
 		JobsReference jobRef_new = searchJobsReferenceByID(jobRef.getJob_ref_id());
+		
+		if(!jobRef_audit.getJob_ref_type().equals(jobRef.getJob_ref_type())){
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Job Type",
+				jobRef_audit.getJob_ref_type(),
+				jobRef_new.getJob_ref_type(),
+				"Updated",
+				jobRef_audit.getJob_name()+" : "+jobRef.getJob_ref_name()
+			});
+		}
 		
 		if(!jobRef_audit.getJob_ref_number().equals(jobRef.getJob_ref_number())){
 			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";

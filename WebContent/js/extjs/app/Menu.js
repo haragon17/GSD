@@ -39,6 +39,11 @@ Ext.onReady(function(){
 		    pid = responseOject.user[0].usr_id;
 		    usr_type = responseOject.user[0].usr_type;
 		    
+		    if(responseOject.chkTR != 0){
+		    	Ext.getCmp('sjob_ref_id').setValue(responseOject.chkTR);
+		    	setTimeout(function() { Ext.get('searchs').dom.click(); }, 800);
+		    }
+		    
 			if(usr_type == 2){
 				jmd_menu = {
 						  text: 'Projects',

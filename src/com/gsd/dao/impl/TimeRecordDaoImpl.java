@@ -9,11 +9,18 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import com.gsd.dao.TimeRecordDao;
 import com.gsd.model.TimeRecord;
 import com.gsd.model.TimeRecordReference;
+import com.gsd.security.UserDetailsApp;
+import com.gsd.security.UserLoginDetail;
 
 public class TimeRecordDaoImpl extends JdbcDaoSupport implements TimeRecordDao {
 
 	@Override
 	public List<TimeRecord> searchTimeRecord(Map<String, String> data) {
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		int type = user.getUserModel().getUsr_type();
+		String usr_name = user.getUsername();
+		
 		String sql = "SELECT tr_id, tr_name, usr_name, tr.job_ref_id, cus_name, cus_code, proj_name, job_name, job_ref_name, tr_name, tr_process, tr_start, tr_finish, (tr_finish - tr_start) AS sum_time, job_ref_number\n"+
 					"FROM time_record tr \n"+
 					"LEFT JOIN jobs_reference job_ref ON job_ref.job_ref_id = tr.job_ref_id\n"+
@@ -49,7 +56,16 @@ public class TimeRecordDaoImpl extends JdbcDaoSupport implements TimeRecordDao {
 		}
 		if(data.get("dept")==null || data.get("dept").isEmpty()){
 		}else{
-			sql += "AND users.dept LIKE '"+data.get("dept")+"%'\n";
+			if(usr_name.equals("jmd_hkt")){
+				sql += "AND (users.dept LIKE '"+data.get("dept")+"%' OR users.dept LIKE 'Pilot%')\n";
+			}else{
+				sql += "AND users.dept LIKE '"+data.get("dept")+"%'\n";
+			}
+//			if(data.get("dept").equals("E-Studio") && type == 2){
+//				sql += "AND (dept LIKE '"+data.get("dept")+"%' OR dept LIKE 'Pilot%')\n";
+//			}else{
+//				sql += "AND dept LIKE '"+data.get("dept")+"%'\n";
+//			}
 		}
 		if(data.get("process")==null || data.get("process").isEmpty()){
 		}else{
