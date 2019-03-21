@@ -53,9 +53,15 @@ public class ReferenceController {
 	public ModelAndView showDepartmentReference(HttpServletRequest request, HttpServletResponse response) {
 		
 		List<Reference> refLs = null;
+		int level = 0;
+		try{
+			level = Integer.parseInt(request.getParameter("level"));
+		}catch(Exception e){
+			logger.error(e.getMessage());
+		}
 		
 		try{
-			refLs = referenceDao.showDepartmentReference();
+			refLs = referenceDao.showDepartmentReference(level);
 		} catch (Exception e){
 			logger.error(e.getMessage());
 		}

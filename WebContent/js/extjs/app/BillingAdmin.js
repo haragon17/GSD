@@ -122,6 +122,12 @@ Ext.onReady(function() {
 	    		Ext.get('isave-syncPub').dom.click();
 	    	}else if(panels.tabs.activeTab.id == "estudioTabs"){
 	    		Ext.get('isave-syncEstudio').dom.click();
+	    	}else if(panels.tabs.activeTab.id == "packagingTabs"){
+	    		Ext.get('isave-syncPackaging').dom.click();
+	    	}else if(panels.tabs.activeTab.id == "pilotTabs"){
+	    		Ext.get('isave-syncPilot').dom.click();
+	    	}else if(panels.tabs.activeTab.id == "catalogTabs"){
+	    		Ext.get('isave-syncCatalog').dom.click();
 	    	}
 	    }
 	});
@@ -201,11 +207,13 @@ Ext.onReady(function() {
 //							Ext.getCmp('ajob_ref_status').bindStore('jobRefStatusEstudio');
 //							Ext.getCmp('ejob_ref_status').bindStore('jobRefStatusEstudio');
 //							Ext.getCmp('gjob_ref_status').bindStore(jobRefStatusEstudio);
-						}else if(myDept == "Publication"){
+						}else if(myDept.indexOf("Publication") !== -1){
 //		        			Ext.getCmp('ajob_ref_status').bindStore('jobRefStatusPublication');
 //							Ext.getCmp('ejob_ref_status').bindStore('jobRefStatusPublication');
 //							Ext.getCmp('gjob_ref_status').bindStore(jobRefStatusPublication);
 		        			deptRef = "Publication";
+		        		}else if(myDept.indexOf("Catalog") !== -1){
+		        			deptRef = "Catalog";
 		        		}else if(myDept == "Packaging"){
 		        			deptRef = "Packaging";
 		        		}else{
@@ -215,6 +223,8 @@ Ext.onReady(function() {
 						var ejob_ref_status = Ext.getCmp('ejob_ref_status');
 						var ajob_ref_type = Ext.getCmp('ajob_ref_type');
 						var ejob_ref_type = Ext.getCmp('ejob_ref_type');
+						var ujob_ref_status = Ext.getCmp('ujob_ref_status');
+						var ujob_ref_approve = Ext.getCmp('ujob_ref_approve');
 						
 						ajob_ref_status.clearValue();
 						ajob_ref_status.getStore().removeAll();
@@ -240,6 +250,24 @@ Ext.onReady(function() {
 							url: 'showJobReference.htm?kind=JobRefType&dept='+deptRef
 						});
 						
+						ujob_ref_status.clearValue();
+						ujob_ref_status.getStore().removeAll();
+						ujob_ref_status.getStore().load({
+							url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
+						});
+						
+						ujob_ref_approve.clearValue();
+						ujob_ref_approve.getStore().removeAll();
+						ujob_ref_approve.getStore().load({
+							url: 'showJobReference.htm?kind=JobRefApprove&dept='+deptRef
+						});
+						
+						if(deptRef == "Catalog"){
+							store.jobsRef.pageSize = 999;
+						}else{
+							store.jobsRef.pageSize = 20;
+						}
+						
 						
 						Ext.Ajax.request({
 							url : 'searchJobsParam.htm?job_id='+job_id,
@@ -249,6 +277,11 @@ Ext.onReady(function() {
 								Ext.getCmp('jobTabs').setDisabled(false);
 								Ext.getCmp('jobTabs').setTitle(job_name);
 								panels.tabs.setActiveTab('jobTabs');
+								if(deptRef !== "Catalog"){
+									Ext.getCmp('gjob_ref_approve').setVisible(false);
+								}else{
+									Ext.getCmp('gjob_ref_approve').setVisible(true);
+								}
 							}
 						});
 					}
@@ -377,10 +410,12 @@ Ext.onReady(function() {
 						deptRef = "";
 						if(myDept.indexOf("E-Studio") !== -1){
 							deptRef = "E-Studio";
-						}else if(myDept == "Publication"){
+						}else if(myDept.indexOf("Publication") !== -1){
 		        			deptRef = "Publication";
 		        		}else if(myDept == "Packaging"){
 		        			deptRef = "Packaging";
+		        		}else if(myDept.indexOf("Catalog") !== -1){
+		        			deptRef = "Catalog";
 		        		}else{
 		        			deptRef = "E-Studio";
 		        		}
@@ -389,6 +424,8 @@ Ext.onReady(function() {
 						var ejob_ref_status = Ext.getCmp('ejob_ref_status');
 						var ajob_ref_type = Ext.getCmp('ajob_ref_type');
 						var ejob_ref_type = Ext.getCmp('ejob_ref_type');
+						var ujob_ref_status = Ext.getCmp('ujob_ref_status');
+						var ujob_ref_approve = Ext.getCmp('ujob_ref_approve');
 						
 						ajob_ref_status.clearValue();
 						ajob_ref_status.getStore().removeAll();
@@ -414,6 +451,24 @@ Ext.onReady(function() {
 							url: 'showJobReference.htm?kind=JobRefType&dept='+deptRef
 						});
 						
+						ujob_ref_status.clearValue();
+						ujob_ref_status.getStore().removeAll();
+						ujob_ref_status.getStore().load({
+							url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
+						});
+						
+						ujob_ref_approve.clearValue();
+						ujob_ref_approve.getStore().removeAll();
+						ujob_ref_approve.getStore().load({
+							url: 'showJobReference.htm?kind=JobRefApprove&dept='+deptRef
+						});
+						
+						if(deptRef == "Catalog"){
+							store.jobsRef.pageSize = 999;
+						}else{
+							store.jobsRef.pageSize = 20;
+						}
+						
 						Ext.Ajax.request({
 							url : 'searchJobsParam.htm?job_id='+job_id,
 							success : function(response, opts) {
@@ -422,6 +477,11 @@ Ext.onReady(function() {
 								Ext.getCmp('jobTabs').setDisabled(false);
 								Ext.getCmp('jobTabs').setTitle(job_name);
 								panels.tabs.setActiveTab('jobTabs');
+								if(deptRef !== "Catalog"){
+									Ext.getCmp('gjob_ref_approve').setVisible(false);
+								}else{
+									Ext.getCmp('gjob_ref_approve').setVisible(true);
+								}
 							}
 						});
 			    }
@@ -434,6 +494,14 @@ Ext.onReady(function() {
 //			})
 	});
 
+	var selModel = Ext.create('Ext.selection.CheckboxModel', {
+        listeners: {
+            selectionchange: function(sm, selections) {
+            	grid.jobRef.down('#updateJobRefStatusButton').setDisabled(selections.length === 0);
+            }
+        }
+    });
+	
 	grid.jobRef = Ext.create('Ext.grid.Panel', {
 //		renderTo : document.body,
 //		title : 'Billing Report',
@@ -443,6 +511,7 @@ Ext.onReady(function() {
 //		autoWidth : true,
 //		frame : true,
 		store : store.jobsRef,
+		selModel: selModel,
 		tbar : [{
 			xtype : 'button',
 			text : 'Add Job',
@@ -453,9 +522,30 @@ Ext.onReady(function() {
 				Ext.getCmp('aproj_ref_id').getStore().load({
 					url: 'showProjectsReference.htm?id='+Ext.getCmp('projid').getValue()
 				});
-				Ext.getCmp('ajob_ref_status').setValue("New");
+				if(myDept.indexOf("Catalog") !== -1){
+					Ext.getCmp('ajob_ref_status').setValue("New Page");
+				}else{
+					Ext.getCmp('ajob_ref_status').setValue("New");
+				}
 				addJobRef.show();
 			}
+		},{
+			xtype: 'button',
+			text: 'Update Status',
+			id: 'updateJobRefStatusButton',
+			itemId: 'updateJobRefStatusButton',
+			iconCls : 'icon-update',
+			disabled : true,
+			handler: function(){
+				var s = grid.jobRef.getSelectionModel().getSelection();
+				selected = [];
+				Ext.each(s, function (item) {
+					selected.push(item.data.job_ref_id);
+				});
+				Ext.getCmp('ujob_ref_id').setValue(selected.toString());
+				updateJobRefStatus.show();
+			}
+			
 		},{
 			xtype : 'button',
 			text : 'Job Report',
@@ -491,6 +581,15 @@ Ext.onReady(function() {
 				})
 			}
 		},"->",{
+			xtype: 'button',
+			text: 'Complete Project',
+			id: 'complete-project-button',
+			iconCls: 'icon-complete',
+			disabled : true,
+			handler: function() {
+				alert("Click!");
+			}
+		},{
 			xtype : 'button',
 			text : 'Invoice',
 			id : 'invoice-button',
@@ -813,6 +912,45 @@ Ext.onReady(function() {
 					}
 				},
 				{
+					text : "Approve",
+					flex : 1.3,
+					align : 'center',
+					sortable : true,
+					dataIndex : 'job_ref_approve',
+					id: 'gjob_ref_approve',
+//					hidden : true,
+//					renderer : function(val){
+//						if(val == "Done" || val == "Sent PDF Vorab" || val == "Sent PDF K1" || val == "Sent PDF K2" || val == "Sent PDF Final" || val == "Up Proof" || val == "CC1" || val == "CC2" || val == "CC3" || val == "CC4"){
+//							return '<b><span style="color:#13baff;">' + val + '</span></b>';
+//						}else if(val == "Wait Mask" || val == "Wait Move Mask" || val == "Missing Pic" || val == "Low Quality Pic" || val == "Low Res Pic" || val == "Ask Customer" || val == "Hold Other"){	
+//							return '<b><span style="color:red;">' + val + '</span></b>';
+//						}else if(val == "Wait Final" || val == "Wait Check" || val == "Wait FI"){
+//							return '<b><span style="color:#ec8500;">' + val + '</span></b>';
+//						}else{
+//							return '<b>'+val+'</b>';
+//						}
+//					},
+					editor : {
+						xtype : 'combobox',
+						id : 'edit_job_ref_approve',
+						store : {
+							fields : ['db_ref_name'],
+							proxy : {
+								type : 'ajax',
+								url : '',
+								reader : {
+									type : 'json',
+									root : 'records',
+								}
+							},
+							autoLoad : true
+						},
+						valueField : 'db_ref_name',
+						displayField : 'db_ref_name',
+						editable : false
+					}
+				},
+				{
 					text : 'Dupplicate',
 					xtype : 'actioncolumn',
 					flex : 0.7,
@@ -944,9 +1082,13 @@ Ext.onReady(function() {
 			        		if(myDept.indexOf("E-Studio") !== -1){
 //			        			Ext.getCmp('gjob_ref_status').bindStore('jobRefStatusEstudio');
 			        			deptRef = "E-Studio";
-			        		}else if(myDept == "Publication"){
+			        		}else if(myDept.indexOf("Publication") !== -1){
 //			        			Ext.getCmp('gjob_ref_status').bindStore('jobRefStatusPublication');
 			        			deptRef = "Publication";
+			        		}else if(myDept.indexOf("Catalog") !== -1){
+			        			deptRef = "Catalog";
+			        		}else if(myDept == "Packaging"){
+			        			deptRef = "Packaging";
 			        		}else{
 			        			deptRef = "E-Studio";
 			        		}
@@ -958,12 +1100,38 @@ Ext.onReady(function() {
 								url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
 							});
 			        	}
+			        	
+			        	if(e.field == "job_ref_approve"){
+			        		deptRef = "";
+			        		if(myDept.indexOf("E-Studio") !== -1){
+			        			deptRef = "E-Studio";
+			        		}else if(myDept.indexOf("Publication") !== -1){
+			        			deptRef = "Publication";
+			        		}else if(myDept.indexOf("Catalog") !== -1){
+			        			deptRef = "Catalog";
+			        		}else if(myDept == "Packaging"){
+			        			deptRef = "Packaging";
+			        		}else{
+			        			deptRef = "E-Studio";
+			        		}
+			        		var mjob_ref = Ext.getCmp('edit_job_ref_approve');
+			        		mjob_ref.clearValue();
+		        			mjob_ref.getStore().removeAll();
+		        			mjob_ref.getStore().load({
+								url: 'showJobReference.htm?kind=JobRefApprove&dept='+deptRef
+							});
+			        	}
 //						alert(editorDate);
 					},
 					afteredit: function (editor, e) {
 						if(e.field == "itm_name"){
 							if(Ext.getCmp('projrefid').getValue() != 0){
 								e.record.set('proj_ref_id', Ext.getCmp('projrefid').getValue());
+							}
+						}
+						if(e.field == "job_ref_approve"){
+							if(Ext.getCmp('edit_job_ref_approve').getValue() == "-"){
+								e.record.set("job_ref_approve", "");
 							}
 						}
 					}
@@ -2779,6 +2947,423 @@ Ext.onReady(function() {
 		});
 
 	
+	grid.catalog = Ext.create('Ext.grid.Panel', {
+		id : 'catalogGrid',
+		store : store.catalogJobRef,
+		tbar : [
+		"->",
+		{
+			type:'refresh',
+			iconCls: 'icon-refresh',
+		    tooltip: 'Refresh grid below',
+		    // hidden:true,
+		    handler: function() {
+		        // refresh logic
+		    	store.catalogJobRef.reload();
+		    }
+	    },
+		{
+			iconCls: 'icon-save',
+			text: 'Save All',
+			id: 'isave-syncCatalog',
+			iconAlign: 'right',
+	        tooltip: 'Sync data from server',
+	        disabled: false,
+	        itemId: 'saveSync',
+	        scope: this,
+	        handler: function(){
+	        	store.catalogJobRef.sync();
+	        }
+		}],
+		minHeight: 608,
+		columnLines : true,
+		columns : [
+			{
+				text : "Date in",
+				flex : 1,
+				sortable : true,
+				dataIndex : 'job_in',
+				renderer: Ext.util.Format.dateRenderer('Y-m-d'),
+				editor: {
+					xtype: 'datefield',
+					format: 'Y-m-d',
+					editable: false
+				}
+			},
+			{
+				text : "Date out",
+				flex : 1,
+				sortable : true,
+				dataIndex : 'job_out',
+				renderer: function(value, meta, record, rowIndex, colIndex, store){
+					myStatus = record.get('job_ref_status');
+					today = new Date();
+					getDay = today.getDay();
+					if(getDay == 6){
+						today.setDate(today.getDate()+2);
+					}
+					todayFormat = Ext.util.Format.date(today, 'Y-m-d');
+					dateOut = Ext.util.Format.date(value, 'Y-m-d');
+					if(myStatus != "Hold"){
+						if(dateOut <= todayFormat){
+							return '<b><span style="color:red;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+						}else{
+							return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+						}
+					}else{
+						return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
+					}
+				},
+				editor: {
+					xtype: 'datefield',
+					id: 'edit_date_today',
+					format: 'Y-m-d        H:i',
+					editable: false,
+					listeners: {
+						"change": function () {
+							newDate = Ext.getCmp('edit_date_today').getValue();
+							var myDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate(), editorDate.getHours(), editorDate.getMinutes());
+							Ext.getCmp('edit_date_today').setValue(myDate);
+						}
+					}
+				}
+			},
+			{
+				text : "Time",
+				flex : 0.6,
+				sortable : true,
+				dataIndex : 'job_out',
+				renderer: function(value, meta, record, rowIndex, colIndex, store){
+					myStatus = record.get('job_ref_status');
+					today = new Date();
+					getDay = today.getDay();
+					if(getDay == 6){
+						today.setDate(today.getDate()+2);
+					}
+					todayFormat = Ext.util.Format.date(today, 'Y-m-d');
+					dateOut = Ext.util.Format.date(value, 'Y-m-d');
+					if(myStatus != "Hold"){
+						if(dateOut <= todayFormat){
+							return '<b><span style="color:red;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+						}else{
+							return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+						}
+					}else{
+						return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
+					}
+				},
+				editor: {
+					xtype: 'timefield',
+					id: 'edit_time_today',
+					format: 'H:i',
+					listeners: {
+						blur: function () {
+							myTime = Ext.getCmp('edit_time_today').getValue();
+							var myDate = new Date(editorDate.getFullYear(), editorDate.getMonth(), editorDate.getDate(), myTime.getHours(), myTime.getMinutes());
+							Ext.getCmp('edit_time_today').setValue(myDate);
+						}
+					}
+				}
+			},
+			{
+		    	text : "Customer Name",
+		    	flex : 2.2,
+		    	sortable : true,
+		    	dataIndex : 'cus_name',
+		    	renderer : renderCustomer
+		    },
+			{
+				text : "Job Name",
+				flex : 2.5,
+				sortable : true,
+				dataIndex : 'job_ref_name',
+				editor: {
+					xtype: 'textfield',
+					allowBlank: false
+				}
+			},
+			{
+				text : "Item",
+				flex : 1.5,
+				sortable : true,
+				dataIndex : 'itm_name',
+				editor: {
+					xtype: 'combobox',
+					id: 'edit_itm_today',
+					store : {
+						fields : [ 'proj_ref_id', 'itm_name', 'proj_ref_desc' ],
+						proxy : {
+							type : 'ajax',
+							url : '',
+							reader : {
+								type : 'json',
+								root : 'records',
+								idProperty : 'proj_ref_id'
+							}
+						},
+						autoLoad : true,
+						sorters: [{
+					         property: 'itm_name',
+					         direction: 'ASC'
+					     }]
+					},
+					valueField : 'itm_name',
+					displayField : 'itm_name',
+//				    tpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'<div class="x-boundlist-item">{itm_name}</div>',
+//				            '<tpl else>',
+//				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
+//				            '</tpl>',
+//			            '</tpl>'
+//				    ),
+//				    displayTpl: Ext.create('Ext.XTemplate',
+//				        '<tpl for=".">',
+//				        	"<tpl if='proj_ref_desc == \"\"'>",
+//				        	'{itm_name}',
+//				            '<tpl else>',
+//				            '{itm_name} - {proj_ref_desc}',
+//				            '</tpl>',
+//				        '</tpl>'
+//				    ),
+				    listeners: {
+				    	select : function(){
+				    		var v = this.getValue();
+							var record = this.findRecord(this.valueField || this.displayField, v);
+							var myIndex = this.store.indexOf(record);
+							var myValue = this.store.getAt(myIndex).data.proj_ref_id;
+							Ext.getCmp('projrefidtoday').setValue(myValue);
+				    	}
+				    }
+				}
+			},
+			{
+				dataIndex : 'proj_ref_id',
+				hidden : true,
+				hideable : false
+			},
+			{
+				text : "Amount",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'amount',
+				editor: {
+					xtype:'numberfield',
+					minValue : 0,
+					allowBlank: false
+				}
+			},
+			{
+				text : "Status",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				renderer : function(val){
+					if(val == "New" || val == "New Page"){
+						return '<b><span style="color:blue;">' + val + '</span></b>';
+					}else if(val == "Hold"){
+						return '<b><span style="color:red;">' + val + '</span></b>';
+					}else{
+						return '<b>'+val+'</b>';
+					}
+				},
+				dataIndex : 'job_ref_status',
+				editor: {
+					xtype: 'combobox',
+//					store : 'jobRefStatusPublication',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showJobReference.htm?kind=JobRefStatus&dept=Catalog',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+					editable : false
+				}
+			},
+			{
+				text : "Approve",
+				flex : 1.3,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'job_ref_approve',
+				renderer : function(val){
+					if(val == "Done" || val == "Sent PDF Vorab" || val == "Sent PDF K1" || val == "Sent PDF K2" || val == "Sent PDF Final" || val == "Up Proof" || val == "CC1" || val == "CC2" || val == "CC3" || val == "CC4"){
+						return '<b><span style="color:#13baff;">' + val + '</span></b>';
+//						}else if(val == "Hold Wait Mask" || val == "Hold Missing" || val == "Hold Low Quality" || val == "Hold Low Res" || val == "Hold Move Mask" || val == "Hold Ask Customer" || val == "Hold Other"){
+					}else if(val == "Wait Mask" || val == "Wait Move Mask" || val == "Missing Pic" || val == "Low Quality Pic" || val == "Low Res Pic" || val == "Ask Customer" || val == "Hold Other"){	
+						return '<b><span style="color:red;">' + val + '</span></b>';
+					}else if(val == "Wait Final" || val == "Wait Check" || val == "Wait FI"){
+						return '<b><span style="color:#ec8500;">' + val + '</span></b>';
+					}else{
+						return '<b>'+val+'</b>';
+					}
+				},
+				editor : {
+					xtype : 'combobox',
+					id : 'edit_job_ref_approve_catalog',
+//					store : 'jobRefApprovePublication',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : 'showJobReference.htm?kind=JobRefApprove&dept=Catalog',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+					editable : false
+				}
+			},
+			{
+				text : "Detail",
+				flex : 2,
+				dataIndex : 'job_ref_dtl',
+				editor : {
+					xtype : 'textfield'
+				}
+			},
+			{
+				text : "Remark",
+				flex : 2,
+				dataIndex : 'job_ref_remark',
+				editor : {
+					xtype : 'textfield'
+				}
+			},
+		    {
+				text : "Name",
+				flex : 1.5,
+				sortable : true,
+				dataIndex : 'job_name',
+				hidden : true,
+			},
+//		    {
+//		    	text : "Dept",
+//				flex : 1,
+//				sortable : true,
+//				dataIndex : 'dept'
+//		    }
+			],
+			viewConfig: { 
+		        stripeRows: false, 
+		        getRowClass: function(record) { 
+		            if(record.get('job_ref_status') == "Hold"){
+		        		return 'hold-row';
+		            }else if(record.get('dept') == "Catalog_Bader"){
+		        		return 'pub_pubworx-row'; 
+		        	}else if(record.get('dept') == "Catalog_Layout"){
+		        		return 'pub_stuber-row'; 
+		        	}else if(record.get('dept') == "Catalog_Witt"){
+		        		return 'pub_migros-row'; 
+		        	}else{
+		            	return 'process-row';
+		            }
+//		            }else if(record.get('job_ref_status') == "New" || record.get('job_ref_status') == "New Pic" || record.get('job_ref_status') == "New Doc" || record.get('job_ref_status') == "New Pic+Doc"){
+//		        		return 'process-row'; 
+//		        	}else{
+//		        		return 'cc-row';
+//		        	}
+		        },
+//		        listeners:{
+//		            itemkeydown:function(view, record, item, index, e){
+//		            	if(e.getKey() == 117){
+//		            		Ext.get('isave-syncPub').dom.click();
+//		            	}
+//		            }
+//		        }
+		    },
+			listeners : {
+				viewready: function (grid) {
+			        var view = grid.view;
+			        this.toolTip = Ext.create('Ext.tip.ToolTip', {
+			            target: view.el,
+			            delegate: view.cellSelector,
+			            trackMouse: true,
+			            renderTo: Ext.getBody(),
+			            listeners: {
+			                beforeshow: function(tip) {
+			                    var trigger = tip.triggerElement,
+			                        parent = tip.triggerElement.parentElement,
+			                        columnTitle = view.getHeaderByCell(trigger).text,
+			                        columnDataIndex = view.getHeaderByCell(trigger).dataIndex,
+			                        columnText = view.getRecord(parent).get(columnDataIndex).toString();
+			                    if(columnDataIndex == "cus_name"){
+			                    	columnText += "("+view.getRecord(parent).get('proj_name').toString()+")";
+			                    }
+			                    if (columnText){
+			                        tip.update("<b>"+(columnText.replace(/\r\n|\n/gi, "<br>"))+"</b>");
+			                    } else {
+			                        return false;
+			                    }
+			                }
+			            }
+			        });
+		        }
+		    },
+		    plugins: 
+			    [{ 
+			        ptype: 'cellediting',
+			        clicksToEdit: 2,
+			        listeners: {
+				        beforeedit: function (editor, e) {
+				        	Ext.getCmp('projrefidtoday').setValue(0);
+				        	if(e.field == "job_out"){
+								editorDate = e.value;
+				        	}else if(e.field == "itm_name"){
+				        		Ext.getCmp('edit_itm_today').getStore().load({
+									url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
+								});
+				        	}
+						},
+						afteredit: function (editor, e) {
+							if(e.field == "itm_name"){
+								if(Ext.getCmp('projrefidtoday').getValue() != 0){
+									e.record.set('proj_ref_id', Ext.getCmp('projrefidtoday').getValue());
+								}
+							}
+						},
+						edit: function (editor, e) {
+							if(e.field == "job_out"){
+								try{
+									myTime = Ext.getCmp('edit_time_today').getValue();
+									var myDate = new Date(editorDate.getFullYear(), editorDate.getMonth(), editorDate.getDate(), myTime.getHours(), myTime.getMinutes());
+									Ext.getCmp('edit_time_today').setValue(myDate);
+									e.record.set('job_out', myDate);
+								}catch(e){
+									console.log(e.message);
+								}
+							}
+							if(e.field == "job_ref_approve"){
+								if(Ext.getCmp('edit_job_ref_approve_catalog').getValue() == "-"){
+									e.record.set("job_ref_approve", "");
+								}
+							}
+						}
+			        }
+			    }],
+		    bbar : Ext.create('Ext.PagingToolbar', {
+				store : store.catalogJobRef,
+				displayInfo : true,
+				displayMsg : '<b>Total Count : {2} <b>&nbsp;&nbsp;&nbsp;',
+				emptyMsg : "<b>No Job to display</b>",
+			})
+	});
+	
 	
 	panels.search = Ext.create('Ext.form.Panel', {
 		title : 'Search Criteria',
@@ -3033,7 +3618,7 @@ Ext.onReady(function() {
 									editable : false,
 									emptyText : 'Department',
 									width : 280,
-									magin : '0 0 10 0',
+									margin : '0 0 10 0',
 //									store : 'deptStore',
 									store : {
 										fields : ['db_ref_name'],
@@ -3134,6 +3719,10 @@ Ext.onReady(function() {
 	    	id: 'packagingTabs',
 	    	title: 'Packaging Jobs',
 	    	items: grid.packaging
+	    },{
+	    	id: 'catalogTabs',
+	    	title: 'Catalog Jobs',
+	    	items: grid.catalog
 //	    },{
 //	    	id: 'pilotTabs',
 //	    	title: 'Pilot Jobs',
@@ -3161,6 +3750,9 @@ Ext.onReady(function() {
                 }else if(tab.id == 'packagingTabs'){
                 	store.packagingJobRef.reload();
                 	grid.packaging.getStore().reload();
+                }else if(tab.id == 'catalogTabs'){
+                	store.catalogJobRef.reload();
+                	grid.catalog.getStore().reload();
                 }else if(tab.id == 'jobTabs'){
                 	store.jobs.reload();
                 	Ext.getCmp('filterSearchField').setValue("");
@@ -3939,7 +4531,7 @@ Ext.onReady(function() {
 	    	    	emptyText : 'Job Name',
 //	    	    	minValue : 0,
 	    	    	msgTarget : 'under',
-	    	    	maxLength : 500,
+	    	    	maxLength : 1000,
 	    	    	name: 'ajob_ref_name',
 	    	    	id: 'ajob_ref_name',
 	    	    },
@@ -4883,7 +5475,152 @@ Ext.onReady(function() {
 				Ext.getCmp('addInvoiceForm').getForm().reset();
 			}
 		}
-	})
+	});
+	
+	updateJobRefStatus = new Ext.create('Ext.window.Window', {
+		title: 'Update Status',
+		width: 450,
+		animateTarget: 'updateJobRefStatusButton',
+		resizable: false,
+		closeAction: 'hide',
+		items: [{
+			xtype: 'form',
+			id: 'updateJobRefStatusForm',
+			items: [{
+				xtype: 'fieldset',
+				title: 'Status Information',
+				defaultType: 'textfield',
+				layout: 'anchor',
+				padding: 10,
+				width: 400,
+				style: {
+	                "margin-left": "auto",
+	                "margin-right": "auto",
+	                "margin-top": "10px",
+	                "margin-bottom": "10px"
+	            },
+	            defaults: {
+	                anchor: '100%'
+	            },
+	            items: [{
+					xtype: 'combobox',
+//					fieldLabel : 'Job Status <font color="red">*</font> ',
+					fieldLabel : 'Job Status ',
+					name : 'ujob_ref_status',
+					id : 'ujob_ref_status',
+					queryMode : 'local',
+					labelWidth : 120,
+					emptyText : 'Job Status',
+//					allowBlank: false,
+					editable : false,
+					msgTarget: 'under',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : '',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+				},{
+					xtype: 'combobox',
+					fieldLabel : 'Job Approve ',
+					name : 'ujob_ref_approve',
+					id : 'ujob_ref_approve',
+					queryMode : 'local',
+					labelWidth : 120,
+					emptyText : 'Job Approve',
+					editable : false,
+					msgTarget: 'under',
+					store : {
+						fields : ['db_ref_name'],
+						proxy : {
+							type : 'ajax',
+							url : '',
+							reader : {
+								type : 'json',
+								root : 'records',
+							}
+						},
+						autoLoad : true
+					},
+					valueField : 'db_ref_name',
+					displayField : 'db_ref_name',
+				}]
+			},{
+				xtype : 'hidden',
+				id : 'ujob_ref_id',
+				name : 'ujob_ref_id'
+            }]
+		}],
+		buttons:[{
+			text: 'Update',
+			width: 100,
+			id: 'updateJobRefStatusSubmit',
+			handler: function(){
+				var form = Ext.getCmp('updateJobRefStatusForm').getForm();
+				if (form.isValid()){
+					 form.submit({
+					 url: 'updateStatusJobReference.htm',
+					 waitTitle: 'Adding Job',
+					 waitMsg: 'Please wait...',
+					 standardSubmit: false,
+	                success: function(form, action) {
+	               	 Ext.MessageBox.show({
+	 						title: 'Information',
+	 						msg: "Job Has Been Update!",
+	 						buttons: Ext.MessageBox.OK,
+	 						icon: Ext.MessageBox.INFO,
+	 						animateTarget: 'updateJobRefStatusButton',
+	 						fn: function(){
+	 							updateJobRefStatus.hide();
+	 							store.jobs.reload();
+     							store.jobsRef.reload();
+	 						}
+	 					});
+	                   },
+	                   failure : function(form, action) {
+//							Ext.Msg.alert('Failed',
+//									action.result ? action.result.message
+//											: 'No response');
+	                   	Ext.MessageBox.show({
+			                    title: 'REMOTE EXCEPTION',
+			                    msg: operation.getError(),
+			                    icon: Ext.MessageBox.ERROR,
+			                    buttons: Ext.Msg.OK,
+			                    fn: function(){location.reload()}
+			                });
+						}
+	     			});
+	       	 }else {
+						Ext.MessageBox.show({
+							title: 'Failed',
+							msg: ' Please Insert All Required Field',
+							buttons: Ext.MessageBox.OK,
+							icon: Ext.MessageBox.ERROR,
+							animateTarget: 'updateJobRefStatusButton',
+						});
+					}
+			}
+		},{
+			text: 'Cancel',
+			width: 100,
+			handler: function(){
+				updateJobRefStatus.hide();
+			}
+		}],
+		listeners: {
+			'beforehide': function(){
+				Ext.getCmp('updateJobRefStatusForm').getForm().reset();
+			}
+		}
+	});
 	
 	duplicateJobRef = new Ext.create('Ext.window.Window', {
 		title: 'Duplicate Job',
@@ -5289,7 +6026,7 @@ Ext.define('jobRefModel', {
 store.jobsRef = Ext.create('Ext.data.JsonStore', {
 	model : 'jobRefModel',
 	id : 'jobRefStore',
-	pageSize : 20,
+//	pageSize : 20,
 //	autoLoad : true,
 //	autoSync : true,
 	proxy : {
@@ -5569,6 +6306,62 @@ store.packagingJobRef = Ext.create('Ext.data.JsonStore', {
 						animateTarget: 'isave-syncPackaging',
 						fn: function(){
 							store.packagingJobRef.reload();
+							}
+					});
+            }
+            
+        },
+    }
+});
+
+store.catalogJobRef = Ext.create('Ext.data.JsonStore', {
+	model : 'jobRefModel',
+	id : 'catalogJobRefStore',
+	pageSize : 999,
+	autoLoad : true,
+	proxy : {
+		type : 'ajax',
+//		url : 'searchTodayJobsReference.htm',
+		api: {
+			read: 'searchTodayJobsReference.htm?grid_dept=Catalog',
+			update: 'updateJobReferenceBatch.htm'
+		},
+		reader : {
+			type : 'json',
+			root : 'records',
+			idProperty : 'job_ref_id',
+			totalProperty : 'total'
+		},
+		writer: {
+            type: 'json',
+            root: 'data',
+            encode: true,
+            writeAllFields: true,
+        },
+        listeners: {
+            exception: function(proxy, response, operation){
+//            	console.log(operation.getError());
+                Ext.MessageBox.show({
+                    title: 'REMOTE EXCEPTION',
+                    msg: operation.getError(),
+                    icon: Ext.MessageBox.ERROR,
+                    buttons: Ext.Msg.OK,
+                    fn: function(){location.reload()}
+                });
+            }
+        }
+	},
+    listeners: {
+        write: function(proxy, operation){
+            if(operation.action == 'update'){
+            	Ext.MessageBox.show({
+						title: 'Information',
+						msg: 'Job Has Been Updated!',
+						buttons: Ext.MessageBox.OK,
+						icon: Ext.MessageBox.INFO,
+						animateTarget: 'isave-syncPub',
+						fn: function(){
+							store.catalogJobRef.reload();
 							}
 					});
             }

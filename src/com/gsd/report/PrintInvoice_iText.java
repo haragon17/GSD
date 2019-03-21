@@ -292,20 +292,37 @@ public class PrintInvoice_iText {
         g2d.setFont(f10b);
         g2d.drawString("Subject:", 75, 370);
         g2d.setColor(Color.black);
-        g2d.drawString(inv.getInv_name(), 140, 371);
+        String subject = inv.getInv_name();
+        int subjectY = 356;
+        int subject_width = g2d.getFontMetrics().stringWidth(subject);
+        if(subject_width > 396){
+	        StringBuilder sb = new StringBuilder(subject);
+	        int ix = 0;
+	        while ((ix = sb.indexOf(" ", ix + 65)) != -1) {
+	            sb.replace(ix, ix + 1, "\n");
+	        }
+	        subject = sb.toString();
+	        for (String line : subject.split("\n")){
+	            g2d.drawString(line, 140, subjectY += 15);
+	        }
+        }else{
+        	subjectY = 371;
+        	g2d.drawString(inv.getInv_name(), 140, subjectY);
+        }
         
+        subjectY += 19;
         g2d.setFont(f9b);
         g2d.setColor(Color.gray);
-        g2d.drawString("No.", 75, 390);
-        g2d.drawString("Description", 140, 390);
-        g2d.drawString("Qty", 370, 390);
-        g2d.drawString("Rate", 435, 390);
-        g2d.drawString("Amount", 495, 390);
-        g2d.drawLine(75, 395, 530, 395);
+        g2d.drawString("No.", 75, subjectY);
+        g2d.drawString("Description", 140, subjectY);
+        g2d.drawString("Qty", 370, subjectY);
+        g2d.drawString("Rate", 435, subjectY);
+        g2d.drawString("Amount", 495, subjectY);
+        g2d.drawLine(75, subjectY+5, 530, subjectY+5);
         
         g2d.setFont(f8p);
         g2d.setColor(Color.black);
-        int itemY = 408;
+        int itemY = subjectY+18;
         double total_price = 0;
         float positive_price = 0;
         float negative_price = 0;

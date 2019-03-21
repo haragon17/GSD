@@ -114,9 +114,16 @@ img {
 	background-image: url(../../images/icons/fam/chart_pie.png) !important;
 }
 
-
 .icon-billed {
 	background-image: url(../../images/icons/fam/report.png) !important;
+}
+
+.icon-complete {
+	background-image: url(../../images/icons/fam/application_side_expand.png) !important;
+}
+
+.icon-update {
+	background-image: url(../../images/icons/fam/pencil_go.png) !important;
 }
 
 .process-row .x-grid-cell { 

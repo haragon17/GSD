@@ -685,6 +685,34 @@ public class JobsController {
 		return new ModelAndView("jsonView", model);
 	}
 	
+	@RequestMapping(value="/updateStatusJobReference")
+	public ModelAndView updateStatusJobReference(HttpServletRequest request, HttpServletResponse response){
+		
+		String job_ref_id = request.getParameter("ujob_ref_id");
+		String job_ref_status = request.getParameter("ujob_ref_status");
+		String job_ref_approve = request.getParameter("ujob_ref_approve");
+		
+		JobsReference jobRef = new JobsReference();
+		jobRef.setJob_ref_status(job_ref_status);
+		
+		if(job_ref_approve.equals("-")){
+			job_ref_approve = "";
+		}
+		jobRef.setJob_ref_approve(job_ref_approve);
+		
+		String[] id = job_ref_id.split(",");
+		for(int i=0; i<id.length; i++){
+			if(id[i].length() > 0){
+				jobRef.setJob_ref_id(Integer.parseInt(id[i]));
+				jobsDao.updateStatusJobReference(jobRef);
+			}
+		}
+		
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("success", true);
+		return new ModelAndView("jsonView", model);
+	}
+	
 	@RequestMapping(value="/updateJobReference")
 	public ModelAndView updateJobReference(HttpServletRequest request, HttpServletResponse response){
 		

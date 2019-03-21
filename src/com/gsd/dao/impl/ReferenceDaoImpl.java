@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 import com.gsd.dao.ReferenceDao;
 import com.gsd.model.Reference;
+import com.gsd.security.UserDetailsApp;
+import com.gsd.security.UserLoginDetail;
 
 public class ReferenceDaoImpl extends JdbcDaoSupport implements ReferenceDao {
 
@@ -21,10 +23,23 @@ public class ReferenceDaoImpl extends JdbcDaoSupport implements ReferenceDao {
 	}
 	
 	@Override
-	public List<Reference> showDepartmentReference() {
+	public List<Reference> showDepartmentReference(int level) {
 		
-		String sql = "SELECT db_ref_name from db_reference WHERE db_ref_kind = 'Department' ORDER BY order_by ASC";
-
+		UserDetailsApp user = UserLoginDetail.getUser();
+		String dept = user.getUserModel().getDept();
+		
+		String sql = "SELECT db_ref_name from db_reference WHERE db_ref_kind = 'Department'";
+				
+		if(level == 2){
+			if(dept.equals("E-Studio")){
+				sql += " AND (db_ref_name LIKE '"+dept+"%' OR db_ref_name = 'Pilot')";
+			}else{
+				sql += " AND db_ref_name LIKE '"+dept+"%'";
+			}
+		}
+		
+		sql += " ORDER BY order_by ASC";
+		
 		List<Reference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Reference>(Reference.class));
 		return result;
 	}

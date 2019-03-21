@@ -218,7 +218,11 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 					"WHEN dept = 'Publication_Pubworx'	THEN 5\n"+
 					"WHEN dept = 'Publication_Stuber'	THEN 6\n"+
 					"WHEN dept = 'Publication_Migros'	THEN 7\n"+
-					"ELSE 8\n"+
+					"WHEN dept = 'Catalog_OTTO'			THEN 8\n"+
+					"WHEN dept = 'Catalog_Bader'		THEN 9\n"+
+					"WHEN dept = 'Catalog_Layout'		THEN 10\n"+
+					"WHEN dept = 'Catalog_Witt'			THEN 11\n"+
+					"ELSE 12\n"+
 					"END,"+
 					"CASE\n"+
 					"WHEN job_ref_status = 'Hold'	THEN 2\n"+
@@ -250,7 +254,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	@Override
 	public List<JobsReference> searchJobsReference(int id, String sort) {
 		
-		String sql = "SELECT job_ref_id, job_ref_name, job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, itm_name, sent_amount, (amount-sent_amount) as total_amount, job_ref_number, job_ref_remark, job_ref_type\n"
+		String sql = "SELECT job_ref_id, job_ref_name, job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, itm_name, sent_amount, (amount-sent_amount) as total_amount, job_ref_number, job_ref_remark, job_ref_type, job_ref_approve\n"
 				+ "FROM jobs_reference\n"
 				+ "LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"
 				+ "LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n"
@@ -778,6 +782,68 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				jobRef.getJob_ref_name(),
 				"Updated",
 				jobRef_audit.getJob_name()+" : "+jobRef.getJob_ref_name()
+			});
+		}
+	}
+	
+	@Override
+	public void updateStatusJobReference(JobsReference jobRef){
+		
+		JobsReference jobRef_audit = searchJobsReferenceByID(jobRef.getJob_ref_id());
+		
+		String job_ref_status = jobRef.getJob_ref_status();
+		String job_ref_approve = jobRef.getJob_ref_approve();
+		
+		if(job_ref_status.equals("Job Status")){
+			job_ref_status = jobRef_audit.getJob_ref_status();
+		}
+		if(job_ref_approve.equals("Job Approve")){
+			job_ref_approve = jobRef_audit.getJob_ref_approve();
+		}
+		
+		String sql = "UPDATE jobs_reference set "
+				+ "job_ref_status=?, "
+				+ "job_ref_approve=?, "
+				+ "update_date=now() "
+				+ "where job_ref_id=?";
+		
+		this.getJdbcTemplate().update(sql, new Object[] {
+				job_ref_status,
+				job_ref_approve,
+				jobRef.getJob_ref_id()
+		});
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		
+		if(!jobRef_audit.getJob_ref_status().equals(jobRef.getJob_ref_status())){
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Jobs Status",
+				jobRef_audit.getJob_ref_status(),
+				jobRef.getJob_ref_status(),
+				"Updated",
+				jobRef_audit.getJob_name()+" : "+jobRef_audit.getJob_ref_name()
+			});
+		}
+		
+		String approve = "";
+		if(jobRef_audit.getJob_ref_approve() != null){
+			approve = jobRef_audit.getJob_ref_approve();
+		}
+		if(!approve.equals(jobRef.getJob_ref_approve())){
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Jobs Approve",
+				jobRef_audit.getJob_ref_approve(),
+				jobRef.getJob_ref_approve(),
+				"Updated",
+				jobRef_audit.getJob_name()+" : "+jobRef_audit.getJob_ref_name()
 			});
 		}
 	}

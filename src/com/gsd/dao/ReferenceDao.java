@@ -8,7 +8,7 @@ public interface ReferenceDao {
 	
 	public List<Reference> showDBReference(String kind, String dept);
 
-	public List<Reference> showDepartmentReference();
+	public List<Reference> showDepartmentReference(int level);
 	
 	public List<Reference> showJobStatus();
 	
