@@ -378,6 +378,7 @@ Ext.onReady(function() {
         listeners: {
             selectionchange: function(sm, selections) {
             	grid.jobRef.down('#updateJobRefStatusButton').setDisabled(selections.length === 0);
+            	grid.jobRef.down('#updateJobRefDateButton').setDisabled(selections.length === 0);
             }
         }
     });
