@@ -1980,7 +1980,7 @@ addProject = new Ext.create('Ext.window.Window', {
         		 Ext.getCmp('ctime').setValue('');
         		 Ext.getCmp('cactual_time').setValue('');
         		 Ext.getCmp('cprice').setValue('');
-        		 Ext.getCmp('ccurrency').setValue('');
+//        		 Ext.getCmp('ccurrency').setValue('');
         		 Ext.getCmp('cproj_ref_desc').setValue('');
         	 }
         	 if(form.isValid()){

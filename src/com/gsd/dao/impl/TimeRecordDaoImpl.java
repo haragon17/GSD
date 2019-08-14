@@ -1,5 +1,7 @@
 package com.gsd.dao.impl;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,37 +31,42 @@ public class TimeRecordDaoImpl extends JdbcDaoSupport implements TimeRecordDao {
 					"LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n"+
 					"LEFT JOIN users ON users.usr_id = tr.usr_id\n"+
 					"WHERE tr_id != 0\n";
-					
+				
+		String search = "";
 		if(data.get("tr_name")==null || data.get("tr_name").isEmpty()){
 		}else{
-			sql += "AND LOWER(tr_name) LIKE LOWER('%"+data.get("tr_name")+"%')\n";
+			search += "AND LOWER(tr_name) LIKE LOWER('%"+data.get("tr_name")+"%')\n";
+		}
+		if(data.get("job_ref_name")==null || data.get("job_ref_name").isEmpty()){
+		}else{
+			search += "AND LOWER(job_ref_name) LIKE LOWER('%"+data.get("job_ref_name")+"%')\n";
 		}
 		if(data.get("job_ref_id")==null || data.get("job_ref_id").isEmpty()){
 		}else{
-			sql += "AND tr.job_ref_id = "+data.get("job_ref_id")+"\n";
+			search += "AND tr.job_ref_id = "+data.get("job_ref_id")+"\n";
 		}
 		if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
 		}else{
-			sql += "AND jobs.proj_id = "+data.get("proj_id")+"\n";
+			search += "AND jobs.proj_id = "+data.get("proj_id")+"\n";
 		}
 		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
 		}else{
-			sql += "AND proj.cus_id = "+data.get("cus_id")+"\n";
+			search += "AND proj.cus_id = "+data.get("cus_id")+"\n";
 		}
 		if(data.get("usr_id")==null || data.get("usr_id").isEmpty()){
 		}else{
-			sql += "AND tr.usr_id = "+data.get("usr_id")+"\n";
+			search += "AND tr.usr_id = "+data.get("usr_id")+"\n";
 		}
 		if(data.get("job_status")==null || data.get("job_status").isEmpty()){
 		}else{
-			sql += "AND jobs.job_status = '"+data.get("job_status")+"'\n";
+			search += "AND jobs.job_status = '"+data.get("job_status")+"'\n";
 		}
 		if(data.get("dept")==null || data.get("dept").isEmpty()){
 		}else{
 			if(usr_name.equals("jmd_hkt")){
-				sql += "AND (users.dept LIKE '"+data.get("dept")+"%' OR users.dept LIKE 'Pilot%')\n";
+				search += "AND (users.dept LIKE '"+data.get("dept")+"%' OR users.dept LIKE 'Pilot%')\n";
 			}else{
-				sql += "AND users.dept LIKE '"+data.get("dept")+"%'\n";
+				search += "AND users.dept LIKE '"+data.get("dept")+"%'\n";
 			}
 //			if(data.get("dept").equals("E-Studio") && type == 2){
 //				sql += "AND (dept LIKE '"+data.get("dept")+"%' OR dept LIKE 'Pilot%')\n";
@@ -69,17 +76,29 @@ public class TimeRecordDaoImpl extends JdbcDaoSupport implements TimeRecordDao {
 		}
 		if(data.get("process")==null || data.get("process").isEmpty()){
 		}else{
-			sql += "AND tr_process LIKE '"+data.get("process")+"%'\n";
+			search += "AND tr_process LIKE '"+data.get("process")+"%'\n";
 		}
 		if(data.get("record_start")==null || data.get("record_start").isEmpty()){
 			if(data.get("record_finish")==null || data.get("record_finish").isEmpty()){
 			}else{
-				sql += "AND tr_start <= '"+data.get("record_finish")+" 23:59:59'\n";
+				search += "AND tr_start <= '"+data.get("record_finish")+" 23:59:59'\n";
 			}
 		}else if(data.get("record_finish")==null || data.get("record_finish").isEmpty()){
-			sql += "AND tr_start >= '"+data.get("record_start")+"'\n";
+			search += "AND tr_start >= '"+data.get("record_start")+"'\n";
 		}else{
-			sql += "AND tr_start BETWEEN '"+data.get("record_start")+"' AND '"+data.get("record_finish")+" 23:59:59'\n";
+			search += "AND tr_start BETWEEN '"+data.get("record_start")+"' AND '"+data.get("record_finish")+" 23:59:59'\n";
+		}
+		
+		if(search.equals("")){
+			Date todayDate = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(todayDate);
+			int year = cal.get(Calendar.YEAR);
+			int month = cal.get(Calendar.MONTH);
+			int day = cal.get(Calendar.DAY_OF_MONTH);
+			sql += "AND tr_start >= '"+year+"-"+(month+1)+"-"+(day)+"'\n";
+		}else{
+			sql += search;
 		}
 		
 		if(data.get("searchType") == "report"){

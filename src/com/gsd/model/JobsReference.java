@@ -35,6 +35,16 @@ public class JobsReference {
 	private String proj_currency;
 	private String job_ref_remark;
 	private String job_ref_type;
+	private String job_dtl;
+	private String job_status;
+	private int cus_id;
+	private BigDecimal new_page;
+	private BigDecimal cc;
+	private BigDecimal ic;
+	private BigDecimal ic_cc;
+	private BigDecimal wait_df;
+	private BigDecimal sent;
+	private BigDecimal s_hold;
 	
 	public int getJob_ref_id() {
 		return job_ref_id;
@@ -215,6 +225,66 @@ public class JobsReference {
 	}
 	public void setJob_ref_type(String job_ref_type) {
 		this.job_ref_type = job_ref_type;
+	}
+	public String getJob_dtl() {
+		return job_dtl;
+	}
+	public void setJob_dtl(String job_dtl) {
+		this.job_dtl = job_dtl;
+	}
+	public String getJob_status() {
+		return job_status;
+	}
+	public void setJob_status(String job_status) {
+		this.job_status = job_status;
+	}
+	public int getCus_id() {
+		return cus_id;
+	}
+	public void setCus_id(int cus_id) {
+		this.cus_id = cus_id;
+	}
+	public BigDecimal getNew_page() {
+		return new_page;
+	}
+	public void setNew_page(BigDecimal new_page) {
+		this.new_page = new_page;
+	}
+	public BigDecimal getCc() {
+		return cc;
+	}
+	public void setCc(BigDecimal cc) {
+		this.cc = cc;
+	}
+	public BigDecimal getIc() {
+		return ic;
+	}
+	public void setIc(BigDecimal ic) {
+		this.ic = ic;
+	}
+	public BigDecimal getIc_cc() {
+		return ic_cc;
+	}
+	public void setIc_cc(BigDecimal ic_cc) {
+		this.ic_cc = ic_cc;
+	}
+	public BigDecimal getWait_df() {
+		return wait_df;
+	}
+	public void setWait_df(BigDecimal wait_df) {
+		this.wait_df = wait_df;
+	}
+	public BigDecimal getSent() {
+		return sent;
+	}
+	public void setSent(BigDecimal sent) {
+		this.sent = sent;
+	}
+	public BigDecimal getS_hold() {
+		return s_hold;
+	}
+	public void setS_hold(BigDecimal s_hold) {
+		this.s_hold = s_hold;
 	}
 	
 }

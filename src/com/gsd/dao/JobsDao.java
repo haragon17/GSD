@@ -54,6 +54,8 @@ public interface JobsDao {
 	
 	public void updateStatusJobReference(JobsReference jobRef);
 	
+	public void updateDateJobReference(JobsReference jobRef);
+	
 	public void deleteJobReference(int id);
 	
 	public JobsReference getDataFromJson(Object data);

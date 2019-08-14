@@ -54,46 +54,55 @@ Ext.onReady(function() {
 						margin : '0 0 10 0',
 						width : 340,
 						emptyText : 'File Name'
-				    },     
-					{
-						xtype: 'combobox',
-						fieldLabel : 'Job Name ',
-						name : 'sjob_ref_id',
-						id : 'sjob_ref_id',
-						queryMode : 'local',
-						labelWidth : 110,
+				    },
+				    {
+				    	fieldLabel : 'Job Name ',
+				    	name : 'sjob_ref_name',
+				    	id : 'sjob_ref_name',
+				    	labelWidth : 110,
 						margin : '0 0 10 0',
 						width : 340,
-						emptyText : 'Job Name',
-						store : {
-							fields : [ 'job_ref_id', 'job_ref_name' ],
-							proxy : {
-								type : 'ajax',
-								url : 'showJobRef.htm?id=0&type=0',
-								reader : {
-									type : 'json',
-									root : 'records',
-									idProperty : 'job_ref_id'
-								}
-							},
-							autoLoad : true,
-							sorters: [{
-						         property: 'itm_name',
-						         direction: 'ASC'
-						     }]
-						},
-						valueField : 'job_ref_id',
-						displayField : 'job_ref_name',
-						listeners : {
-							blur : function() {
-								var v = this.getValue();
-								var record = this.findRecord(this.valueField || this.displayField, v);
-								if(record == false){
-									Ext.getCmp('sjob_ref_id').setValue("");
-								}
-							}
-						}
-					},
+						emptyText : 'Job Name'
+				    },
+//					{
+//						xtype: 'combobox',
+//						fieldLabel : 'Job Name ',
+//						name : 'sjob_ref_id',
+//						id : 'sjob_ref_id',
+//						queryMode : 'local',
+//						labelWidth : 110,
+//						margin : '0 0 10 0',
+//						width : 340,
+//						emptyText : 'Job Name',
+//						store : {
+//							fields : [ 'job_ref_id', 'job_ref_name' ],
+//							proxy : {
+//								type : 'ajax',
+//								url : 'showJobRef.htm?id=0&type=0',
+//								reader : {
+//									type : 'json',
+//									root : 'records',
+//									idProperty : 'job_ref_id'
+//								}
+//							},
+//							autoLoad : true,
+//							sorters: [{
+//						         property: 'itm_name',
+//						         direction: 'ASC'
+//						     }]
+//						},
+//						valueField : 'job_ref_id',
+//						displayField : 'job_ref_name',
+//						listeners : {
+//							blur : function() {
+//								var v = this.getValue();
+//								var record = this.findRecord(this.valueField || this.displayField, v);
+//								if(record == false){
+//									Ext.getCmp('sjob_ref_id').setValue("");
+//								}
+//							}
+//						}
+//					},
 					{
 						xtype: 'combobox',
 						fieldLabel : 'Process Type ',
@@ -328,17 +337,18 @@ Ext.onReady(function() {
 //							item.clearValue();
 //							item.getStore().removeAll();
 							var proj = Ext.getCmp('sproj_id');
-							var job_ref = Ext.getCmp('sjob_ref_id');
 							proj.clearValue();
 							proj.getStore().removeAll();
 							proj.getStore().load({
 								url: 'showProjects.htm?type=all&id='+myId
 							});
-							job_ref.clearValue();
-							job_ref.getStore().removeAll();
-							job_ref.getStore().load({
-								url: 'showJobRef.htm?id='+myId+'&type=1'
-							});
+							
+//							var job_ref = Ext.getCmp('sjob_ref_id');
+//							job_ref.clearValue();
+//							job_ref.getStore().removeAll();
+//							job_ref.getStore().load({
+//								url: 'showJobRef.htm?id='+myId+'&type=1'
+//							});
 						}
 
 					}
@@ -387,17 +397,18 @@ Ext.onReady(function() {
 //							item.clearValue();
 //							item.getStore().removeAll();
 							var proj = Ext.getCmp('sproj_id');
-							var job_ref = Ext.getCmp('sjob_ref_id');
 							proj.clearValue();
 							proj.getStore().removeAll();
 							proj.getStore().load({
 								url: 'showProjects.htm?type=all&id='+myId
 							});
-							job_ref.clearValue();
-							job_ref.getStore().removeAll();
-							job_ref.getStore().load({
-								url: 'showJobRef.htm?id='+myId+'&type=1'
-							});
+							
+//							var job_ref = Ext.getCmp('sjob_ref_id');
+//							job_ref.clearValue();
+//							job_ref.getStore().removeAll();
+//							job_ref.getStore().load({
+//								url: 'showJobRef.htm?id='+myId+'&type=1'
+//							});
 						}
 
 					}
@@ -434,16 +445,15 @@ Ext.onReady(function() {
 					listeners : {
 
 						select : function() {
-							var item = Ext.getCmp('sitm_id');
-							var proj_id = Ext.getCmp('sproj_id').getValue();
-
-							var job_ref = Ext.getCmp('sjob_ref_id');
-							
-							job_ref.clearValue();
-							job_ref.getStore().removeAll();
-							job_ref.getStore().load({
-								url: 'showJobRef.htm?id='+proj_id+'&type=2'
-							});
+//							var item = Ext.getCmp('sitm_id');
+//							var proj_id = Ext.getCmp('sproj_id').getValue();
+//
+//							var job_ref = Ext.getCmp('sjob_ref_id');
+//							job_ref.clearValue();
+//							job_ref.getStore().removeAll();
+//							job_ref.getStore().load({
+//								url: 'showJobRef.htm?id='+proj_id+'&type=2'
+//							});
 						}
 					}
 				},
@@ -516,6 +526,11 @@ Ext.onReady(function() {
 					xtype : 'hidden',
 					id : 'scus_id',
 					name : 'scus_id'
+	            },
+				{
+					xtype : 'hidden',
+					id : 'sjob_ref_id',
+					name : 'sjob_ref_id'
 	            }  ]
 			} ]
 		} ],
@@ -533,7 +548,7 @@ Ext.onReady(function() {
 							store.timeRecord.loadPage(1);
 						}
 					});
-
+					Ext.getCmp('sjob_ref_id').setValue("");
 				} else {
 					Ext.MessageBox.show({
 						title : 'Failed',
@@ -553,18 +568,18 @@ Ext.onReady(function() {
 				Ext.getCmp('record_start').setMaxValue(new Date());
 				Ext.getCmp('record_finish').setMinValue('');
 				var proj = Ext.getCmp('sproj_id');
-				var job_ref = Ext.getCmp('sjob_ref_id');
+//				var job_ref = Ext.getCmp('sjob_ref_id');
 				var process = Ext.getCmp('sprocess');
 				proj.clearValue();
 				proj.getStore().removeAll();
 				proj.getStore().load({
 					url: 'showProjects.htm?type=all&id=0'
 				});
-				job_ref.clearValue();
-				job_ref.getStore().removeAll();
-				job_ref.getStore().load({
-					url: 'showJobRef.htm?id=0&type=0'
-				});
+//				job_ref.clearValue();
+//				job_ref.getStore().removeAll();
+//				job_ref.getStore().load({
+//					url: 'showJobRef.htm?id=0&type=0'
+//				});
 				process.clearValue();
 				process.getStore().removeAll();
 				process.getStore().load({

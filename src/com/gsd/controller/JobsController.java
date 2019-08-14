@@ -685,6 +685,53 @@ public class JobsController {
 		return new ModelAndView("jsonView", model);
 	}
 	
+	@RequestMapping(value="/updateDateJobReference")
+	public ModelAndView updateDateJobReference(HttpServletRequest request, HttpServletResponse response){
+		
+		Timestamp job_in_ts = null;
+		Timestamp job_out_ts = null;
+		
+		String job_ref_id = request.getParameter("udjob_ref_id");
+		String job_in = request.getParameter("ujob_in");
+		String job_out = request.getParameter("ujob_out")+" "+request.getParameter("utime");
+		
+		JobsReference jobRef = new JobsReference();
+		if(!job_in.equals("Date in")){
+			try{
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			    Date parsedJobIn = dateFormat.parse(job_in);
+			    job_in_ts = new java.sql.Timestamp(parsedJobIn.getTime());
+			}catch(Exception e){
+				logger.error(e.getMessage());
+			}
+		}
+		
+		if(!job_out.equals("Date out")){
+			try{
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+				Date parsedJobOut = dateFormat.parse(job_out);
+				job_out_ts = new java.sql.Timestamp(parsedJobOut.getTime());
+			}catch(Exception e){
+				logger.error(e.getMessage());
+			}
+		}
+		
+		jobRef.setJob_in_ts(job_in_ts);
+		jobRef.setJob_out_ts(job_out_ts);
+		
+		String[] id = job_ref_id.split(",");
+		for(int i=0; i<id.length; i++){
+			if(id[i].length() > 0){
+				jobRef.setJob_ref_id(Integer.parseInt(id[i]));
+				jobsDao.updateDateJobReference(jobRef);
+			}
+		}
+		
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("success", true);
+		return new ModelAndView("jsonView", model);
+	}
+	
 	@RequestMapping(value="/updateStatusJobReference")
 	public ModelAndView updateStatusJobReference(HttpServletRequest request, HttpServletResponse response){
 		

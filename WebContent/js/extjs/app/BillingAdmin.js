@@ -498,6 +498,7 @@ Ext.onReady(function() {
         listeners: {
             selectionchange: function(sm, selections) {
             	grid.jobRef.down('#updateJobRefStatusButton').setDisabled(selections.length === 0);
+            	grid.jobRef.down('#updateJobRefDateButton').setDisabled(selections.length === 0);
             }
         }
     });
@@ -544,6 +545,23 @@ Ext.onReady(function() {
 				});
 				Ext.getCmp('ujob_ref_id').setValue(selected.toString());
 				updateJobRefStatus.show();
+			}
+			
+		},{
+			xtype: 'button',
+			text: 'Update Date',
+			id: 'updateJobRefDateButton',
+			itemId: 'updateJobRefDateButton',
+			iconCls : 'icon-update',
+			disabled : true,
+			handler: function(){
+				var s = grid.jobRef.getSelectionModel().getSelection();
+				selected = [];
+				Ext.each(s, function (item) {
+					selected.push(item.data.job_ref_id);
+				});
+				Ext.getCmp('udjob_ref_id').setValue(selected.toString());
+				updateJobRefDate.show();
 			}
 			
 		},{
@@ -1982,7 +2000,7 @@ Ext.onReady(function() {
 		        	}else if(record.get('dept') == "E-Studio_OTTO"){
 		        		return 'estudio_otto-row'; 
 		        	}else if(record.get('dept') == "E-Studio_CandA"){
-		        		return 'estudio_canda-row'; 
+		        		return 'estudio_canda-row';
 		        	}else{
 		        		return 'estudio_masking-row';
 		        	}
@@ -2854,13 +2872,19 @@ Ext.onReady(function() {
 				viewConfig: { 
 			        stripeRows: false, 
 			        getRowClass: function(record) { 
-			            if(record.get('job_ref_status') == "Hold"){
+			        	if(record.get('job_ref_status') == "Hold"){
 			        		return 'hold-row';
-			            }else if(record.get('job_ref_status') == "New" || record.get('job_ref_status') == "New Pic" || record.get('job_ref_status') == "New Doc" || record.get('job_ref_status') == "New Pic+Doc"){
-			        		return 'process-row'; 
+			            }else if(record.get('dept') == "Packaging_Migros"){
+			            	return 'pub_pubworx-row'; 
+			        	}else if(record.get('dept') == "Packaging_Vector"){
+			        		return 'pub_stuber-row'; 
+			        	}else if(record.get('dept') == "Packaging_Penny"){
+			        		return 'pub_migros-row'; 
+			        	}else if(record.get('dept') == "Packaging_Rewe"){
+			        		return 'estudio_masking-row'; 
 			        	}else{
-			        		return 'cc-row';
-			        	}
+			            	return 'process-row';
+			            }
 			        },
 			    },
 				listeners : {
@@ -2962,19 +2986,20 @@ Ext.onReady(function() {
 		    	store.catalogJobRef.reload();
 		    }
 	    },
-		{
-			iconCls: 'icon-save',
-			text: 'Save All',
-			id: 'isave-syncCatalog',
-			iconAlign: 'right',
-	        tooltip: 'Sync data from server',
-	        disabled: false,
-	        itemId: 'saveSync',
-	        scope: this,
-	        handler: function(){
-	        	store.catalogJobRef.sync();
-	        }
-		}],
+//		{
+//			iconCls: 'icon-save',
+//			text: 'Save All',
+//			id: 'isave-syncCatalog',
+//			iconAlign: 'right',
+//	        tooltip: 'Sync data from server',
+//	        disabled: false,
+//	        itemId: 'saveSync',
+//	        scope: this,
+//	        handler: function(){
+//	        	store.catalogJobRef.sync();
+//	        }
+//		}
+	    ],
 		minHeight: 608,
 		columnLines : true,
 		columns : [
@@ -2984,11 +3009,6 @@ Ext.onReady(function() {
 				sortable : true,
 				dataIndex : 'job_in',
 				renderer: Ext.util.Format.dateRenderer('Y-m-d'),
-				editor: {
-					xtype: 'datefield',
-					format: 'Y-m-d',
-					editable: false
-				}
 			},
 			{
 				text : "Date out",
@@ -3014,19 +3034,6 @@ Ext.onReady(function() {
 						return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'Y-m-d')+'</span></b>';
 					}
 				},
-				editor: {
-					xtype: 'datefield',
-					id: 'edit_date_today',
-					format: 'Y-m-d        H:i',
-					editable: false,
-					listeners: {
-						"change": function () {
-							newDate = Ext.getCmp('edit_date_today').getValue();
-							var myDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate(), editorDate.getHours(), editorDate.getMinutes());
-							Ext.getCmp('edit_date_today').setValue(myDate);
-						}
-					}
-				}
 			},
 			{
 				text : "Time",
@@ -3052,240 +3059,156 @@ Ext.onReady(function() {
 						return '<b><span style="color:green;">'+Ext.util.Format.date(value, 'H:i')+'</span></b>';
 					}
 				},
-				editor: {
-					xtype: 'timefield',
-					id: 'edit_time_today',
-					format: 'H:i',
-					listeners: {
-						blur: function () {
-							myTime = Ext.getCmp('edit_time_today').getValue();
-							var myDate = new Date(editorDate.getFullYear(), editorDate.getMonth(), editorDate.getDate(), myTime.getHours(), myTime.getMinutes());
-							Ext.getCmp('edit_time_today').setValue(myDate);
-						}
-					}
-				}
 			},
 			{
 		    	text : "Customer Name",
-		    	flex : 2.2,
+		    	flex : 2,
 		    	sortable : true,
-		    	dataIndex : 'cus_name',
+		    	dataIndex : 'cus_code',
 		    	renderer : renderCustomer
 		    },
 			{
-				text : "Job Name",
-				flex : 2.5,
+				text : "Project Name",
+				flex : 2.8,
 				sortable : true,
-				dataIndex : 'job_ref_name',
-				editor: {
-					xtype: 'textfield',
-					allowBlank: false
-				}
+				dataIndex : 'job_name',
 			},
 			{
-				text : "Item",
-				flex : 1.5,
-				sortable : true,
-				dataIndex : 'itm_name',
-				editor: {
-					xtype: 'combobox',
-					id: 'edit_itm_today',
-					store : {
-						fields : [ 'proj_ref_id', 'itm_name', 'proj_ref_desc' ],
-						proxy : {
-							type : 'ajax',
-							url : '',
-							reader : {
-								type : 'json',
-								root : 'records',
-								idProperty : 'proj_ref_id'
-							}
-						},
-						autoLoad : true,
-						sorters: [{
-					         property: 'itm_name',
-					         direction: 'ASC'
-					     }]
-					},
-					valueField : 'itm_name',
-					displayField : 'itm_name',
-//				    tpl: Ext.create('Ext.XTemplate',
-//				        '<tpl for=".">',
-//				        	"<tpl if='proj_ref_desc == \"\"'>",
-//				        	'<div class="x-boundlist-item">{itm_name}</div>',
-//				            '<tpl else>',
-//				            '<div class="x-boundlist-item">{itm_name} - {proj_ref_desc}</div>',
-//				            '</tpl>',
-//			            '</tpl>'
-//				    ),
-//				    displayTpl: Ext.create('Ext.XTemplate',
-//				        '<tpl for=".">',
-//				        	"<tpl if='proj_ref_desc == \"\"'>",
-//				        	'{itm_name}',
-//				            '<tpl else>',
-//				            '{itm_name} - {proj_ref_desc}',
-//				            '</tpl>',
-//				        '</tpl>'
-//				    ),
-				    listeners: {
-				    	select : function(){
-				    		var v = this.getValue();
-							var record = this.findRecord(this.valueField || this.displayField, v);
-							var myIndex = this.store.indexOf(record);
-							var myValue = this.store.getAt(myIndex).data.proj_ref_id;
-							Ext.getCmp('projrefidtoday').setValue(myValue);
-				    	}
-				    }
-				}
-			},
-			{
-				dataIndex : 'proj_ref_id',
-				hidden : true,
-				hideable : false
-			},
-			{
-				text : "Amount",
+				text : "New",
 				flex : 0.7,
 				align : 'center',
 				sortable : true,
-				dataIndex : 'amount',
-				editor: {
-					xtype:'numberfield',
-					minValue : 0,
-					allowBlank: false
-				}
+				dataIndex : 'new_page',
 			},
 			{
-				text : "Status",
+				text : "CC",
 				flex : 0.7,
 				align : 'center',
 				sortable : true,
-				renderer : function(val){
-					if(val == "New" || val == "New Page"){
-						return '<b><span style="color:blue;">' + val + '</span></b>';
-					}else if(val == "Hold"){
-						return '<b><span style="color:red;">' + val + '</span></b>';
-					}else{
-						return '<b>'+val+'</b>';
-					}
-				},
-				dataIndex : 'job_ref_status',
-				editor: {
-					xtype: 'combobox',
-//					store : 'jobRefStatusPublication',
-					store : {
-						fields : ['db_ref_name'],
-						proxy : {
-							type : 'ajax',
-							url : 'showJobReference.htm?kind=JobRefStatus&dept=Catalog',
-							reader : {
-								type : 'json',
-								root : 'records',
-							}
-						},
-						autoLoad : true
-					},
-					valueField : 'db_ref_name',
-					displayField : 'db_ref_name',
-					editable : false
-				}
+				dataIndex : 'cc',
 			},
 			{
-				text : "Approve",
-				flex : 1.3,
+				text : "IC",
+				flex : 0.7,
 				align : 'center',
 				sortable : true,
-				dataIndex : 'job_ref_approve',
-				renderer : function(val){
-					if(val == "Done" || val == "Sent PDF Vorab" || val == "Sent PDF K1" || val == "Sent PDF K2" || val == "Sent PDF Final" || val == "Up Proof" || val == "CC1" || val == "CC2" || val == "CC3" || val == "CC4"){
-						return '<b><span style="color:#13baff;">' + val + '</span></b>';
-//						}else if(val == "Hold Wait Mask" || val == "Hold Missing" || val == "Hold Low Quality" || val == "Hold Low Res" || val == "Hold Move Mask" || val == "Hold Ask Customer" || val == "Hold Other"){
-					}else if(val == "Wait Mask" || val == "Wait Move Mask" || val == "Missing Pic" || val == "Low Quality Pic" || val == "Low Res Pic" || val == "Ask Customer" || val == "Hold Other"){	
-						return '<b><span style="color:red;">' + val + '</span></b>';
-					}else if(val == "Wait Final" || val == "Wait Check" || val == "Wait FI"){
-						return '<b><span style="color:#ec8500;">' + val + '</span></b>';
-					}else{
-						return '<b>'+val+'</b>';
-					}
-				},
-				editor : {
-					xtype : 'combobox',
-					id : 'edit_job_ref_approve_catalog',
-//					store : 'jobRefApprovePublication',
-					store : {
-						fields : ['db_ref_name'],
-						proxy : {
-							type : 'ajax',
-							url : 'showJobReference.htm?kind=JobRefApprove&dept=Catalog',
-							reader : {
-								type : 'json',
-								root : 'records',
-							}
-						},
-						autoLoad : true
-					},
-					valueField : 'db_ref_name',
-					displayField : 'db_ref_name',
-					editable : false
-				}
+				dataIndex : 'ic',
+			},
+			{
+				text : "IC CC",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'ic_cc',
+			},
+			{
+				text : "Wait DF",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'wait_df',
+			},
+			{
+				text : "Hold",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 's_hold',
+			},
+			{
+				text : "Sent",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'sent',
+			},
+			{
+				text : "Total",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'total_amount',
 			},
 			{
 				text : "Detail",
 				flex : 2,
-				dataIndex : 'job_ref_dtl',
-				editor : {
-					xtype : 'textfield'
-				}
+				dataIndex : 'job_dtl',
 			},
 			{
-				text : "Remark",
-				flex : 2,
-				dataIndex : 'job_ref_remark',
-				editor : {
-					xtype : 'textfield'
-				}
-			},
-		    {
-				text : "Name",
-				flex : 1.5,
-				sortable : true,
-				dataIndex : 'job_name',
+		    	text : 'Edit',
+				xtype : 'actioncolumn',
+				flex : 0.5,
 				hidden : true,
-			},
-//		    {
-//		    	text : "Dept",
-//				flex : 1,
-//				sortable : true,
-//				dataIndex : 'dept'
-//		    }
+				align : 'center',
+				id : 'job_edit_cate',
+				items : [ {
+					iconCls : 'table-edit',
+					handler : function(grid, rowIndex, colIndex) {
+						job_id = grid.getStore().getAt(rowIndex).get('job_id');
+						job_name = grid.getStore().getAt(rowIndex).get('job_name');
+						cus_id = grid.getStore().getAt(rowIndex).get('cus_id');
+						cus_name = grid.getStore().getAt(rowIndex).get('cus_name');
+						cus_code = grid.getStore().getAt(rowIndex).get('cus_code');
+						proj_id = grid.getStore().getAt(rowIndex).get('proj_id');
+						job_dtl = grid.getStore().getAt(rowIndex).get('job_dtl');
+						dept = grid.getStore().getAt(rowIndex).get('dept');
+						status = grid.getStore().getAt(rowIndex).get('job_status');
+						
+						Ext.getCmp('eproj_id').getStore().load({
+							url: 'showProjects.htm?type=all&id='+cus_id
+						});
+						
+						Ext.getCmp('ejob_id').setValue(job_id);
+						Ext.getCmp('ejob_name').setValue(job_name);
+						Ext.getCmp('ecus_name').setValue(cus_name);
+						Ext.getCmp('ecus_code').setValue(cus_code);
+						Ext.getCmp('eproj_id').setValue(proj_id);
+						Ext.getCmp('ejob_dtl').setValue(job_dtl);
+						Ext.getCmp('edept').setValue(dept);
+						Ext.getCmp('ejob_status').setValue(status);
+						editJob.show();
+					}
+				}]
+		    },
+		    {
+				text : 'Delete',
+				xtype : 'actioncolumn',
+				flex : 0.5,
+				hidden : true,
+				align : 'center',
+				id : 'job_del_cate',
+				items : [ {
+					iconCls : 'icon-delete',
+					handler : function(grid, rowIndex, colIndex) {
+						job_id = grid.getStore().getAt(rowIndex).get('job_id');
+						Ext.getCmp('jobid').setValue(job_id);
+						Ext.MessageBox.show({
+							title : 'Confirm',
+							msg : 'Are you sure you want to delete this?',
+							buttons : Ext.MessageBox.YESNO,
+							animateTarget : 'job_del_cate',
+							fn : confirmChk,
+							icon : Ext.MessageBox.QUESTION
+						});
+					}
+				} ]
+			}
 			],
 			viewConfig: { 
 		        stripeRows: false, 
 		        getRowClass: function(record) { 
-		            if(record.get('job_ref_status') == "Hold"){
-		        		return 'hold-row';
-		            }else if(record.get('dept') == "Catalog_Bader"){
+		        	if(record.get('dept') == "Catalog_OTTO"){
 		        		return 'pub_pubworx-row'; 
-		        	}else if(record.get('dept') == "Catalog_Layout"){
+		        	}else if(record.get('dept') == "Catalog_Bader"){
 		        		return 'pub_stuber-row'; 
-		        	}else if(record.get('dept') == "Catalog_Witt"){
+		        	}else if(record.get('dept') == "Catalog_Layout"){
 		        		return 'pub_migros-row'; 
+		        	}else if(record.get('dept') == "Catalog_Witt"){
+		        		return 'estudio_masking-row'; 
 		        	}else{
 		            	return 'process-row';
 		            }
-//		            }else if(record.get('job_ref_status') == "New" || record.get('job_ref_status') == "New Pic" || record.get('job_ref_status') == "New Doc" || record.get('job_ref_status') == "New Pic+Doc"){
-//		        		return 'process-row'; 
-//		        	}else{
-//		        		return 'cc-row';
-//		        	}
 		        },
-//		        listeners:{
-//		            itemkeydown:function(view, record, item, index, e){
-//		            	if(e.getKey() == 117){
-//		            		Ext.get('isave-syncPub').dom.click();
-//		            	}
-//		            }
-//		        }
 		    },
 			listeners : {
 				viewready: function (grid) {
@@ -3313,49 +3236,138 @@ Ext.onReady(function() {
 			                }
 			            }
 			        });
-		        }
-		    },
-		    plugins: 
-			    [{ 
-			        ptype: 'cellediting',
-			        clicksToEdit: 2,
-			        listeners: {
-				        beforeedit: function (editor, e) {
-				        	Ext.getCmp('projrefidtoday').setValue(0);
-				        	if(e.field == "job_out"){
-								editorDate = e.value;
-				        	}else if(e.field == "itm_name"){
-				        		Ext.getCmp('edit_itm_today').getStore().load({
-									url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
-								});
-				        	}
-						},
-						afteredit: function (editor, e) {
-							if(e.field == "itm_name"){
-								if(Ext.getCmp('projrefidtoday').getValue() != 0){
-									e.record.set('proj_ref_id', Ext.getCmp('projrefidtoday').getValue());
-								}
-							}
-						},
-						edit: function (editor, e) {
-							if(e.field == "job_out"){
-								try{
-									myTime = Ext.getCmp('edit_time_today').getValue();
-									var myDate = new Date(editorDate.getFullYear(), editorDate.getMonth(), editorDate.getDate(), myTime.getHours(), myTime.getMinutes());
-									Ext.getCmp('edit_time_today').setValue(myDate);
-									e.record.set('job_out', myDate);
-								}catch(e){
-									console.log(e.message);
-								}
-							}
-							if(e.field == "job_ref_approve"){
-								if(Ext.getCmp('edit_job_ref_approve_catalog').getValue() == "-"){
-									e.record.set("job_ref_approve", "");
-								}
-							}
+		        },
+		    itemdblclick: function(dv, record, item, index, e) {
+				job_name = dv.getStore().getAt(index).get('job_name');
+				job_id = dv.getStore().getAt(index).get('job_id');
+				proj_id = dv.getStore().getAt(index).get('proj_id');
+				myDept = dv.getStore().getAt(index).get('dept');
+				cus_id = dv.getStore().getAt(index).get('cus_id');
+//				totalAmount = grid.getStore().getAt(rowIndex).get('total_amount');
+				Ext.getCmp('cusid').setValue(cus_id);
+				Ext.getCmp('projid').setValue(proj_id);
+				Ext.getCmp('jobid_ref').setValue(job_id);
+				deptRef = "";
+				if(myDept.indexOf("E-Studio") !== -1){
+					deptRef = "E-Studio";
+				}else if(myDept.indexOf("Publication") !== -1){
+        			deptRef = "Publication";
+        		}else if(myDept == "Packaging"){
+        			deptRef = "Packaging";
+        		}else if(myDept.indexOf("Catalog") !== -1){
+        			deptRef = "Catalog";
+        		}else{
+        			deptRef = "E-Studio";
+        		}
+				
+				var ajob_ref_status = Ext.getCmp('ajob_ref_status');
+				var ejob_ref_status = Ext.getCmp('ejob_ref_status');
+				var ajob_ref_type = Ext.getCmp('ajob_ref_type');
+				var ejob_ref_type = Ext.getCmp('ejob_ref_type');
+				var ujob_ref_status = Ext.getCmp('ujob_ref_status');
+				var ujob_ref_approve = Ext.getCmp('ujob_ref_approve');
+				
+				ajob_ref_status.clearValue();
+				ajob_ref_status.getStore().removeAll();
+				ajob_ref_status.getStore().load({
+					url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
+				});
+				
+				ejob_ref_status.clearValue();
+				ejob_ref_status.getStore().removeAll();
+				ejob_ref_status.getStore().load({
+					url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
+				});
+				
+				ajob_ref_type.clearValue();
+				ajob_ref_type.getStore().removeAll();
+				ajob_ref_type.getStore().load({
+					url: 'showJobReference.htm?kind=JobRefType&dept='+deptRef
+				});
+				
+				ejob_ref_type.clearValue();
+				ejob_ref_type.getStore().removeAll();
+				ejob_ref_type.getStore().load({
+					url: 'showJobReference.htm?kind=JobRefType&dept='+deptRef
+				});
+				
+				ujob_ref_status.clearValue();
+				ujob_ref_status.getStore().removeAll();
+				ujob_ref_status.getStore().load({
+					url: 'showJobReference.htm?kind=JobRefStatus&dept='+deptRef
+				});
+				
+				ujob_ref_approve.clearValue();
+				ujob_ref_approve.getStore().removeAll();
+				ujob_ref_approve.getStore().load({
+					url: 'showJobReference.htm?kind=JobRefApprove&dept='+deptRef
+				});
+				
+				if(deptRef == "Catalog"){
+					store.jobsRef.pageSize = 999;
+				}else{
+					store.jobsRef.pageSize = 20;
+				}
+				
+				Ext.Ajax.request({
+					url : 'searchJobsParam.htm?job_id='+job_id,
+					success : function(response, opts) {
+	//					store.jobsRef.load({url:'searchJobsReference.htm?id='+job_id});
+						store.jobsRef.loadPage(1);
+						Ext.getCmp('jobTabs').setDisabled(false);
+						Ext.getCmp('jobTabs').setTitle(job_name);
+						panels.tabs.setActiveTab('jobTabs');
+						if(deptRef !== "Catalog"){
+							Ext.getCmp('gjob_ref_approve').setVisible(false);
+						}else{
+							Ext.getCmp('gjob_ref_approve').setVisible(true);
 						}
-			        }
-			    }],
+					}
+				});
+				window.scrollTo(0,0);
+		    }
+	    },
+//		    plugins: 
+//			    [{ 
+//			        ptype: 'cellediting',
+//			        clicksToEdit: 2,
+//			        listeners: {
+//				        beforeedit: function (editor, e) {
+//				        	Ext.getCmp('projrefidtoday').setValue(0);
+//				        	if(e.field == "job_out"){
+//								editorDate = e.value;
+//				        	}else if(e.field == "itm_name"){
+//				        		Ext.getCmp('edit_itm_today').getStore().load({
+//									url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
+//								});
+//				        	}
+//						},
+//						afteredit: function (editor, e) {
+//							if(e.field == "itm_name"){
+//								if(Ext.getCmp('projrefidtoday').getValue() != 0){
+//									e.record.set('proj_ref_id', Ext.getCmp('projrefidtoday').getValue());
+//								}
+//							}
+//						},
+//						edit: function (editor, e) {
+//							if(e.field == "job_out"){
+//								try{
+//									myTime = Ext.getCmp('edit_time_today').getValue();
+//									var myDate = new Date(editorDate.getFullYear(), editorDate.getMonth(), editorDate.getDate(), myTime.getHours(), myTime.getMinutes());
+//									Ext.getCmp('edit_time_today').setValue(myDate);
+//									e.record.set('job_out', myDate);
+//								}catch(e){
+//									console.log(e.message);
+//								}
+//							}
+//							if(e.field == "job_ref_approve"){
+//								if(Ext.getCmp('edit_job_ref_approve_catalog').getValue() == "-"){
+//									e.record.set("job_ref_approve", "");
+//								}
+//							}
+//						}
+//			        }
+//			    }],
 		    bbar : Ext.create('Ext.PagingToolbar', {
 				store : store.catalogJobRef,
 				displayInfo : true,
@@ -3657,8 +3669,8 @@ Ext.onReady(function() {
 							Ext.getCmp('jobTabs').setDisabled(true);
 							Ext.getCmp('jobTabs').setTitle("Jobs");
 							store.jobs.loadPage(1);
-							store.publicationJobRef.reload();
-							store.jobsToday.reload();
+//							store.publicationJobRef.reload();
+//							store.jobsToday.reload();
 						}
 					});
 
@@ -3732,7 +3744,7 @@ Ext.onReady(function() {
             'tabchange': function (tabPanel, tab) {
                 if(tab.id == 'publicationTabs'){
                 	store.publicationJobRef.reload();
-                	grid.publication.getStore().reload();
+//                	grid.publication.getStore().reload();
 //                	for(var xyz=0;xyz<store.jobsToday.count();xyz++){
 //        				if(Ext.fly(publicationGrid.plugins[0].view.getNodes()[xyz]).hasCls(publicationGrid.plugins[0].rowCollapsedCls) == true){
 //        					publicationGrid.plugins[0].toggleRow(xyz, publicationGrid.getStore().getAt(xyz));
@@ -3743,16 +3755,16 @@ Ext.onReady(function() {
 //                	},500); 
                 }else if(tab.id == 'estudioTabs'){
                 	store.estudioJobRef.reload();
-                	grid.estudio.getStore().reload();
+//                	grid.estudio.getStore().reload();
                 }else if(tab.id == 'pilotTabs'){
                 	store.pilotJobRef.reload();
-                	grid.pilot.getStore().reload();
+//                	grid.pilot.getStore().reload();
                 }else if(tab.id == 'packagingTabs'){
                 	store.packagingJobRef.reload();
-                	grid.packaging.getStore().reload();
+//                	grid.packaging.getStore().reload();
                 }else if(tab.id == 'catalogTabs'){
                 	store.catalogJobRef.reload();
-                	grid.catalog.getStore().reload();
+//                	grid.catalog.getStore().reload();
                 }else if(tab.id == 'jobTabs'){
                 	store.jobs.reload();
                 	Ext.getCmp('filterSearchField').setValue("");
@@ -4448,6 +4460,7 @@ Ext.onReady(function() {
 	          							store.jobs.reload();
 	          							Ext.getCmp('filterSearchField').setValue("");
 	          		                	store.jobs.clearFilter();
+	          		                	store.catalogJobRef.reload();
 	          							}
 	          					});
 	                            },
@@ -5477,6 +5490,171 @@ Ext.onReady(function() {
 		}
 	});
 	
+	updateJobRefDate = new Ext.create('Ext.window.Window', {
+		title: 'Update Date',
+		width: 450,
+		animateTarget: 'updateJobRefDateButton',
+		resizable: false,
+		closeAction: 'hide',
+		items: [{
+			xtype: 'form',
+			id: 'updateJobRefDateForm',
+			items: [{
+				xtype: 'fieldset',
+				title: 'Date Information',
+				defaultType: 'textfield',
+				layout: 'anchor',
+				padding: 10,
+				width: 400,
+				style: {
+	                "margin-left": "auto",
+	                "margin-right": "auto",
+	                "margin-top": "10px",
+	                "margin-bottom": "10px"
+	            },
+	            defaults: {
+	                anchor: '100%'
+	            },
+	            items: [{
+					xtype : 'datefield',
+					fieldLabel : 'Job in ',
+					name: 'ujob_in',
+					id: 'ujob_in',
+	                labelWidth : 120,
+	                msgTarget : 'under',
+//	                margin: '10 110 10 0',
+	                editable: false,
+	                format: 'Y-m-d',
+	                emptyText : 'Date in',
+	                listeners: {
+	                	   "change": function () {
+	                		   			var startDate = Ext.getCmp('ujob_in').getRawValue();
+	                		   			Ext.getCmp('ujob_out').setMinValue(startDate);
+	                	   }
+	                }
+				},
+	    	    {
+					fieldLabel : 'Deadline ',
+					name : 'ujob_date',
+					combineErrors: true,
+					xtype: 'fieldcontainer',
+					labelWidth : 100,
+					width : 350,
+					layout: 'hbox',
+	                defaults: {
+	                    flex: 1,
+	                },
+	                items: [
+	                    {
+	                        xtype: 'datefield',
+	                        name: 'ujob_out',
+	                        id: 'ujob_out',
+	                        labelSeparator : '',
+	                        margin: '0 0 0 20',
+	                        msgTarget : 'under',
+	                        flex: 1.5,
+	                        editable: false,
+	                        format: 'Y-m-d',
+	                        emptyText : 'Date out',
+	                        listeners: {
+	                        	   "change": function () {
+	                        		   			var startDate = Ext.getCmp('ujob_in').getRawValue();
+	                        		   			Ext.getCmp('ujob_out').setMinValue(startDate);
+	            	    	                	Ext.getCmp('utime').allowBlank = false;
+	                        	   }
+	                        }
+	                    },
+	                 {
+	                   	xtype: 'fieldcontainer',
+	  	                combineErrors: true,
+	  	                margin: '0 0 0 0',
+	                 	labelSeparator : '',
+	                 	flex: 0.1
+	                 },
+	                    {
+	                        xtype: 'timefield',
+	                        margin: '0 0 0 0',	
+	                        msgTarget : 'under',
+	                        name: 'utime',
+	                        id: 'utime',
+	                        labelSeparator : '',
+	                        msgTarget : 'under',
+	                        emptyText : 'Time',
+	                        format: 'H:i'
+	                    }
+	                ]
+				}]
+	            },{
+				xtype : 'hidden',
+				id : 'udjob_ref_id',
+				name : 'udjob_ref_id'
+            }]
+		}],
+		buttons:[{
+			text: 'Update',
+			width: 100,
+			id: 'updateJobRefDateSubmit',
+			handler: function(){
+				var form = Ext.getCmp('updateJobRefDateForm').getForm();
+				if (form.isValid()){
+					 form.submit({
+					 url: 'updateDateJobReference.htm',
+					 waitTitle: 'Updating Job',
+					 waitMsg: 'Please wait...',
+					 standardSubmit: false,
+	                success: function(form, action) {
+	               	 Ext.MessageBox.show({
+	 						title: 'Information',
+	 						msg: "Job Has Been Update!",
+	 						buttons: Ext.MessageBox.OK,
+	 						icon: Ext.MessageBox.INFO,
+	 						animateTarget: 'updateJobRefDateButton',
+	 						fn: function(){
+	 							updateJobRefDate.hide();
+	 							store.jobs.reload();
+     							store.jobsRef.reload();
+	 						}
+	 					});
+	                   },
+	                   failure : function(form, action) {
+//							Ext.Msg.alert('Failed',
+//									action.result ? action.result.message
+//											: 'No response');
+	                   	Ext.MessageBox.show({
+			                    title: 'REMOTE EXCEPTION',
+			                    msg: operation.getError(),
+			                    icon: Ext.MessageBox.ERROR,
+			                    buttons: Ext.Msg.OK,
+			                    fn: function(){location.reload()}
+			                });
+						}
+	     			});
+	       	 }else {
+						Ext.MessageBox.show({
+							title: 'Failed',
+							msg: ' Please Insert All Required Field',
+							buttons: Ext.MessageBox.OK,
+							icon: Ext.MessageBox.ERROR,
+							animateTarget: 'updateJobRefDateButton',
+						});
+					}
+			}
+		},{
+			text: 'Cancel',
+			width: 100,
+			handler: function(){
+				updateJobRefDate.hide();
+			}
+		}],
+		listeners: {
+			'beforehide': function(){
+				Ext.getCmp('updateJobRefDateForm').getForm().reset();
+				Ext.getCmp('utime').clearInvalid();
+				Ext.getCmp('utime').allowBlank = true;
+			}
+		}
+	});
+	
 	updateJobRefStatus = new Ext.create('Ext.window.Window', {
 		title: 'Update Status',
 		width: 450,
@@ -5568,7 +5746,7 @@ Ext.onReady(function() {
 				if (form.isValid()){
 					 form.submit({
 					 url: 'updateStatusJobReference.htm',
-					 waitTitle: 'Adding Job',
+					 waitTitle: 'Updating Job',
 					 waitMsg: 'Please wait...',
 					 standardSubmit: false,
 	                success: function(form, action) {
@@ -5946,9 +6124,32 @@ Ext.onReady(function() {
 		}
 	});
 	
-	setInterval(function(){store.publicationJobRef.reload()},240000);
-	setInterval(function(){store.estudioJobRef.reload()},240000);
-	setInterval(function(){store.pilotJobRef.reload()},240000);
+//	setInterval(function(){store.publicationJobRef.reload()},240000);
+//	setInterval(function(){store.estudioJobRef.reload()},240000);
+//	setInterval(function(){store.pilotJobRef.reload()},240000);
+//	setInterval(function(){store.packagingJobRef.reload()},240000);
+//	setInterval(function(){store.catalogJobRef.reload()},240000);
+	
+	setInterval(function(){panels.tabs.getActiveTab().items.get(0).getStore().reload()},210000);
+	
+//	setInterval(function(){
+//		console.log(panels.tabs.getActiveTab().id);
+//		if(panels.tabs.getActiveTab().id == 'publicationTabs'){
+//        	store.publicationJobRef.reload();
+//        }else if(panels.tabs.getActiveTab().id == 'estudioTabs'){
+//        	store.estudioJobRef.reload();
+//        }else if(panels.tabs.getActiveTab().id == 'pilotTabs'){
+//        	store.pilotJobRef.reload();
+//        }else if(panels.tabs.getActiveTab().id == 'packagingTabs'){
+//        	store.packagingJobRef.reload();
+//        }else if(panels.tabs.getActiveTab().id == 'catalogTabs'){
+//        	store.catalogJobRef.reload();
+//        }else if(panels.tabs.getActiveTab().id == 'jobTabs'){
+//        	store.jobsRef.reload();
+//        }else if(panels.tabs.getActiveTab().id == 'projTabs'){
+//        	store.jobs.reload();
+//        }
+//	},210000);
 	
 }); //end onReady
 
@@ -6019,6 +6220,74 @@ Ext.define('jobRefModel', {
 	},{
 		name : 'job_ref_type',
 		type : 'string'
+	}
+	]
+});
+
+Ext.define('catalogModel', {
+	extend : 'Ext.data.Model',
+	fields : [ {
+		name : 'job_id',
+		type : 'int'
+	},{
+		name : 'job_name',
+		type : 'string'
+	},{
+		name : 'proj_id',
+		type : 'int'
+	},{
+		name : 'cus_id',
+		type : 'int'
+	},{
+		name : 'proj_name',
+		type : 'string'
+	},{
+		name : 'cus_name',
+		type : 'string'
+	},{
+		name : 'cus_code',
+		type : 'string'
+	},{
+		name : 'dept',
+		type : 'string'
+	},{
+		name : 'job_dtl',
+		type : 'string'
+	},{
+		name : 'job_status',
+		type : 'string'
+	},{
+		name : 'total_amount',
+		type : 'float'
+	},{
+		name : 'new_page',
+		type : 'float'
+	},{
+		name : 'cc',
+		type : 'float'
+	},{
+		name : 'ic',
+		type : 'float'
+	},{
+		name : 'ic_cc',
+		type : 'float'
+	},{
+		name : 'wait_df',
+		type : 'float'
+	},{
+		name : 'sent',
+		type : 'float'
+	},{
+		name : 's_hold',
+		type : 'float'
+	},{
+		name : 'job_in',
+		type : 'date',
+		dateFormat: 'Y-m-d H:i:s'
+	},{
+		name : 'job_out',
+		type : 'date',
+		dateFormat: 'Y-m-d H:i:s'
 	}
 	]
 });
@@ -6094,7 +6363,7 @@ store.publicationJobRef = Ext.create('Ext.data.JsonStore', {
 	model : 'jobRefModel',
 	id : 'publicationJobRefStore',
 	pageSize : 999,
-	autoLoad : true,
+//	autoLoad : true,
 	proxy : {
 		type : 'ajax',
 //		url : 'searchTodayJobsReference.htm',
@@ -6150,7 +6419,7 @@ store.estudioJobRef = Ext.create('Ext.data.JsonStore', {
 	model : 'jobRefModel',
 	id : 'estudioJobRefStore',
 	pageSize : 999,
-	autoLoad : true,
+//	autoLoad : true,
 	proxy : {
 		type : 'ajax',
 //		url : 'searchTodayJobsReference.htm',
@@ -6206,7 +6475,7 @@ store.pilotJobRef = Ext.create('Ext.data.JsonStore', {
 	model : 'jobRefModel',
 	id : 'pilotJobRefStore',
 	pageSize : 999,
-	autoLoad : true,
+//	autoLoad : true,
 	proxy : {
 		type : 'ajax',
 //		url : 'searchTodayJobsReference.htm',
@@ -6262,7 +6531,7 @@ store.packagingJobRef = Ext.create('Ext.data.JsonStore', {
 	model : 'jobRefModel',
 	id : 'packagingJobRefStore',
 	pageSize : 999,
-	autoLoad : true,
+//	autoLoad : true,
 	proxy : {
 		type : 'ajax',
 //		url : 'searchTodayJobsReference.htm',
@@ -6315,59 +6584,67 @@ store.packagingJobRef = Ext.create('Ext.data.JsonStore', {
 });
 
 store.catalogJobRef = Ext.create('Ext.data.JsonStore', {
-	model : 'jobRefModel',
+	model : 'catalogModel',
 	id : 'catalogJobRefStore',
 	pageSize : 999,
-	autoLoad : true,
+//	autoLoad : true,
 	proxy : {
 		type : 'ajax',
-//		url : 'searchTodayJobsReference.htm',
-		api: {
-			read: 'searchTodayJobsReference.htm?grid_dept=Catalog',
-			update: 'updateJobReferenceBatch.htm'
-		},
+		url : 'searchTodayJobsReference.htm?grid_dept=Catalog',
 		reader : {
 			type : 'json',
 			root : 'records',
-			idProperty : 'job_ref_id',
+			idProperty : 'job_id',
 			totalProperty : 'total'
-		},
-		writer: {
-            type: 'json',
-            root: 'data',
-            encode: true,
-            writeAllFields: true,
-        },
-        listeners: {
-            exception: function(proxy, response, operation){
-//            	console.log(operation.getError());
-                Ext.MessageBox.show({
-                    title: 'REMOTE EXCEPTION',
-                    msg: operation.getError(),
-                    icon: Ext.MessageBox.ERROR,
-                    buttons: Ext.Msg.OK,
-                    fn: function(){location.reload()}
-                });
-            }
-        }
+		}
 	},
-    listeners: {
-        write: function(proxy, operation){
-            if(operation.action == 'update'){
-            	Ext.MessageBox.show({
-						title: 'Information',
-						msg: 'Job Has Been Updated!',
-						buttons: Ext.MessageBox.OK,
-						icon: Ext.MessageBox.INFO,
-						animateTarget: 'isave-syncPub',
-						fn: function(){
-							store.catalogJobRef.reload();
-							}
-					});
-            }
-            
-        },
-    }
+//	proxy : {
+//		type : 'ajax',
+//		api: {
+//			read: 'searchTodayJobsReference.htm?grid_dept=Catalog',
+//			update: 'updateJobReferenceBatch.htm'
+//		},
+//		reader : {
+//			type : 'json',
+//			root : 'records',
+//			idProperty : 'job_id',
+//			totalProperty : 'total'
+//		},
+//		writer: {
+//            type: 'json',
+//            root: 'data',
+//            encode: true,
+//            writeAllFields: true,
+//        },
+//        listeners: {
+//            exception: function(proxy, response, operation){
+//                Ext.MessageBox.show({
+//                    title: 'REMOTE EXCEPTION',
+//                    msg: operation.getError(),
+//                    icon: Ext.MessageBox.ERROR,
+//                    buttons: Ext.Msg.OK,
+//                    fn: function(){location.reload()}
+//                });
+//            }
+//        }
+//	},
+//    listeners: {
+//        write: function(proxy, operation){
+//            if(operation.action == 'update'){
+//            	Ext.MessageBox.show({
+//						title: 'Information',
+//						msg: 'Job Has Been Updated!',
+//						buttons: Ext.MessageBox.OK,
+//						icon: Ext.MessageBox.INFO,
+//						animateTarget: 'isave-syncPub',
+//						fn: function(){
+//							store.catalogJobRef.reload();
+//							}
+//					});
+//            }
+//            
+//        },
+//    }
 });
 
 Ext.define('jobModel', {
@@ -6453,22 +6730,22 @@ store.jobs = Ext.create('Ext.data.JsonStore', {
 	}
 });
 
-store.jobsToday = Ext.create('Ext.data.JsonStore', {
-	model : 'jobModel',
-	id : 'jobTodayStore',
-	pageSize : 20,
-	autoLoad : true,
-	proxy : {
-		type : 'ajax',
-		url : 'searchTodayJobs.htm',
-		reader : {
-			type : 'json',
-			root : 'records',
-			idProperty : 'job_id',
-			totalProperty : 'total'
-		}
-	}
-});
+//store.jobsToday = Ext.create('Ext.data.JsonStore', {
+//	model : 'jobModel',
+//	id : 'jobTodayStore',
+//	pageSize : 20,
+//	autoLoad : true,
+//	proxy : {
+//		type : 'ajax',
+//		url : 'searchTodayJobs.htm',
+//		reader : {
+//			type : 'json',
+//			root : 'records',
+//			idProperty : 'job_id',
+//			totalProperty : 'total'
+//		}
+//	}
+//});
 
 Ext.Ajax.useDefaultXhrHeader = false;
 
@@ -6649,6 +6926,7 @@ function confirmChk(btn) {
 								Ext.getCmp('jobTabs').setTitle("Jobs");
 								Ext.getCmp('filterSearchField').setValue("");
       		                	store.jobs.clearFilter();
+      		                	store.catalogJobRef.reload();
 							},
 							icon : Ext.MessageBox.INFO
 						});
@@ -6724,7 +7002,7 @@ function getParamValues() {
 }
 
 function renderCustomer(value, meta, record, rowIndex, colIndex, store) {
-    return record.get('cus_name')+'('+record.get('proj_name')+')';
+    return value+'('+record.get('proj_name')+')';
 }
 
 function renderTime(value, meta, record, rowIndex, colIndex, store) {

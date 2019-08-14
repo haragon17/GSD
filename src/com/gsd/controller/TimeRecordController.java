@@ -76,7 +76,7 @@ public class TimeRecordController {
 		session.setAttribute("job_status", "");
 		session.setAttribute("process", "");
 		
-		if(type == 0 || type == 1){
+		if(type == 0 || type == 1 || user.getUserModel().getUsr_id() == 21 || user.getUserModel().getUsr_id() == 24){
 			return new ModelAndView("TimeRecordAdmin");
 		}else if(type == 2){
 			return new ModelAndView("TimeRecord");
@@ -99,6 +99,7 @@ public class TimeRecordController {
 		session.setAttribute("dept", request.getParameter("sdept"));
 		session.setAttribute("job_status", request.getParameter("sjob_status"));
 		session.setAttribute("process", request.getParameter("sprocess"));
+		session.setAttribute("job_ref_name", request.getParameter("sjob_ref_name"));
 
 	}
 	
@@ -120,6 +121,7 @@ public class TimeRecordController {
 		map.put("dept", (String)session.getAttribute("dept"));
 		map.put("job_status", (String)session.getAttribute("job_status"));
 		map.put("process", (String)session.getAttribute("process"));
+		map.put("job_ref_name", (String)session.getAttribute("job_ref_name"));
 		map.put("searchType", "");
 		
 		int start = Integer.parseInt(request.getParameter("start"));

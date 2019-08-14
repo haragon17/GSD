@@ -2,13 +2,18 @@ package com.gsd.dao.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 
 import com.gsd.dao.JobsDao;
 import com.gsd.model.Jobs;
@@ -155,82 +160,124 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	
 	public List<JobsReference> searchTodayJobsReference(Map<String, String> data){
 		
-		String sql = "SELECT job_ref_id, job_ref_name, jobs.job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, job_ref_remark, job_ref_type, "
-				+ "job_ref_approve, itm_name, job_name, proj_name, cus_name, dept, jobs.proj_id, sent_amount, (amount-sent_amount) as total_amount, job_ref_number\n"+
-				"FROM jobs_reference\n"+
-				"LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"+
-				"LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n"+
-				"LEFT JOIN jobs on jobs.job_id = jobs_reference.job_id\n"+
-				"LEFT JOIN projects proj on proj.proj_id = jobs.proj_id\n"+
-				"LEFT JOIN customer cus on cus.cus_id = proj.cus_id\n"+
-				"WHERE job_ref_status <> 'Sent' AND job_ref_status <> 'Checked'\n";
-//				"AND date (job_out) <= (CASE\n"+
-//				"WHEN extract(dow from current_date) = 6 THEN (current_date+2)\n"+
-//				"WHEN extract(dow from current_date) = 7 THEN (current_date+1)\n"+
-//				"ELSE current_date END)\n";
-				
-		if(data.get("job_name")==null || data.get("job_name").isEmpty()){
+		String sql = "";
+		if(data.get("dept").equals("Catalog")){
+			sql = "SELECT jobs.job_id, z8.job_in, z8.job_out, job_name, jobs.proj_id, proj_name, cus_name, cus_code, cus.cus_id, dept, job_dtl, job_status,\n" +
+					"CASE WHEN x.total_amount IS NULL THEN 0 ELSE x.total_amount END,\n" +
+					"CASE WHEN z1.new_page IS NULL THEN 0 ELSE z1.new_page END,\n" +
+					"CASE WHEN z2.cc IS NULL THEN 0 ELSE z2.cc END,\n" +
+					"CASE WHEN z3.ic IS NULL THEN 0 ELSE z3.ic END,\n" +
+					"CASE WHEN z4.ic_cc IS NULL THEN 0 ELSE z4.ic_cc END,\n" +
+					"CASE WHEN z5.wait_df IS NULL THEN 0 ELSE z5.wait_df END,\n" +
+					"CASE WHEN z6.sent IS NULL THEN 0 ELSE z6.sent END,\n" +
+					"CASE WHEN z7.s_hold IS NULL THEN 0 ELSE z7.s_hold END\n" +
+					"FROM jobs\n" +
+					"LEFT JOIN projects proj ON proj.proj_id = jobs.proj_id\n" +
+					"LEFT JOIN customer cus ON cus.cus_id = proj.cus_id\n" +
+					"LEFT JOIN (select job_id, cast(sum(amount) as numeric(9,2)) as total_amount from jobs_reference group by job_id) x on x.job_id = jobs.job_id\n" +
+					"LEFT JOIN (select job_id, sum(amount) as new_page from jobs_reference where job_ref_status LIKE 'New%' group by job_id) z1 on z1.job_id = jobs.job_id\n" +
+					"LEFT JOIN (select job_id, sum(amount) as cc from jobs_reference where job_ref_status LIKE 'CC' group by job_id) z2 on z2.job_id = jobs.job_id\n" +
+					"LEFT JOIN (select job_id, sum(amount) as ic from jobs_reference where job_ref_status LIKE 'IC' group by job_id) z3 on z3.job_id = jobs.job_id\n" +
+					"LEFT JOIN (select job_id, sum(amount) as ic_cc from jobs_reference where job_ref_status LIKE 'IC CC' group by job_id) z4 on z4.job_id = jobs.job_id\n" +
+					"LEFT JOIN (select job_id, sum(amount) as wait_df from jobs_reference where job_ref_status LIKE 'Wait DF' group by job_id) z5 on z5.job_id = jobs.job_id\n" +
+					"LEFT JOIN (select job_id, sum(amount) as sent from jobs_reference where job_ref_status LIKE 'Sent' group by job_id) z6 on z6.job_id = jobs.job_id\n" +
+					"LEFT JOIN (select job_id, sum(amount) as s_hold from jobs_reference where job_ref_status LIKE 'Hold' group by job_id) z7 on z7.job_id = jobs.job_id\n" +
+					"LEFT JOIN (SELECT * FROM (SELECT job_id,job_in,job_out,ROW_NUMBER () OVER (PARTITION BY job_id ORDER BY job_out) FROM jobs_reference WHERE job_ref_status != 'Sent' and job_ref_status != 'Hold') x WHERE ROW_NUMBER = 1) z8 on z8.job_id = jobs.job_id\n" +
+					"WHERE jobs.job_id != 0\n" +
+					"AND job_status = 'Processing'\n" +
+					"AND dept LIKE 'Catalog%'\n" +
+					"AND (CASE WHEN x.total_amount IS NULL THEN 0 ELSE x.total_amount END) - (CASE WHEN z6.sent IS NULL THEN 0 ELSE z6.sent END) > 0\n"+
+					"ORDER BY\n"+
+					"CASE\n"+
+					"WHEN dept = 'Catalog'				THEN 1\n"+
+					"WHEN dept = 'Catalog_OTTO'			THEN 2\n"+
+					"WHEN dept = 'Catalog_Bader'		THEN 3\n"+
+					"WHEN dept = 'Catalog_Layout'		THEN 4\n"+
+					"WHEN dept = 'Catalog_Witt'			THEN 5\n"+
+					"ELSE 6\n" +
+					"END,\n" +
+					"z8.job_out ASC";
 		}else{
-			sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
-		}
-		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
-		}else{
-			sql += "AND cus.cus_id = "+data.get("cus_id")+"\n";
-		}
-		if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
-		}else{
-			sql += "AND jobs.proj_id = "+data.get("proj_id")+"\n";
-		}
-		if(data.get("dept")==null || data.get("dept").isEmpty()){
-		}else{
-			sql += "AND dept LIKE '"+data.get("dept")+"%'\n";
-		}
-		if(data.get("status")==null || data.get("status").isEmpty()){
-		}else{
-			sql += "AND job_status = '"+data.get("status")+"'\n";
-		}
+			sql = "SELECT job_ref_id, job_ref_name, jobs.job_id, jobs_reference.proj_ref_id, amount, job_in, job_out, job_ref_dtl, job_ref_status, job_ref_remark, job_ref_type, "
+					+ "job_ref_approve, itm_name, job_name, proj_name, cus_name, dept, jobs.proj_id, sent_amount, (amount-sent_amount) as total_amount, job_ref_number\n"+
+					"FROM jobs_reference\n"+
+					"LEFT JOIN projects_reference proj_ref on proj_ref.proj_ref_id = jobs_reference.proj_ref_id\n"+
+					"LEFT JOIN item itm on itm.itm_id = proj_ref.itm_id\n"+
+					"LEFT JOIN jobs on jobs.job_id = jobs_reference.job_id\n"+
+					"LEFT JOIN projects proj on proj.proj_id = jobs.proj_id\n"+
+					"LEFT JOIN customer cus on cus.cus_id = proj.cus_id\n"+
+					"WHERE job_ref_status <> 'Sent' AND job_ref_status <> 'Checked'\n";
+//					"AND date (job_out) <= (CASE\n"+
+//					"WHEN extract(dow from current_date) = 6 THEN (current_date+2)\n"+
+//					"WHEN extract(dow from current_date) = 7 THEN (current_date+1)\n"+
+//					"ELSE current_date END)\n";
 		
-//		if(data.get("dept").equals("Packaging")){
-//			sql += 	"ORDER BY\n"+
-//					"CASE job_ref_status\n"+
-//					"WHEN 'New' 	THEN 1\n"+
-//					"WHEN 'CC' 		THEN 2\n"+
-//					"WHEN 'CC2' 	THEN 3\n"+
-//					"WHEN 'CC3' 	THEN 4\n"+
-//					"WHEN 'CC+Final' THEN 5\n"+
-//					"WHEN 'Final' 	THEN 6\n"+
-//					"WHEN 'Hold' 	THEN 7\n"+
-//					"WHEN 'Sent' 	THEN 8\n"+
-//					"ELSE 9\n"+
-//					"CASE\n"+
-//					"WHEN job_ref_status LIKE 'New%'	THEN 1\n"+
-//					"WHEN job_ref_status = 'Hold'		THEN 3\n"+
-//					"ELSE 2\n"+
-//					"END,"+
-//					"jobs_reference.job_out ASC";
-//		}else{
-			sql += 	"ORDER BY\n"+
-					"CASE\n"+
-					"WHEN dept = 'E-Studio'				THEN 1\n"+
-					"WHEN dept = 'E-Studio_OTTO'		THEN 2\n"+
-					"WHEN dept = 'E-Studio_CandA'		THEN 3\n"+
-					"WHEN dept = 'Publication'			THEN 4\n"+
-					"WHEN dept = 'Publication_Pubworx'	THEN 5\n"+
-					"WHEN dept = 'Publication_Stuber'	THEN 6\n"+
-					"WHEN dept = 'Publication_Migros'	THEN 7\n"+
-					"WHEN dept = 'Catalog_OTTO'			THEN 8\n"+
-					"WHEN dept = 'Catalog_Bader'		THEN 9\n"+
-					"WHEN dept = 'Catalog_Layout'		THEN 10\n"+
-					"WHEN dept = 'Catalog_Witt'			THEN 11\n"+
-					"ELSE 12\n"+
-					"END,"+
-					"CASE\n"+
-					"WHEN job_ref_status = 'Hold'	THEN 2\n"+
-					"ELSE 1\n"+
-					"END,"+
-					"jobs_reference.job_out ASC";
+			if(data.get("job_name")==null || data.get("job_name").isEmpty()){
+			}else{
+				sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
+			}
+			if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
+			}else{
+				sql += "AND cus.cus_id = "+data.get("cus_id")+"\n";
+			}
+			if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
+			}else{
+				sql += "AND jobs.proj_id = "+data.get("proj_id")+"\n";
+			}
+			if(data.get("dept")==null || data.get("dept").isEmpty()){
+			}else{
+				sql += "AND dept LIKE '"+data.get("dept")+"%'\n";
+			}
+			if(data.get("status")==null || data.get("status").isEmpty()){
+			}else{
+				sql += "AND job_status = '"+data.get("status")+"'\n";
+			}
+//			if(data.get("dept").equals("Packaging")){
+//				sql += 	"ORDER BY\n"+
+//						"CASE job_ref_status\n"+
+//						"WHEN 'New' 	THEN 1\n"+
+//						"WHEN 'CC' 		THEN 2\n"+
+//						"WHEN 'CC2' 	THEN 3\n"+
+//						"WHEN 'CC3' 	THEN 4\n"+
+//						"WHEN 'CC+Final' THEN 5\n"+
+//						"WHEN 'Final' 	THEN 6\n"+
+//						"WHEN 'Hold' 	THEN 7\n"+
+//						"WHEN 'Sent' 	THEN 8\n"+
+//						"ELSE 9\n"+
+//						"CASE\n"+
+//						"WHEN job_ref_status LIKE 'New%'	THEN 1\n"+
+//						"WHEN job_ref_status = 'Hold'		THEN 3\n"+
+//						"ELSE 2\n"+
+//						"END,"+
+//						"jobs_reference.job_out ASC";
+//			}else{
+				sql += 	"ORDER BY\n"+
+						"CASE\n"+
+						"WHEN dept = 'E-Studio'				THEN 1\n"+
+						"WHEN dept = 'E-Studio_OTTO'		THEN 2\n"+
+						"WHEN dept = 'E-Studio_CandA'		THEN 3\n"+
+						"WHEN dept = 'Publication'			THEN 4\n"+
+						"WHEN dept = 'Publication_Pubworx'	THEN 5\n"+
+						"WHEN dept = 'Publication_Stuber'	THEN 6\n"+
+						"WHEN dept = 'Publication_Migros'	THEN 7\n"+
+						"WHEN dept = 'Catalog_OTTO'			THEN 8\n"+
+						"WHEN dept = 'Catalog_Bader'		THEN 9\n"+
+						"WHEN dept = 'Catalog_Layout'		THEN 10\n"+
+						"WHEN dept = 'Catalog_Witt'			THEN 11\n"+
+						"WHEN dept = 'Packaging'			THEN 12\n"+
+						"WHEN dept = 'Packaging_Migros'		THEN 13\n"+
+						"WHEN dept = 'Packaging_Vector'		THEN 14\n"+
+						"WHEN dept = 'Packaging_Penny'		THEN 15\n"+
+						"WHEN dept = 'Packaging_Rewe'		THEN 16\n"+
+						"ELSE 17\n"+
+						"END,"+
+						"CASE\n"+
+						"WHEN job_ref_status = 'Hold'	THEN 2\n"+
+						"ELSE 1\n"+
+						"END,"+
+						"jobs_reference.job_out ASC";
 //		}
-		
+		}
 //		System.out.println(sql);
 		
 		List<JobsReference> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<JobsReference>(JobsReference.class));
@@ -397,25 +444,46 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 	public void createJobReference(JobsReference jobRef) {
 		
 		String sql = "INSERT INTO jobs_reference VALUES (default,?,?,?,?,?,?,?,?,now(),now(),?,null,default,?,'',?)";
+		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+		String id_column = "job_ref_id";
 		
-		this.getJdbcTemplate().update(sql, new Object[] {
-//				jobRef.getJob_ref_id(),
-				jobRef.getJob_id(),
-				jobRef.getJob_ref_name(),
-				jobRef.getProj_ref_id(),
-				jobRef.getAmount(),
-				jobRef.getJob_in_ts(),
-				jobRef.getJob_out_ts(),
-				jobRef.getJob_ref_dtl(),
-				jobRef.getCretd_usr(),
-				jobRef.getJob_ref_status(),
-				jobRef.getJob_ref_number(),
-				jobRef.getJob_ref_type()
-		});
+//		this.getJdbcTemplate().update(sql, new Object[] {
+//				jobRef.getJob_id(),
+//				jobRef.getJob_ref_name(),
+//				jobRef.getProj_ref_id(),
+//				jobRef.getAmount(),
+//				jobRef.getJob_in_ts(),
+//				jobRef.getJob_out_ts(),
+//				jobRef.getJob_ref_dtl(),
+//				jobRef.getCretd_usr(),
+//				jobRef.getJob_ref_status(),
+//				jobRef.getJob_ref_number(),
+//				jobRef.getJob_ref_type()
+//		});
+		
+		this.getJdbcTemplate().update(con -> {
+		    PreparedStatement ps = con.prepareStatement(sql, new String[]{id_column});
+		    ps.setInt(1, jobRef.getJob_id());
+		    ps.setString(2, jobRef.getJob_ref_name());
+		    ps.setInt(3, jobRef.getProj_ref_id());
+		    ps.setBigDecimal(4, jobRef.getAmount());
+		    ps.setTimestamp(5, jobRef.getJob_in_ts());
+		    ps.setTimestamp(6, jobRef.getJob_out_ts());
+		    ps.setString(7, jobRef.getJob_ref_dtl());
+		    ps.setInt(8, jobRef.getCretd_usr());
+		    ps.setString(9, jobRef.getJob_ref_status());
+		    ps.setString(10, jobRef.getJob_ref_number());
+		    ps.setString(11, jobRef.getJob_ref_type());
+		    return ps;
+		}
+		, keyHolder);
+		
+		int job_ref_id = (Integer) keyHolder.getKeys().get(id_column);
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
-		JobsReference jobRef2 = searchJobsReferenceByID(jobRef.getJob_ref_id());
+//		JobsReference jobRef2 = searchJobsReferenceByID(jobRef.getJob_ref_id());
+		JobsReference jobRef2 = searchJobsReferenceByID(job_ref_id);
 		
 		String audit = "INSERT INTO audit_logging (aud_id,parent_id,parent_object,commit_by,commit_date,commit_desc,parent_ref) VALUES (default,?,?,?,now(),?,?)";
 		this.getJdbcTemplate().update(audit, new Object[]{
@@ -815,7 +883,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		
-		if(!jobRef_audit.getJob_ref_status().equals(jobRef.getJob_ref_status())){
+		if(!jobRef_audit.getJob_ref_status().equals(job_ref_status)){
 			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
 				jobRef.getJob_ref_id(),
@@ -833,7 +901,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		if(jobRef_audit.getJob_ref_approve() != null){
 			approve = jobRef_audit.getJob_ref_approve();
 		}
-		if(!approve.equals(jobRef.getJob_ref_approve())){
+		if(!approve.equals(job_ref_approve)){
 			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
 				jobRef.getJob_ref_id(),
@@ -844,6 +912,117 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 				jobRef.getJob_ref_approve(),
 				"Updated",
 				jobRef_audit.getJob_name()+" : "+jobRef_audit.getJob_ref_name()
+			});
+		}
+	}
+	
+	public void updateDateJobReference(JobsReference jobRef){
+
+		JobsReference jobRef_audit = searchJobsReferenceByID(jobRef.getJob_ref_id());
+		
+		Timestamp job_in = jobRef.getJob_in_ts();
+		Timestamp job_out = jobRef.getJob_out_ts();
+
+		if(job_in == null){
+			if(jobRef_audit.getJob_in() != null){
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				Date parsedJobIn;
+				try {
+					parsedJobIn = dateFormat.parse(jobRef_audit.getJob_in());
+					job_in = new java.sql.Timestamp(parsedJobIn.getTime());
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		if(job_out == null){
+			if(jobRef_audit.getJob_out() != null){
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+				Date parsedJobOut;
+				try {
+					parsedJobOut = dateFormat.parse(jobRef_audit.getJob_out());
+					job_out = new java.sql.Timestamp(parsedJobOut.getTime());
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+		String sql = "UPDATE jobs_reference set "
+				+ "job_in=?, "
+				+ "job_out=?, "
+				+ "update_date=now() "
+				+ "where job_ref_id=?";
+		
+		this.getJdbcTemplate().update(sql, new Object[] {
+				job_in,
+				job_out,
+				jobRef.getJob_ref_id()
+		});
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		JobsReference jobRef_new = searchJobsReferenceByID(jobRef.getJob_ref_id());
+		
+		if(jobRef_audit.getJob_out() == null){
+			if(jobRef_new.getJob_out() != null){
+				String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
+				this.getJdbcTemplate().update(audit, new Object[]{
+					jobRef.getJob_ref_id(),
+					"Jobs Reference:"+jobRef_audit.getJob_id(),
+					user.getUserModel().getUsr_name(),
+					"Date Out",
+					jobRef_audit.getJob_out(),
+					jobRef_new.getJob_out(),
+					"Updated",
+					jobRef_audit.getJob_name()+" : "+jobRef_new.getJob_ref_name()
+				});
+			}
+		}
+		else if(!jobRef_audit.getJob_out().equals(jobRef_new.getJob_out())){
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Date Out",
+				jobRef_audit.getJob_out(),
+				jobRef_new.getJob_out(),
+				"Updated",
+				jobRef_audit.getJob_name()+" : "+jobRef_new.getJob_ref_name()
+			});
+		}
+		
+		if(jobRef_audit.getJob_in() == null){
+			if(jobRef_new.getJob_in() != null){
+				String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
+				this.getJdbcTemplate().update(audit, new Object[]{
+					jobRef.getJob_ref_id(),
+					"Jobs Reference:"+jobRef_audit.getJob_id(),
+					user.getUserModel().getUsr_name(),
+					"Date In",
+					jobRef_audit.getJob_in(),
+					jobRef_new.getJob_in(),
+					"Updated",
+					jobRef_audit.getJob_name()+" : "+jobRef_new.getJob_ref_name()
+				});
+			}
+		}
+		else if(!jobRef_audit.getJob_in().equals(jobRef_new.getJob_in())){
+			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
+			this.getJdbcTemplate().update(audit, new Object[]{
+				
+				jobRef.getJob_ref_id(),
+				"Jobs Reference:"+jobRef_audit.getJob_id(),
+				user.getUserModel().getUsr_name(),
+				"Date In",
+				jobRef_audit.getJob_in(),
+				jobRef_new.getJob_in(),
+				"Updated",
+				jobRef_audit.getJob_name()+" : "+jobRef_new.getJob_ref_name()
 			});
 		}
 	}

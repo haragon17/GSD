@@ -1171,7 +1171,7 @@ Ext.onReady(function() {
 	            	fieldLabel: 'Project No. ',
 	            	name: 'ainv_proj_no',
 	            	id: 'ainv_proj_no',
-	            	labelWidth: 100,
+	            	labelWidth: 120,
 	            	msgTarget: 'under',
 	            	emptyText: 'Project Number'
 	            },{
@@ -1500,7 +1500,7 @@ Ext.onReady(function() {
 	            	fieldLabel: 'Project No. ',
 	            	name: 'einv_proj_no',
 	            	id: 'einv_proj_no',
-	            	labelWidth: 100,
+	            	labelWidth: 120,
 	            	msgTarget: 'under',
 	            	emptyText: 'Project Number'
 	            },{
