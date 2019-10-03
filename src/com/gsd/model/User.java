@@ -18,6 +18,7 @@ public class User {
 	private String phone;
 	private int usr_type;
 	private String dept;
+	private int usr_activate;
 	
 	public User(){}
 	
@@ -96,5 +97,13 @@ public class User {
 
 	public void setDept(String dept) {
 		this.dept = dept;
+	}
+
+	public int getUsr_activate() {
+		return usr_activate;
+	}
+
+	public void setUsr_activate(int usr_activate) {
+		this.usr_activate = usr_activate;
 	}
 }

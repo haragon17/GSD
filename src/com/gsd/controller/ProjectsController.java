@@ -498,13 +498,15 @@ public class ProjectsController {
 				System.out.println("file size = " + uploadItem.getFile().getSize());
 				try {
 //					File createMain = new File("/Users/gsd/files");
-					File createMain = new File("/mnt/eSTUDIO/_COMMON/.jview/files");
+//					File createMain = new File("/mnt/eSTUDIO/_COMMON/.jview/files");
+					File createMain = new File("/jview_storage/files");
 					if (!createMain.exists()) {
 						createMain.mkdir();
 					}
 					   String fileName = uploadItem.getFile().getOriginalFilename();  
 //					   String filePath = "/Users/gsd/files/" + proj.getProj_id();
-					   String filePath = "/mnt/eSTUDIO/_COMMON/.jview/files/" + proj.getProj_id();
+//					   String filePath = "/mnt/eSTUDIO/_COMMON/.jview/files/" + proj.getProj_id();
+					   String filePath = "/jview_storage/files/" + proj.getProj_id();
 					   File newFile = new File(filePath);
 					   if(!newFile.exists()){
 						   newFile.mkdir();
@@ -662,12 +664,14 @@ public class ProjectsController {
 					}
 
 					try {
-						   File createMain = new File("/mnt/eSTUDIO/_COMMON/.jview/files");  
+//						   File createMain = new File("/mnt/eSTUDIO/_COMMON/.jview/files");
+						   File createMain = new File("/jview_storage/files");
 						   if(!createMain.exists()){
 							   createMain.mkdir();
 						   }
 						   String fileName = uploadItem.getFile().getOriginalFilename();  
-						   String filePath = "/mnt/eSTUDIO/_COMMON/.jview/files/" + proj.getProj_id();
+//						   String filePath = "/mnt/eSTUDIO/_COMMON/.jview/files/" + proj.getProj_id();
+						   String filePath = "/jview_storage/files/" + proj.getProj_id();
 						   File newFile = new File(filePath);
 						   if(!newFile.exists()){
 							   newFile.mkdir();
@@ -711,12 +715,14 @@ public class ProjectsController {
 					System.out.println("file type = " + uploadItem.getFile().getContentType());
 					System.out.println("file size = " + uploadItem.getFile().getSize());
 					try {
-						File createMain = new File("/mnt/eSTUDIO/_COMMON/.jview/files");
+//						File createMain = new File("/mnt/eSTUDIO/_COMMON/.jview/files");
+						File createMain = new File("/jview_storage/files");
 						if (!createMain.exists()) {
 							createMain.mkdir();
 						}
 						   String fileName = uploadItem.getFile().getOriginalFilename();  
-						   String filePath = "/mnt/eSTUDIO/_COMMON/.jview/files/" + proj.getProj_id();
+//						   String filePath = "/mnt/eSTUDIO/_COMMON/.jview/files/" + proj.getProj_id();
+						   String filePath = "/jview_storage/files/" + proj.getProj_id();
 						   File newFile = new File(filePath);
 						   if(!newFile.exists()){
 							   newFile.mkdir();

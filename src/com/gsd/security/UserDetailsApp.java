@@ -64,6 +64,10 @@ public class UserDetailsApp implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+    	boolean usr_activate = true;
+    	if(user.getUsr_activate() == 0){
+    		usr_activate = false;
+    	}
+        return usr_activate;
     }
 }

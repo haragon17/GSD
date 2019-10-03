@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import net.sf.json.JSONObject;
 
@@ -32,7 +33,7 @@ public class UserController {
 
 	private ApplicationContext context;
 	private UserDao userDao;
-	private String uname, fname, lname, email;
+//	private String uname, fname, lname, email;
 	private static int chkPush,chkTR;
 
 	private static final Logger logger = Logger.getLogger(UserController.class);
@@ -134,6 +135,7 @@ public class UserController {
 		String phone = request.getParameter("phone");
 		int usr_type = Integer.parseInt(request.getParameter("usr_type"));
 		String dept = request.getParameter("dept");
+		int usr_activate = Integer.parseInt(request.getParameter("usr_activate"));
 
 		User user = new User();
 		user.setUsr_id(userDao.getLastUserId());
@@ -146,6 +148,7 @@ public class UserController {
 		user.setPhone(phone);
 		user.setUsr_type(usr_type);
 		user.setDept(dept);
+		user.setUsr_activate(usr_activate);
 
 		userDao.createUser(user);
 		
@@ -189,10 +192,18 @@ public class UserController {
 		UserDetailsApp user = UserLoginDetail.getUser();
 		int type = user.getUserModel().getUsr_type();
 
-		uname = "";
-		fname = "";
-		lname = "";
-		email = "";
+//		uname = "";
+//		fname = "";
+//		lname = "";
+//		email = "";
+		HttpSession session = request.getSession();
+		session.setAttribute("uname", "");
+		session.setAttribute("fname", "");
+		session.setAttribute("lname", "");
+		session.setAttribute("email", "");
+		session.setAttribute("dept", "");
+		session.setAttribute("usr_activate", "");
+		
 		
 		if (type == 0) {
 			return new ModelAndView("MemberManagement");
@@ -202,28 +213,39 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/searchMemberParam")
-	public void searchReportParam(HttpServletRequest request, HttpServletResponse response) {
+	public void searchMemberParam(HttpServletRequest request, HttpServletResponse response) {
 
-		uname = request.getParameter("usr_name");
-		fname = request.getParameter("fname");
-		lname = request.getParameter("lname");
-		email = request.getParameter("email");
+		HttpSession session = request.getSession();
+		session.setAttribute("uname", request.getParameter("usr_name"));
+		session.setAttribute("fname", request.getParameter("fname"));
+		session.setAttribute("lname", request.getParameter("lname"));
+		session.setAttribute("email", request.getParameter("email"));
+		session.setAttribute("dept", request.getParameter("sdept"));
+		session.setAttribute("usr_activate", request.getParameter("usr_activate"));
+		
+//		uname = request.getParameter("usr_name");
+//		fname = request.getParameter("fname");
+//		lname = request.getParameter("lname");
+//		email = request.getParameter("email");
 
 	}
 
 	@RequestMapping(value = "/searchMember")
 	public ModelAndView searchMember(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+		HttpSession session = request.getSession();
 		UserDetailsApp userLoginDetail = UserLoginDetail.getUser();
 		List<User> user = null;
 		List<User> userLs = new ArrayList<User>();
 		Map<String, String> map = new HashMap<String, String>();
 
 		map.put("id", Integer.toString(userLoginDetail.getUserModel().getUsr_id()));
-		map.put("uname", uname);
-		map.put("fname", fname);
-		map.put("lname", lname);
-		map.put("email", email);
+		map.put("uname", (String)session.getAttribute("uname"));
+		map.put("fname", (String)session.getAttribute("fname"));
+		map.put("lname", (String)session.getAttribute("lname"));
+		map.put("email", (String)session.getAttribute("email"));
+		map.put("dept", (String)session.getAttribute("dept"));
+		map.put("usr_activate", (String)session.getAttribute("usr_activate"));
 
 		int start = Integer.parseInt(request.getParameter("start"));
 		int limit = Integer.parseInt(request.getParameter("limit"));
@@ -263,6 +285,7 @@ public class UserController {
 		String phone = request.getParameter("ephone");
 		int type = Integer.parseInt(request.getParameter("usr_type"));
 		String dept = request.getParameter("edept");
+		int usr_activate = Integer.parseInt(request.getParameter("usr_activate"));
 
 		User user = new User();
 		user.setUsr_id(id);
@@ -272,6 +295,7 @@ public class UserController {
 		user.setEmail(email);
 		user.setUsr_type(type);
 		user.setDept(dept);
+		user.setUsr_activate(usr_activate);
 
 		if (!phone.equals("Phone Number")) {
 			user.setPhone(phone);

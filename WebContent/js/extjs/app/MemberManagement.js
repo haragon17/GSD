@@ -33,7 +33,7 @@ Ext.onReady(function(){
         autoWidth: true,
         id:'formPanel',
 	    width: 750,
-	    height: 200,
+	    height: 210,
 	    collapsible:true,
 	    renderTo: document.body,
 	    style: {
@@ -71,18 +71,30 @@ Ext.onReady(function(){
 	            },
 	            defaultType: 'textfield',
 	            items: [{
-	                fieldLabel: 'User Name ',
-	                name: 'usr_name',
-	                labelWidth: 80,
-	                margin: '0 0 10 0',
-	                width: 260
+		                fieldLabel: 'User Name ',
+		                name: 'usr_name',
+		                labelWidth: 80,
+		                margin: '0 0 10 0',
+		                width: 260
 	            	},{
 		                fieldLabel: 'Email ',
 		                name: 'email',
 		                labelWidth: 80,
 		                margin: '0 0 10 0',
 		                width: 260
-		            	}
+		            },{
+	            		fieldLabel: 'User Status ',
+		                name: 'susr_activate',
+		                xtype: 'radiogroup',
+		                labelWidth: 80,
+		                margin: '0 0 10 0',
+		                width: 260,
+		                horizon : true,
+	                    items: [
+	                       { boxLabel: 'Active', name: 'usr_activate', inputValue: '1'},
+	                       { boxLabel: 'Inactive', name: 'usr_activate', inputValue: '0'},
+	                    ]
+	            	}
 	            ]
 	        },{
 	            columnWidth: 0.36,
@@ -95,18 +107,33 @@ Ext.onReady(function(){
 	            layout: 'anchor',
 	            defaultType: 'textfield',
 	            items:[ {
-	                fieldLabel: 'First Name ',
-	                name: 'fname',
-	                labelWidth: 80,
-	                margin: '0 0 10 0',
-	                width: 260
+		                fieldLabel: 'First Name ',
+		                name: 'fname',
+		                labelWidth: 80,
+		                margin: '0 0 10 0',
+		                width: 260
 	            	},{
 		                fieldLabel: 'Last Name ',
 		                name: 'lname',
 		                labelWidth: 80,
 		                margin: '0 0 10 0',
 		                width: 260
-	            	}]
+	            	},{
+		            	fieldLabel: 'Department ',
+		            	name: 'sdept',
+		            	xtype: 'combobox',
+		            	labelWidth: 80,
+		                margin: '0 0 10 0',
+		                width: 260,
+		                queryMode : 'local',
+//		    			emptyText : 'Department',
+//		    			allowBlank: false,
+		    			editable : false,
+		    			msgTarget: 'under',
+		    			store : department,
+		    			valueField : 'name',
+		    			displayField : 'name'
+		            }]
 	        }]
 	    }],
 	    
@@ -165,14 +192,15 @@ Ext.onReady(function(){
 	          "margin-bottom": "auto"
 	      },
 	    width: 900,
-	    height: 350,   
+	    height: 370,
 	    columns: [
-	        {text: "User Name",		   flex:1.5, sortable: true, dataIndex:'usr_name' },
-	        {text: "First Name",      flex:1.8, sortable: true, dataIndex:'fname'},
+	        {text: "User Name",		 flex:1.5, sortable: true, dataIndex:'usr_name' },
+	        {text: "First Name",     flex:1.8, sortable: true, dataIndex:'fname'},
 	        {text: "Last Name",      flex:1.8, sortable: true, dataIndex:'lname'},
-	        {text: "Email",      flex:2, sortable: true, dataIndex:'email'},
-	        {text: "Phone",      flex:1.5, sortable: true, dataIndex:'phone'},
-	        {text: 'Edit',   xtype: 'actioncolumn', flex:1,  align: 'center', id: 'edit',
+	        {text: "Email",      	 flex:2, sortable: true, dataIndex:'email'},
+	        {text: "Department",	 flex:1.5, sortable: true, dataIndex:'dept'},
+//	        {text: "Phone",      	 flex:1.5, sortable: true, dataIndex:'phone'},
+	        {text: 'Edit',   		 xtype: 'actioncolumn', flex:1,  align: 'center', id: 'edit',
 		            items: [{ iconCls : 'table-edit', 
 		            	handler: function(grid, rowIndex, colIndex) {
 		            		 usr_id = grid.getStore().getAt(rowIndex).get('usr_id');
@@ -184,6 +212,7 @@ Ext.onReady(function(){
 		            		 phone = grid.getStore().getAt(rowIndex).get('phone');
 		            		 type = grid.getStore().getAt(rowIndex).get('usr_type');
 		            		 dept = grid.getStore().getAt(rowIndex).get('dept');
+		            		 activate = grid.getStore().getAt(rowIndex).get('usr_activate');
 		            		 
 		            		 Ext.getCmp('efname').setValue(fname);
 		            		 Ext.getCmp('elname').setValue(lname);
@@ -193,6 +222,7 @@ Ext.onReady(function(){
 		            		 Ext.getCmp('eusr_type').setValue({usr_type:type});
 		            		 Ext.getCmp('eid').setValue(usr_id);
 		            		 Ext.getCmp('edept').setValue(dept);
+		            		 Ext.getCmp('eusr_activate').setValue({usr_activate:activate});
 		            		 editMember.show();
 		            		 }
 		            }]
@@ -238,6 +268,7 @@ Ext.define('mems', {
 		{name: 'phone',    type: 'string'},
 		{name: 'dept',    type: 'string'},
 		{name: 'usr_type', type: 'int'},
+		{name: 'usr_activate', type: 'int'},
 		{name: 'update_date', type: 'date', dateFormat: 'Y-m-d H:i:s'}
 		
      ]
@@ -246,7 +277,7 @@ Ext.define('mems', {
 store.searchMember = Ext.create('Ext.data.JsonStore', {
     model: 'mems',
     id: 'memstore',
-    pageSize: 9,
+    pageSize: 10,
     autoLoad: true,
     proxy: {
         type: 'ajax',
@@ -280,7 +311,8 @@ var department = Ext.create('Ext.data.Store', {
 			{"name":"Packaging"},
 			{"name":"Catalog"},
 			{"name":"KK"},
-			{"name":"Manager"}
+			{"name":"Manager"},
+			{"name":"Billing"}
 	]
 });
 
@@ -369,22 +401,6 @@ editMember = new Ext.create('Ext.window.Window', {
 	           		maxLengthText: 'Maximum input 20 Character',
 	                },
 	                {
-	               	 xtype: 'radiogroup',
-	                    fieldLabel: 'User Type ',
-	                    id: 'eusr_type',
-	                    labelWidth : 145,
-	                    // Arrange radio buttons into two columns, distributed vertically
-	                    columns: 2,
-//	                    vertical: true,
-	                    horizon : true,
-	                    items: [
-							{ boxLabel: 'Admin', name: 'usr_type', inputValue: '0'},
-							{ boxLabel: 'Manager', name: 'usr_type', inputValue: '1'},
-							{ boxLabel: 'JMD', name: 'usr_type', inputValue: '2'},
-							{ boxLabel: 'Staff', name: 'usr_type', inputValue: '3'},
-	                    ]
-	                },
-	                {
 	                	xtype : 'combobox',
 	    				fieldLabel : 'Department <font color="red">*</font> ',
 	    				name : 'edept',
@@ -414,6 +430,33 @@ editMember = new Ext.create('Ext.window.Window', {
 //						displayField : 'db_ref_name',
 	                },
 	                {
+	               	 xtype: 'radiogroup',
+	                    fieldLabel: 'User Type <font color="red">*</font> ',
+	                    id: 'eusr_type',
+	                    labelWidth : 145,
+	                    // Arrange radio buttons into two columns, distributed vertically
+	                    columns: 2,
+//	                    vertical: true,
+	                    horizon : true,
+	                    items: [
+							{ boxLabel: 'Admin', name: 'usr_type', inputValue: '0'},
+							{ boxLabel: 'Manager', name: 'usr_type', inputValue: '1'},
+							{ boxLabel: 'JMD', name: 'usr_type', inputValue: '2'},
+							{ boxLabel: 'Staff', name: 'usr_type', inputValue: '3'},
+	                    ]
+	                },
+	                {
+	               	 xtype: 'radiogroup',
+	                    fieldLabel: 'User Activate <font color="red">*</font> ',
+	                    labelWidth : 145,
+	                    id:'eusr_activate',
+	                    horizon : true,
+	                    items: [
+	                       { boxLabel: 'Enable', name: 'usr_activate', inputValue: '1'},
+	                       { boxLabel: 'Disable', name: 'usr_activate', inputValue: '0'},
+	                    ]
+	                },
+	                {
 	                	xtype: 'hidden',
 		    	    	id: 'eid',
 		    	    	name: 'eid'
@@ -421,13 +464,7 @@ editMember = new Ext.create('Ext.window.Window', {
 	                   ]
 	           }],
 	    }],
-        buttons:[{
-        	text: 'Reset',
-        	width:100,
-        	handler: function(){
-        		Ext.getCmp('editform').getForm().reset();
-        	}
-        },{	
+        buttons:[{	
        		  text: 'Update',
       		  width:100,
       		  id: 'ebtn',
@@ -483,7 +520,13 @@ editMember = new Ext.create('Ext.window.Window', {
  					});
  				}
 			}
-           	}],
+           	},{
+            	text: 'Reset',
+            	width:100,
+            	handler: function(){
+            		Ext.getCmp('editform').getForm().reset();
+            	}
+            }],
            	listeners:{
            		'beforehide':function(){
            			Ext.getCmp('editform').getForm().reset();
@@ -681,7 +724,7 @@ addMember = new Ext.create('Ext.window.Window', {
      },
      {
     	 xtype: 'radiogroup',
-         fieldLabel: 'User Type <font color="red">*</font>  ',
+         fieldLabel: 'User Type <font color="red">*</font> ',
          labelWidth : 145,
          id:'type',
          // Arrange radio buttons into two columns, distributed vertically
@@ -693,6 +736,20 @@ addMember = new Ext.create('Ext.window.Window', {
             { boxLabel: 'Manager', name: 'usr_type', inputValue: '1'},
             { boxLabel: 'JMD', name: 'usr_type', inputValue: '2'},
 			{ boxLabel: 'Staff', name: 'usr_type', inputValue: '3', checked: true },
+         ]
+     },
+     {
+    	 xtype: 'radiogroup',
+         fieldLabel: 'User Activate <font color="red">*</font> ',
+         labelWidth : 145,
+         id:'activate',
+         // Arrange radio buttons into two columns, distributed vertically
+//         columns: 2,
+//       vertical: true,
+         horizon : true,
+         items: [
+            { boxLabel: 'Enable', name: 'usr_activate', inputValue: '1', checked: true},
+            { boxLabel: 'Disable', name: 'usr_activate', inputValue: '0'},
          ]
      },
      
@@ -728,7 +785,8 @@ buttons: [{
 				dept: dept.getValue(),
 				email: email.getValue(),
 				phone: phone.getValue(),
-				usr_type: Ext.getCmp('type').getValue().usr_type
+				usr_type: Ext.getCmp('type').getValue().usr_type,
+				usr_activate: Ext.getCmp('activate').getValue().usr_activate
 			},
 			success: function(response, opts){
 				box1.hide();
@@ -776,6 +834,8 @@ buttons: [{
 			Ext.getCmp('adept').reset();
 			Ext.getCmp('aemail').reset();
 			Ext.getCmp('aphone').reset();
+			Ext.getCmp('type').reset();
+			Ext.getCmp('activate').reset();
 	  }
 	}],
 listeners:{
@@ -789,6 +849,8 @@ listeners:{
 			Ext.getCmp('adept').reset();
 			Ext.getCmp('aemail').reset();
 			Ext.getCmp('aphone').reset();
+			Ext.getCmp('type').reset();
+			Ext.getCmp('activate').reset();
 		}
 	}
 });

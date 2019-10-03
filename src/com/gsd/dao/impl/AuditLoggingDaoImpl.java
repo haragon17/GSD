@@ -10,6 +10,8 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 import com.gsd.dao.AuditLoggingDao;
 import com.gsd.model.AuditLogging;
+import com.gsd.security.UserDetailsApp;
+import com.gsd.security.UserLoginDetail;
 
 public class AuditLoggingDaoImpl extends JdbcDaoSupport implements AuditLoggingDao{
 
@@ -65,6 +67,11 @@ public class AuditLoggingDaoImpl extends JdbcDaoSupport implements AuditLoggingD
 				"LEFT JOIN jobs ON jobs.job_id = aud.parent_id\n" +
 				"LEFT JOIN jobs jobs2 ON jobs2.job_id = substring(aud.parent_object , ':*([0-9]{1,9})')::int AND aud.parent_object LIKE '%Jobs Reference%'\n" +
 				"WHERE aud_id <> 0\n";
+		
+		UserDetailsApp user = UserLoginDetail.getUser();
+		if(user.getUserModel().getUsr_type() != 0){
+			sql += "AND aud.parent_object <> 'Users'\n";
+		}
 		
 		if(data.get("aud_dept")==null || data.get("aud_dept").isEmpty()){
 		}else if(data.get("aud_dept").equals("E-Studio")){
@@ -137,7 +144,7 @@ public class AuditLoggingDaoImpl extends JdbcDaoSupport implements AuditLoggingD
 				
 		sql += "ORDER BY 1 DESC";
 		
-//		System.out.println(sql);
+		System.out.println(sql);
 		
 		List<AuditLogging> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<AuditLogging>(AuditLogging.class));
 		return result;
