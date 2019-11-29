@@ -6110,7 +6110,7 @@ Ext.onReady(function() {
 			var responseOject = Ext.decode(response.responseText);
 			userDept = responseOject.user[0].dept;
 			userType = responseOject.user[0].usr_type;
-			if(userDept == "Manager" || userDept == "Billing" || userDept == "IT"){
+			if(userDept == "Manager" || userDept == "Billing" || userDept == "IT" || userDept == "Pilot"){
 				panels.tabs.add({
 					id: 'pilotTabs',
 			    	title: 'Pilot Jobs',

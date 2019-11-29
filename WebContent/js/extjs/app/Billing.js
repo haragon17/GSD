@@ -2634,18 +2634,18 @@ Ext.onReady(function() {
 									url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
 								});
 				        	}
-				        	if(e.field == "job_ref_approve"){
-				        		var gjob_ref = Ext.getCmp('edit_job_ref_approve_jmd_packaging');
-								
-			        			gjob_ref.clearValue();
-			        			gjob_ref.getStore().removeAll();
-			        			gjob_ref.getStore().load({
-									url: 'showJobReference.htm?kind=JobRefApprove&dept='+e.record.get('dept')
-								});
-				        	}
-				        	if(e.field == "sent_amount"){
-				        		Ext.getCmp('esent_amount').setMaxValue(e.record.get('amount'));
-				        	}
+//				        	if(e.field == "job_ref_approve"){
+//				        		var gjob_ref = Ext.getCmp('edit_job_ref_approve_jmd_packaging');
+//								
+//			        			gjob_ref.clearValue();
+//			        			gjob_ref.getStore().removeAll();
+//			        			gjob_ref.getStore().load({
+//									url: 'showJobReference.htm?kind=JobRefApprove&dept='+e.record.get('dept')
+//								});
+//				        	}
+//				        	if(e.field == "sent_amount"){
+//				        		Ext.getCmp('esent_amount').setMaxValue(e.record.get('amount'));
+//				        	}
 						},
 						afteredit: function (editor, e) {
 							if(e.field == "itm_name"){
@@ -4161,18 +4161,18 @@ Ext.onReady(function() {
 									url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
 								});
 				        	}
-				        	if(e.field == "job_ref_approve"){
-				        		var gjob_ref = Ext.getCmp('edit_job_ref_approve_packaging_type3');
-								
-			        			gjob_ref.clearValue();
-			        			gjob_ref.getStore().removeAll();
-			        			gjob_ref.getStore().load({
-									url: 'showJobReference.htm?kind=JobRefApprove&dept='+e.record.get('dept')
-								});
-				        	}
-				        	if(e.field == "sent_amount"){
-				        		Ext.getCmp('esent_amount').setMaxValue(e.record.get('amount'));
-				        	}
+//				        	if(e.field == "job_ref_approve"){
+//				        		var gjob_ref = Ext.getCmp('edit_job_ref_approve_packaging_type3');
+//								
+//			        			gjob_ref.clearValue();
+//			        			gjob_ref.getStore().removeAll();
+//			        			gjob_ref.getStore().load({
+//									url: 'showJobReference.htm?kind=JobRefApprove&dept='+e.record.get('dept')
+//								});
+//				        	}
+//				        	if(e.field == "sent_amount"){
+//				        		Ext.getCmp('esent_amount').setMaxValue(e.record.get('amount'));
+//				        	}
 						},
 						afteredit: function (editor, e) {
 							if(e.field == "itm_name"){
@@ -6285,7 +6285,7 @@ Ext.onReady(function() {
 	});
 	
 	function userGridType(){
-		deptRef = ""
+		deptRef = "";
 		if(userDept.indexOf("Publication") !== -1){
 			deptRef = "Publication";
 			if(userType == 2){
@@ -6824,6 +6824,7 @@ Ext.onReady(function() {
 	            }
 	        }
 		});
+		userStore.reload();
 	}
 	
 //	setInterval(function(){store.publicationJobRef.reload()},240000);
