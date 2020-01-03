@@ -397,6 +397,7 @@ public class UserController {
 		userLs.setEmail(email);
 		userLs.setUsr_type(user.getUserModel().getUsr_type());
 		userLs.setDept(user.getUserModel().getDept());
+		userLs.setUsr_activate(user.getUserModel().getUsr_activate());
 
 		if (!phone.equals("Phone Number")) {
 			userLs.setPhone(phone);

@@ -144,7 +144,7 @@ public class AuditLoggingDaoImpl extends JdbcDaoSupport implements AuditLoggingD
 				
 		sql += "ORDER BY 1 DESC";
 		
-		System.out.println(sql);
+//		System.out.println(sql);
 		
 		List<AuditLogging> result = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<AuditLogging>(AuditLogging.class));
 		return result;

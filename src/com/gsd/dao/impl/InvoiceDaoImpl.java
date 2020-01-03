@@ -1391,7 +1391,12 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 	@Override
 	public List<Invoice> showInvoiceReport(Map<String, String> data) {
 		
-		String sql = "SELECT inv.inv_id, inv_currency, inv_bill_date, inv_number, cus.cus_name, inv_name, inv_itm_name, inv_ref_qty, inv_ref_price, inv_total_price_eur, x.total_price\n"+
+		String sql = "SELECT inv.inv_id, inv_currency, inv_bill_date, inv_number, cus.cus_name, inv_name, inv_itm_name,\n"+
+				"COALESCE(inv_ref_qty,0.00) as inv_ref_qty, COALESCE(inv_ref_price,0.00) as inv_ref_price, COALESCE(inv_total_price_eur,0.00) as inv_total_price_eur, \n"+
+				"CASE\n" +
+				"WHEN x.total_price IS NULL THEN 0.00\n" +
+				"ELSE x.total_price\n" +
+				"END\n"+
 				"FROM invoice inv\n"+
 				"LEFT JOIN invoice_reference inv_ref ON inv_ref.inv_id = inv.inv_id\n"+
 				"LEFT JOIN customer cus ON cus.cus_id = inv.cus_id\n"+
@@ -1426,6 +1431,8 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		}
 		
 		sql += "ORDER BY inv_number DESC";
+		
+//		System.out.println(sql);
 		
 		List<Invoice> inv = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Invoice>(Invoice.class));
 		return inv;

@@ -278,9 +278,9 @@ Ext.onReady(function() {
 								Ext.getCmp('jobTabs').setTitle(job_name);
 								panels.tabs.setActiveTab('jobTabs');
 								if(deptRef !== "Catalog"){
-									Ext.getCmp('gjob_ref_approve').setVisible(false);
+									Ext.getCmp('gjob_ref_dtl').setVisible(false);
 								}else{
-									Ext.getCmp('gjob_ref_approve').setVisible(true);
+									Ext.getCmp('gjob_ref_dtl').setVisible(true);
 								}
 							}
 						});
@@ -478,9 +478,9 @@ Ext.onReady(function() {
 								Ext.getCmp('jobTabs').setTitle(job_name);
 								panels.tabs.setActiveTab('jobTabs');
 								if(deptRef !== "Catalog"){
-									Ext.getCmp('gjob_ref_approve').setVisible(false);
+									Ext.getCmp('gjob_ref_dtl').setVisible(false);
 								}else{
-									Ext.getCmp('gjob_ref_approve').setVisible(true);
+									Ext.getCmp('gjob_ref_dtl').setVisible(true);
 								}
 							}
 						});
@@ -930,11 +930,24 @@ Ext.onReady(function() {
 					}
 				},
 				{
+					text : "Job Detail",
+					flex : 1.3,
+					align : 'center',
+					sortable : true,
+					dataIndex : 'job_ref_dtl',
+					id: 'gjob_ref_dtl',
+					editor : {
+						xtype: 'textfield',
+						allowBlank: true
+					}
+				},
+				{
 					text : "Approve",
 					flex : 1.3,
 					align : 'center',
 					sortable : true,
 					dataIndex : 'job_ref_approve',
+					hidden : true,
 					id: 'gjob_ref_approve',
 //					hidden : true,
 //					renderer : function(val){
@@ -3318,9 +3331,9 @@ Ext.onReady(function() {
 						Ext.getCmp('jobTabs').setTitle(job_name);
 						panels.tabs.setActiveTab('jobTabs');
 						if(deptRef !== "Catalog"){
-							Ext.getCmp('gjob_ref_approve').setVisible(false);
+							Ext.getCmp('gjob_ref_dtl').setVisible(false);
 						}else{
-							Ext.getCmp('gjob_ref_approve').setVisible(true);
+							Ext.getCmp('gjob_ref_dtl').setVisible(true);
 						}
 					}
 				});
