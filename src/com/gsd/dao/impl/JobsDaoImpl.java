@@ -31,6 +31,7 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		
 		UserDetailsApp user = UserLoginDetail.getUser();
 		int type = user.getUserModel().getUsr_type();
+		boolean chk = true;
 		
 		String sql = "SELECT jobs.job_id, job_name, jobs.proj_id, proj_name, cus_name, cus_code, cus.cus_id, payment_terms, job_dtl, job_status, dept,\n"
 				+ "CASE WHEN y.remain_job IS NULL THEN 0 ELSE y.remain_job END,\n"
@@ -49,27 +50,35 @@ public class JobsDaoImpl extends JdbcDaoSupport implements JobsDao {
 		}
 		if(data.get("job_name")==null || data.get("job_name").isEmpty()){
 		}else{
+			chk = false;
 			sql += "AND LOWER(job_name) LIKE LOWER('%"+data.get("job_name")+"%')\n";
 		}
 		if(data.get("cus_id")==null || data.get("cus_id").isEmpty()){
 		}else{
+			chk = false;
 			sql += "AND cus.cus_id = "+data.get("cus_id")+"\n";
 		}
 		if(data.get("proj_id")==null || data.get("proj_id").isEmpty()){
 		}else{
+			chk = false;
 			sql += "AND jobs.proj_id = "+data.get("proj_id")+"\n";
 		}
 		if(data.get("dept")==null || data.get("dept").isEmpty()){
 		}else{
+//			chk = true;
 			if(data.get("dept").equals("E-Studio") && type == 2){
-				sql += "AND (dept LIKE '"+data.get("dept")+"%' OR dept LIKE 'Pilot%')\n";
+				sql += "AND (dept LIKE '"+data.get("dept")+"%' OR dept LIKE 'Pilot%' OR dept LIKE 'Publication%')\n";
 			}else{
 				sql += "AND dept LIKE '"+data.get("dept")+"%'\n";
 			}
 		}
 		if(data.get("status")==null || data.get("status").isEmpty()){
 		}else{
+			chk = false;
 			sql += "AND job_status = '"+data.get("status")+"'\n";
+		}
+		if(chk){
+			sql += "AND job_status != 'Billed'\n";
 		}
 		sql += "ORDER BY\n"+
 				"CASE job_status\n"+

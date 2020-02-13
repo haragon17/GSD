@@ -1163,6 +1163,26 @@ Ext.onReady(function() {
 				}
 			},
 			{
+				text : "Sent",
+				flex : 0.6,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'sent_amount',
+				editor: {
+					xtype:'numberfield',
+					id : 'esent_amount',
+					minValue : 0,
+					allowBlank: false
+				}
+			},
+			{
+				text : "Remain",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'total_amount'
+			},
+			{
 				text : "Status",
 				flex : 0.7,
 				align : 'center',
@@ -1315,6 +1335,9 @@ Ext.onReady(function() {
 				        		Ext.getCmp('edit_itm_today').getStore().load({
 									url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
 								});
+				        	}
+				        	if(e.field == "sent_amount"){
+				        		Ext.getCmp('esent_amount').setMaxValue(e.record.get('amount'));
 				        	}
 						},
 						afteredit: function (editor, e) {
@@ -6344,6 +6367,10 @@ Ext.onReady(function() {
 				    	id: 'pilotTabs',
 				    	title: 'Pilot Jobs',
 				    	items: grid.pilot
+				    },{
+				    	id: 'pubTabs',
+				    	title: 'Publication Jobs',
+				    	items: grid.publication
 				    }]
 				}else{
 					var userGrid = [{
@@ -6764,8 +6791,8 @@ Ext.onReady(function() {
 									Ext.getCmp('jobTabs').setDisabled(true);
 									Ext.getCmp('jobTabs').setTitle("Jobs");
 									store.jobs.loadPage(1);
-									store.publicationJobRef.reload();
-									store.estudioJobRef.reload();
+//									store.publicationJobRef.reload();
+//									store.estudioJobRef.reload();
 								}
 							});
 
@@ -6814,6 +6841,8 @@ Ext.onReady(function() {
 	                	store.jobs.reload();
 	                	Ext.getCmp('filterSearchField').setValue("");
 	                	store.jobs.clearFilter();
+	                }else if(tab.id == 'pubTabs'){
+	                	store.publicationJobRef.reload();
 	                }else{
 	                	store.pilotJobRef.reload();
 	                }

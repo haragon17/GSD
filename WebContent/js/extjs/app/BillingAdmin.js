@@ -1434,6 +1434,26 @@ Ext.onReady(function() {
 				}
 			},
 			{
+				text : "Sent",
+				flex : 0.5,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'sent_amount',
+				editor: {
+					xtype:'numberfield',
+					id : 'esent_amount',
+					minValue : 0,
+					allowBlank: false
+				}
+			},
+			{
+				text : "Remain",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'total_amount'
+			},
+			{
 				text : "Status",
 				flex : 0.7,
 				align : 'center',
@@ -1606,6 +1626,9 @@ Ext.onReady(function() {
 				        		Ext.getCmp('edit_itm_today').getStore().load({
 									url: 'showProjectsReference.htm?id='+e.record.get('proj_id')
 								});
+				        	}
+				        	if(e.field == "sent_amount"){
+				        		Ext.getCmp('esent_amount').setMaxValue(e.record.get('amount'));
 				        	}
 						},
 						afteredit: function (editor, e) {
