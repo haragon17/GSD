@@ -2142,7 +2142,8 @@ store.exchangeRates = Ext.create('Ext.data.JsonStore', {
 	autoLoad : true,
 	proxy : {
 		type : 'ajax',
-		url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c&base=EUR',
+//		url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c&base=EUR',
+		url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c',
 		reader : {
 			type : 'json',
 			root : 'rates',
@@ -2965,18 +2966,24 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 							var new_price = 0;
 							
 							if(currency !== inv_currency){
-								var EUR = 1;
-								var USD = store.exchangeRates.getAt(0).data.USD;
+//								var EUR = 1;
+//								var USD = store.exchangeRates.getAt(0).data.USD;
+								var USD = 1;
+								var EUR = store.exchangeRates.getAt(0).data.EUR;
 								var THB = store.exchangeRates.getAt(0).data.THB;
 								var AUD = store.exchangeRates.getAt(0).data.AUD;
 								var GBP = store.exchangeRates.getAt(0).data.GBP;
 								var CHF = store.exchangeRates.getAt(0).data.CHF;
 								var SGD = store.exchangeRates.getAt(0).data.SGD;
 								var myRate = 0;
-								if(currency == "EUR"){
+//								if(currency == "EUR"){
+//									myRate = price;
+//								}else if(currency == "USD"){
+//									myRate = price/USD;
+								if(currency == "USD"){
 									myRate = price;
-								}else if(currency == "USD"){
-									myRate = price/USD;
+								}else if(currency == "EUR"){
+									myRate = price/EUR;
 								}else if(currency == "THB"){
 									myRate = price/THB;
 								}else if(currency == "AUD"){
@@ -2988,10 +2995,14 @@ addInvoiceItem = new Ext.create('Ext.window.Window', {
 								}else if(currency == "SGD"){
 									myRate = price/SGD;
 								}
-								if(inv_currency == "EUR"){
+//								if(inv_currency == "EUR"){
+//									new_price = myRate;
+//								}else if(inv_currency == "USD"){
+//									new_price = myRate*USD;
+								if(inv_currency == "USD"){
 									new_price = myRate;
-								}else if(inv_currency == "USD"){
-									new_price = myRate*USD;
+								}else if(inv_currency == "EUR"){
+									new_price = myRate*EUR;
 								}else if(inv_currency == "THB"){
 									new_price = myRate*THB;
 								}else if(inv_currency == "AUD"){
@@ -3266,18 +3277,24 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 							var new_price = 0;
 							
 							if(currency !== inv_currency){
-								var EUR = 1;
-								var USD = store.exchangeRates.getAt(0).data.USD;
+//								var EUR = 1;
+//								var USD = store.exchangeRates.getAt(0).data.USD;
+								var USD = 1;
+								var EUR = store.exchangeRates.getAt(0).data.EUR;
 								var THB = store.exchangeRates.getAt(0).data.THB;
 								var AUD = store.exchangeRates.getAt(0).data.AUD;
 								var GBP = store.exchangeRates.getAt(0).data.GBP;
 								var CHF = store.exchangeRates.getAt(0).data.CHF;
 								var SGD = store.exchangeRates.getAt(0).data.SGD;
 								var myRate = 0;
-								if(currency == "EUR"){
+//								if(currency == "EUR"){
+//									myRate = price;
+//								}else if(currency == "USD"){
+//									myRate = price/USD;
+								if(currency == "USD"){
 									myRate = price;
-								}else if(currency == "USD"){
-									myRate = price/USD;
+								}else if(currency == "EUR"){
+									myRate = price/EUR;
 								}else if(currency == "THB"){
 									myRate = price/THB;
 								}else if(currency == "AUD"){
@@ -3289,10 +3306,14 @@ editInvoiceItem = new Ext.create('Ext.window.Window', {
 								}else if(currency == "SGD"){
 									myRate = price/SGD;
 								}
-								if(inv_currency == "EUR"){
+//								if(inv_currency == "EUR"){
+//									new_price = myRate;
+//								}else if(inv_currency == "USD"){
+//									new_price = myRate*USD;
+								if(inv_currency == "USD"){
 									new_price = myRate;
-								}else if(inv_currency == "USD"){
-									new_price = myRate*USD;
+								}else if(inv_currency == "EUR"){
+									new_price = myRate*EUR;
 								}else if(inv_currency == "THB"){
 									new_price = myRate*THB;
 								}else if(inv_currency == "AUD"){

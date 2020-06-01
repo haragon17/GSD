@@ -30,7 +30,7 @@ public class ItemDaoImpl extends JdbcDaoSupport implements ItemDao {
 	@Override
 	public List<Item> showItem(int proj_id){
 		
-		String sql = "SELECT item.itm_id, itm_name FROM item\n"
+		String sql = "SELECT item.itm_id, itm_name, itm_desc FROM item\n"
 				+ "LEFT JOIN projects_reference proj_ref ON proj_ref.itm_id = item.itm_id\n";
 		
 		if(proj_id != 0){

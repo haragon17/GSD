@@ -435,7 +435,7 @@ Ext.onReady(function() {
 					Ext.Ajax.request({
 						url : 'searchProjectsParam.htm?AUD='+store.exchangeRates.getAt(0).data.AUD+'&CHF='+store.exchangeRates.getAt(0).data.CHF+
 						'&GBP='+store.exchangeRates.getAt(0).data.GBP+'&THB='+store.exchangeRates.getAt(0).data.THB+
-						'&USD='+store.exchangeRates.getAt(0).data.USD+'&cus_id='+Ext.getCmp('cusid').getValue() + getParamValues(),
+						'&USD='+store.exchangeRates.getAt(0).data.USD+'&EUR='+store.exchangeRates.getAt(0).data.EUR+'&cus_id='+Ext.getCmp('cusid').getValue() + getParamValues(),
 						success : function(response, opts) {
 //							store.projectsRef.loadPage(1);
 							store.projectsRef.reload();
@@ -745,38 +745,38 @@ Ext.onReady(function() {
 		            			 }else{
 		            				 myDesc = "-";
 		            			 }
-//		            			if(proj_currency == "USD"){
-//		            				 myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)*store.exchangeRates.getAt(0).data.EUR)*100)/100);
-//            					}else if(proj_currency == "EUR"){
-//            						myEuro = '€ '+(Math.round(rec.data.price*100)/100);
-//            					}else if(proj_currency == "THB"){
-//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.THB*store.exchangeRates.getAt(0).data.EUR)*100)/100);
-//            					}else if(proj_currency == "AUD"){
-//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.AUD*store.exchangeRates.getAt(0).data.EUR)*100)/100);
-//            					}else if(proj_currency == "GBP"){
-//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.GBP*store.exchangeRates.getAt(0).data.EUR)*100)/100);
-//            					}else if(proj_currency == "CHF"){
-//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.CHF*store.exchangeRates.getAt(0).data.EUR)*100)/100);
-//            					}else{
-//            						myEuro = '-';
-//            					}
-		            			if(proj_currency == "EUR"){
+		            			if(proj_currency == "USD"){
+		            				 myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)*store.exchangeRates.getAt(0).data.EUR)*100)/100);
+            					}else if(proj_currency == "EUR"){
             						myEuro = '€ '+(Math.round(rec.data.price*100)/100);
-		            			}else if(proj_currency == "USD"){
-		            				myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.USD)*100)/100);
             					}else if(proj_currency == "THB"){
-            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.THB)*100)/100);
+            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.THB*store.exchangeRates.getAt(0).data.EUR)*100)/100);
             					}else if(proj_currency == "AUD"){
-            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.AUD)*100)/100);
+            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.AUD*store.exchangeRates.getAt(0).data.EUR)*100)/100);
             					}else if(proj_currency == "GBP"){
-            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.GBP)*100)/100);
+            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.GBP*store.exchangeRates.getAt(0).data.EUR)*100)/100);
             					}else if(proj_currency == "CHF"){
-            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.CHF)*100)/100);
-            					}else if(proj_currency == "SGD"){
-            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.SGD)*100)/100);
+            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.CHF*store.exchangeRates.getAt(0).data.EUR)*100)/100);
             					}else{
             						myEuro = '-';
             					}
+//		            			if(proj_currency == "EUR"){
+//            						myEuro = '€ '+(Math.round(rec.data.price*100)/100);
+//		            			}else if(proj_currency == "USD"){
+//		            				myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.USD)*100)/100);
+//            					}else if(proj_currency == "THB"){
+//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.THB)*100)/100);
+//            					}else if(proj_currency == "AUD"){
+//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.AUD)*100)/100);
+//            					}else if(proj_currency == "GBP"){
+//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.GBP)*100)/100);
+//            					}else if(proj_currency == "CHF"){
+//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.CHF)*100)/100);
+//            					}else if(proj_currency == "SGD"){
+//            						myEuro = '€ '+(Math.round(((Math.round(rec.data.price*100)/100)/store.exchangeRates.getAt(0).data.SGD)*100)/100);
+//            					}else{
+//            						myEuro = '-';
+//            					}
 		            			if(rec.data.proj_id == v){
 		            				var actual_time = "";
 		            				var target_time = "";
@@ -1061,7 +1061,8 @@ store.exchangeRates = Ext.create('Ext.data.JsonStore', {
 	autoLoad : true,
 	proxy : {
 		type : 'ajax',
-		url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c&base=EUR',
+//		url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c&base=EUR',
+		url : 'https://openexchangerates.org/api/latest.json?app_id=70ee2e9a9f814ea0a36bd0a00a11272c',
 		reader : {
 			type : 'json',
 			root : 'rates',

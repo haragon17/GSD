@@ -270,8 +270,9 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		if(currency.equals("EUR")){
 //			System.out.println(String.format("%.2f", total_price)+" EUR");
 		}else{
-//			float convert_eur = map.get("EUR") / map.get(currency);
-			float total_eur = total_price.floatValue() / map.get(currency);
+			float convert_eur = map.get("EUR") / map.get(currency);
+			float total_eur = total_price.floatValue() / convert_eur;
+//			float total_eur = total_price.floatValue() / map.get(currency);
 //			System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
 			total_price = new BigDecimal(total_eur);
 		}
@@ -482,7 +483,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 			total_price = total_price.multiply(new BigDecimal(vat));
 			String currency = inv_new.getInv_currency();
 			if(!currency.equals("EUR")){
-				float total_eur = total_price.floatValue() / map.get(currency);
+				float convert_eur = map.get("EUR") / map.get(currency);
+				float total_eur = total_price.floatValue() / convert_eur;
+//				float total_eur = total_price.floatValue() / map.get(currency);
 				total_price = new BigDecimal(total_eur);
 			}
 			
@@ -519,8 +522,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 			if(currency.equals("EUR")){
 //				System.out.println(String.format("%.2f", total_price)+" EUR");
 			}else{
-//				float convert_eur = map.get("EUR") / map.get(currency);
-				float total_eur = total_price.floatValue() / map.get(currency);
+				float convert_eur = map.get("EUR") / map.get(currency);
+				float total_eur = total_price.floatValue() / convert_eur;
+//				float total_eur = total_price.floatValue() / map.get(currency);
 //				System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
 				total_price = new BigDecimal(total_eur);
 			}
@@ -633,8 +637,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		if(currency.equals("EUR")){
 //			System.out.println(String.format("%.2f", total_price)+" EUR");
 		}else{
-//			float convert_eur = map.get("EUR") / map.get(currency);
-			float total_eur = total_price.floatValue() / map.get(currency);
+			float convert_eur = map.get("EUR") / map.get(currency);
+			float total_eur = total_price.floatValue() / convert_eur;
+//			float total_eur = total_price.floatValue() / map.get(currency);
 //			System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
 			total_price = new BigDecimal(total_eur);
 		}
@@ -790,8 +795,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 				if(currency.equals("EUR")){
 //					System.out.println(String.format("%.2f", total_price)+" EUR");
 				}else{
-//					float convert_eur = map.get("EUR") / map.get(currency);
-					float total_eur = total_price.floatValue() / map.get(currency);
+					float convert_eur = map.get("EUR") / map.get(currency);
+					float total_eur = total_price.floatValue() / convert_eur;
+//					float total_eur = total_price.floatValue() / map.get(currency);
 //					System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
 					total_price = new BigDecimal(total_eur);
 				}
@@ -1055,7 +1061,9 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		if(currency.equals("EUR")){
 //			System.out.println(String.format("%.2f", total_price)+" EUR");
 		}else{
-			float total_eur = total_price.floatValue() / map.get(currency);
+			float convert_eur = map.get("EUR") / map.get(currency);
+			float total_eur = total_price.floatValue() / convert_eur;
+//			float total_eur = total_price.floatValue() / map.get(currency);
 			total_price = new BigDecimal(total_eur);
 		}
 		

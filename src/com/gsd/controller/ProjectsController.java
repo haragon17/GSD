@@ -146,6 +146,7 @@ public class ProjectsController {
 		session.setAttribute("THB", request.getParameter("THB"));
 		session.setAttribute("USD", request.getParameter("USD"));
 		session.setAttribute("SGD", request.getParameter("SGD"));
+		session.setAttribute("EUR", request.getParameter("EUR"));
 //		proj_name = request.getParameter("sproj_name");
 //		itm_id = request.getParameter("sitm_id");
 //		cus_id = request.getParameter("cus_id");

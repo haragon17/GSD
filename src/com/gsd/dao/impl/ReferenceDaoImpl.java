@@ -32,7 +32,7 @@ public class ReferenceDaoImpl extends JdbcDaoSupport implements ReferenceDao {
 				
 		if(level == 2){
 			if(dept.equals("E-Studio")){
-				sql += " AND (db_ref_name LIKE '"+dept+"%' OR db_ref_name = 'Pilot' OR db_ref_name = 'Publication')";
+				sql += " AND (db_ref_name LIKE '"+dept+"%' OR db_ref_name = 'Pilot' OR db_ref_name LIKE 'Publication%')";
 			}else{
 				sql += " AND db_ref_name LIKE '"+dept+"%'";
 			}

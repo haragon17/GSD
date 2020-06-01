@@ -331,7 +331,8 @@ public class UserDaoImpl extends JdbcDaoSupport implements UserDao{
 	@Override
 	public List<User> showUser(String dept) {
 		
-		String sql = "SELECT usr_id,usr_name FROM users WHERE (usr_type = 2 OR usr_type = 3) AND dept LIKE '"+dept+"%' AND usr_name NOT LIKE 'jmd%' AND usr_activate = 1 ORDER BY usr_name";
+//		String sql = "SELECT usr_id,usr_name FROM users WHERE (usr_type = 2 OR usr_type = 3) AND dept LIKE '"+dept+"%' AND usr_name NOT LIKE 'jmd%' AND usr_activate = 1 ORDER BY usr_name";
+		String sql = "SELECT usr_id,usr_name FROM users WHERE dept LIKE '"+dept+"%' AND usr_name NOT LIKE 'jmd%' AND usr_activate = 1 ORDER BY usr_name";
 		
 		List<User> user = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<User>(User.class));
 		return user;

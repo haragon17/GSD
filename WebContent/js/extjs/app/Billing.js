@@ -3134,6 +3134,20 @@ Ext.onReady(function() {
 				dataIndex : 'amount',
 			},
 			{
+				text : "Sent",
+				flex : 0.5,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'sent_amount',
+			},
+			{
+				text : "Remain",
+				flex : 0.7,
+				align : 'center',
+				sortable : true,
+				dataIndex : 'total_amount'
+			},
+			{
 				text : "Status",
 				flex : 0.7,
 				align : 'center',
