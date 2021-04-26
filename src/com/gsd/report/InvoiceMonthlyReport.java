@@ -82,6 +82,20 @@ public class InvoiceMonthlyReport extends AbstractJExcelView{
 		map3.put(10, (List<Invoice>) model.get("tta_angebote20"));
 		map3.put(11, (List<Invoice>) model.get("gsda_angebote20"));
 		
+		Map<Integer, List<Invoice>> map4 = new HashMap<Integer, List<Invoice>>();
+		map4.put(0, (List<Invoice>) model.get("gsd21"));
+		map4.put(1, (List<Invoice>) model.get("jv21"));
+		map4.put(2, (List<Invoice>) model.get("fgs21"));
+		map4.put(3, (List<Invoice>) model.get("mm21"));
+		map4.put(4, (List<Invoice>) model.get("gsdp21"));
+		map4.put(5, (List<Invoice>) model.get("gps21"));
+		map4.put(6, (List<Invoice>) model.get("tta21"));
+		map4.put(7, (List<Invoice>) model.get("stu21"));
+		map4.put(8, (List<Invoice>) model.get("gsda21"));
+		map4.put(9, (List<Invoice>) model.get("gsd_angebote21"));
+		map4.put(10, (List<Invoice>) model.get("tta_angebote21"));
+		map4.put(11, (List<Invoice>) model.get("gsda_angebote21"));
+		
 		Date dateTime = new Date();
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HHmmss");
 		String currentDateTime = dateFormat.format(dateTime);
@@ -94,6 +108,7 @@ public class InvoiceMonthlyReport extends AbstractJExcelView{
  			List<Invoice> myList = map.get(x);
  			List<Invoice> myList2 = map2.get(x);
  			List<Invoice> myList3 = map3.get(x);
+ 			List<Invoice> myList4 = map4.get(x);
 			int row = 4;
 			for(int i=0; i<myList.size(); i++){
 				
@@ -111,39 +126,51 @@ public class InvoiceMonthlyReport extends AbstractJExcelView{
 				ws.addCell(new Number(abc,row,myList.get(i).getJan().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList2.get(i).getJan().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList3.get(i).getJan().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+				ws.addCell(new Number(abc,row,myList4.get(i).getJan().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList.get(i).getFeb().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList2.get(i).getFeb().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList3.get(i).getFeb().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+				ws.addCell(new Number(abc,row,myList4.get(i).getFeb().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList.get(i).getMar().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList2.get(i).getMar().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList3.get(i).getMar().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+				ws.addCell(new Number(abc,row,myList4.get(i).getMar().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList.get(i).getApr().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList2.get(i).getApr().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList3.get(i).getApr().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+				ws.addCell(new Number(abc,row,myList4.get(i).getApr().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList.get(i).getMay().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList2.get(i).getMay().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList3.get(i).getMay().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+				ws.addCell(new Number(abc,row,myList4.get(i).getMay().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList.get(i).getJun().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList2.get(i).getJun().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList3.get(i).getJun().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+				ws.addCell(new Number(abc,row,myList4.get(i).getJun().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList.get(i).getJul().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList2.get(i).getJul().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList3.get(i).getJul().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+				ws.addCell(new Number(abc,row,myList4.get(i).getJul().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList.get(i).getAug().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList2.get(i).getAug().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList3.get(i).getAug().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+				ws.addCell(new Number(abc,row,myList4.get(i).getAug().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList.get(i).getSep().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList2.get(i).getSep().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList3.get(i).getSep().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+				ws.addCell(new Number(abc,row,myList4.get(i).getSep().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList.get(i).getOct().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList2.get(i).getOct().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList3.get(i).getOct().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+				ws.addCell(new Number(abc,row,myList4.get(i).getOct().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList.get(i).getNov().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList2.get(i).getNov().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList3.get(i).getNov().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+				ws.addCell(new Number(abc,row,myList4.get(i).getNov().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList.get(i).getDec().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList2.get(i).getDec().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				ws.addCell(new Number(abc,row,myList3.get(i).getDec().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+				ws.addCell(new Number(abc,row,myList4.get(i).getDec().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 				row++;
 			}
 			if(x == 0 || x == 6 || x == 8){
@@ -184,7 +211,19 @@ public class InvoiceMonthlyReport extends AbstractJExcelView{
 				ws.addCell(new Formula(34,3,"SUM(AI5:AI"+row+")",ws.getWritableCell(34, 3).getCellFormat()));
 				ws.addCell(new Formula(35,3,"SUM(AJ5:AJ"+row+")",ws.getWritableCell(35, 3).getCellFormat()));
 				ws.addCell(new Formula(36,3,"SUM(AK5:AK"+row+")",ws.getWritableCell(36, 3).getCellFormat()));
-				ws.addCell(new Label(0,row,"Angebote",ws.getWritableCell(53, 1).getCellFormat()));
+				ws.addCell(new Formula(37,3,"SUM(AL5:AL"+row+")",ws.getWritableCell(37, 3).getCellFormat()));
+				ws.addCell(new Formula(38,3,"SUM(AM5:AM"+row+")",ws.getWritableCell(38, 3).getCellFormat()));
+				ws.addCell(new Formula(39,3,"SUM(AN5:AN"+row+")",ws.getWritableCell(39, 3).getCellFormat()));
+				ws.addCell(new Formula(40,3,"SUM(AO5:AO"+row+")",ws.getWritableCell(40, 3).getCellFormat()));
+				ws.addCell(new Formula(41,3,"SUM(AP5:AP"+row+")",ws.getWritableCell(41, 3).getCellFormat()));
+				ws.addCell(new Formula(42,3,"SUM(AQ5:AQ"+row+")",ws.getWritableCell(42, 3).getCellFormat()));
+				ws.addCell(new Formula(43,3,"SUM(AR5:AR"+row+")",ws.getWritableCell(43, 3).getCellFormat()));
+				ws.addCell(new Formula(44,3,"SUM(AS5:AS"+row+")",ws.getWritableCell(44, 3).getCellFormat()));
+				ws.addCell(new Formula(45,3,"SUM(AT5:AT"+row+")",ws.getWritableCell(45, 3).getCellFormat()));
+				ws.addCell(new Formula(46,3,"SUM(AU5:AU"+row+")",ws.getWritableCell(46, 3).getCellFormat()));
+				ws.addCell(new Formula(47,3,"SUM(AV5:AV"+row+")",ws.getWritableCell(47, 3).getCellFormat()));
+				ws.addCell(new Formula(48,3,"SUM(AW5:AW"+row+")",ws.getWritableCell(48, 3).getCellFormat()));
+				ws.addCell(new Label(0,row,"Angebote",ws.getWritableCell(65, 1).getCellFormat()));
 				row++;
 				ws.addCell(new Label(0,row,"Total:",ws.getWritableCell(0, 2).getCellFormat()));
 				ws.addCell(new Formula(1,row,"SUM(B"+(row+3)+":B150)",ws.getWritableCell(1, 3).getCellFormat()));
@@ -223,22 +262,38 @@ public class InvoiceMonthlyReport extends AbstractJExcelView{
 				ws.addCell(new Formula(34,row,"SUM(AI"+(row+3)+":AI150)",ws.getWritableCell(34, 3).getCellFormat()));
 				ws.addCell(new Formula(35,row,"SUM(AJ"+(row+3)+":AJ150)",ws.getWritableCell(35, 3).getCellFormat()));
 				ws.addCell(new Formula(36,row,"SUM(AK"+(row+3)+":AK150)",ws.getWritableCell(36, 3).getCellFormat()));
+				ws.addCell(new Formula(37,row,"SUM(AL"+(row+3)+":AL150)",ws.getWritableCell(37, 3).getCellFormat()));
+				ws.addCell(new Formula(38,row,"SUM(AM"+(row+3)+":AM150)",ws.getWritableCell(38, 3).getCellFormat()));
+				ws.addCell(new Formula(39,row,"SUM(AN"+(row+3)+":AN150)",ws.getWritableCell(39, 3).getCellFormat()));
+				ws.addCell(new Formula(40,row,"SUM(AO"+(row+3)+":AO150)",ws.getWritableCell(40, 3).getCellFormat()));
+				ws.addCell(new Formula(41,row,"SUM(AP"+(row+3)+":AP150)",ws.getWritableCell(41, 3).getCellFormat()));
+				ws.addCell(new Formula(42,row,"SUM(AQ"+(row+3)+":AQ150)",ws.getWritableCell(42, 3).getCellFormat()));
+				ws.addCell(new Formula(43,row,"SUM(AR"+(row+3)+":AR150)",ws.getWritableCell(43, 3).getCellFormat()));
+				ws.addCell(new Formula(44,row,"SUM(AS"+(row+3)+":AS150)",ws.getWritableCell(44, 3).getCellFormat()));
+				ws.addCell(new Formula(45,row,"SUM(AT"+(row+3)+":AT150)",ws.getWritableCell(45, 3).getCellFormat()));
+				ws.addCell(new Formula(46,row,"SUM(AU"+(row+3)+":AU150)",ws.getWritableCell(46, 3).getCellFormat()));
+				ws.addCell(new Formula(47,row,"SUM(AV"+(row+3)+":AV150)",ws.getWritableCell(47, 3).getCellFormat()));
+				ws.addCell(new Formula(48,row,"SUM(AW"+(row+3)+":AW150)",ws.getWritableCell(48, 3).getCellFormat()));
 				row++;
 				List<Invoice> angList;
 				List<Invoice> angList2;
 				List<Invoice> angList3;
+				List<Invoice> angList4;
 				if(x == 0){
 					angList = map.get(9);
 					angList2 = map2.get(9);
 					angList3 = map3.get(9);
+					angList4 = map4.get(9);
 				}else if(x == 6){
 					angList = map.get(10);
 					angList2 = map2.get(10);
 					angList3 = map3.get(10);
+					angList4 = map4.get(10);
 				}else{
 					angList = map.get(11);
 					angList2 = map2.get(11);
 					angList3 = map3.get(11);
+					angList4 = map.get(11);
 				}
 				for(int i=0; i<angList.size(); i++){
 					
@@ -283,39 +338,51 @@ public class InvoiceMonthlyReport extends AbstractJExcelView{
 					ws.addCell(new Number(abc,row,angList.get(i).getJan().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList2.get(i).getJan().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList3.get(i).getJan().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+					ws.addCell(new Number(abc,row,angList4.get(i).getJan().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList.get(i).getFeb().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList2.get(i).getFeb().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList3.get(i).getFeb().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+					ws.addCell(new Number(abc,row,angList4.get(i).getFeb().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList.get(i).getMar().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList2.get(i).getMar().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList3.get(i).getMar().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+					ws.addCell(new Number(abc,row,angList4.get(i).getMar().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList.get(i).getApr().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList2.get(i).getApr().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList3.get(i).getApr().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+					ws.addCell(new Number(abc,row,angList4.get(i).getApr().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList.get(i).getMay().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList2.get(i).getMay().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList3.get(i).getMay().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+					ws.addCell(new Number(abc,row,angList4.get(i).getMay().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList.get(i).getJun().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList2.get(i).getJun().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList3.get(i).getJun().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+					ws.addCell(new Number(abc,row,angList4.get(i).getJun().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList.get(i).getJul().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList2.get(i).getJul().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList3.get(i).getJul().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+					ws.addCell(new Number(abc,row,angList4.get(i).getJul().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList.get(i).getAug().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList2.get(i).getAug().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList3.get(i).getAug().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+					ws.addCell(new Number(abc,row,angList4.get(i).getAug().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList.get(i).getSep().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList2.get(i).getSep().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList3.get(i).getSep().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+					ws.addCell(new Number(abc,row,angList4.get(i).getSep().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList.get(i).getOct().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList2.get(i).getOct().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList3.get(i).getOct().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+					ws.addCell(new Number(abc,row,angList4.get(i).getOct().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList.get(i).getNov().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList2.get(i).getNov().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList3.get(i).getNov().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+					ws.addCell(new Number(abc,row,angList4.get(i).getNov().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList.get(i).getDec().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList2.get(i).getDec().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					ws.addCell(new Number(abc,row,angList3.get(i).getDec().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
+					ws.addCell(new Number(abc,row,angList4.get(i).getDec().doubleValue(),ws.getWritableCell(abc, 4).getCellFormat()));abc++;
 					row++;
 				}
 			}

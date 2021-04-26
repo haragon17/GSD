@@ -641,6 +641,20 @@ public class InvoiceController {
 		List<Invoice> tta_angebote20 = invoiceDao.showInvoiceMonthlyReport("2020", 7, "Angebote");
 		List<Invoice> gsda_angebote20 = invoiceDao.showInvoiceMonthlyReport("2020", 9, "Angebote");
 		
+		List<Invoice> gsd21 = invoiceDao.showInvoiceMonthlyReport("2021", 1, inv_bill_type);
+		List<Invoice> jv21 = invoiceDao.showInvoiceMonthlyReport("2021", 2, inv_bill_type);
+		List<Invoice> fgs21 = invoiceDao.showInvoiceMonthlyReport("2021", 3, inv_bill_type);
+		List<Invoice> mm21 = invoiceDao.showInvoiceMonthlyReport("2021", 4, inv_bill_type);
+		List<Invoice> gsdp21 = invoiceDao.showInvoiceMonthlyReport("2021", 5, inv_bill_type);
+		List<Invoice> gps21 = invoiceDao.showInvoiceMonthlyReport("2021", 6, inv_bill_type);
+		List<Invoice> tta21 = invoiceDao.showInvoiceMonthlyReport("2021", 7, inv_bill_type);
+		List<Invoice> stu21 = invoiceDao.showInvoiceMonthlyReport("2021", 8, inv_bill_type);
+		List<Invoice> gsda21 = invoiceDao.showInvoiceMonthlyReport("2021", 9, inv_bill_type);
+		
+		List<Invoice> gsd_angebote21 = invoiceDao.showInvoiceMonthlyReport("2021", 1, "Angebote");
+		List<Invoice> tta_angebote21 = invoiceDao.showInvoiceMonthlyReport("2021", 7, "Angebote");
+		List<Invoice> gsda_angebote21 = invoiceDao.showInvoiceMonthlyReport("2021", 9, "Angebote");
+		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("gsd18", gsd18);
 		map.put("jv18", jv18);
@@ -678,6 +692,18 @@ public class InvoiceController {
 		map.put("gsd_angebote20", gsd_angebote20);
 		map.put("tta_angebote20", tta_angebote20);
 		map.put("gsda_angebote20", gsda_angebote20);
+		map.put("gsd21", gsd21);
+		map.put("jv21", jv21);
+		map.put("fgs21", fgs21);
+		map.put("mm21", mm21);
+		map.put("gsdp21", gsdp21);
+		map.put("gps21", gps21);
+		map.put("tta21", tta21);
+		map.put("stu21", stu21);
+		map.put("gsda21", gsda21);
+		map.put("gsd_angebote21", gsd_angebote21);
+		map.put("tta_angebote21", tta_angebote21);
+		map.put("gsda_angebote21", gsda_angebote21);
 		
 		return new ModelAndView("invoice_monthly-print", map);
 	}

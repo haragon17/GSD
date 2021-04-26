@@ -270,7 +270,7 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		if(currency.equals("EUR")){
 //			System.out.println(String.format("%.2f", total_price)+" EUR");
 		}else{
-			float convert_eur = map.get("EUR") / map.get(currency);
+			float convert_eur = map.get("EUR") * map.get(currency);
 			float total_eur = total_price.floatValue() / convert_eur;
 //			float total_eur = total_price.floatValue() / map.get(currency);
 //			System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
@@ -335,6 +335,8 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 		
 		if(!inv_audit.getInv_currency().equals(inv_new.getInv_currency())){
 			
+			
+			
 			List<InvoiceReference> inv_refLs = searchInvoiceReference(inv.getInv_id());
 			for(int i=0; i<inv_refLs.size(); i++){
 				BigDecimal currency = new BigDecimal(map.get(inv_audit.getInv_currency()));
@@ -346,6 +348,27 @@ public class InvoiceDaoImpl extends JdbcDaoSupport implements InvoiceDao {
 				String sql_price = "UPDATE invoice_reference SET inv_ref_price="+price+" WHERE inv_ref_id="+inv_refLs.get(i).getInv_ref_id();
 				this.getJdbcTemplate().update(sql_price);
 			}
+			
+			List<InvoiceReference> inv_refLs2 = searchInvoiceReference(inv.getInv_id());
+			BigDecimal total_price = BigDecimal.ZERO;
+			for(int i=0; i<inv_refLs2.size(); i++){
+				BigDecimal price = inv_refLs2.get(i).getInv_ref_price().multiply(inv_refLs2.get(i).getInv_ref_qty());
+				total_price = total_price.add(price);
+			}
+			float discount = 1 - (inv.getInv_discount().floatValue() / 100);
+			total_price = total_price.multiply(new BigDecimal(discount));
+			float vat = (inv.getInv_vat().floatValue() / 100)+1;
+			total_price = total_price.multiply(new BigDecimal(vat));
+			String currency = inv_new.getInv_currency();
+			if(!currency.equals("EUR")){
+				float convert_eur = map.get("EUR") * map.get(currency);
+				float total_eur = total_price.floatValue() / convert_eur;
+//				float total_eur = total_price.floatValue() / map.get(currency);
+				total_price = new BigDecimal(total_eur);
+			}
+			
+			String sql_total = "UPDATE invoice SET inv_total_price_eur="+String.format("%.2f", total_price)+" WHERE inv_id="+inv.getInv_id();
+			this.getJdbcTemplate().update(sql_total);
 			
 			String audit = "INSERT INTO audit_logging VALUES (default,?,?,?,now(),?,?,?,?,?)";
 			this.getJdbcTemplate().update(audit, new Object[]{
@@ -483,7 +506,7 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 			total_price = total_price.multiply(new BigDecimal(vat));
 			String currency = inv_new.getInv_currency();
 			if(!currency.equals("EUR")){
-				float convert_eur = map.get("EUR") / map.get(currency);
+				float convert_eur = map.get("EUR") * map.get(currency);
 				float total_eur = total_price.floatValue() / convert_eur;
 //				float total_eur = total_price.floatValue() / map.get(currency);
 				total_price = new BigDecimal(total_eur);
@@ -522,7 +545,7 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 			if(currency.equals("EUR")){
 //				System.out.println(String.format("%.2f", total_price)+" EUR");
 			}else{
-				float convert_eur = map.get("EUR") / map.get(currency);
+				float convert_eur = map.get("EUR") * map.get(currency);
 				float total_eur = total_price.floatValue() / convert_eur;
 //				float total_eur = total_price.floatValue() / map.get(currency);
 //				System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
@@ -637,7 +660,7 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		if(currency.equals("EUR")){
 //			System.out.println(String.format("%.2f", total_price)+" EUR");
 		}else{
-			float convert_eur = map.get("EUR") / map.get(currency);
+			float convert_eur = map.get("EUR") * map.get(currency);
 			float total_eur = total_price.floatValue() / convert_eur;
 //			float total_eur = total_price.floatValue() / map.get(currency);
 //			System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
@@ -795,10 +818,10 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 				if(currency.equals("EUR")){
 //					System.out.println(String.format("%.2f", total_price)+" EUR");
 				}else{
-					float convert_eur = map.get("EUR") / map.get(currency);
+					float convert_eur = map.get("EUR") * map.get(currency);
 					float total_eur = total_price.floatValue() / convert_eur;
 //					float total_eur = total_price.floatValue() / map.get(currency);
-//					System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
+					System.out.println(String.format("%.2f", total_price) + " " + currency + " = " + String.format("%.2f", total_eur)+ " EUR");
 					total_price = new BigDecimal(total_eur);
 				}
 				
@@ -1061,7 +1084,7 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 		if(currency.equals("EUR")){
 //			System.out.println(String.format("%.2f", total_price)+" EUR");
 		}else{
-			float convert_eur = map.get("EUR") / map.get(currency);
+			float convert_eur = map.get("EUR") * map.get(currency);
 			float total_eur = total_price.floatValue() / convert_eur;
 //			float total_eur = total_price.floatValue() / map.get(currency);
 			total_price = new BigDecimal(total_eur);
@@ -1286,6 +1309,8 @@ if(inv_audit.getInv_discount().compareTo(inv_new.getInv_discount()) != 0){
 				
 		sql += "GROUP BY cus_name\n" +
 			"ORDER BY cus_name ASC";
+		
+//		System.out.println(sql);
 		
 		List<Invoice> inv = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<Invoice>(Invoice.class));
 		return inv;
